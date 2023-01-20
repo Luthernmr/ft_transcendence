@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   db:
-    container_name: pg_container
+    container_name: postgres
     image: postgres
     restart: always
     environment:
@@ -11,9 +11,11 @@ services:
       POSTGRES_DB: test_db
     ports:
       - "5432:5432"
-  
+    networks:
+      - transcendence-network
+
   pgadmin:
-    container_name: pgadmin4_container
+    container_name: pgadmin
     image: dpage/pgadmin4
     restart: always
     environment:
@@ -21,6 +23,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"
+    networks:
+      - transcendence-network
 
   backend:
     container_name: backend
@@ -32,6 +36,8 @@ services:
       - "5000:5000"
     volumes:
       - backend-data:/app
+    networks:
+      - transcendence-network
 
   frontend:
     container_name: frontend
@@ -43,6 +49,8 @@ services:
       - "3000:3000"
     volumes:
       - frontend-data:/app
+    networks:
+      - transcendence-network
 
 networks:
   transcendence-network:
@@ -54,7 +62,7 @@ volumes:
     driver_opts:
       type: none
       #device: ./backend
-      device: /home/fbelthoi/ft_transcendence/src/backend
+      device: /home/fbelthoi/ft_transcendence/backend
       o: bind
 
   frontend-data:
@@ -63,5 +71,5 @@ volumes:
     driver_opts:
       type: none
       #device: ./frontend
-      device: /home/fbelthoi/ft_transcendence/src/frontend
+      device: /home/fbelthoi/ft_transcendence/frontend
       o: bind
