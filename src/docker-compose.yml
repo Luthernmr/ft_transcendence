@@ -20,7 +20,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
-      - "5050:80"
+      - "5050:5050"
 
   backend:
     container_name: backend
@@ -31,7 +31,7 @@ services:
     ports:
       - "5000:5000"
     volumes:
-      - ./backend:/app
+      - backend-data:/app
 
   frontend:
     container_name: frontend
@@ -42,4 +42,24 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./frontend:/app
+      - frontend-data:/app
+
+networks:
+  transcendence-network:
+
+volumes:
+  backend-data:
+    name: backend-data
+    driver: local
+    driver_opts:
+      type: none
+      device: ./backend
+      o: bind
+
+  frontend-data:
+    name: frontend-data
+    driver: local
+    driver_opts:
+      type: none
+      device: ./frontend
+      o: bind

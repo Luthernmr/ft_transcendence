@@ -1,14 +1,24 @@
-import { useState } from "react";
-import Index from "./components/Index";
+import logo from './logo.svg';
+import './App.css';
 
 function App() {
-  const [isLoggedIn, setLoggedIn ] = useState(false);
-
   return (
-    <>
-      <Index isLoggedIn={isLoggedIn} setLoggedIn={setLoggedIn} />
-    </>
-
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://felix-belthoise.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
   );
 }
 
