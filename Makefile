@@ -19,10 +19,7 @@ down:
 clean:		
 			docker system prune -fa
 
-fclean:		clea
-ifneq ($(VOLUMES),)
-	docker volume rm $(VOLUMES)
-endif
+fclean:		clean
 
 re:			down fclean all
 

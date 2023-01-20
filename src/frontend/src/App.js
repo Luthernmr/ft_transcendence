@@ -1,24 +1,18 @@
 import logo from './logo.svg';
+import axios from 'axios';
+import { useNavigate } from "react-router-dom";
+import { ClickButton } from './components/ClickButton';
 import './App.css';
 
 function App() {
+  function handleRequest() {
+    //let navigate = useNavigate();
+    //navigate('/test/v1');
+  }
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://felix-belthoise.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <ClickButton />
+    </>
   );
 }
 
