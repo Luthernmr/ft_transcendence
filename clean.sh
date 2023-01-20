@@ -1,0 +1,1 @@
+sh ~/Desktop/Cleaner_42/Cleaner_42.sh
