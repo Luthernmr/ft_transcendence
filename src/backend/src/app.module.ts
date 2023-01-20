@@ -7,16 +7,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
-    // TypeOrmModule.forRoot({
-    //   type: 'mysql',
-    //   host: '127.0.0.1',
-    //   port: 5432,
-    //   username: 'root',
-    //   password: 'root',
-    //   database: 'test_db',
-    //   entities: [],
-    //   synchronize: true,
-    // }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'pg_container',
+      port: 5432,
+      username: 'root',
+      password: 'root',
+      database: 'test_db',
+      entities: [],
+      synchronize: true,
+    }),
   ],
   controllers: [AppController, TestController],
   providers: [AppService, TestService],
