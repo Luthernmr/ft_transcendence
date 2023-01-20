@@ -54,7 +54,7 @@ volumes:
     driver_opts:
       type: none
       #device: ./backend
-      device: /home/$USER/ft_transcendence/src/backend
+      device: /home/fbelthoi/ft_transcendence/src/backend
       o: bind
 
   frontend-data:
@@ -63,5 +63,5 @@ volumes:
     driver_opts:
       type: none
       #device: ./frontend
-      device: /home/$USER/ft_transcendence/src/frontend
+      device: /home/fbelthoi/ft_transcendence/src/frontend
       o: bind
