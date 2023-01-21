@@ -57,19 +57,15 @@ networks:
 
 volumes:
   backend-data:
-    name: backend-data
     driver: local
     driver_opts:
       type: none
-      #device: ./backend
-      device: /home/fbelthoi/ft_transcendence/backend
       o: bind
+      device: /home/$USER/ft_transcendence/backend
 
   frontend-data:
-    name: frontend-data
     driver: local
     driver_opts:
       type: none
-      #device: ./frontend
-      device: /home/fbelthoi/ft_transcendence/frontend
       o: bind
+      device: /home/$USER/ft_transcendence/frontend
