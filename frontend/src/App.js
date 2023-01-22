@@ -1,7 +1,6 @@
-import logo from './logo.svg';
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
-import { ClickButton } from './components/ClickButton';
+import { PlayPongButton } from './pong/components/PlayPongButton';
 import './App.css';
 
 function App() {
@@ -10,9 +9,11 @@ function App() {
     //navigate('/test/v1');
   }
   return (
-    <>
-      <ClickButton />
-    </>
+    <div className="App">
+      <header className="App-header">
+        You are in the App function;
+      </header>
+    </div>
   );
 }
 
