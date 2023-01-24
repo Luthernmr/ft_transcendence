@@ -1,15 +1,17 @@
 import { React } from "react";
-import { PlayPongButton } from "./components/PlayPongButton";
 import './Pong.css'
-import { GameManager } from "./components/GameManager" 
+//import { GameManager } from "./sample_pong/GameManager"
+//import { PlayPongButton } from "./sample_pong/PlayPongButton";
+import GameManager from "./GameManager";
 
 function Pong() {
 
 	return (
 		<div>
 			Welcome to the Pong page!
-			<PlayPongButton />
+			{/* <PlayPongButton /> */}
 			<GameManager />
+
 		</div>
 	  );
 }

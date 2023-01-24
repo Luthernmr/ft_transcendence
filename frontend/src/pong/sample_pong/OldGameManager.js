@@ -71,7 +71,7 @@ const InitialState = () => {
     }
 }
 
-export class GameManager extends React.Component {
+export class OldGameManager extends React.Component {
     constructor(props) {
         super(props);
         this.state = InitialState();
@@ -86,6 +86,7 @@ export class GameManager extends React.Component {
 
         if (!this.touchingEdge(playerEdge)) {
             const deltaY =  (isUp ? -COL_SIZE : COL_SIZE);
+			
             /* if ball touches the edge */
             const newDir = (this.state.deltaY !== COL_SIZE ^ isUp) ? -this.state.deltaY: this.state.deltaY;
             
