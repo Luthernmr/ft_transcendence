@@ -9,9 +9,7 @@ function Pong() {
 	return (
 		<div>
 			Welcome to the Pong page!
-			{/* <PlayPongButton /> */}
 			<GameManager />
-
 		</div>
 	  );
 }

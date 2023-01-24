@@ -1,36 +1,17 @@
-import React, { useEffect, useRef } from "react";
-import './PongStyles.css'
+import React, { useEffect, useRef } from 'react';
+import { Stage, Layer, Rect, Text, Circle, Line } from 'react-konva';
+import Ball from "./components/Ball";
 
-const docStyle = document.documentElement.style;
-const SPEED = 5;
-const FRAME_RATE = 75;
+const FRAME_RATE = 1000;
 
-export default function GameManager() {
-	let ballPositionX = 0;
-	let ballPositionY = 0;
-
-	const shouldRun = useRef(true);
-	useEffect(() => {
-		if (shouldRun.current)
-		{
-			shouldRun.current = false;
-			setInterval(update, FRAME_RATE);
-		}
-	}, []);
-
-	const update = () => {
-		console.log("Updating physics");
-		docStyle.setProperty("--ballPositionX", ballPositionX);
-		docStyle.setProperty("--ballPositionY", ballPositionY);
-		ballPositionX += SPEED;
-		ballPositionY += SPEED;
-		//docStyle.setProperty("--nextBallPositionX", ballPositionX);
-		//docStyle.setProperty("--nextBallPositionY", ballPositionY);
-	}
-
+function GameManager() {
 	return (
-		<div className="BallPosition">
-			<div className="Ball"/>
-		</div>
-	);
+			<Stage width={window.innerWidth} height={window.innerHeight}>
+			  <Layer>
+				<Ball />
+			  </Layer>
+			</Stage>
+		  );
 }
+
+export default GameManager;
