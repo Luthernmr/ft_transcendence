@@ -1,57 +1,33 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Circle } from "react-konva";
+import ICollider from './ICollider'
+import Actor from './Actor'
 
-const FRAME_RATE = 1000/60;
 const BALL_SPEED = 10;
 
-class Ball extends React.Component<any, any> {
-	id: number = 0;
-
-	constructor(props: any) {
-		super(props);
-		this.state = {
-			x: 100,
-			y: 100,
-		}
-		this.update = this.update.bind(this);
-		this.setPosition = this.setPosition.bind(this);
+class Ball extends Actor {
+	constructor(x: number, y: number) {
+		super();
+		this.position = {x, y};
+		this.width = 50;
+		this.height = 50;
+		this.deltaX = BALL_SPEED;
+		this.deltaY = BALL_SPEED;
 	}
 
-	componentDidMount() {
-		this.launchMovement();
+	onUpdate() {
+		const {x, y} = this.position;
+		this.setPosition(x + this.deltaX, y + this.deltaY);
 	}
 
-	componentWillUnmount() {
-		clearInterval(this.id);
-	}
-
-	launchMovement = () => {
-		this.id = window.setInterval(this.update, FRAME_RATE);
-	}
-
-	update() {
-		const {x, y} = this.state;
-		this.setPosition(x + BALL_SPEED, y + BALL_SPEED);
-	}
-
-	setPosition(newX: number, newY: number) {
-		this.setState( {
-			x: newX,
-			y: newY,
-		})
-		console.log('new position updated: ', newX, newY);
-	}
-
-	render() {
-		let {x, y} = this.state;
-		return (
-			<Circle
-				radius={10}
-				fill="green"
-				x={x}
-				y={y}
-			/>
-		);
+	onCollision(other: ICollider, direction: string) {
+		console.log("The Ball collided with object at ", other.position, "direction: ", direction);
+		if (direction == "right" || direction == "left")
+			this.deltaX = -this.deltaX;
+		else if (direction == "up" || direction == "bottom")
+			this.deltaY = -this.deltaY;
+		else
+			console.log("Probably hit a corner");
 	}
 }
 

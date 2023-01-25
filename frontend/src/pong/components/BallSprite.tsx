@@ -1,27 +1,19 @@
 import React from "react";
 import { Circle } from "react-konva";
+import PositionGetter from "./PositionGetter";
 
-interface PositionGetter {
-	getPosition: () => {x: number, y: number};
-}
+function BallSprite({getPosition}: PositionGetter) {
 
-class BallSprite extends React.Component<any, any> {
-	constructor(props: PositionGetter){
-		super(props);
-		const {getPosition} = this.props;
-	}
-
-	render() {
-		let {x, y} = this.props.getPosition();
-		return (
-			<Circle
-				radius={10}
-				fill="green"
-				x={x}
-				y={y}
-			/>
-		)
-	}
+	let {x, y} = getPosition();
+	
+	return (
+	<Circle
+		radius={10}
+		fill="green"
+		x={x}
+		y={y}
+	/>
+	)
 }
 
 export default BallSprite;
