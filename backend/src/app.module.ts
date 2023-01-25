@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { SocketGateway } from './socket/socket.gateway';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TestController } from './controllers/test.controller';
@@ -8,6 +9,7 @@ import { User } from './entities/user.entity'
 
 @Module({
   imports: [
+	SocketGateway,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'postgres',
