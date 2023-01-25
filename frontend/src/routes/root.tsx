@@ -1,4 +1,5 @@
 import './root.css'
+import * as React from "react";
 
 export default function Root() {
 	return (
@@ -9,5 +10,5 @@ export default function Root() {
 				<a className="Root-link" href='./pong'>Go to the Pong page</a>
 			</header>
 		</div>
-	)
+	);
 }

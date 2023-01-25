@@ -1,5 +1,5 @@
-import { React } from "react";
-import { ClickButton } from './components/ClickButton'
+import React from "react";
+import ClickButton from "./components/ClickButton";
 
 function Account() {
 	return (
