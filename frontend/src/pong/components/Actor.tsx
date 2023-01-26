@@ -2,8 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import ICollider from './ICollider'
 import IBound from "./IBound";
 
-const FRAME_RATE = 1000/60;
-
 function getBounds(col: ICollider) {
 	let left = col.position.x - col.width / 2;
 	let right = col.position.x + col.width / 2;
@@ -59,24 +57,26 @@ abstract class Actor implements ICollider {
 
 		let direction = "none";
 
-		console.log("l:", myBounds.left, "r:", myBounds.right, "u", myBounds.up, "b", myBounds.bottom);
-
-		if (this.position.x < other.position.x && myBounds.right > otherBounds.left){
+		if (this.position.x <= other.position.x && myBounds.right >= otherBounds.left) {
 			crossX = true;
-			if (oldBounds.right <= otherBounds.left)
+			console.log("right?", oldBounds.right, otherBounds.left);
+			if (oldBounds.right < otherBounds.left)
 				direction = "right";
-		} else if (this.position.x > other.position.x && otherBounds.right > myBounds.left){
+		} else if (this.position.x > other.position.x && myBounds.left <= otherBounds.right){
 			crossX = true;
-			if (oldBounds.left >= otherBounds.right)
+			console.log("left?", oldBounds.left, otherBounds.right);
+			if (oldBounds.left > otherBounds.right)
 				direction = "left"
 		}
 
-		if (this.position.y < other.position.y && myBounds.bottom > otherBounds.up) {
+		if (this.position.y <= other.position.y && myBounds.bottom >= otherBounds.up) {
 			crossY = true;
-			if (oldBounds.bottom <= otherBounds.up)
+			console.log("up?", oldBounds.bottom, otherBounds.up);
+			if (oldBounds.bottom < otherBounds.up)
 				direction = "up";
-		} else if (this.position.y > other.position.y && myBounds.up < otherBounds.bottom) {
+		} else if (this.position.y > other.position.y && myBounds.up <= otherBounds.bottom) {
 			crossY = true;
+			console.log("bottom?", oldBounds.up, otherBounds.bottom);
 			if (oldBounds.up > otherBounds.bottom)
 				direction = "bottom";
 		}

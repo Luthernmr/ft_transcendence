@@ -20,6 +20,8 @@ class GameManager extends React.Component<any, any> {
 		new Wall(500, 500, 800, 20),
 		new Wall(900, 300, 20, 400),
 		new Wall(100, 300, 20, 400),
+		new Wall(600, 300, 20, 200),
+		new Wall(300, 350, 200, 20),
 	]
 
 	constructor(props: any) {
@@ -72,6 +74,8 @@ class GameManager extends React.Component<any, any> {
 					<WallSprite position={ this.walls[1].position } width={ this.walls[1].width } height={this.walls[1].height} />
 					<WallSprite position={ this.walls[2].position } width={ this.walls[2].width } height={this.walls[2].height} />
 					<WallSprite position={ this.walls[3].position } width={ this.walls[3].width } height={this.walls[3].height} />
+					<WallSprite position={ this.walls[4].position } width={ this.walls[4].width } height={this.walls[4].height} />
+					<WallSprite position={ this.walls[5].position } width={ this.walls[5].width } height={this.walls[5].height} />
 				</Layer>
 			</Stage>
 		);

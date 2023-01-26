@@ -9,8 +9,8 @@ class Ball extends Actor {
 	constructor(x: number, y: number) {
 		super();
 		this.position = {x, y};
-		this.width = 50;
-		this.height = 50;
+		this.width = 25;
+		this.height = 25;
 		this.deltaX = BALL_SPEED;
 		this.deltaY = BALL_SPEED;
 	}
