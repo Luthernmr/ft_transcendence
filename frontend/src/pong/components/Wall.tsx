@@ -1,7 +1,7 @@
 import ICollider from "./ICollider";
 
 class Wall implements ICollider {
-	
+
 	position: {x: number, y: number};
 	width: number;
 	height: number;

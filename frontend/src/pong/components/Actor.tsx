@@ -18,9 +18,6 @@ abstract class Actor implements ICollider {
 	width: number;
 	height: number;
 
-	deltaX: number;
-	deltaY: number;
-
 	constructor() {
 		this.setPosition = this.setPosition.bind(this);
 		this.onUpdate = this.onUpdate.bind(this);
@@ -29,12 +26,10 @@ abstract class Actor implements ICollider {
 		this.position = {x: 0, y: 0};
 		this.width = 50;
 		this.height = 50;
-		this.deltaX = 0;
-		this.deltaY = 0;
 	}
 
 	abstract onUpdate(): void;
-	abstract onCollision(other: ICollider, direction: string): void;
+	abstract onCollision(other: ICollider, direction: {right: boolean, left: boolean, up: boolean, bottom: boolean}): void;
 
 	getPosition() {
 		let {x, y} = this.position;
@@ -44,7 +39,7 @@ abstract class Actor implements ICollider {
 	setPosition(newX: number, newY: number) {
 		this.oldPosition = this.position;
 		this.position = {x: newX, y: newY};
-		console.log('Position updated: ', newX, newY);
+		//console.log('Position updated: ', newX, newY);
 	}
 
 	collide(other: ICollider) {
@@ -55,30 +50,26 @@ abstract class Actor implements ICollider {
 		let otherBounds = getBounds(other);
 		let oldBounds = getBounds({position: this.oldPosition, width: this.width, height: this.height})
 
-		let direction = "none";
+		let direction = {right: false, left: false, up: false, bottom: false};
 
 		if (this.position.x <= other.position.x && myBounds.right >= otherBounds.left) {
 			crossX = true;
-			console.log("right?", oldBounds.right, otherBounds.left);
 			if (oldBounds.right < otherBounds.left)
-				direction = "right";
+				direction.right = true;
 		} else if (this.position.x > other.position.x && myBounds.left <= otherBounds.right){
 			crossX = true;
-			console.log("left?", oldBounds.left, otherBounds.right);
 			if (oldBounds.left > otherBounds.right)
-				direction = "left"
+				direction.left = true;
 		}
 
 		if (this.position.y <= other.position.y && myBounds.bottom >= otherBounds.up) {
 			crossY = true;
-			console.log("up?", oldBounds.bottom, otherBounds.up);
 			if (oldBounds.bottom < otherBounds.up)
-				direction = "up";
+				direction.up = true;
 		} else if (this.position.y > other.position.y && myBounds.up <= otherBounds.bottom) {
 			crossY = true;
-			console.log("bottom?", oldBounds.up, otherBounds.bottom);
 			if (oldBounds.up > otherBounds.bottom)
-				direction = "bottom";
+				direction.bottom = true;
 		}
 
 		if (crossX && crossY)

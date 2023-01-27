@@ -1,11 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Circle } from "react-konva";
 import ICollider from './ICollider'
 import Actor from './Actor'
 
 const BALL_SPEED = 10;
 
 class Ball extends Actor {
+
+	deltaX: number;
+	deltaY: number;
+
 	constructor(x: number, y: number) {
 		super();
 		this.position = {x, y};
@@ -20,14 +22,12 @@ class Ball extends Actor {
 		this.setPosition(x + this.deltaX, y + this.deltaY);
 	}
 
-	onCollision(other: ICollider, direction: string) {
-		console.log("The Ball collided with object at ", other.position, "direction: ", direction);
-		if (direction == "right" || direction == "left")
+	onCollision(other: ICollider, direction: {right: boolean, left: boolean, up: boolean, bottom: boolean}) {
+		//console.log("The Ball collided with object at ", other.position, "direction: ", direction);
+		if (direction.right || direction.left)
 			this.deltaX = -this.deltaX;
-		else if (direction == "up" || direction == "bottom")
+		if (direction.up || direction.bottom)
 			this.deltaY = -this.deltaY;
-		else
-			console.log("Probably hit a corner");
 	}
 }
 

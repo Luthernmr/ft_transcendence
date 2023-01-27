@@ -4,15 +4,19 @@ import PositionGetter from "./PositionGetter";
 import Wall from "./Wall"
 import ICollider from "./ICollider"
 
-function WallSprite({position, width, height}: ICollider) {
+interface WallProperties {
+	wall: Wall;
+}
+
+function WallSprite({wall}: WallProperties) {
 	
 	return (
 	<Rect
-		width={width}
-		height={height}
+		width={wall.width}
+		height={wall.height}
 		fill="gray"
-		x={position.x - width / 2}
-		y={position.y - height / 2}
+		x={wall.position.x - wall.width / 2}
+		y={wall.position.y - wall.height / 2}
 	/>
 	)
 }
