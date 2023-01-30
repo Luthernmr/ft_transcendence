@@ -3,7 +3,7 @@ import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Root from './routes/root'
-import Account from './account/Accout'
+import Auth from './account/Auth'
 import Chat from './chat/Chat'
 import Pong from './pong/Pong'
 
@@ -12,7 +12,8 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Root />} />
-        <Route path="/account" element={<Account />} />
+        <Route path="/account" element={<Auth />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/pong" element={<Pong />} />
       </Routes>

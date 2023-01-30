@@ -7,6 +7,12 @@ import { User } from './entities/user.entity';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Get('register')
+  async sayeHi()
+  {
+		console.log("hellor");
+  }
+
   @Post('register')
   async register(
 	@Body('name') name:string,
@@ -16,6 +22,9 @@ export class AppController {
 		const hashedPassword = await bcrypt.hash(password, 12);
 		
 		console.log('user create');
+		console.log(name);
+		console.log(email);
+		console.log(password);
 		return this.appService.register({
 			name,
 			email,

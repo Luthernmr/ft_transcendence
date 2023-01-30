@@ -8,13 +8,16 @@ export class AppService {
 	constructor(
 		@InjectRepository(User) private readonly userRepository: Repository<User>
 	){	
-	}
-
+		}
 	async register(data:any): Promise<User>{
 		return(this.userRepository.save(data));
 	}
 
 	async removeUser(id:number): Promise<void>{
 		await this.userRepository.delete({id : id});
+	}
+	async sayeHi()
+	{
+		return ("hello");
 	}
 }
