@@ -6,6 +6,9 @@ WORKDIR /app
 
 RUN npm install
 
+RUN npm install sudo
+
+
 #COPY . .
 
 EXPOSE 3000
