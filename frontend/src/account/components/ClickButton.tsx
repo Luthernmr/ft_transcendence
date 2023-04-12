@@ -6,6 +6,7 @@ export function ClickButton() {
 	const handleRequest = async () => {
 		let newUser = await axios.get("http://localhost:5000/test/user");
 		try{
+			
 			console.log("New User created!");	
 		}
 		catch(error) {

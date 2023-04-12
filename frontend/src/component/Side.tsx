@@ -35,9 +35,6 @@ import {
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
 import {
-	BrowserRouter as Router,
-	Route,
-	Routes,
 	Link as RouteLink
   } from "react-router-dom";
 
