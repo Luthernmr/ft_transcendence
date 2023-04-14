@@ -5,16 +5,17 @@ const Paddle = (props: any) => <Rect {...props} fill="white" />;
 const Ball = (props: any) => <Rect {...props} fill="white" />;
 
 const Pong: React.FC = () => {
-	const [paddleY, setPaddleY] = useState(200);
+	const [playerPaddleY, setPlayerPaddleY] = useState(200);
+	const [aiPaddleY, setAiPaddleY] = useState(200);
 	const [ballPosition, setBallPosition] = useState({ x: 300, y: 200 });
 	const [ballVelocity, setBallVelocity] = useState({ x: 2, y: 2 });
-	const [score, setScore] = useState(0);
+	const [score, setScore] = useState({ player: 0, ai: 0 });
 
 	const handleKeyDown = (e: KeyboardEvent) => {
 		if (e.key === 'ArrowUp') {
-			setPaddleY((prevY) => Math.max(0, prevY - 20));
+			setPlayerPaddleY((prevY) => Math.max(0, prevY - 20));
 		} else if (e.key === 'ArrowDown') {
-			setPaddleY((prevY) => Math.min(300, prevY + 20));
+			setPlayerPaddleY((prevY) => Math.min(300, prevY + 20));
 		}
 	};
 
@@ -31,26 +32,43 @@ const Pong: React.FC = () => {
 			const newX = ballPosition.x + ballVelocity.x;
 			const newY = ballPosition.y + ballVelocity.y;
 
-			if (newX <= 10 && newY >= paddleY && newY <= paddleY + 100) {
+			// Update AI paddle position with some inaccuracy
+			setAiPaddleY((prevY) => {
+				const targetY = ballPosition.y - 50 + (Math.random() * 40 - 20);
+				return prevY + (targetY - prevY) * 0.1;
+			});
+
+			// Collision with player paddle
+			if (newX <= 10 && newY >= playerPaddleY && newY <= playerPaddleY + 100) {
 				setBallVelocity({ x: -ballVelocity.x, y: ballVelocity.y });
-				setScore(score + 1);
 			} else if (newX <= 0) {
-				setBallPosition({ x: 300, y: 200 });
-				setBallVelocity({ x: 2, y: 2 });
-				setScore(0);
-			} else if (newX >= 590) {
+				setScore({ ...score, ai: score.ai + 1 });
+				setTimeout(() => {
+					setBallPosition({ x: 300, y: 200 });
+					setBallVelocity({ x: 2, y: 2 });
+				}, 1000);
+				return;
+			}
+
+			// Collision with AI paddle
+			if (newX >= 580 && newY >= aiPaddleY && newY <= aiPaddleY + 100) {
 				setBallVelocity({ x: -ballVelocity.x, y: ballVelocity.y });
+			} else if (newX >= 590) {
+				setScore({ ...score, player: score.player + 1 });
+				setTimeout(() => {
+					setBallPosition({ x: 300, y: 200 });
+					setBallVelocity({ x: -2, y: 2 });
+				}, 1000);
+				return;
 			}
 
 			if (newY <= 0 || newY >= 390) {
 				setBallVelocity({ x: ballVelocity.x, y: -ballVelocity.y });
 			}
-
 			setBallPosition({ x: newX, y: newY });
 		}, 10);
-
 		return () => clearInterval(interval);
-	}, [ballPosition, ballVelocity, paddleY, score]);
+	}, [ballPosition, ballVelocity, playerPaddleY, aiPaddleY, score]);
 
 	return (
 		<div
@@ -66,7 +84,8 @@ const Pong: React.FC = () => {
 				style={{ backgroundColor: 'black', userSelect: 'none', touchAction: 'none' }}
 			>
 				<Layer>
-					<Paddle x={0} y={paddleY} width={10} height={100} />
+					<Paddle x={0} y={playerPaddleY} width={10} height={100} />
+					<Paddle x={590} y={aiPaddleY} width={10} height={100} />
 					<Ball x={ballPosition.x} y={ballPosition.y} width={10} height={10} />
 					<Line
 						points={[300, 0, 300, 400]}
@@ -75,16 +94,35 @@ const Pong: React.FC = () => {
 						dash={[5, 5]}
 					/>
 					<Text
-						x={280}
+						x={250}
 						y={10}
-						text={`Score: ${score}`}
+						text={'Player: ${score.player}'}
 						fontSize={18}
 						fill="white"
 					/>
+					<Text
+						x={330}
+						y={10}
+						text={'AI: ${score.ai}'}
+						fontSize={18}
+						fill="white" />
 				</Layer>
 			</Stage>
+			{(score.player === 3 || score.ai === 3) && (
+				<div
+					style={{
+						position: 'absolute',
+						top: '50%',
+						left: '50%',
+						transform: 'translate(-50%, -50%)',
+						color: 'white',
+						fontSize: '24px',
+					}}
+				>
+					{score.player === 3 ? 'Player Wins!' : 'AI Wins!'}
+				</div>
+			)}
 		</div>
 	);
 };
-
 export default Pong;
