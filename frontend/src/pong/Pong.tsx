@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 
-const Paddle = (props: any) => <Rect {...props} fill="white" />;
-const Ball = (props: any) => <Rect {...props} fill="white" />;
+const Paddle = (props: any) => <Rect {...props} fill="dodgerblue" shadowBlur={10} />;
+const Ball = (props: any) => <Rect {...props} fill="lime" shadowBlur={5} />;
 
 const Pong: React.FC = () => {
 	const [playerPaddleY, setPlayerPaddleY] = useState(200);
@@ -40,7 +40,8 @@ const Pong: React.FC = () => {
 
 			// Collision with player paddle
 			if (newX <= 10 && newY >= playerPaddleY && newY <= playerPaddleY + 100) {
-				setBallVelocity({ x: -ballVelocity.x, y: ballVelocity.y });
+				const deltaY = newY - (playerPaddleY + 50);
+				setBallVelocity({ x: -ballVelocity.x, y: ballVelocity.y + deltaY * 0.1 });
 			} else if (newX <= 0) {
 				setScore({ ...score, ai: score.ai + 1 });
 				setTimeout(() => {
@@ -52,7 +53,8 @@ const Pong: React.FC = () => {
 
 			// Collision with AI paddle
 			if (newX >= 580 && newY >= aiPaddleY && newY <= aiPaddleY + 100) {
-				setBallVelocity({ x: -ballVelocity.x, y: ballVelocity.y });
+				const deltaY = newY - (aiPaddleY + 50);
+				setBallVelocity({ x: -ballVelocity.x, y: ballVelocity.y + deltaY * 0.1 });
 			} else if (newX >= 590) {
 				setScore({ ...score, player: score.player + 1 });
 				setTimeout(() => {
@@ -81,7 +83,11 @@ const Pong: React.FC = () => {
 			<Stage
 				width={600}
 				height={400}
-				style={{ backgroundColor: 'black', userSelect: 'none', touchAction: 'none' }}
+				style={{
+					backgroundColor: 'navy',
+					userSelect: 'none',
+					touchAction: 'none',
+				}}
 			>
 				<Layer>
 					<Paddle x={0} y={playerPaddleY} width={10} height={100} />
@@ -92,20 +98,24 @@ const Pong: React.FC = () => {
 						stroke="white"
 						strokeWidth={2}
 						dash={[5, 5]}
+						shadowBlur={3}
 					/>
 					<Text
 						x={250}
 						y={10}
-						text={'Player: ${score.player}'}
+						text={`Player: ${score.player}`}
 						fontSize={18}
 						fill="white"
+						shadowBlur={3}
 					/>
 					<Text
 						x={330}
 						y={10}
-						text={'AI: ${score.ai}'}
+						text={`AI: ${score.ai}`}
 						fontSize={18}
-						fill="white" />
+						fill="white"
+						shadowBlur={3}
+					/>
 				</Layer>
 			</Stage>
 			{(score.player === 3 || score.ai === 3) && (
