@@ -31,7 +31,6 @@ import {
 } from 'react-icons/fi';
 import { RiGamepadLine } from 'react-icons/Ri';
 import { IconType } from 'react-icons';
-import { ReactText } from 'react';
 
 interface LinkItemProps {
   name: string;
@@ -108,7 +107,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 
 interface NavItemProps extends FlexProps {
   icon: IconType;
-  // children: ReactText;
 }
 const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   return (
