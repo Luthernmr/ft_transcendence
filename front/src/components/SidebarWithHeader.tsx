@@ -29,6 +29,7 @@ import {
   FiChevronDown,
   FiMessageSquare,
 } from 'react-icons/fi';
+import { BsJoystick } from 'react-icons/Bs';
 import { RiGamepadLine } from 'react-icons/Ri';
 import { IconType } from 'react-icons';
 
@@ -37,7 +38,7 @@ interface LinkItemProps {
   icon: IconType;
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Pong', icon: RiGamepadLine },
+  { name: 'Play', icon: RiGamepadLine },
   { name: 'Chat', icon: FiMessageSquare },
   { name: 'Settings', icon: FiSettings },
 ];
@@ -92,7 +93,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+          <Icon as={BsJoystick} fontSize="2xl" />
+          <Text as="span" ml="2">
+            Pong
+          </Text>
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
@@ -167,7 +171,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         fontSize="2xl"
         fontFamily="monospace"
         fontWeight="bold">
-        Logo
+        Pong
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
