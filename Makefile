@@ -22,7 +22,7 @@ fclean:		clean
 re:			down fclean all
 
 volumes:
-	mkdir -p /home/$USER/ft_transcendence/frontend
-	mkdir -p /home/$USER/ft_transcendence/backend
+	mkdir -p ~/frontend
+	mkdir -p ~/backend
 
 .PHONY: all up down clean fclean re
