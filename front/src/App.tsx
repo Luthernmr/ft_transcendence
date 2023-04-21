@@ -1,11 +1,14 @@
-import { ChakraProvider } from '@chakra-ui/react'
 import SidebarWithHeader from './components/SidebarWithHeader'
+import { Route, Routes } from 'react-router-dom'
+import Pong from './components/Pong'
 
 function App() {
   return (
-    <ChakraProvider>
-      <SidebarWithHeader><></></SidebarWithHeader>
-    </ChakraProvider>
+    <SidebarWithHeader>
+      <Routes>
+        <Route path="/Play" element={<Pong />} />
+      </Routes>
+    </SidebarWithHeader>
   )
 }
 
