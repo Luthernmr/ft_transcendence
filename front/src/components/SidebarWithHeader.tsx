@@ -215,7 +215,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               borderColor={useColorModeValue('gray.200', 'gray.700')}>
               <MenuItem as={RouteLink} to="/Settings">Settings</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem as={RouteLink} to="/Login">Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>

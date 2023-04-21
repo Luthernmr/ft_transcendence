@@ -8,7 +8,6 @@ import {
 	Switch,
 	Button,
 	Image,
-	useColorModeValue,
 	HStack,
 } from '@chakra-ui/react';
 
