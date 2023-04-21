@@ -149,11 +149,9 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
 
 interface MobileProps extends FlexProps {
   onOpen: () => void;
-  routeName: string;
 }
-const MobileNav = ({ onOpen, routeName, ...rest }: MobileProps) => {
+const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   return (
-    // <Link as={RouteLink} to={routeName} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
       <Flex
         ml={{ base: 0, md: 60 }}
         px={{ base: 4, md: 4 }}
@@ -223,6 +221,5 @@ const MobileNav = ({ onOpen, routeName, ...rest }: MobileProps) => {
           </Flex>
         </HStack>
       </Flex>
-    // </Link>
   );
 };
