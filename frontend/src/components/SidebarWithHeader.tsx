@@ -29,8 +29,8 @@ import {
   FiChevronDown,
   FiMessageSquare,
 } from 'react-icons/fi';
-import { BsJoystick } from 'react-icons/Bs';
-import { RiGamepadLine } from 'react-icons/Ri';
+import { BsJoystick } from 'react-icons/bs';
+import { RiGamepadLine } from 'react-icons/ri';
 import { IconType } from 'react-icons';
 import { Link as RouteLink } from "react-router-dom";
 
