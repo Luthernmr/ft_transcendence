@@ -2,11 +2,13 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Controller, Get,Res, Req, Post, Delete, Put, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get,Res, Req, Post, Delete, Put, Body, BadRequestException,
+UseGuards } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { Response, Request} from 'express';
 import { JwtService } from '@nestjs/jwt'
 import { UserService } from 'src/Services/user.service';
+import { AuthGuard } from 'src/Guards/auth.guard';
 
 
 @Controller('api')
@@ -18,7 +20,7 @@ export class AuthController {
 
 @Post('register')
   async register(
-	@Body('pseudo') pseudo: string,
+	@Body('nickname') nickname: string,
 	@Body('email')  email: string,
 	@Body('password') password: string,
 	@Body('isOnline') isOnline: boolean,
@@ -26,7 +28,7 @@ export class AuthController {
 		const hashedPassword = await bcrypt.hash(password, 12);
 
 		const user = await this.userService.create({
-			pseudo,
+			nickname,
 			email,
 			password: hashedPassword,
 			isOnline,
@@ -36,6 +38,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @UseGuards(AuthGuard)
   async login (
 	@Body('email')  email: string,
 	@Body('password') password: string,
@@ -50,7 +53,7 @@ export class AuthController {
 	{
 		throw new BadRequestException('invalid credentials');
 	}
-	const payload = {id : user.id, pseudo : user.pseudo, email : user.email};
+	const payload = {id : user.id, nickname : user.nickname, email : user.email};
 	const jwt = await this.jwtService.signAsync(payload);
 	response.cookie('jwt', jwt, {httpOnly : true});
 	return {
