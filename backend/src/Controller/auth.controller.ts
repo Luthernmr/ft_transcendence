@@ -23,7 +23,6 @@ export class AuthController {
 	@Body('nickname') nickname: string,
 	@Body('email')  email: string,
 	@Body('password') password: string,
-	@Body('isOnline') isOnline: boolean,
 	){
 		const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -31,14 +30,12 @@ export class AuthController {
 			nickname,
 			email,
 			password: hashedPassword,
-			isOnline,
 		});
 		delete user.password
 		return user;
   }
 
   @Post('login')
-  @UseGuards(AuthGuard)
   async login (
 	@Body('email')  email: string,
 	@Body('password') password: string,

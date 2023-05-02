@@ -45,10 +45,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Settings', icon: FiSettings, routeName: "/Settings" },
 ];
 
-export default function SidebarWithHeader({
-  children,
-}: {
-  children: ReactNode;
+export default function SidebarWithHeader({children,}: {children: ReactNode;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (

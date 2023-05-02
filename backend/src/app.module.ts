@@ -15,6 +15,6 @@ import { AuthGuard } from './Guards/auth.guard';
 		UserModule, BddModule,
 	],
 	controllers: [],
-	providers: [{provide: APP_GUARD, useClass: AuthGuard}],
+	providers: [],
 })
 export class AppModule { }
