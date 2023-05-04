@@ -32,7 +32,8 @@ import {
 import { BsJoystick } from 'react-icons/bs';
 import { RiGamepadLine } from 'react-icons/ri';
 import { IconType } from 'react-icons';
-import { Link as RouteLink } from "react-router-dom";
+import { Link as RouteLink, useNavigate } from "react-router-dom";
+import axios from 'axios';
 
 interface LinkItemProps {
   name: string;
@@ -69,7 +70,7 @@ export default function SidebarWithHeader({children,}: {children: ReactNode;
       {/* mobilenav */}
       <MobileNav onOpen={onOpen} />
       <Box ml={{ base: 0, md: 60 }} p="4">
-        {children}
+    	 {children}
       </Box>
     </Box>
   );
@@ -148,6 +149,17 @@ interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+	
+	//const navigate = useNavigate();
+  	const signOut = async(event : any) => {
+    	try{
+			const response = await axios.get('http://212.227.209.204:5000/api/logout', { withCredentials: true })
+			localStorage.removeItem('token');
+			console.log(response.data);
+		}catch
+		{
+		}
+	}
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -212,7 +224,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               borderColor={useColorModeValue('gray.200', 'gray.700')}>
               <MenuItem as={RouteLink} to="/Settings">Settings</MenuItem>
               <MenuDivider />
-              <MenuItem as={RouteLink} to="/Login">Sign out</MenuItem>
+              <MenuItem onClick={signOut} as={RouteLink} to="/Login">Sign out</MenuItem>
             </MenuList>
           </Menu>
         </Flex>

@@ -2,18 +2,18 @@ import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+ 	@PrimaryGeneratedColumn()
+ 	id: number;
 
-  @Column()
+  	@Column()
 	nickname: string;
 
-  @Column({unique : true})
-  email: string;
-
-  @Column()
-  password: string;
-
-  @Column({ default: false })
-  isOnline: boolean;
+  	@Column({unique : true})
+  	email: string;
+	
+  	@Column()
+  	password: string;
+	
+  	@Column({ default: false })
+  	isOnline: boolean;
 }

@@ -8,14 +8,8 @@ import RegisterCard from './components/user/registerCard'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <ChakraProvider>
-	<BrowserRouter>
-		<Routes>
-		  	<Route path="/Register" element={<RegisterCard/>} />
-		  	<Route path="/Login" element={<LoginCard/>} />
-		</Routes>
+    <ChakraProvider>	
         <App />
-	</BrowserRouter>
     </ChakraProvider>
   </React.StrictMode>,
 )

@@ -4,7 +4,6 @@ import {
 	FormControl,
 	FormLabel,
 	Input,
-	Checkbox,
 	Stack,
 	Link,
 	Button,
@@ -13,13 +12,18 @@ import {
 	useColorModeValue,
   } from '@chakra-ui/react';
   import axios from 'axios';
-  import { useState, ChangeEvent } from 'react';
-  
+import { FormEventHandler } from 'react';
+  import {  useState, ChangeEvent, useEffect } from 'react';
+  import { useNavigate } from 'react-router-dom';
+
   interface FormValue {
 	email: string;
 	password: string;
   }
   
+  interface OnlineResponse {
+	online: boolean;
+  }
 
   export default function loginCard() {
 	
@@ -31,19 +35,26 @@ import {
 	  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setFormValue({...formValue, [event.target.name]: event.target.value});
 	  };
-	
-	  const handleSubmit = async () => {
+	  const navigate = useNavigate();
+
+	 	const handleSubmit = async (event : any) =>  {
+		event.preventDefault();
+		try {
+		  const response = await axios.post('http://212.227.209.204:5000/api/login', {
+			"email" : formValue.email,
+			"password" : formValue.password
 		
-		axios.post('http://212.227.209.204:5000/api/login',
-			{
-				"email" : formValue.email,
-				"password" : formValue.password
-			}
-		);
-		//console.log(response.data);
-		
-	  };
+		  }, { withCredentials: true });
+		  console.log(response.data);
+		  localStorage.setItem('token', response.data.token);
+		  navigate('/Chat');
+		} catch (error) {
+			console.log(error);
+		}
+	};
 	return (
+	<>
+	{ !localStorage.getItem('token') && (
 	<form onSubmit={handleSubmit}>
 	 	<Flex
 		minH={'100vh'}
@@ -84,7 +95,10 @@ import {
 		</Stack>
 	  	</Flex>
 	  </form>
-	);
+  )}
+  {localStorage.getItem('token') && <div>Vous êtes connecté !</div>}
+	</>
+	)
   }
 
   

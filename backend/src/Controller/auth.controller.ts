@@ -17,7 +17,6 @@ export class AuthController {
 		private readonly userService: UserService,
 		private jwtService: JwtService,	
 	) {}
-
 @Post('register')
   async register(
 	@Body('nickname') nickname: string,
@@ -48,20 +47,19 @@ export class AuthController {
 	}
 	if (!await bcrypt.compare(password, user.password))
 	{
-		throw new BadRequestException('invalid credentials');
+		throw new BadRequestException('bad password');
 	}
-	const payload = {id : user.id, nickname : user.nickname, email : user.email};
+	this.userService.setOnline(user);
+	const payload = {id : user.id, nickname : user.nickname, email : user.email, isOnline : user.isOnline};
 	const jwt = await this.jwtService.signAsync(payload);
 	response.cookie('jwt', jwt, {httpOnly : true});
-	return {
-		message : 'succes'
-	};
+	return response.send({token : jwt});
   }
 
   @Get('user')
   async user(@Req() request : Request){
 	try{
-		const cookie = request.cookies['jwt'];
+		const cookie = request.cookies;
 		const data = await this.jwtService.verifyAsync(cookie);
 		const user = await this.userService.getUser(data.email)
 		
@@ -78,12 +76,46 @@ export class AuthController {
 	}
   }
 
-  @Post('logout')
-  async logout(@Res({passthrough : true}) response : Response)
+  @Get('logout')
+  async logout(@Res({passthrough : true}) response : Response, @Req() request : Request)
   {
+	const cookie = request.cookies['jwt'];
+	if (!cookie)
+	{
+		return {
+			message : "no cookie set"
+		}
+	}
+	const data = await this.jwtService.verifyAsync(cookie);
+	const user = await this.userService.getUser(data.email);
+	this.userService.setOffline(user)
 	response.clearCookie('jwt');
 	return {
-		message : "logout success"
+		message : "ciao"
 	}
   }
+  @Get('isOnline')
+  async isOnline(@Req() request : Request, @Res() response : Response)
+  {
+	try {
+		const cookie = request.cookies['jwt'];
+		if (!cookie) {
+		  return response.send({ message: request.cookies['jwt'] });
+		}
+		const data = await this.jwtService.verifyAsync(cookie);
+		if (!data) {
+		  return response.send({ message: "data not set" });
+		}
+		const user = await this.userService.getUser(data.email);
+		if (!user.isOnline) {
+		  return response.send({ online: false });
+		} else {
+		  return response.send({ online: true });
+		}
+	  } catch (error) {
+		console.error(error);
+		return response.send({ message: "error verifying token" });
+	  }
+  }
+  
 }
