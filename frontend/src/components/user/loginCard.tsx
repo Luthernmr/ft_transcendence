@@ -47,7 +47,7 @@ import { FormEventHandler } from 'react';
 		  }, { withCredentials: true });
 		  console.log(response.data);
 		  localStorage.setItem('token', response.data.token);
-		  navigate('/Chat');
+		 	navigate('/connected');
 		} catch (error) {
 			console.log(error);
 		}

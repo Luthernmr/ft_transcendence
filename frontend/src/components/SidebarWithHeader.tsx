@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import {
   IconButton,
   Avatar,
@@ -114,9 +114,10 @@ interface NavItemProps extends FlexProps {
   children: string;
   routeName: string;
 }
+
 const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
-  return (
-    <Link as={RouteLink} to={routeName} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+	return (
+		<Link as={RouteLink} to={routeName} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
       <Flex
         align="center"
         p="4"
@@ -125,20 +126,20 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: 'cyan.400',
-          color: 'white',
+			bg: 'cyan.400',
+			color: 'white',
         }}
         {...rest}>
         {icon && (
-          <Icon
+			<Icon
             mr="4"
             fontSize="16"
             _groupHover={{
-              color: 'white',
+				color: 'white',
             }}
             as={icon}
-          />
-        )}
+			/>
+			)}
         {children}
       </Flex>
     </Link>
@@ -146,20 +147,35 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
 };
 
 interface MobileProps extends FlexProps {
-  onOpen: () => void;
+	onOpen: () => void;
+}
+
+interface User{
+	nickname: string;
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-	
+	const [user, setUser] = useState<User>({
+		nickname : "",
+	});
+
+	useEffect(() => {
+		const getUser = async() => {
+			const res = await axios.get('http://212.227.209.204:5000/api/user', { withCredentials: true });
+			setUser(res.data);
+			console.log(res.data);	
+		}
+		getUser();
+	  }, []);
 	//const navigate = useNavigate();
   	const signOut = async(event : any) => {
-    	try{
-			const response = await axios.get('http://212.227.209.204:5000/api/logout', { withCredentials: true })
-			localStorage.removeItem('token');
-			console.log(response.data);
-		}catch
-		{
+		  try{
+			  const response = await axios.get('http://212.227.209.204:5000/api/logout', { withCredentials: true })
+			  localStorage.removeItem('token');
+			  console.log(response.data);
+			}catch
+			{
+			}
 		}
-	}
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -212,7 +228,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   alignItems="flex-start"
                   spacing="1px"
                   ml="2">
-                  <Text fontSize="sm">Bob The Dog</Text>
+                  <Text fontSize="sm">{user.nickname}</Text>
                 </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />
