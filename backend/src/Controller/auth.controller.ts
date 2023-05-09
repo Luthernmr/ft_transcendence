@@ -22,6 +22,7 @@ export class AuthController {
 	@Body('nickname') nickname: string,
 	@Body('email')  email: string,
 	@Body('password') password: string,
+	@Body('img' ) img : string
 	){
 		const hashedPassword = await bcrypt.hash(password, 12);
 
@@ -29,6 +30,7 @@ export class AuthController {
 			nickname,
 			email,
 			password: hashedPassword,
+			img : img
 		});
 		delete user.password
 		return user;
@@ -54,6 +56,24 @@ export class AuthController {
 	const jwt = await this.jwtService.signAsync(payload);
 	response.cookie('jwt', jwt, {httpOnly : true});
 	return response.send({token : jwt});
+  }
+
+  @Post('settings')
+  async settings (
+	@Body('img') img : string,
+	@Body('nickname') nickname : string,
+	@Res({passthrough : true}) response : Response,
+	@Req() request : Request
+  )
+  {
+		const cookie = request.cookies['jwt'];
+		const data = await this.jwtService.verifyAsync(cookie);
+		const user = await this.userService.getUser(data.email)
+		if (!user)
+			return ("no user");
+		this.userService.changeImg(user, img);
+		this.userService.changeNickname(user, nickname);
+		return response.send({img, user});
   }
 
   @Get('user')
@@ -100,7 +120,7 @@ export class AuthController {
 	try {
 		const cookie = request.cookies['jwt'];
 		if (!cookie) {
-		  return response.send({ message: request.cookies['jwt'] });
+			return response.send({ message: request.cookies['jwt'] });
 		}
 		const data = await this.jwtService.verifyAsync(cookie);
 		if (!data) {
@@ -114,7 +134,7 @@ export class AuthController {
 		}
 	  } catch (error) {
 		console.error(error);
-		return response.send({ message: "error verifying token" });
+		return response.send({ message: "no cookie set", online: false  });
 	  }
   }
   

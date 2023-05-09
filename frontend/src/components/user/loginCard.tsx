@@ -24,9 +24,9 @@ import { FormEventHandler } from 'react';
   interface OnlineResponse {
 	online: boolean;
   }
-
+  
   export default function loginCard() {
-	
+	  
 	const [formValue, setFormValue] = useState<FormValue>({
 		email: '',
 		password: ''
@@ -45,16 +45,13 @@ import { FormEventHandler } from 'react';
 			"password" : formValue.password
 		
 		  }, { withCredentials: true });
-		  console.log(response.data);
-		  localStorage.setItem('token', response.data.token);
-		 	navigate('/connected');
+		  	console.log(response.data);
+		 	navigate('/home');
 		} catch (error) {
 			console.log(error);
 		}
 	};
 	return (
-	<>
-	{ !localStorage.getItem('token') && (
 	<form onSubmit={handleSubmit}>
 	 	<Flex
 		minH={'100vh'}
@@ -95,9 +92,6 @@ import { FormEventHandler } from 'react';
 		</Stack>
 	  	</Flex>
 	  </form>
-  )}
-  {localStorage.getItem('token') && <div>Vous êtes connecté !</div>}
-	</>
 	)
   }
 

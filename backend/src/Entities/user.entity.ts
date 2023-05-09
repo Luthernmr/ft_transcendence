@@ -8,12 +8,15 @@ export class User {
   	@Column()
 	nickname: string;
 
-  	@Column({unique : true})
-  	email: string;
+	@Column({unique : true})
+	email: string;
 	
-  	@Column()
-  	password: string;
+	@Column()
+	password: string;
 	
-  	@Column({ default: false })
-  	isOnline: boolean;
+	@Column({ default: false })
+	isOnline: boolean;
+
+	@Column({default: "nothing"})
+  	imgPdp: string;
 }

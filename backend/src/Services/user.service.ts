@@ -31,5 +31,16 @@ export class UserService {
 			user.isOnline = false;
 			await this.userRepository.save(user);
 		}
+
+		async changeImg(user : User, img: string)
+		{
+			user.imgPdp = img;
+			await this.userRepository.save(user);
+		}
+		async changeNickname(user : User, nickname: string)
+		{
+			user.nickname = nickname;
+			await this.userRepository.save(user);
+		}
 		
 }
