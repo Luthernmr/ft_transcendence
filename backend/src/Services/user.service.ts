@@ -5,13 +5,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../Entities/user.entity';
 import { Repository } from 'typeorm';
-import { get } from 'http';
 
 @Injectable()
 export class UserService {
 	constructor(
 			@InjectRepository(User)
 			private userRepository: Repository<User>,
+
 		) {}
 
 		async create(data: any): Promise<User>{
@@ -21,6 +21,7 @@ export class UserService {
 		{
 			return this.userRepository.findOne({ where: { email: email } });
 		}
+
 		async setOnline(user : User)
 		{
 			user.isOnline = true;

@@ -25,7 +25,7 @@ export default function App() {
     <BrowserRouter>
 		<Routes>
 			<Route path="/Register" element={<RegisterCard />} />
-			<Route path="/Login" element={!online && <LoginCard/>} />
+			<Route path="/Login" element={<LoginCard/>} />
 		
 			<Route path="/home/*" element={online && <SidebarWithHeader>
            		<Routes>

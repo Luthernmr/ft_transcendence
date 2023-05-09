@@ -10,12 +10,9 @@ import { UserModule } from './user.module';
 import { UserService } from 'src/Services/user.service';
 
 @Module({
-	imports: 
-	[
-		UserModule,
-		JwtModule.register({secret: 'secret', signOptions: { expiresIn: '999d' }})
-	],
+	imports: [JwtModule.register({secret: 'secret', signOptions: { expiresIn: '999d' }}), UserModule],
 	controllers: [AuthController],
-	providers: [UserService],
+	providers: [AuthService],
+	exports : [AuthService]
 })
 export class AuthModule { }

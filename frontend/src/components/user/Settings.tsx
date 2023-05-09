@@ -28,20 +28,24 @@ export default function UserProfileSettings() {
 		twoFactorAuthEnabled: false
 	});
 	
+	const [profilePreview, setPreview] = useState('');
+	
 	const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setProfile({ ...profile, nickname: event.target.value });
 	};
 
 	const handleAvatarChange = (event : any) => {
 		setProfile({...profile, imgPdp: event.target.files[0]})
+		setPreview(URL.createObjectURL(event.target.files[0]))
+		console.log("here :" + event.target.files[0]);
 	}
 	
 	const SendModif = async (event : any) =>  {
 		event.preventDefault();
 		try {
 		  const response = await axios.post('http://212.227.209.204:5000/api/settings', {
-			"nickname" :  profile.nickname,
-			"img" : profile.imgPdp
+			  "img" : profile.imgPdp,
+			  "nickname" :  profile.nickname
 			
 		}, { withCredentials: true });
 		  	console.log(response.data);
@@ -65,7 +69,7 @@ export default function UserProfileSettings() {
 						<Image
 							borderRadius="full"
 							boxSize="50px"
-							src={profile.imgPdp}
+							src={profilePreview}
 							alt="User avatar"
 						/>
 						<input

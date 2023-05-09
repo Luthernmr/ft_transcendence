@@ -3,19 +3,22 @@ https://docs.nestjs.com/controllers#controllers
 */
 
 import { Controller, Get,Res, Req, Post, Delete, Put, Body, BadRequestException,
-UseGuards } from '@nestjs/common';
+UseGuards, UsePipes, ValidationPipe, UploadedFile, UseInterceptors} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Response, Request} from 'express';
+import { Response, Request, request, response} from 'express';
 import { JwtService } from '@nestjs/jwt'
 import { UserService } from 'src/Services/user.service';
 import { AuthGuard } from 'src/Guards/auth.guard';
+import { LoginDto } from 'src/DTO/user.dto';
+import { AuthService } from 'src/Services/auth.service';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 
 @Controller('api')
 export class AuthController {
 	constructor(
 		private readonly userService: UserService,
-		private jwtService: JwtService,	
+		private readonly authService:AuthService,	
 	) {}
 @Post('register')
   async register(
@@ -37,52 +40,28 @@ export class AuthController {
   }
 
   @Post('login')
+  @UsePipes(new ValidationPipe())
   async login (
-	@Body('email')  email: string,
-	@Body('password') password: string,
+	@Body() loginDto: LoginDto,
 	@Res({passthrough : true}) response : Response
   ){
-	const user = await this.userService.getUser(email);
+	const user = await this.userService.getUser(loginDto.email);
 	if (!user)
 	{
 			throw new BadRequestException('invalid credentials');
 	}
-	if (!await bcrypt.compare(password, user.password))
+	if (!await bcrypt.compare(loginDto.password, user.password))
 	{
 		throw new BadRequestException('bad password');
 	}
-	this.userService.setOnline(user);
-	const payload = {id : user.id, nickname : user.nickname, email : user.email, isOnline : user.isOnline};
-	const jwt = await this.jwtService.signAsync(payload);
-	response.cookie('jwt', jwt, {httpOnly : true});
-	return response.send({token : jwt});
-  }
-
-  @Post('settings')
-  async settings (
-	@Body('img') img : string,
-	@Body('nickname') nickname : string,
-	@Res({passthrough : true}) response : Response,
-	@Req() request : Request
-  )
-  {
-		const cookie = request.cookies['jwt'];
-		const data = await this.jwtService.verifyAsync(cookie);
-		const user = await this.userService.getUser(data.email)
-		if (!user)
-			return ("no user");
-		this.userService.changeImg(user, img);
-		this.userService.changeNickname(user, nickname);
-		return response.send({img, user});
+	return this.authService.login(user,response);
   }
 
   @Get('user')
   async user(@Req() request : Request){
 	try{
-		const cookie = request.cookies['jwt'];
-		const data = await this.jwtService.verifyAsync(cookie);
-		const user = await this.userService.getUser(data.email)
-		
+	
+		const user = await this.authService.getUserCookie(request);
 		if (!user)
 			return ("no user");
 		const {password, ...result} = user;
@@ -99,34 +78,15 @@ export class AuthController {
   @Get('logout')
   async logout(@Res({passthrough : true}) response : Response, @Req() request : Request)
   {
-	const cookie = request.cookies['jwt'];
-	if (!cookie)
-	{
-		return {
-			message : "no cookie set"
-		}
-	}
-	const data = await this.jwtService.verifyAsync(cookie);
-	const user = await this.userService.getUser(data.email);
-	this.userService.setOffline(user)
-	response.clearCookie('jwt');
-	return {
-		message : "ciao"
-	}
+	return this.authService.logout(request, response);
   }
+
   @Get('isOnline')
   async isOnline(@Req() request : Request, @Res() response : Response)
   {
 	try {
-		const cookie = request.cookies['jwt'];
-		if (!cookie) {
-			return response.send({ message: request.cookies['jwt'] });
-		}
-		const data = await this.jwtService.verifyAsync(cookie);
-		if (!data) {
-		  return response.send({ message: "data not set" });
-		}
-		const user = await this.userService.getUser(data.email);
+	
+		const user = await this.authService.getUserCookie(request);
 		if (!user.isOnline) {
 		  return response.send({ online: false });
 		} else {
@@ -137,5 +97,25 @@ export class AuthController {
 		return response.send({ message: "no cookie set", online: false  });
 	  }
   }
-  
+
+  @Post('settings')
+	async settings (
+	  @Body('img') img : string,
+	  @Body('nickname') nickname : string,
+	  @Res({passthrough : true}) response : Response,
+	  @Req() request : Request
+	)
+	{
+		  const user = await this.authService.getUserCookie(request);
+		  if (!user)
+			  return ("no user");
+		  this.userService.changeImg(user, img);
+		  this.userService.changeNickname(user, nickname);
+		  return response.send({img, user});
+	}
+	//@Post('upload')//TODO - 
+	//@UseInterceptors(FileInterceptor('file'))
+	//uploadFile(@UploadedFile() file: Express.Multer.File) {
+  	//console.log(file);
+	//}
 }

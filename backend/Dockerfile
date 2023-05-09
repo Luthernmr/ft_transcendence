@@ -7,7 +7,7 @@ COPY package.json ./
 RUN npm install
 RUN npm install -g @nestjs/cli
 
-COPY . .
+#COPY . .
 
 EXPOSE 5000
 
