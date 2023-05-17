@@ -8,7 +8,6 @@ import * as bcrypt from 'bcrypt';
 import { Response, Request, request, response} from 'express';
 import { JwtService } from '@nestjs/jwt'
 import { UserService } from 'src/Services/user.service';
-import { AuthGuard } from 'src/Guards/auth.guard';
 import { LoginDto } from 'src/DTO/user.dto';
 import { AuthService } from 'src/Services/auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -27,7 +26,8 @@ export class AuthController {
 	@Body('password') password: string,
 	@Body('img' ) img : string
 	){
-		const hashedPassword = await bcrypt.hash(password, 12);
+		const salt = await bcrypt.genSalt();
+		const hashedPassword = await bcrypt.hash(password, salt);
 
 		const user = await this.userService.create({
 			nickname,
@@ -54,6 +54,7 @@ export class AuthController {
 	{
 		throw new BadRequestException('bad password');
 	}
+	
 	return this.authService.login(user,response);
   }
 
@@ -113,9 +114,9 @@ export class AuthController {
 		  this.userService.changeNickname(user, nickname);
 		  return response.send({img, user});
 	}
-	//@Post('upload')//TODO - 
-	//@UseInterceptors(FileInterceptor('file'))
-	//uploadFile(@UploadedFile() file: Express.Multer.File) {
-  	//console.log(file);
-	//}
+		@Post('upload')
+		@UseInterceptors(FileInterceptor('file'))
+		uploadFile(@UploadedFile() file: Express.Multer.File) {
+  		console.log(file);
+	}
 }

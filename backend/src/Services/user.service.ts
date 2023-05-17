@@ -11,7 +11,6 @@ export class UserService {
 	constructor(
 			@InjectRepository(User)
 			private userRepository: Repository<User>,
-
 		) {}
 
 		async create(data: any): Promise<User>{

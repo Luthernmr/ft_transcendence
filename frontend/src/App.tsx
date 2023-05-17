@@ -8,18 +8,18 @@ import LoginCard from "./components/user/loginCard";
 import RegisterCard from "./components/user/registerCard";
 import { FiLogIn } from "react-icons/fi";
 import axios from "axios";
+import Cookies from 'js-cookie';
 
 
 export default function App() {
 	const [online, setOnline] = useState(false);
 	useEffect(() => {
 	  async function fetchData() {
-		const response = await axios.get('http://212.227.209.204:5000/api/isOnline', { withCredentials: true });
-		setOnline(response.data.online);
-	  }
-	  fetchData();
-	}, [online]);
-	console.log( "test :" , online);
+	}
+	fetchData();
+}, [online]);
+console.log( "test :" , online);
+
 	
   return (
     <BrowserRouter>
