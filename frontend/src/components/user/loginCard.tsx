@@ -43,10 +43,9 @@ import { FormEventHandler } from 'react';
 		  const response = await axios.post('http://212.227.209.204:5000/api/login', {
 			"email" : formValue.email,
 			"password" : formValue.password
-		
 		  }, { withCredentials: true });
 		  	console.log(response.data);
-		 	navigate('/home');
+		 	navigate('/Home');
 		} catch (error) {
 			console.log(error);
 		}

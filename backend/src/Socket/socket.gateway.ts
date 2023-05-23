@@ -3,28 +3,28 @@ https://docs.nestjs.com/websockets/gateways#gateways
 */
 
 import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
+import { Server, Socket } from "socket.io";
 
-@WebSocketGateway()
-export class TestGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
+@WebSocketGateway({ cors: { origin: ['http://212.227.209.204:3000'] } })
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
 
     @WebSocketServer()
-    server: any;
+    server: Server;
 
     @SubscribeMessage('events')
     handleEvent(@MessageBody() data: string) {
         this.server.emit('events', data);
-		console.log(data);
     }
 
-    handleConnection(client: any, ...args: any[]) {
+    handleConnection(client: Socket) {
         console.log('User connected');
     }
 
-    handleDisconnect(client: any) {
+    handleDisconnect(client: Socket) {
         console.log('User disconnected');
     }
 
-    afterInit(server: any) {
+    afterInit(server: Socket) {
         console.log('Socket is live')
     }
 }

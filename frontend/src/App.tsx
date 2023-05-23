@@ -8,18 +8,18 @@ import LoginCard from "./components/user/loginCard";
 import RegisterCard from "./components/user/registerCard";
 import { FiLogIn } from "react-icons/fi";
 import axios from "axios";
-import Cookies from 'js-cookie';
+import Home from "./components/Home";
+import { userSocket } from "./sockets/sockets";
 
 
 export default function App() {
 	const [online, setOnline] = useState(false);
-	useEffect(() => {
-	  async function fetchData() {
-	}
-	fetchData();
-}, [online]);
-console.log( "test :" , online);
 
+
+useEffect(() => {
+
+	userSocket.on('connect', ()=> {console.log("connected front"); setOnline(true);})
+	},[online])
 	
   return (
     <BrowserRouter>
@@ -27,9 +27,9 @@ console.log( "test :" , online);
 			<Route path="/Register" element={<RegisterCard />} />
 			<Route path="/Login" element={<LoginCard/>} />
 		
-			<Route path="/home/*" element={online && <SidebarWithHeader>
+			<Route path="/home/*" element={ online && <SidebarWithHeader>
            		<Routes>
-           		  <Route path="/home" element={<Chat/>} />
+           		  <Route path="/" element={<Home/>} />
            		  <Route path="/Play" element={<Pong/>} /> 
            		  <Route path="/Chat" element={<Chat/>} />
            		  <Route path="/Settings" element={<Settings/>}  />
