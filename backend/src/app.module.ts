@@ -1,14 +1,19 @@
-import { SocketGateway } from './Socket/socket.gateway';
-import { SocketModule } from './Socket/socket.module';
-import { AuthModule } from './Modules/auth.module';
-import { UserModule } from './Modules/user.module';
-import { AuthService } from './Services/auth.service';
+import { FriendModule } from './social/friend.module';
+import { FriendController } from './social/friend.controller';
+import { Auth42Controller } from './auth/auth42.controller';
+import { Auth42Service } from './auth/auth42.service';
+import { SocketGateway } from './auth/socket.gateway';
+import { SocketModule } from './auth/socket.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { AuthService } from './auth/auth.service';
 import { Module } from '@nestjs/common';
-import { BddModule } from './Modules/bdd.module';
+import { BddModule } from './bdd/bdd.module';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
-	imports: [UserModule, BddModule, AuthModule, SocketModule],
-	controllers: [],
-	providers: []
+	imports: [FriendModule, UserModule, BddModule, AuthModule, SocketModule],
+	controllers: [ ],
+	providers: [Auth42Service, JwtService]
 })
 export class AppModule { }

@@ -3,7 +3,7 @@ https://docs.nestjs.com/providers#services
 */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../Entities/user.entity';
+import { User } from './user.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -19,6 +19,11 @@ export class UserService {
 		async getUser(email: any): Promise<User>
 		{
 			return this.userRepository.findOne({ where: { email: email } });
+		}
+
+		async getUserById(id: number): Promise<User>
+		{
+			return this.userRepository.findOne({ where: { id: id } });
 		}
 
 		async setOnline(user : User)
@@ -42,5 +47,11 @@ export class UserService {
 			user.nickname = nickname;
 			await this.userRepository.save(user);
 		}
-		
+
+		async getAllUser() : Promise <any>
+		{
+			this.userRepository.find()
+			console.log(this.userRepository)
+			return this.userRepository
+		}
 }

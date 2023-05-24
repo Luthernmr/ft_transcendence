@@ -6,14 +6,6 @@ import { Server } from "socket.io";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-// const io = new Server({
-//	cors: {
-//		origin: '*',
-//		credentials : true
-//	  }
-// });
-// io.listen(5000);
-
 	app.use(cookieParser());
 
 	app.enableCors({

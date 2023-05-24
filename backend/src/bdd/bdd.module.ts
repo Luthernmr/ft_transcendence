@@ -2,9 +2,10 @@
 https://docs.nestjs.com/modules
 */
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../Entities/user.entity'
+import { User } from '../user/user.entity'
 
 import { Module } from '@nestjs/common';
+import { Friend } from 'src/social/friend.entiy';
 
 @Module({
    		imports: [TypeOrmModule.forRoot({
@@ -14,7 +15,7 @@ import { Module } from '@nestjs/common';
 		username: 'root',
 		password: 'root',
 		database: 'ft_db',
-		entities: [User],
+		entities: [User,Friend],
 		synchronize: true,
 	})
 	],
