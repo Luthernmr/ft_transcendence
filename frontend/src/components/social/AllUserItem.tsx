@@ -1,6 +1,6 @@
 import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal } from "@chakra-ui/react";
 import axios from "axios";
-import { AddIcon, DragHandleIcon} from '@chakra-ui/icons'
+import { AddIcon, DragHandleIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
 
 interface User {
@@ -9,8 +9,8 @@ interface User {
 	imgPdp: string;
 }
 
-interface FriendRequest{
-	id : number;
+interface FriendRequest {
+	id: number;
 }
 
 export default function AllUserItem() {
@@ -25,40 +25,40 @@ export default function AllUserItem() {
 		}
 		getAllUser();
 	}, []);
-	
+
 	return (
 		<List spacing={3}>
 			{users.map((user) => (
 				<Popover>
-						<Box >
-							<ListItem>
-								<Flex alignItems={'center'} justifyContent={'space-between'}>
-									<Avatar
-										size="sm"		
-										src={user.imgPdp}>
-										<AvatarBadge boxSize='1em' bg='green.500' />
-										<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
-									</Avatar>
-									<Box ml='2'>
-										<Text fontSize='sm' fontWeight='bold'>
-											{user.nickname}
-											<Badge ml='1' fontSize='xs' colorScheme='green'>
-												ingame
-											</Badge>
-										</Text>
-										<Text fontSize='xs'>Student</Text>
-									</Box>
-							<PopoverTrigger>
-							<IconButton
-									variant='outline'
-									colorScheme='blue'
-									aria-label='Send email'
-									icon={<DragHandleIcon />}
-								/>
-							</PopoverTrigger>
-								</Flex>
-							</ListItem>
-						</Box>
+					<Box >
+						<ListItem>
+							<Flex alignItems={'center'} justifyContent={'space-between'}>
+								<Avatar
+									size="sm"
+									src={user.imgPdp}>
+									<AvatarBadge boxSize='1em' bg='green.500' />
+									<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
+								</Avatar>
+								<Box ml='2'>
+									<Text fontSize='sm' fontWeight='bold'>
+										{user.nickname}
+										<Badge ml='1' fontSize='xs' colorScheme='green'>
+											ingame
+										</Badge>
+									</Text>
+									<Text fontSize='xs'>Student</Text>
+								</Box>
+								<PopoverTrigger>
+									<IconButton
+										variant='outline'
+										colorScheme='blue'
+										aria-label='Send email'
+										icon={<DragHandleIcon />}
+									/>
+								</PopoverTrigger>
+							</Flex>
+						</ListItem>
+					</Box>
 					<Portal>
 						<PopoverContent>
 							<PopoverArrow />

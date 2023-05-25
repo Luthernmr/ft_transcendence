@@ -13,15 +13,11 @@ export default function FriendList() {
 			<Tabs isFitted variant='enclosed'>
 				<TabList mb='1em'>
 					<Tab>Friends</Tab>
-					<Tab>Online Users</Tab>
 					<Tab>All User</Tab>
 				</TabList>
 				<TabPanels>
 					<TabPanel>
 						<p>friends list</p>
-					</TabPanel>
-					<TabPanel>
-						<p>Online users</p>
 					</TabPanel>
 					<TabPanel>
 						<AllUserItem />
