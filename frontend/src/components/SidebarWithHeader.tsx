@@ -34,6 +34,7 @@ import { RiGamepadLine } from 'react-icons/ri';
 import { IconType } from 'react-icons';
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import FriendList from './social/FriendList';
 
 interface LinkItemProps {
 	name: string;
@@ -53,10 +54,10 @@ export default function SidebarWithHeader({ children }: {
 	return (
 		<>
 			<Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-				<SidebarContent
-					onClose={() => onClose}
-					display={{ base: 'none', md: 'block' }}
-				/>
+			<SidebarContent
+				onClose={() => onClose}
+				display={{ base: 'none', md: 'block' }}
+			/>
 				<Drawer
 					autoFocus={false}
 					isOpen={isOpen}
@@ -71,9 +72,19 @@ export default function SidebarWithHeader({ children }: {
 				</Drawer>
 				{/* mobilenav */}
 				<MobileNav onOpen={onOpen} />
+					<Box
+						pos="fixed"
+						right="0" 
+						bg={useColorModeValue('white', 'gray.900')}
+						h="full"
+						w={{ base: 'full', md: 60 }}
+						>	
+						<FriendList/>
+					</Box >
 				<Box ml={{ base: 0, md: 60 }} p="4">
 					{children}
 				</Box>
+
 			</Box>
 		</>
 	);
@@ -155,7 +166,7 @@ interface MobileProps extends FlexProps {
 
 interface User {
 	nickname: string;
-	imgPdp : string;
+	imgPdp: string;
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	const [user, setUser] = useState<User>({
@@ -222,10 +233,15 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 							transition="all 0.3s"
 							_focus={{ boxShadow: 'none' }}>
 							<HStack>
+								<Box 
+									borderRadius="full"
+									boxShadow='outline'
+									bg='white'>
 								<Avatar
-									size={'sm'}
+									size={'md'}
 									src={user.imgPdp}
-								/>
+									/>
+									</Box>
 								<VStack
 									display={{ base: 'none', md: 'flex' }}
 									alignItems="flex-start"

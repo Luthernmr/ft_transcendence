@@ -15,7 +15,9 @@ export class UserController {
 	@Get('all')
 	async all(@Res() response: Response)
 	{
-		console.log(this.userService.getAllUser)
+		const users = await this.userService.getAllUser();
+		const allUsers = { users : users}
+		response.send(allUsers);
 		//response.send(this.userService.getAllUser);
 	}
 }

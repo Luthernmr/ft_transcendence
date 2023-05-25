@@ -22,7 +22,6 @@ export class AuthController {
 	constructor(
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
-		private readonly auth42Service: Auth42Service,
 	) { }
 	@Post('register')
 	async register(

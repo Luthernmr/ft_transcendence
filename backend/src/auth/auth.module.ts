@@ -15,7 +15,7 @@ import { Auth42Controller } from './auth42.controller';
 @Module({
 	imports: [JwtModule.register({secret: 'secret', signOptions: { expiresIn: '999d' }}), UserModule],
 	controllers: [AuthController, Auth42Controller],
-	providers: [auth42Strategy, AuthService, Auth42Service, JwtService],
+	providers: [auth42Strategy, AuthService, Auth42Service],
 	exports : [AuthService,  Auth42Service]
 })
 export class AuthModule { }

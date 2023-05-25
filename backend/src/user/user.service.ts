@@ -11,14 +11,21 @@ export class UserService {
 	constructor(
 			@InjectRepository(User)
 			private userRepository: Repository<User>,
-		) {}
-
-		async create(data: any): Promise<User>{
-			return this.userRepository.save(data);
-		}
-		async getUser(email: any): Promise<User>
+			) {}
+			
+			async create(data: any): Promise<User>{
+				return this.userRepository.save(data);
+			}
+			async getUser(email: any): Promise<User>
 		{
 			return this.userRepository.findOne({ where: { email: email } });
+		}
+		
+		async getAllUser() : Promise <any>
+		{
+			//this.userRepository.find()
+			const users = await this.userRepository.find();
+			return users;
 		}
 
 		async getUserById(id: number): Promise<User>
@@ -48,10 +55,4 @@ export class UserService {
 			await this.userRepository.save(user);
 		}
 
-		async getAllUser() : Promise <any>
-		{
-			this.userRepository.find()
-			console.log(this.userRepository)
-			return this.userRepository
-		}
 }
