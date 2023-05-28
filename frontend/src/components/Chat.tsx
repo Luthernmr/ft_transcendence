@@ -16,10 +16,19 @@ interface Message {
 }
 
 const exampleMessages: Message[] = [
-  { sender: 'Alice', content: 'Salut !' },
-  { sender: 'Bob the dog', content: 'Wsh !' },
-  { sender: 'Alice', content: 'Comment ça va ?' },
-  { sender: 'Bob the dog', content: 'OKLM !' },
+  { sender: 'Alice', content: 'Hello !' },
+  { sender: 'Bob the dog', content: 'Yo man !' },
+  { sender: 'Alice', content: 'How are you ?' },
+  { sender: 'Bob the dog', content: 'Good !' },
+  { sender: 'Alice', content: 'How you dealin with socket ?' },
+  { sender: 'Bob the dog', content: 'I keep going 😁' },
+  { sender: 'Alice', content: 'Nice!' },
+  { sender: 'Bob the dog', content: 'Luther is giving me some good vibes 🔥!' },
+  { sender: 'Alice', content: 'Oh really nice !' },
+  { sender: 'Bob the dog', content: 'Aza too man 👨‍🎤 !' },
+  { sender: 'Alice', content: 'Wait, wait are you the Bowie ft Les Daft-punk Team ?' },
+  { sender: 'Bob the dog', content: 'We are !' },
+  { sender: 'Bob the dog', content: 'And I\'m a bit skyzo 👒 !' },
 ];
 
 interface MessageItemProps {
@@ -49,24 +58,25 @@ const MessageItem: React.FC<MessageItemProps> = ({ sender, content }) => {
   );
 };
 
-const Messaging: React.FC = () => {
+const ChatComponent: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
 
   const sendMessage = () => {
-    console.log('Message envoyé :', inputValue);
+    console.log('Message sent:', inputValue);
     setInputValue('');
   };
 
   return (
-    <Box
+    <Flex
       bg="white"
       borderRadius="lg"
       p={4}
       boxShadow="md"
-      w="100%"
-      maxW="500px"
+      h="calc(100vh - 115px)"
+      direction="column"
+      justify="space-between"
     >
-      <VStack spacing={4} align="start">
+      <VStack spacing={4} align="start" overflowY="auto" flex="1">
         {exampleMessages.map((msg, index) => (
           <MessageItem
             key={index}
@@ -79,14 +89,15 @@ const Messaging: React.FC = () => {
         <Input
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
-          placeholder="Écrivez votre message ici..."
+          placeholder="Type your message..."
+          flex="1"
         />
         <Button colorScheme="teal" onClick={sendMessage}>
-          Envoyer
+          Send
         </Button>
       </HStack>
-    </Box>
+    </Flex>
   );
 };
 
-export default Messaging;
+export default ChatComponent;
