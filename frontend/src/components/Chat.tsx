@@ -21,8 +21,8 @@ const exampleMessages: Message[] = [
   { sender: 'Alice', content: 'How are you ?' },
   { sender: 'Bob the dog', content: 'Good !' },
   { sender: 'Alice', content: 'How you dealin with socket ?' },
-  { sender: 'Bob the dog', content: 'I keep going 😁' },
-  { sender: 'Alice', content: 'Nice!' },
+  { sender: 'Bob the dog', content: 'I do some front to chill a bit 😁' },
+  { sender: 'Alice', content: 'Okay!' },
   { sender: 'Bob the dog', content: 'Luther is giving me some good vibes 🔥!' },
   { sender: 'Alice', content: 'Oh really nice !' },
   { sender: 'Bob the dog', content: 'Aza too man 👨‍🎤 !' },
@@ -62,6 +62,7 @@ const ChatComponent: React.FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<Message[]>(exampleMessages);
   const chatRef = useRef<HTMLDivElement>(null);
+  const [chatHeight, setChatHeight] = useState<number>(0);
 
   const sendMessage = () => {
     console.log("Message sent:", inputValue);
@@ -69,11 +70,28 @@ const ChatComponent: React.FC = () => {
   };
 
   useEffect(() => {
-    // Scroll to the bottom of the chat box when new messages are added
     if (chatRef.current) {
       chatRef.current.scrollTop = chatRef.current.scrollHeight;
     }
   }, [messages]);
+
+  useEffect(() => {
+    const calculateHeight = () => {
+      const windowHeight = window.innerHeight;
+      const headerHeight = 60;
+      const footerHeight = 50;
+      const calculatedHeight = windowHeight - headerHeight - footerHeight;
+      setChatHeight(calculatedHeight);
+    };
+
+    calculateHeight();
+
+    window.addEventListener("resize", calculateHeight);
+
+    return () => {
+      window.removeEventListener("resize", calculateHeight);
+    };
+  }, []);
 
   return (
     <Flex
@@ -81,7 +99,7 @@ const ChatComponent: React.FC = () => {
       borderRadius="lg"
       p={4}
       boxShadow="md"
-      h="calc(100vh - 115px)" // Subtract 20px for the mobile navigation bar
+      h={`${chatHeight}px`}
       w="100%"
       direction="column"
       justify="space-between"
