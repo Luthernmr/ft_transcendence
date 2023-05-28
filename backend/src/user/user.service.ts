@@ -30,7 +30,15 @@ export class UserService {
 
 		async getUserById(id: number): Promise<User>
 		{
-			return this.userRepository.findOne({ where: { id: id } });
+			return await this.userRepository.findOne({ where: { id: id } });
+		}
+
+		async setSocket(id : number, socketId : string)
+		{
+			var user : any = await this.getUserById(id);
+			console.log('test', user.nickname);
+			user.socketId = socketId;
+			await this.userRepository.save(user);
 		}
 
 		async setOnline(user : User)

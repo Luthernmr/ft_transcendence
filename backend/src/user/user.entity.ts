@@ -21,6 +21,9 @@ export class User {
   @Column({ default: false })
   isOnline: boolean;
 
+  @Column({nullable: true})
+  socketId: string;
+
   @ManyToMany(() => Friend, friend => friend.users)
   @JoinTable()
   friends: Friend[];

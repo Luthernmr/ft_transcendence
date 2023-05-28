@@ -54,10 +54,10 @@ export default function SidebarWithHeader({ children }: {
 	return (
 		<>
 			<Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
-			<SidebarContent
-				onClose={() => onClose}
-				display={{ base: 'none', md: 'block' }}
-			/>
+				<SidebarContent
+					onClose={() => onClose}
+					display={{ base: 'none', md: 'block' }}
+				/>
 				<Drawer
 					autoFocus={false}
 					isOpen={isOpen}
@@ -72,15 +72,15 @@ export default function SidebarWithHeader({ children }: {
 				</Drawer>
 				{/* mobilenav */}
 				<MobileNav onOpen={onOpen} />
-					<Box
-						pos="fixed"
-						right="0" 
-						bg={useColorModeValue('white', 'gray.900')}
-						h="full"
-						w={{ base: 'full', md: 60 }}
-						>	
-						<FriendList/>
-					</Box >
+				<Box
+					pos="fixed"
+					right="0"
+					bg={useColorModeValue('white', 'gray.900')}
+					h="full"
+					w={{ base: 'full', md: 60 }}
+				>
+					<FriendList />
+				</Box >
 				<Box ml={{ base: 0, md: 60 }} p="4">
 					{children}
 				</Box>
@@ -177,8 +177,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	useEffect(() => {
 		const getUser = async () => {
 			const res = await axios.get('http://212.227.209.204:5000/api/user', { withCredentials: true });
-			setUser(res.data);
-			console.log(res.data);
+			setUser(res.data.user);
+			localStorage.setItem('currentUser', JSON.stringify(res.data.user))
+			console.log(localStorage.getItem('currentUser'))
 		}
 		getUser();
 	}, []);
@@ -233,15 +234,15 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 							transition="all 0.3s"
 							_focus={{ boxShadow: 'none' }}>
 							<HStack>
-								<Box 
+								<Box
 									borderRadius="full"
 									boxShadow='outline'
 									bg='white'>
-								<Avatar
-									size={'md'}
-									src={user.imgPdp}
+									<Avatar
+										size={'md'}
+										src={user.imgPdp}
 									/>
-									</Box>
+								</Box>
 								<VStack
 									display={{ base: 'none', md: 'flex' }}
 									alignItems="flex-start"

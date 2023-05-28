@@ -61,13 +61,14 @@ export class AuthController {
 	}
 
 	@Get('user')
-	async user(@Req() request: Request) {
+	async user(@Req() request: Request,
+	@Res() response : Response) {
 		try {
 			const user = await this.authService.getUserCookie(request);
 			if (!user)
 				return ("no user");
 			const { password, ...result } = user;
-			return result;
+			return response.send({user : result});
 		}
 		catch (e) {
 			return {

@@ -10,16 +10,19 @@ import { FiLogIn } from "react-icons/fi";
 import axios from "axios";
 import Home from "./components/Home";
 import { userSocket } from "./sockets/sockets";
-
+import Cookies from 'js-cookie';
+import { Socket } from "socket.io-client";
 
 export default function App() {
 	const [online, setOnline] = useState(false);
+	userSocket.on('connect', ()=> {
+		  setOnline(true);
+		  userSocket.emit('connect',{data : localStorage.getItem('currentUser')})
+	})
 
-
-useEffect(() => {
-
-	userSocket.on('connect', ()=> {console.log("connected front"); setOnline(true);})
-	},[online])
+	userSocket.on('pendingRequest', (userSocket)=> {
+		console.log('pending');
+	})
 	
   return (
     <BrowserRouter>

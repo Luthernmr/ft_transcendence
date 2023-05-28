@@ -2,6 +2,7 @@ import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge
 import axios from "axios";
 import { AddIcon, DragHandleIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
+import { userSocket } from "../../sockets/sockets";
 
 interface User {
 	id: number;
@@ -26,10 +27,17 @@ export default function AllUserItem() {
 		getAllUser();
 	}, []);
 
+	function sendFriendRequest(e : any, id : number){
+		e.preventDefault()
+		var current : User = JSON.parse(localStorage.getItem('currentUser')!)
+		userSocket.emit("friendRequest", {userSenderId :  current.id ,userReceiveId: id})
+		console.log('test');
+	}
+
 	return (
 		<List spacing={3}>
 			{users.map((user) => (
-				<Popover>
+				<Popover key={user.id}>
 					<Box >
 						<ListItem>
 							<Flex alignItems={'center'} justifyContent={'space-between'}>
@@ -66,6 +74,7 @@ export default function AllUserItem() {
 							<PopoverCloseButton />
 							<PopoverBody>
 								<IconButton
+								onClick={(e) => sendFriendRequest(e, user.id)}
 									variant='outline'
 									colorScheme='blue'
 									aria-label='addFriend'

@@ -1,9 +1,17 @@
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { userSocket } from '../sockets/sockets';
 export default function Home() {
 
+	useEffect(() => {
 
+		userSocket.on('connect', ()=> {
+			userSocket.auth = {
+					jwt :'prout'
+			  };
+		})
+		},[])
 	return (
 		<Flex width="100%">
 			
