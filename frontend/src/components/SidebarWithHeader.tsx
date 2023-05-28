@@ -35,6 +35,7 @@ import { IconType } from 'react-icons';
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import FriendList from './social/FriendList';
+import { userSocket } from '../sockets/sockets';
 
 interface LinkItemProps {
 	name: string;
@@ -193,6 +194,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 		{
 		}
 	}
+
+	userSocket.on('pendingRequest', (userSocket)=> {
+		
+		console.log('pending');
+	})
+	
 	return (
 		<Flex
 			ml={{ base: 0, md: 60 }}

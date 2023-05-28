@@ -23,13 +23,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
    //     this.server.emit('events', data);
    // }
 
-    handleConnection(client: Socket) {
-		//TODO - need to set User Socket
-		console.log("connected");
+    handleConnection(client: Socket,  auth : any) {
+		const userId = JSON.parse(client.handshake.auth.token).id;
+		this.userService.setSocket(userId, client.id);
+		console.log("connected socket id : ", client.id);
     }
 
     handleDisconnect(client: Socket) {
-        console.log('User disconnected');
+		console.log("disconnected socket id : ", client.id);
     }
 
     afterInit(server: Socket) {
@@ -45,8 +46,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//faire les verif (if les deux user sont ou pas amis)
 		const userReceiv = await this.userService.getUserById(data.userReceiveId)
 		const otherId = userReceiv.socketId;
-			console.log('other',otherId)
-			client.to(otherId).emit('pendingRequest', data.userSenderId);
+		client.to(otherId).emit('pendingRequest', data.userSenderId);
+		console.log("client: ", client.id + " request to ", ' other',otherId, )
 		
 			// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
 	}

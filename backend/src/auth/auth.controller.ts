@@ -57,7 +57,7 @@ export class AuthController {
 			throw new BadRequestException('bad password');
 		}
 
-		return this.authService.login(user, response);
+		return (await this.authService.login(user, response));
 	}
 
 	@Get('user')

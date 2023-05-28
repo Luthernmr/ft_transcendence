@@ -15,14 +15,14 @@ import { Socket } from "socket.io-client";
 
 export default function App() {
 	const [online, setOnline] = useState(false);
+	
 	userSocket.on('connect', ()=> {
-		  setOnline(true);
-		  userSocket.emit('connect',{data : localStorage.getItem('currentUser')})
+		auth: {
+			token: localStorage.getItem("currentUser")
+		  }
+		console.log('front connect')
 	})
-
-	userSocket.on('pendingRequest', (userSocket)=> {
-		console.log('pending');
-	})
+	
 	
   return (
     <BrowserRouter>
@@ -30,7 +30,7 @@ export default function App() {
 			<Route path="/Register" element={<RegisterCard />} />
 			<Route path="/Login" element={<LoginCard/>} />
 		
-			<Route path="/home/*" element={ online && <SidebarWithHeader>
+			<Route path="/home/*" element={ <SidebarWithHeader>
            		<Routes>
            		  <Route path="/" element={<Home/>} />
            		  <Route path="/Play" element={<Pong/>} /> 
