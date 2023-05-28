@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   Box,
   VStack,
@@ -8,7 +8,7 @@ import {
   Button,
   Flex,
   Spacer,
-} from '@chakra-ui/react';
+} from "@chakra-ui/react";
 
 interface Message {
   sender: string;
@@ -37,14 +37,14 @@ interface MessageItemProps {
 }
 
 const MessageItem: React.FC<MessageItemProps> = ({ sender, content }) => {
-  const isSentByMe = sender === 'Alice';
+  const isSentByMe = sender === "Alice";
 
   return (
     <Flex width="100%">
       {isSentByMe ? <Spacer /> : null}
       <Box
-        bg={isSentByMe ? 'blue.400' : 'gray.300'}
-        color={isSentByMe ? 'white' : 'black'}
+        bg={isSentByMe ? "blue.400" : "gray.300"}
+        color={isSentByMe ? "white" : "black"}
         borderRadius="lg"
         px={4}
         py={2}
@@ -59,12 +59,21 @@ const MessageItem: React.FC<MessageItemProps> = ({ sender, content }) => {
 };
 
 const ChatComponent: React.FC = () => {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState<Message[]>(exampleMessages);
+  const chatRef = useRef<HTMLDivElement>(null);
 
   const sendMessage = () => {
-    console.log('Message sent:', inputValue);
-    setInputValue('');
+    console.log("Message sent:", inputValue);
+    setInputValue("");
   };
+
+  useEffect(() => {
+    // Scroll to the bottom of the chat box when new messages are added
+    if (chatRef.current) {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <Flex
@@ -72,19 +81,18 @@ const ChatComponent: React.FC = () => {
       borderRadius="lg"
       p={4}
       boxShadow="md"
-      h="calc(100vh - 115px)"
+      h="calc(100vh - 115px)" // Subtract 20px for the mobile navigation bar
+      w="100%"
       direction="column"
       justify="space-between"
     >
-      <VStack spacing={4} align="start" overflowY="auto" flex="1">
-        {exampleMessages.map((msg, index) => (
-          <MessageItem
-            key={index}
-            sender={msg.sender}
-            content={msg.content}
-          />
-        ))}
-      </VStack>
+      <Box flex="1" overflowY="auto" ref={chatRef}>
+        <VStack spacing={4} align="start">
+          {messages.map((msg, index) => (
+            <MessageItem key={index} sender={msg.sender} content={msg.content} />
+          ))}
+        </VStack>
+      </Box>
       <HStack spacing={4} mt={4}>
         <Input
           value={inputValue}
