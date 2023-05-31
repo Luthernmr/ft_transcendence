@@ -5,7 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/user.entity'
 
 import { Module } from '@nestjs/common';
-import { Friend } from 'src/social/friend.entiy';
+import { Friend } from 'src/social/friend.entity';
+import { PendingRequest } from 'src/social/pendingRequest.entity';
 
 @Module({
    		imports: [TypeOrmModule.forRoot({
@@ -15,7 +16,7 @@ import { Friend } from 'src/social/friend.entiy';
 		username: 'root',
 		password: 'root',
 		database: 'ft_db',
-		entities: [User,Friend],
+		entities: [User,Friend, PendingRequest],
 		synchronize: true,
 	})
 	],

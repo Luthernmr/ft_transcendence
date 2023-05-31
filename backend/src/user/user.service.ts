@@ -5,62 +5,61 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
+import { PendingRequest } from 'src/social/pendingRequest.entity';
 
 @Injectable()
 export class UserService {
 	constructor(
-			@InjectRepository(User)
-			private userRepository: Repository<User>,
-			) {}
-			
-			async create(data: any): Promise<User>{
-				return this.userRepository.save(data);
-			}
-			async getUser(email: any): Promise<User>
-		{
-			return this.userRepository.findOne({ where: { email: email } });
-		}
-		
-		async getAllUser() : Promise <any>
-		{
-			//this.userRepository.find()
-			const users = await this.userRepository.find();
-			return users;
-		}
+		@InjectRepository(User)
+		private userRepository: Repository<User>,
+		@InjectRepository(PendingRequest)
+			private pendingRequest: Repository<PendingRequest>
+	) { }
 
-		async getUserById(id: number): Promise<User>
-		{
-			return await this.userRepository.findOne({ where: { id: id } });
-		}
+	async create(data: any): Promise<User> {
+		return this.userRepository.save(data);
+	}
+	async getUser(email: any): Promise<User> {
+		return this.userRepository.findOne({ where: { email: email } });
+	}
 
-		async setSocket(id : number, socketId : string)
-		{
-			var user : any = await this.getUserById(id);
-			console.log('test', user.nickname);
-			user.socketId = socketId;
-			await this.userRepository.save(user);
-		}
+	async getAllUser(): Promise<any> {
+		//this.userRepository.find()
+		const users = await this.userRepository.find();
+		return users;
+	}
 
-		async setOnline(user : User)
-		{
-			user.isOnline = true;
-			await this.userRepository.save(user);
-		}
-		async setOffline(user : User)
-		{
-			user.isOnline = false;
-			await this.userRepository.save(user);
-		}
+	async getUserById(id: number): Promise<User> {
+		return await this.userRepository.findOne({ where: { id: id } });
+	}
 
-		async changeImg(user : User, img: string)
-		{
-			user.imgPdp = img;
-			await this.userRepository.save(user);
-		}
-		async changeNickname(user : User, nickname: string)
-		{
-			user.nickname = nickname;
-			await this.userRepository.save(user);
-		}
+	async setSocket(id: number, socketId: string) {
+		var user: any = await this.getUserById(id);
+		console.log('test', user.nickname);
+		user.socketId = socketId;
+		await this.userRepository.save(user);
+	}
+
+	async setOnline(user: User) {
+		user.isOnline = true;
+		await this.userRepository.save(user);
+	}
+	async setOffline(user: User) {
+		user.isOnline = false;
+		await this.userRepository.save(user);
+	}
+
+	async changeImg(user: User, img: string) {
+		user.imgPdp = img;
+		await this.userRepository.save(user);
+	}
+	async changeNickname(user: User, nickname: string) {
+		user.nickname = nickname;
+		await this.userRepository.save(user);
+	}
+
+	async createPendingRequest(data : any) : Promise<PendingRequest> {
+		return this.pendingRequest.save(data);
+	}
 
 }

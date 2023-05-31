@@ -48,6 +48,8 @@ export default function loginCard() {
 			navigate('/Home');
 		} catch (error) {
 			console.log(error);
+			console.log(formValue.email);
+			console.log(formValue.password);
 		}
 	};
 

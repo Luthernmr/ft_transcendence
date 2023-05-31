@@ -17,10 +17,11 @@ export class AuthService {
 
 	) { }
 	async login(user: User, response : Response): Promise<any> {
-		this.userService.setOnline(user);
+		await this.userService.setOnline(user);
 		const payload = { id: user.id, nickname: user.nickname, email: user.email, isOnline: user.isOnline };
 		const jwt = await this.jwtService.signAsync(payload);
 		response.cookie('jwt', jwt, { httpOnly: true });
+	 	response.send({token : jwt})
 	}
 	
 	async getUserCookie(request : Request): Promise<User>

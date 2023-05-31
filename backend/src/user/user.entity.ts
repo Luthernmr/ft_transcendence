@@ -1,7 +1,8 @@
-import { Friend } from 'src/social/friend.entiy';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable } from 'typeorm';
+import { Friend } from 'src/social/friend.entity';
+import { PendingRequest } from 'src/social/pendingRequest.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
 
-@Entity('users')
+@Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
@@ -15,7 +16,7 @@ export class User {
   @Column({nullable: true})
   password: string;
 
-  @Column()
+  @Column({nullable: true})
   imgPdp: string;
 
   @Column({ default: false })
@@ -24,7 +25,7 @@ export class User {
   @Column({nullable: true})
   socketId: string;
 
-  @ManyToMany(() => Friend, friend => friend.users)
+  @OneToMany(() => Friend, friend => friend.user)
   @JoinTable()
   friends: Friend[];
 }

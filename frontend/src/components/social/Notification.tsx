@@ -15,8 +15,25 @@ import {
 	TabPanel,
 	TabPanels,
 	Tabs,
+	IconButton,
+	Box,
+	Avatar,
+	Tag,
+	TagLabel,
+	Text,
+	Flex,
+	Stack,
+	Bold
 } from '@chakra-ui/react'
 import React from 'react'
+import {
+	FiSettings,
+	FiMenu,
+	FiBell,
+	FiChevronDown,
+	FiMessageSquare,
+} from 'react-icons/fi';
+import { userSocket } from '../../sockets/sockets';
 
 function Example() {
 	// 1. Create the component
@@ -60,22 +77,60 @@ function Example() {
 	return <DataTabs data={tabData} />
 }
 
-export default function RequestPopover() {
+const PendingRequest = () => {
+	return (
+		<Box>
+			<Tabs variant='soft-rounded' colorScheme='blue'>
+				<TabList>
+					<Tab>Friends Request</Tab>
+					<Tab>New Message</Tab>
+				</TabList>
+				<TabPanels>
+					<TabPanel>
+						<Stack direction='row' align='center' m={2}>
+							<Avatar
+								src='https://bit.ly/sage-adebayo'
+								size='xs'
+								name='Segun Adebayo'
+								ml={-1}
+								mr={2}
+								/>
+								<Text><Text as='b'>Luther </Text>want .play. with you</Text>
+						</Stack>
+						<Stack spacing={2} direction='row' align='center'>
+							
+							<Button colorScheme='twitter' size='sm'>Accepter</Button>
+							<Button colorScheme='gray' size='sm'>Rejeter</Button>
+						</Stack>
 
+					</TabPanel>
+					<TabPanel>
+						<p>two!</p>
+					</TabPanel>
+				</TabPanels>
+			</Tabs>
+		</Box>
+	)
+}
+export default function Notification() {
+userSocket.on('')
 	return (
 		<Popover>
 			<PopoverTrigger>
-				<Button>Trigger</Button>
+				<IconButton
+					size="lg"
+					variant="ghost"
+					aria-label="open menu"
+					icon={<FiBell />}
+				/>
 			</PopoverTrigger>
 			<Portal>
 				<PopoverContent>
 					<PopoverArrow />
-					<PopoverHeader>Header</PopoverHeader>
 					<PopoverCloseButton />
 					<PopoverBody>
-						<Button colorScheme='blue'>Button</Button>
+						<PendingRequest />
 					</PopoverBody>
-					<PopoverFooter>This is the footer</PopoverFooter>
 				</PopoverContent>
 			</Portal>
 		</Popover>

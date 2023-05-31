@@ -9,7 +9,7 @@ async function bootstrap() {
 	app.use(cookieParser());
 
 	app.enableCors({
-			 origin : 'http://212.227.209.204:3000',
+			 origin : ['http://212.227.209.204:3000', 'https://api.intra.42.fr/oauth/'],
 		 	 credentials : true
 		})
 		app.useGlobalPipes(new ValidationPipe({

@@ -1,5 +1,5 @@
 import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 
 @Entity('friend')
 export class Friend {
@@ -15,7 +15,7 @@ export class Friend {
 	@Column()
 	blocked: boolean;
 
-	@ManyToMany(() => User, user => user.friends)
+	@ManyToOne(() => User, user => user.friends)
 	@JoinTable()
-	users: User[];
+	user: User[];
 }

@@ -9,6 +9,8 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { validate } from 'class-validator';
 import { SocketAddress } from 'net';
+import { FriendService } from 'src/social/friend.service';
+import { PendingRequest } from 'src/social/pendingRequest.entity';
 
 @WebSocketGateway({ cors: { origin: ['http://212.227.209.204:3000'] , cookie: true} })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -23,10 +25,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
    //     this.server.emit('events', data);
    // }
 
-    handleConnection(client: Socket,  auth : any) {
-		const userId = JSON.parse(client.handshake.auth.token).id;
-		this.userService.setSocket(userId, client.id);
+    async handleConnection(client: Socket,  auth : any) {
+		//recup le jwt dqns le socket et le decoder pour recup les data
+
+		
+		//await this.userService.setSocket(userId, client.id);
 		console.log("connected socket id : ", client.id);
+
     }
 
     handleDisconnect(client: Socket) {
@@ -46,8 +51,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//faire les verif (if les deux user sont ou pas amis)
 		const userReceiv = await this.userService.getUserById(data.userReceiveId)
 		const otherId = userReceiv.socketId;
-		client.to(otherId).emit('pendingRequest', data.userSenderId);
-		console.log("client: ", client.id + " request to ", ' other',otherId, )
+		const request = await this.userService.createPendingRequest({
+			type : "friend",
+			senderId : data.userSenderId,
+		})
+		client.to(otherId).emit('pendingRequest', request);
+		//console.log("client: ", client.id + " request to ", ' other',otherId, )
 		
 			// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
 	}

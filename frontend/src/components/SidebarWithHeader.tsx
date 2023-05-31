@@ -35,6 +35,7 @@ import { IconType } from 'react-icons';
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import FriendList from './social/FriendList';
+import Notification from './social/Notification';
 import { userSocket } from '../sockets/sockets';
 
 interface LinkItemProps {
@@ -228,12 +229,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			</Text>
 
 			<HStack spacing={{ base: '0', md: '6' }}>
-				<IconButton
-					size="lg"
-					variant="ghost"
-					aria-label="open menu"
-					icon={<FiBell />}
-				/>
+				
+				<Notification />
 				<Flex alignItems={'center'}>
 					<Menu>
 						<MenuButton

@@ -17,7 +17,6 @@ export class Auth42Service {
 	) { }
 
 	async login(request: any): Promise<any> {
-		console.log(request.user)
 		var user: User = await this.userService.getUser(request.user._json.email);
 		if (!user) {
 			user = await this.userService.create({
@@ -27,6 +26,7 @@ export class Auth42Service {
 				isOnline: false
 			});
 		}
+		await this.userService.setOnline(user);
 		const payload = { id: user.id, nickname: user.nickname, email: user.email, isOnline: user.isOnline };
 		const jwt = await this.jwtService.signAsync(payload);
 		return jwt;
