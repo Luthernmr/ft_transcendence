@@ -11,8 +11,9 @@ import { validate } from 'class-validator';
 import { SocketAddress } from 'net';
 import { FriendService } from 'src/social/friend.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
+import 'dotenv/config'
 
-@WebSocketGateway({ cors: { origin: ['http://212.227.209.204:3000'] , cookie: true} })
+@WebSocketGateway({ cors: { origin: process.env.FRONTEND, cookie: true} })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer()
     server: Server;

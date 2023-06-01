@@ -17,10 +17,10 @@ export class UserService {
 	) { }
 
 	async create(data: any): Promise<User> {
-		return await this.userRepository.save(data);
+		return this.userRepository.save(data);
 	}
 	async getUser(email: any): Promise<User> {
-		return await this.userRepository.findOne({ where: { email: email } });
+		return this.userRepository.findOne({ where: { email: email } });
 	}
 
 	async getAllUser(): Promise<any> {

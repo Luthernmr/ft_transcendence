@@ -43,7 +43,7 @@ export default function UserProfileSettings() {
 	const SendModif = async (event : any) =>  {
 		event.preventDefault();
 		try {
-		  const response = await axios.post('http://212.227.209.204:5000/api/settings', {
+		  const response = await axios.post(import.meta.env.VITE_BACKEND + '/api/settings', {
 			  "img" : profile.imgPdp,
 			  "nickname" :  profile.nickname
 			

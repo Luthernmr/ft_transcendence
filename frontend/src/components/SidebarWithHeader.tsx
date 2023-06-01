@@ -178,7 +178,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 
 	useEffect(() => {
 		const getUser = async () => {
-			const res = await axios.get('http://212.227.209.204:5000/api/user', { withCredentials: true });
+			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
 			setUser(res.data.user);
 			localStorage.setItem('currentUser', JSON.stringify(res.data.user))
 			console.log(localStorage.getItem('currentUser'))
@@ -188,7 +188,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	const navigate = useNavigate();
 	const signOut = async (event: any) => {
 		try {
-			const response = await axios.get('http://212.227.209.204:5000/api/logout', { withCredentials: true })
+			const response = await axios.get(import.meta.env.VITE_BACKEND + 'api/logout', { withCredentials: true })
 			console.log(response.data);
 			navigate('/Login')
 		} catch

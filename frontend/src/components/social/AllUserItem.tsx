@@ -21,7 +21,7 @@ export default function AllUserItem() {
 
 	useEffect(() => {
 		const getAllUser = async () => {
-			const res = await axios.get('http://212.227.209.204:5000/user/all', { withCredentials: true });
+			const res = await axios.get(import.meta.env.VITE_BACKEND + '/user/all', { withCredentials: true });
 			setUsers(res.data.users);
 		}
 		getAllUser();
