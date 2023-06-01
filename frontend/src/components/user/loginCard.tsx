@@ -14,7 +14,7 @@ import {
 import axios from 'axios';
 import { FormEventHandler } from 'react';
 import { useState, ChangeEvent, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 interface FormValue {
 	email: string;
@@ -53,8 +53,23 @@ export default function loginCard() {
 		}
 	};
 
+	const [isConnected, setConnected] = useState(false);
+
+	
+
+	useEffect(() => {
+		if (!isConnected)
+		{
+			
+		}
+	})
 	const connectAPI = async (event: any) => {
-		window.location.href = 'https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-4e4b700d8e948264d6535a43e80e6a0f64a8f20752bd33c1cc2b97bbac5a53d7&redirect_uri=http%3A%2F%2F212.227.209.204%3A5000%2Fauth%2F42&response_type=code';
+		window.location.href = "https://api.intra.42.fr/oauth/authorize?client_id=u-s4t2ud-4e4b700d8e948264d6535a43e80e6a0f64a8f20752bd33c1cc2b97bbac5a53d7&redirect_uri=http%3A%2F%2F212.227.209.204%3A5000%2Fauth%2F42&response_type=code"
+		const response = await axios.	post('http://212.227.209.204:5000/auth/42', { withCredentials: true });
+		console.log(response);
+		navigate('/Home');
+		
+	
 	}
 
 

@@ -15,7 +15,7 @@ import { PendingRequest } from 'src/social/pendingRequest.entity';
 		port: 5432,
 		username: 'root',
 		password: 'root',
-		database: 'ft_db',
+		database: 'test_db',
 		entities: [User,Friend, PendingRequest],
 		synchronize: true,
 	})

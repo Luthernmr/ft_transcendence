@@ -17,10 +17,10 @@ export class UserService {
 	) { }
 
 	async create(data: any): Promise<User> {
-		return this.userRepository.save(data);
+		return await this.userRepository.save(data);
 	}
 	async getUser(email: any): Promise<User> {
-		return this.userRepository.findOne({ where: { email: email } });
+		return await this.userRepository.findOne({ where: { email: email } });
 	}
 
 	async getAllUser(): Promise<any> {
@@ -59,7 +59,7 @@ export class UserService {
 	}
 
 	async createPendingRequest(data : any) : Promise<PendingRequest> {
-		return this.pendingRequest.save(data);
+		return await this.pendingRequest.save(data);
 	}
 
 }

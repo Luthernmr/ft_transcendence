@@ -9,9 +9,10 @@ import { AuthService } from './auth/auth.service';
 import { Module } from '@nestjs/common';
 import { BddModule } from './bdd/bdd.module';
 import { JwtService } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-	imports: [FriendModule, UserModule, BddModule, AuthModule, SocketModule],
+	imports: [FriendModule, UserModule, BddModule, AuthModule, SocketModule, ConfigModule.forRoot({envFilePath: '.env'})],
 	controllers: [],
 	providers: [Auth42Service, JwtService]
 })

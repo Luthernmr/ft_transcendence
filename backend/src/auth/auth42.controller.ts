@@ -6,6 +6,7 @@ import { Controller, Get, Res, Req, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
+import axios from "axios";
 
 
 @Controller('auth')
@@ -20,9 +21,16 @@ export class Auth42Controller {
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: any
 	) {
+		const ret = await axios.get('https://api.intra.42.fr/v2/me', {
+			headers: {
+			  Authorization: "Bearer " + request.user.access_token,
+			},
+		})
 		console.log(request)
-		let token = await this.auth42Service.login(request);
-		response.cookie('jwt', token, { httpOnly: true });
+		let token = await this.auth42Service.login(request.user);
+		 response.cookie('jwt', token, { httpOnly: true });
+	
+		response.redirect('http://212.227.209.204:3000/home');
 		return ({ jwt : token});
 	}
 }

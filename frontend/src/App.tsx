@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, BrowserRouter, Navigate, useNavigate } from "react-router-dom";
+import { Routes, Route, BrowserRouter, Navigate, useNavigate, useLocation } from "react-router-dom";
 import Chat from "./components/Chat";
 import Pong from "./components/Pong";
 import Settings from "./components/user/Settings";
@@ -23,6 +23,15 @@ export default function App() {
 		console.log('front connect')
 	})
 	
+		//const location = useLocation();
+	  //
+		//// Utilisation de location pour accéder à l'URL
+		//console.log(location.pathname); // Récupère le chemin de l'URL
+		//console.log(location.search); // Récupère les paramètres de requête (y compris le point d'interrogation)
+	  //
+		//// Utilisation de URLSearchParams pour manipuler les paramètres de requête
+		//const params = new URLSearchParams(location.search);
+		//console.log(params.get('code')); 
 	
   return (
     <BrowserRouter>
