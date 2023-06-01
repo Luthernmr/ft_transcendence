@@ -1,4 +1,4 @@
-import { Controller, Get, Body } from '@nestjs/common';
+import { Controller, Get, Body, Req } from '@nestjs/common';
 import { TestService } from '../services/test.service'
 
 @Controller('test')
@@ -13,8 +13,8 @@ export class TestController {
 	}
 
 	@Get('/user')
-	async createUser() {
-		const newUser = await this.testService.createUser();
+	async createUser(@Body() data: string) {
+		const newUser = await this.testService.createUser(data);
 		return ;
 	}
 }

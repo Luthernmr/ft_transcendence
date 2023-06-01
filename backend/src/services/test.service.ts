@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Body, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -14,11 +14,12 @@ export class TestService {
 		return 'Welcome to transcendence v0.0.1f8.2!';
 	}
 
-	async createUser() : Promise<User> {
+	async createUser(hd: string) : Promise<User> {
 		const newUser = new User();
 		newUser.name = "Aza";
 		newUser.email = "aza@lol.com";
 		newUser.password = "123";
+		console.log("Created user from ip " + hd);
 		await this.userRepository.save(newUser);
 		return newUser;
 	}

@@ -61,7 +61,7 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      #device: ./backend
+      #device: ${PWD}/backend
       device: /home/fbelthoi/ft_transcendence/backend
       o: bind
 
@@ -70,6 +70,6 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      #device: ./frontend
+      #device: ${PWD}/frontend
       device: /home/fbelthoi/ft_transcendence/frontend
       o: bind

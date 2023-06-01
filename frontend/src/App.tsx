@@ -1,11 +1,10 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Root from './routes/root'
 import Account from './account/Accout'
 import Chat from './chat/Chat'
 import Pong from './pong/Pong'
+import TicTacToe from './pong/TicTacToe'
 
 function App() {
   return (
