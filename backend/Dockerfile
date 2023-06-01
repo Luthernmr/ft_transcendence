@@ -1,13 +1,14 @@
-FROM node:14.16.1
+FROM node:latest
 
 WORKDIR /app
 
-#COPY package.json ./
+COPY package.json ./
 
 RUN npm install
+RUN npm install -g @nestjs/cli
 
 #COPY . .
 
-#EXPOSE 5000
+EXPOSE 5000
 
 CMD ["npm", "run", "start:dev"]

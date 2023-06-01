@@ -23,5 +23,3 @@ fclean:			clean
 re:			down fclean all
 
 .PHONY: all up down clean fclean re
-
-#docker volume rm $(docker volume ls -q)

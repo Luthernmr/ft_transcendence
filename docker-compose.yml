@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      POSTGRES_DB: test_db
+      POSTGRES_DB: ft_db
     ports:
       - "5432:5432"
     networks:
@@ -57,19 +57,19 @@ networks:
 
 volumes:
   backend-data:
-    name: backend-data
     driver: local
     driver_opts:
       type: none
-      #device: ${PWD}/backend
-      device: /home/fbelthoi/ft_transcendence/backend
       o: bind
+      #device: ./backend
+      device: /home/fbelthoi/ft_transcendence/backend #use this with absolute path if docker doesn't want to compile because of relative path
+      #device: /home/$USER/ft_transcendence/backend
 
   frontend-data:
-    name: frontend-data
     driver: local
     driver_opts:
       type: none
-      #device: ${PWD}/frontend
-      device: /home/fbelthoi/ft_transcendence/frontend
       o: bind
+      #device: ./frontend
+      #device: /home/$USER/ft_transcendence/frontend
+      device: /home/fbelthoi/ft_transcendence/frontend #use this with absolute path if docker doesn't want to compile because of relative path

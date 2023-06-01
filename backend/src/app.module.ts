@@ -1,27 +1,20 @@
+import { FriendModule } from './social/friend.module';
+import { FriendController } from './social/friend.controller';
+import { Auth42Controller } from './auth/auth42.controller';
+import { Auth42Service } from './auth/auth42.service';
+import { SocketModule } from './user/socket.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
+import { AuthService } from './auth/auth.service';
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { TestController } from './controllers/test.controller';
-import { TestService } from './services/test.service';
-import { TestGateway } from './services/test/test.gateway';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity'
+import { BddModule } from './bdd/bdd.module';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
+
 
 @Module({
-  imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'postgres',
-      port: 5432,
-      username: 'root',
-      password: 'root',
-      database: 'test_db',
-      entities: [User],
-      synchronize: true,
-    }),
-    TypeOrmModule.forFeature([User]),
-  ],
-  controllers: [AppController, TestController],
-  providers: [AppService, TestService, TestGateway],
+	imports: [FriendModule, UserModule, BddModule, AuthModule, SocketModule, ConfigModule.forRoot()],
+	controllers: [],
+	providers: [Auth42Service, JwtService]
 })
-export class AppModule {}
+export class AppModule { }
