@@ -38,7 +38,7 @@ import { useNavigate } from 'react-router-dom';
 	
 	  const handleSubmit = async () => {
 		
-		axios.post('http://212.227.209.204:5000/api/register',
+		axios.post(import.meta.env.VITE_BACKEND + '/api/register',
 			{
 				"nickname" : formValue.nickname,
 				"email" : formValue.email,

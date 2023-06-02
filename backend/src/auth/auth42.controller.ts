@@ -30,7 +30,7 @@ export class Auth42Controller {
 		let token = await this.auth42Service.login(request.user);
 		 response.cookie('jwt', token, { httpOnly: true });
 	
-		response.redirect('http://212.227.209.204:3000/home');
+		response.redirect(process.env.FRONTEND + '/home');
 		return ({ jwt : token});
 	}
 }
