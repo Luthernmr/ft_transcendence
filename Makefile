@@ -1,5 +1,5 @@
 NAME	= transcendence
-#VOLUMES	= $(shell echo | docker volume ls -q)
+VOLUMES	= $(shell echo | docker volume ls -q)
 
 all:	${NAME}
 

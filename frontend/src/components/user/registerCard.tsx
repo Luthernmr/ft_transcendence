@@ -14,6 +14,7 @@ import {
   } from '@chakra-ui/react';
   import axios from 'axios';
   import { useState, ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
   
   interface FormValue {
 	email: string;
@@ -33,16 +34,18 @@ import {
 	  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setFormValue({...formValue, [event.target.name]: event.target.value});
 	  };
+	  const navigate = useNavigate();
 	
 	  const handleSubmit = async () => {
 		
-		axios.post(import.meta.env.VITE_BACKEND + '/api/register',
+		axios.post('http://212.227.209.204:5000/api/register',
 			{
 				"nickname" : formValue.nickname,
 				"email" : formValue.email,
 				"password" : formValue.password
 			}
 		);
+		navigate('/login');
 		//console.log(response.data);
 		
 	  };
