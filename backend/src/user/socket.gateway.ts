@@ -26,11 +26,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
    //     this.server.emit('events', data);
    // }
 
-    async handleConnection(client: Socket,  auth : any) {
+    async handleConnection(client: Socket) {
 		//recup le jwt dqns le socket et le decoder pour recup les data
 
 		
 		//await this.userService.setSocket(userId, client.id);
+		console.log("token", console.log(client.handshake.auth.token));
 		console.log("connected socket id : ", client.id);
 
     }

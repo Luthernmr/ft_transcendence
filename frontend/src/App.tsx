@@ -12,42 +12,58 @@ import Home from "./components/Home";
 import { userSocket } from "./sockets/sockets";
 import Cookies from 'js-cookie';
 import { Socket } from "socket.io-client";
+import { error } from "console";
 
 export default function App() {
+
+	// Ajouter un état pour suivre si getAuthToken a déjà été appelée
+	const [authTokenCalled, setAuthTokenCalled] = useState(false);
+
+	const navigate = useNavigate();
+	React.useEffect(() => {
+		if (location.search.includes('code') && !authTokenCalled) {
+			const getAuthToken = async () => {
+				try{
+					const res = await axios.get(import.meta.env.VITE_BACKEND + '/auth/42' + location.search, { withCredentials: true });
+					console.log("res", res.data);
+					if (res.data.jwt)
+						localStorage.setItem('jwt', res.data.jwt);
+						navigate('/home');
+				}
+				catch(error)
+				{
+					console.log("already",error)
+				}
+			};
+			getAuthToken();
+			setAuthTokenCalled(true); // Mettre à jour l'état pour indiquer que getAuthToken a été appelée
+		}
+		console.log("here", location);
+	}, [location, authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
+
 	const [online, setOnline] = useState(false);
-	
-	userSocket.on('connect', ()=> {
+
+	userSocket.on('connect', () => {
 		auth: {
 			token: localStorage.getItem("currentUser")
-		  }
+		}
 		console.log('front connect')
 	})
-	
-		//const location = useLocation();
-	  //
-		//// Utilisation de location pour accéder à l'URL
-		//console.log(location.pathname); // Récupère le chemin de l'URL
-		//console.log(location.search); // Récupère les paramètres de requête (y compris le point d'interrogation)
-	  //
-		//// Utilisation de URLSearchParams pour manipuler les paramètres de requête
-		//const params = new URLSearchParams(location.search);
-		//console.log(params.get('code')); 
-	
-  return (
-    <BrowserRouter>
+
+
+	return (
 		<Routes>
 			<Route path="/Register" element={<RegisterCard />} />
-			<Route path="/Login" element={<LoginCard/>} />
-		
-			<Route path="/home/*" element={ <SidebarWithHeader>
-           		<Routes>
-           		  <Route path="/" element={<Home/>} />
-           		  <Route path="/Play" element={<Pong/>} /> 
-           		  <Route path="/Chat" element={<Chat/>} />
-           		  <Route path="/Settings" element={<Settings/>}  />
-           		</Routes>
-        </SidebarWithHeader>} />
+			<Route path="/Login" element={<LoginCard />} />
+
+			<Route path="/home/*" element={<SidebarWithHeader>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/Play" element={<Pong />} />
+					<Route path="/Chat" element={<Chat />} />
+					<Route path="/Settings" element={<Settings />} />
+				</Routes>
+			</SidebarWithHeader>} />
 		</Routes>
-    </BrowserRouter>	
-  );
+	);
 }

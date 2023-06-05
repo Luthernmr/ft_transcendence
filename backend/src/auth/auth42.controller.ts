@@ -21,16 +21,11 @@ export class Auth42Controller {
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: any
 	) {
-		const ret = await axios.get('https://api.intra.42.fr/v2/me', {
-			headers: {
-			  Authorization: "Bearer " + request.user.access_token,
-			},
-		})
-		console.log(request)
+		//console.log("here", request)
 		let token = await this.auth42Service.login(request.user);
-		 response.cookie('jwt', token, { httpOnly: true });
-	
-		response.redirect('http://212.227.209.204:3000/home');
+
+		response.cookie('jwt', token, { httpOnly: true });
+		//response.redirect('http://212.227.209.204:3000/home');
 		return ({ jwt : token});
 	}
 }

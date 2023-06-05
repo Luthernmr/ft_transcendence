@@ -7,9 +7,11 @@ import LoginCard from './components/user/loginCard'
 import RegisterCard from './components/user/registerCard'
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  <React.StrictMode>
-    <ChakraProvider>	
-        <App />
-    </ChakraProvider>
-  </React.StrictMode>,
+	<React.StrictMode>
+		<ChakraProvider>
+			<BrowserRouter>
+				<App />
+			</BrowserRouter>
+		</ChakraProvider>
+	</React.StrictMode>,
 )

@@ -45,6 +45,7 @@ export default function loginCard() {
 				"password": formValue.password
 			}, { withCredentials: true });
 			console.log(response.data);
+			localStorage.setItem('jwt', response.data.token);
 			navigate('/Home');
 		} catch (error) {
 			console.log(error);
