@@ -25,7 +25,6 @@ import {
 import {
 	FiSettings,
 	FiMenu,
-	FiBell,
 	FiChevronDown,
 	FiMessageSquare,
 } from 'react-icons/fi';
@@ -34,7 +33,6 @@ import { RiGamepadLine } from 'react-icons/ri';
 import { IconType } from 'react-icons';
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import FriendList from './social/FriendList';
 import Notification from './social/Notification';
 import { userSocket } from '../sockets/sockets';
 
@@ -74,7 +72,7 @@ export default function SidebarWithHeader({ children }: {
 				</Drawer>
 				{/* mobilenav */}
 				<MobileNav onOpen={onOpen} />
-				<Box
+				{/* <Box
 					pos="fixed"
 					right="0"
 					bg={useColorModeValue('white', 'gray.900')}
@@ -82,7 +80,7 @@ export default function SidebarWithHeader({ children }: {
 					w={{ base: 'full', md: 60 }}
 				>
 					<FriendList />
-				</Box >
+				</Box > */}
 				<Box ml={{ base: 0, md: 60 }} p="4">
 					{children}
 				</Box>
