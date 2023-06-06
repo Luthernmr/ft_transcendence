@@ -6,13 +6,13 @@ export declare class SocketGateway implements OnGatewayConnection, OnGatewayDisc
     private readonly userService;
     server: Server;
     constructor(userService: UserService);
-    handleConnection(client: Socket): Promise<void>;
+    handleConnection(client: Socket): any;
     handleDisconnect(client: Socket): void;
     afterInit(server: Socket): void;
     Friend(client: Socket, data: {
         userSenderId: any;
         userReceiveId: any;
-    }): Promise<void>;
+    }): any;
     acceptFriendRequest(data: {
         validate: any;
         userSenderId: any;
