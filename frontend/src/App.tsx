@@ -13,35 +13,9 @@ import { userSocket } from "./sockets/sockets";
 import Cookies from 'js-cookie';
 import { Socket } from "socket.io-client";
 import { error } from "console";
+import AuthElement from "./components/user/AuthElement";
 
 export default function App() {
-
-	// Ajouter un état pour suivre si getAuthToken a déjà été appelée
-	const [authTokenCalled, setAuthTokenCalled] = useState(false);
-
-	const navigate = useNavigate();
-	React.useEffect(() => {
-		if (location.search.includes('code') && !authTokenCalled) {
-			const getAuthToken = async () => {
-				try{
-					const res = await axios.get(import.meta.env.VITE_BACKEND + '/auth/42' + location.search, { withCredentials: true });
-					console.log("res", res.data);
-					if (res.data.jwt)
-						localStorage.setItem('jwt', res.data.jwt);
-						navigate('/home');
-				}
-				catch(error)
-				{
-					console.log("already",error)
-				}
-			};
-			getAuthToken();
-			setAuthTokenCalled(true); // Mettre à jour l'état pour indiquer que getAuthToken a été appelée
-		}
-		console.log("here", location);
-	}, [location, authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
-
-	const [online, setOnline] = useState(false);
 
 	userSocket.on('connect', () => {
 		auth: {
@@ -55,6 +29,7 @@ export default function App() {
 		<Routes>
 			<Route path="/Register" element={<RegisterCard />} />
 			<Route path="/Login" element={<LoginCard />} />
+			<Route path="/Auth" element={<AuthElement />} />
 
 			<Route path="/home/*" element={<SidebarWithHeader>
 				<Routes>

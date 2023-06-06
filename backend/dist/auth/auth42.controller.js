@@ -11,11 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Auth42Controller = void 0;
 const common_1 = require("@nestjs/common");
-const express_1 = require("express");
 const auth42_guard_1 = require("./auth42.guard");
 const auth42_service_1 = require("./auth42.service");
 let Auth42Controller = class Auth42Controller {
@@ -34,7 +32,7 @@ __decorate([
     __param(0, (0, common_1.Res)({ passthrough: true })),
     __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_a = typeof express_1.Response !== "undefined" && express_1.Response) === "function" ? _a : Object, Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], Auth42Controller.prototype, "login42", null);
 Auth42Controller = __decorate([

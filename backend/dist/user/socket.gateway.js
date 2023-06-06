@@ -11,7 +11,6 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-var _a, _b;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SocketGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
@@ -50,12 +49,12 @@ let SocketGateway = class SocketGateway {
 };
 __decorate([
     (0, websockets_1.WebSocketServer)(),
-    __metadata("design:type", typeof (_a = typeof socket_io_1.Server !== "undefined" && socket_io_1.Server) === "function" ? _a : Object)
+    __metadata("design:type", socket_io_1.Server)
 ], SocketGateway.prototype, "server", void 0);
 __decorate([
     (0, websockets_1.SubscribeMessage)('friendRequest'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [typeof (_b = typeof socket_io_1.Socket !== "undefined" && socket_io_1.Socket) === "function" ? _b : Object, Object]),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
     __metadata("design:returntype", Promise)
 ], SocketGateway.prototype, "Friend", null);
 __decorate([

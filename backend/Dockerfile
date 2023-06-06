@@ -9,6 +9,6 @@ RUN npm install
 RUN npm install -g @nestjs/cli
 
 
-EXPOSE 5001
+EXPOSE 5000
 
 CMD ["npm", "run", "start:dev"]

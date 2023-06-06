@@ -35,6 +35,7 @@ import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import Notification from './social/Notification';
 import { userSocket } from '../sockets/sockets';
+import FriendList from './social/FriendList';
 
 interface LinkItemProps {
 	name: string;
@@ -53,7 +54,7 @@ export default function SidebarWithHeader({ children }: {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	return (
 		<>
-			<Box minH="100%" bg={useColorModeValue('gray.100', 'gray.900')}>
+			<Flex h={'100vh'} flexDirection={'column'} bg={useColorModeValue('gray.100', 'gray.900')}>
 				<SidebarContent
 					onClose={() => onClose}
 					display={{ base: 'none', md: 'block' }}
@@ -79,13 +80,13 @@ export default function SidebarWithHeader({ children }: {
 					h="full"
 					w={{ base: 'full', md: 60 }}
 				>
-					<FriendList />
-				</Box > */}
-				<Box ml={{ base: 0, md: 60 }} p="4">
+			</Box > */}
+				<Flex h={'100%'} ml={{ base: 0, md: 60 }} p="4" >
 					{children}
-				</Box>
+					<FriendList />
+				</Flex>
 
-			</Box>
+			</Flex>
 		</>
 	);
 }

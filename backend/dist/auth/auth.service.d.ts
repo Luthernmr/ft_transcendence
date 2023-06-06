@@ -8,5 +8,5 @@ export declare class AuthService {
     constructor(userService: UserService, jwtService: JwtService);
     login(user: User, response: Response): Promise<any>;
     getUserCookie(request: Request): Promise<User>;
-    logout(request: Request, response: Response): Promise<any>;
+    logout(request: Request, response: Response): Promise<Response<any, Record<string, any>>>;
 }
