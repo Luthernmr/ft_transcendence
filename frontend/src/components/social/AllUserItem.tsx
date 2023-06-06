@@ -35,12 +35,13 @@ export default function AllUserItem() {
 	}
 
 	return (
-		<List spacing={3}>
+		<List>
 			{users.map((user) => (
 				<Popover key={user.id}>
 					<Box >
-						<ListItem>
-							<Flex alignItems={'center'} justifyContent={'space-between'}>
+						<ListItem  >
+								<PopoverTrigger>
+							<Flex alignItems={'center'} _hover={{bg: 'gray.200', }} padding={'2'} w={'100%'} borderRadius={'8'}>
 								<Avatar
 									size="sm"
 									src={user.imgPdp}>
@@ -50,21 +51,12 @@ export default function AllUserItem() {
 								<Box ml='2'>
 									<Text fontSize='sm' fontWeight='bold'>
 										{user.nickname}
-										<Badge ml='1' fontSize='xs' colorScheme='green'>
-											ingame
-										</Badge>
 									</Text>
 									<Text fontSize='xs'>Student</Text>
 								</Box>
-								<PopoverTrigger>
-									<IconButton
-										variant='outline'
-										colorScheme='blue'
-										aria-label='Send email'
-										icon={<DragHandleIcon />}
-									/>
-								</PopoverTrigger>
 							</Flex>
+									
+								</PopoverTrigger>
 						</ListItem>
 					</Box>
 					<Portal>

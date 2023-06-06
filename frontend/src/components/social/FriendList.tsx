@@ -10,7 +10,7 @@ export default function FriendList() {
 
 	return (
 		<>
-			<Tabs isFitted variant='enclosed'>
+			<Tabs variant='soft-rounded'>
 				<TabList mb='1em'>
 					<Tab>Friends</Tab>
 					<Tab>All User</Tab>
