@@ -3,13 +3,9 @@ import {
   Avatar,
   AvatarGroup,
   Box,
-  Button,
   Flex,
   Heading,
   IconButton,
-  Input,
-  InputGroup,
-  InputRightElement,
   StackDivider,
   VStack,
 } from "@chakra-ui/react";
@@ -79,6 +75,7 @@ function Chat() {
       padding={"15px"}
       minHeight={"100%"}
       flex={"1"}
+      direction={"column"}
     >
       <VStack
         divider={<StackDivider borderColor={"gray.200"} />}
