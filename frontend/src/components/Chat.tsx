@@ -44,6 +44,125 @@ function Chat() {
           },
         ],
       },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
+      {
+        users: [
+          { id: 1, name: "Ryan Florence", src: "https://bit.ly/ryan-florence" },
+          { id: 2, name: "Segun Adebayo", src: "https://bit.ly/sage-adebayo" },
+          { id: 3, name: "Christian Nwamba", src: "https://bit.ly/code-beast" },
+        ],
+      },
+      {
+        users: [
+          { id: 3, name: "Kent Dodds", src: "https://bit.ly/kent-c-dodds" },
+          {
+            id: 4,
+            name: "Prosper Otemuyiwa",
+            src: "https://bit.ly/prosper-baba",
+          },
+        ],
+      },
     ];
 
     setGroups(fakeGroupsData);
@@ -58,12 +177,17 @@ function Chat() {
         height="100%"
         flex={"1"}
       >
-        <Flex justifyContent={"space-between"} alignItems={"center"}>
-          <IconButton aria-label={"Go back"} icon={<ArrowBackIcon />} onClick={() => setSelectedGroup(null)}/>
+        <Flex justifyContent={"space-between"} alignItems={"center"} mb={4}>
+          <IconButton
+            aria-label={"Go back"}
+            icon={<ArrowBackIcon />}
+            onClick={() => setSelectedGroup(null)}
+          />
           <Heading size={"md"} textAlign={"center"} flex={"1"}>
             Rooms
           </Heading>
         </Flex>
+        {/* <Box borderBottom="1px solid" borderColor="gray.200" /> */}
       </Box>
     );
   }
@@ -76,19 +200,22 @@ function Chat() {
       minHeight={"100%"}
       flex={"1"}
       direction={"column"}
+      maxH={"100%"}
     >
+      <Flex justifyContent={"space-between"} alignItems={"center"} mb={4}>
+        <IconButton aria-label={"Add room"} icon={<AddIcon />} />
+        <Heading size={"md"} textAlign={"center"} flex={"1"}>
+          Rooms
+        </Heading>
+      </Flex>
+      {/* <Box borderBottom="1px solid" borderColor="gray.200" /> */}
       <VStack
         divider={<StackDivider borderColor={"gray.200"} />}
         spacing={4}
         align={"stretch"}
         height={"100%"}
+        overflowY={"auto"}
       >
-        <Flex justifyContent={"space-between"} alignItems={"center"}>
-          <Heading size={"md"} textAlign={"center"} flex={"1"}>
-            Rooms
-          </Heading>
-          <IconButton aria-label={"Add room"} icon={<AddIcon />} />
-        </Flex>
         {groups.map((group, index) => (
           <Box h={"40px"} key={index} onClick={() => setSelectedGroup(group)}>
             <AvatarGroup size={"md"} max={2}>
