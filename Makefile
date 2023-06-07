@@ -1,24 +1,29 @@
-NAME	= transcendence
-VOLUMES	= $(shell echo | docker volume ls -q)
+NAME = ft_transcendence
 
-all:	${NAME}
+all: up
 
-${NAME}:	
-			#make clean
-			make up
+up: build
+	docker-compose -f docker-compose.yml up -d
 
-up:			
-			docker compose -f docker-compose.yml up -d --build
+down:
+	docker-compose -f docker-compose.yml down
 
-down:		
-			docker compose -f docker-compose.yml down
+stop:
+	docker-compose -f docker-compose.yml stop
 
-clean:		
-			docker system prune -fa
-			docker volume rm $(VOLUMES)
+restart: down up
 
-fclean:			clean
+build:
+	docker-compose -f docker-compose.yml build
 
-re:			down fclean all
+clean: stop
+	docker system prune -fa
+	@if [ -n "$(VOLUMES)" ]; then \
+		docker volume rm $(VOLUMES); \
+	fi
 
-.PHONY: all up down clean fclean re
+fclean: clean
+
+re: fclean up
+
+.PHONY: all up down stop restart build clean fclean re

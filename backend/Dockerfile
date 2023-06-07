@@ -1,14 +1,14 @@
 FROM node:latest
 
 WORKDIR /app
-COPY . .
 
 COPY package.json ./
+COPY package-lock.json ./
 
-RUN npm install
-RUN npm install -g @nestjs/cli
+RUN npm ci
 
+COPY . .
 
-EXPOSE 5000
+EXPOSE 5001
 
 CMD ["npm", "run", "start:dev"]
