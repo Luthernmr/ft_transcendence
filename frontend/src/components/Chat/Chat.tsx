@@ -27,6 +27,10 @@ const fakeMessagesData: Message[] = [
   { id: 6, userId: 2, content: "Just working on a project. You?" },
   { id: 7, userId: 1, content: "Same here. Let's keep in touch." },
   { id: 8, userId: 2, content: "Sure, talk to you later!" },
+  // { id: 9, userId: 2, content: "Sure, talk to you later!" },
+  // { id: 10, userId: 2, content: "Sure, talk to you later!" },
+  // { id: 11, userId: 2, content: "Sure, talk to you later!" },
+  // { id: 12, userId: 2, content: "Sure, talk to you later!" },
 ];
 
 function Chat() {
