@@ -65,7 +65,7 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], SocketGateway.prototype, "acceptFriendRequest", null);
 SocketGateway = __decorate([
-    (0, websockets_1.WebSocketGateway)({ cors: { origin: process.env.FRONTEND, cookie: true } }),
+    (0, websockets_1.WebSocketGateway)({ cors: { origin: process.env.FRONTEND } }),
     __metadata("design:paramtypes", [user_service_1.UserService])
 ], SocketGateway);
 exports.SocketGateway = SocketGateway;

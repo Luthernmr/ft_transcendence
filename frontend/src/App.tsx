@@ -18,9 +18,9 @@ import AuthElement from "./components/user/AuthElement";
 export default function App() {
 
 	userSocket.on('connect', () => {
-		auth: {
-			token: localStorage.getItem("currentUser")
-		}
+		//auth: {
+		//	token: localStorage.getItem("currentUser")
+		//}
 		console.log('front connect')
 	})
 
@@ -30,10 +30,10 @@ export default function App() {
 			<Route path="/Register" element={<RegisterCard />} />
 			<Route path="/Login" element={<LoginCard />} />
 			<Route path="/Auth" element={<AuthElement />} />
+			<Route path="/" element={<Home />} />
 
 			<Route path="/home/*" element={<SidebarWithHeader>
 				<Routes>
-					<Route path="/" element={<Home />} />
 					<Route path="/Play" element={<Pong />} />
 					<Route path="/Chat" element={<Chat />} />
 					<Route path="/Settings" element={<Settings />} />

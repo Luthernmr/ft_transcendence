@@ -84,7 +84,7 @@ export default function SidebarWithHeader({ children }: {
 				<Flex h={'100%'} ml={{ base: 0, md: 60 }} p="4" >
 
 					{children}
-					<Box ml={2}>
+					<Box ml={5}>
 						<FriendList />
 					</Box>
 				</Flex>
