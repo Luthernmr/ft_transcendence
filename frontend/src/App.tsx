@@ -1,19 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, BrowserRouter, Navigate, useNavigate, useLocation } from "react-router-dom";
-import Chat from "./components/Chat";
-import Pong from "./components/Pong";
-import Settings from "./components/user/Settings";
-import SidebarWithHeader from "./components/SidebarWithHeader";
-import LoginCard from "./components/user/loginCard";
-import RegisterCard from "./components/user/registerCard";
-import { FiLogIn } from "react-icons/fi";
-import axios from "axios";
-import Home from "./components/Home";
+import { Routes, Route } from "react-router-dom";
+import Chat from "./components/Chat/Chat";
+import Pong from "./components/Pong/Pong";
+import Settings from "./components/User/Settings";
+import SidebarWithHeader from "./components/Dashboard/SidebarWithHeader";
+import LoginCard from "./components/User/loginCard";
+import RegisterCard from "./components/User/registerCard";
+import Home from "./components/Dashboard/Home";
 import { userSocket } from "./sockets/sockets";
-import Cookies from 'js-cookie';
-import { Socket } from "socket.io-client";
-import { error } from "console";
-import AuthElement from "./components/user/AuthElement";
+import AuthElement from "./components/User/AuthElement";
 
 export default function App() {
 

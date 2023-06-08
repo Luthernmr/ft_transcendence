@@ -1,11 +1,6 @@
-frontend/node_modules
-node_modules
 backend/dist
-.env
-frontend/.env
+backend/node_modules
 backend/.env
-backend/dist/tsconfig.build.tsbuildinfo
-/.vscode
-
-packages/**/*.d.ts
-packages/**/*.js
+frontend/node_modules
+frontend/.env
+.vscode

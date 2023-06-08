@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   db:
@@ -33,7 +33,7 @@ services:
       dockerfile: Dockerfile
     image: backend
     ports:
-      - "5000:5000"
+      - "5001:5001"
     volumes:
       - backend-data:/app
     networks:
@@ -61,15 +61,13 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      device: ./backend
-      #device: /home/fbelthoi/ft_transcendence/backend #use this with absolute path if docker doesn't want to compile because of relative path
-      #device: /home/$USER/ft_transcendence/backend
+      #device: ./backend
+      device: /home/fbelthoi/ft_transcendence/backend #use this with absolute path if docker doesn't want to compile because of relative path
 
   frontend-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      device: ./frontend
-        #device: /home/$USER/ft_transcendence/frontend
-        #device: /home/fbelthoi/ft_transcendence/frontend #use this with absolute path if docker doesn't want to compile because of relative path
+      #device: ./frontend
+      device: /home/fbelthoi/ft_transcendence/frontend #use this with absolute path if docker doesn't want to compile because of relative path

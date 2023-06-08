@@ -33,9 +33,9 @@ import { RiGamepadLine } from 'react-icons/ri';
 import { IconType } from 'react-icons';
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from 'axios';
-import Notification from './social/Notification';
-import { userSocket } from '../sockets/sockets';
-import FriendList from './social/FriendList';
+import Notification from '../Social/Notification';
+import { userSocket } from '../../sockets/sockets';
+import FriendList from '../Social/FriendList';
 
 interface LinkItemProps {
 	name: string;

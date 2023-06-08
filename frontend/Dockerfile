@@ -3,15 +3,14 @@ FROM node:latest
 WORKDIR /app
 
 COPY es.sh /es.sh
-
 RUN chmod +x /es.sh
 
 COPY package.json ./
+COPY package-lock.json ./
+
+RUN npm ci
 
 COPY . .
-
-RUN npm install
-
 
 EXPOSE 3000
 
