@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const friend_entity_1 = require("../social/friend.entity");
+const pendingRequest_entity_1 = require("../social/pendingRequest.entity");
 const typeorm_1 = require("typeorm");
 let User = class User {
 };
@@ -47,6 +48,11 @@ __decorate([
     (0, typeorm_1.JoinTable)(),
     __metadata("design:type", Array)
 ], User.prototype, "friends", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => pendingRequest_entity_1.PendingRequest, pendingRequest => pendingRequest.user),
+    (0, typeorm_1.JoinTable)(),
+    __metadata("design:type", Array)
+], User.prototype, "pendingRequest", void 0);
 User = __decorate([
     (0, typeorm_1.Entity)('user')
 ], User);

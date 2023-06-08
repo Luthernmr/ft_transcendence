@@ -4,5 +4,5 @@ export declare class Friend {
     name: string;
     img: string;
     blocked: boolean;
-    user: User[];
+    user: User;
 }

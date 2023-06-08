@@ -10,6 +10,12 @@ interface User {
 	imgPdp: string;
 }
 
+interface Friend {
+	id: number;
+	nickname: string;
+	imgPdp: string;
+}
+
 interface FriendRequest {
 	id: number;
 }
@@ -41,7 +47,7 @@ export default function AllUserItem() {
 					<Box >
 						<ListItem  >
 								<PopoverTrigger>
-							<Flex alignItems={'center'} _hover={{bg: 'gray.200', }} padding={'2'} w={'100%'} borderRadius={'8'}>
+							<Flex alignItems={'center'} _hover={{bg: 'gray.200', cursor : 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
 								<Avatar
 									size="sm"
 									src={user.imgPdp}>

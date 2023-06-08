@@ -2,7 +2,7 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Get } from '@nestjs/common';
 import { UserService } from 'src/user/user.service';
 
 @Controller('social')
@@ -17,4 +17,8 @@ export class FriendController {
 	){
 		this.addFriend(id);
 	}
+	@Get('allRequest')
+	async allRequest(
+		@Body()
+	)
 }

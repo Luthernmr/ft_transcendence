@@ -14,4 +14,9 @@ export class PendingRequest {
 
 	@Column()
 	senderId: number
+
+	@Column()
+	@ManyToOne(() => User, user => user.pendingRequest)
+	user : User
+	
 }

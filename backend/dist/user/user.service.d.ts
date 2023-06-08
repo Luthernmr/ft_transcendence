@@ -15,4 +15,5 @@ export declare class UserService {
     changeImg(user: User, img: string): Promise<void>;
     changeNickname(user: User, nickname: string): Promise<void>;
     createPendingRequest(data: any): Promise<PendingRequest>;
+    getAllPendingRequest(): Promise<any>;
 }

@@ -61,6 +61,10 @@ let UserService = class UserService {
     async createPendingRequest(data) {
         return await this.pendingRequest.save(data);
     }
+    async getAllPendingRequest() {
+        const pendingRequests = await this.pendingRequest.find();
+        return pendingRequests;
+    }
 };
 UserService = __decorate([
     (0, common_1.Injectable)(),

@@ -36,11 +36,11 @@ let SocketGateway = class SocketGateway {
         console.log('friendRequest : ', data.userSenderId, data.userReceiveId, client.id);
         const userReceiv = await this.userService.getUserById(data.userReceiveId);
         const otherId = userReceiv.socketId;
-        const request = await this.userService.createPendingRequest({
+        const pendingRequest = await this.userService.createPendingRequest({
             type: "friend",
             senderId: data.userSenderId,
         });
-        client.to(otherId).emit('pendingRequest', request);
+        client.to(otherId).emit('pendingRequest', { pendingRequest, userReceiv });
     }
     acceptFriendRequest(data) {
         if (class_validator_1.validate)
