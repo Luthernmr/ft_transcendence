@@ -6,7 +6,7 @@ import SidebarWithHeader from "./components/Dashboard/SidebarWithHeader";
 import LoginCard from "./components/User/loginCard";
 import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
-import { userSocket } from "./sockets/sockets";
+import { pongSocket, userSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
 
 export default function App() {
@@ -18,6 +18,9 @@ export default function App() {
 		console.log('front connect')
 	})
 
+	pongSocket.on('connect', () => {
+		console.log("pong socket connecting");
+	})
 
 	return (
 		<Routes>
