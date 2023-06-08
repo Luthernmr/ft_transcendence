@@ -1,11 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { PongGateway } from './pong.gateway'
+import { Socket } from 'dgram';
+
+interface PongRuntimeData {
+	socket: Socket,
+	ballX: number,
+	ballY: number,
+	deltaX: number,
+	deltaY: number,
+}
 
 @Injectable()
 export class PongService {
-	pongGateway: PongGateway;
-
-	constructor() {
-		//setInterval(this.pongGateway.updateBall, 120);
+	runtimeDatas: PongRuntimeData[];
+	
+	constructor(private readonly pongGateway : PongGateway) {
+		
 	}
+
+
 }

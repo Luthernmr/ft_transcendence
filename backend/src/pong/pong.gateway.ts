@@ -3,6 +3,7 @@ import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
 
+@Injectable()
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND}, namespace: 'pong' })
 export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
   @WebSocketServer()
