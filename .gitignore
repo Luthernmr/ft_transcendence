@@ -4,6 +4,8 @@ backend/dist
 .env
 frontend/.env
 backend/.env
-backend/.env
-frontend/.env
 backend/dist/tsconfig.build.tsbuildinfo
+/.vscode
+
+packages/**/*.d.ts
+packages/**/*.js
