@@ -1,5 +1,7 @@
 NAME = ft_transcendence
 
+VOLUMES	= $(shell echo | docker volume ls -q)
+
 all: up
 
 up: build
