@@ -6,6 +6,8 @@ import { PongService } from './pong.service';
 
 interface ChangeDirData {
   socket: Socket,
+  ballX: number,
+  ballY: number,
   dX: number,
   dY: number
 }
@@ -26,6 +28,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   handleDisconnect(socket: Socket) {
     console.log("Socket disconnected from pong :" + socket.id);
+    this.pongService.CloseRoom(socket.id);
   }
 
   afterInit(socket: Socket) {
@@ -36,35 +39,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   
   @SubscribeMessage('start')
   handleEvent(@ConnectedSocket() socket: Socket) {
-    this.pongService.StartRoom({
-      socket: socket,
-      ballX: 390,
-      ballY: 290,
-      dX: 10,
-      dY: 10,
-    })
+    this.pongService.StartRoom(socket)
   }
 
   EmitChangeDir(datas: ChangeDirData) {
-    datas.socket.emit('ChangeDir', {dX: datas.dX, dY: datas.dY });
+    const payload = { x: datas.ballX, y: datas.ballY, dX: datas.dX, dY: datas.dY }
+    datas.socket.emit('ChangeDir', payload);
     console.log("Emitted change dir");
   }
-
-  // @Interval(12)
-  // updateBall() {
-  //   console.log(this.x > 499);
-  //   if (this.x > 499)
-  //     this.dir = "left";
-  //   else if (this.x < 201)
-  //     this.dir = "right";
-
-  //   if (this.dir === "right")
-  //     this.x += 1;
-  //   else if (this.dir === "left")
-  //     this.x -= 1;
-
-  //   this.server.emit('moveBall', {x: this.x, y: this.y});
-  //   console.log("dir: " + this.dir);
-  //   console.log("emitted: x: " + this.x + ", y: " + this.y);
-  // }
 }

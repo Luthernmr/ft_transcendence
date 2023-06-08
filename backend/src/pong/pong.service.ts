@@ -7,6 +7,7 @@ interface PongRuntimeData {
 	socket: Socket,
 	ballX: number,
 	ballY: number,
+	ballRadius: number,
 	dX: number,
 	dY: number,
 }
@@ -25,11 +26,20 @@ export class PongService {
 	}
 
 	LaunchUpdates() {
-		setInterval(this.GlobalUpdate.bind(this), 1000);
+		setInterval(this.GlobalUpdate.bind(this), 16);
 	}
 
-	StartRoom(datas: PongRuntimeData) {
+	StartRoom(socket: Socket) {
+		const datas: PongRuntimeData = {
+			socket: socket,
+			ballX: 390,
+			ballY: 290,
+			ballRadius: 20,
+			dX: 30,
+			dY: 30,
+		};
 		this.runtimeDatas.push(datas);
+		
 	}
 
 	CloseRoom(socketID: string) {
@@ -38,18 +48,47 @@ export class PongService {
 				const index = this.runtimeDatas.indexOf(data);
 				this.runtimeDatas.splice(index, 1);
 				console.log("Closed room");
+
 				return;
 			}
 		})
 	}
 
 	GlobalUpdate() {
-		console.log("PongService Updating...");
+		//console.log("PongService Updating...");
 		this.runtimeDatas.forEach(function (data) {
-			console.log("Updating room...");
-			data.dX = -data.dX;
-			data.dY = -data.dY;
-			this.pongGateway.EmitChangeDir(data);
+			//console.log("Updating room...");
+			
+			const odX = data.dX;
+			const odY = data.dY;
+
+			data.ballX += data.dX * (16 / 100);
+			data.ballY += data.dY * (16 / 100);
+
+			if (data.ballX < 95) { // leftWall.x + wallWidth / 2 + ballRadius / 2
+				data.ballX = 95;
+				data.dX = -data.dX;
+				console.log("Touched left wall: " + data.ballX + ", " + data.dX);
+			} else if (data.ballX > 665) { // rightWall.x - wallWidth / 2 - ballRadius / 2
+				data.ballX = 665;
+				data.dX = -data.dX;
+				console.log("Touched right wall: " + data.ballX + ", " + data.dX);
+			}
+
+			if (data.ballY < 55){
+				data.ballY = 55;
+				data.dY = -data.dY;
+				console.log("Touched up wall: " + data.ballY + ", " + data.dY);
+			} else if (data.ballY > 435) {
+				data.ballY = 435;
+				data.dY = -data.dY;
+				console.log("Touched bottom wall: " + data.ballY + ", " + data.dY);
+			}
+
+
+			if (data.dX != odX || data.dY != odY)
+				this.pongGateway.EmitChangeDir(data);
+
 		}, this)
 	}
 }
