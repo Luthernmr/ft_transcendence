@@ -13,7 +13,9 @@ import { FriendService } from 'src/social/friend.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import 'dotenv/config'
 
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND} })
+console.log("Websocket: " + process.env.FRONTEND);
+
+@WebSocketGateway({ cors: { origin: process.env.FRONTEND } })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer()
     server: Server;

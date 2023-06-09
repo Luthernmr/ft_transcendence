@@ -9,6 +9,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 	app.use(cookieParser());
 
+	console.log("FRONTEND: " + process.env.FRONTEND);
 	app.enableCors({
 			 origin : [process.env.FRONTEND as string, 'https://api.intra.42.fr/oauth/'],
 		 	 credentials : true
