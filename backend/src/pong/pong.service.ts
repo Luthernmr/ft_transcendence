@@ -39,7 +39,6 @@ export class PongService {
 			dY: 30,
 		};
 		this.runtimeDatas.push(datas);
-		
 	}
 
 	CloseRoom(socketID: string) {
@@ -65,22 +64,22 @@ export class PongService {
 			data.ballX += data.dX * (16 / 100);
 			data.ballY += data.dY * (16 / 100);
 
-			if (data.ballX < 95) { // leftWall.x + wallWidth / 2 + ballRadius / 2
-				data.ballX = 95;
+			if (data.ballX <= 90) { // leftWall.x + wallWidth
+				data.ballX = 90;
 				data.dX = -data.dX;
 				console.log("Touched left wall: " + data.ballX + ", " + data.dX);
-			} else if (data.ballX > 665) { // rightWall.x - wallWidth / 2 - ballRadius / 2
-				data.ballX = 665;
+			} else if (data.ballX >= 660) { // rightWall.x - ballRadius
+				data.ballX = 660;
 				data.dX = -data.dX;
 				console.log("Touched right wall: " + data.ballX + ", " + data.dX);
 			}
 
-			if (data.ballY < 55){
-				data.ballY = 55;
+			if (data.ballY <= 50){
+				data.ballY = 50;
 				data.dY = -data.dY;
 				console.log("Touched up wall: " + data.ballY + ", " + data.dY);
-			} else if (data.ballY > 435) {
-				data.ballY = 435;
+			} else if (data.ballY >= 430) {
+				data.ballY = 430;
 				data.dY = -data.dY;
 				console.log("Touched bottom wall: " + data.ballY + ", " + data.dY);
 			}
