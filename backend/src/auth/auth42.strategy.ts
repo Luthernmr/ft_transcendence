@@ -12,7 +12,7 @@ export class auth42Strategy extends PassportStrategy(Strategy, '42') {
 			tokenURL: process.env.TOKEN_URL,
 			clientID: process.env.CLIENT_ID,
 			clientSecret: process.env.CLIENT_SECRET,
-			callbackURL: 'http://212.227.209.204:3000/auth',
+			callbackURL: process.env.CALLBACK_URL,
 		});
 	}
 	validate(access_token: string, refresh_token: string, user: any): any {

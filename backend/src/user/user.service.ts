@@ -62,4 +62,10 @@ export class UserService {
 		return await this.pendingRequest.save(data);
 	}
 
+	async getAllPendingRequest(): Promise<any> {
+		//this.userRepository.find()
+		const pendingRequests = await this.pendingRequest.find();
+		return pendingRequests;
+	}
+	
 }

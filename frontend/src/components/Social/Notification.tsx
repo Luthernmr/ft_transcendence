@@ -24,7 +24,7 @@ import {
 	Flex,
 	Stack,
 } from '@chakra-ui/react'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
 	FiSettings,
 	FiMenu,
@@ -33,6 +33,7 @@ import {
 	FiMessageSquare,
 } from 'react-icons/fi';
 import { userSocket } from '../../sockets/sockets';
+import axios from 'axios';
 
 function Example() {
 	// 1. Create the component
@@ -73,10 +74,27 @@ function Example() {
 	]
 
 	// 3. Pass the props and chill!
-//	return <DataTabs data={tabData} />
+	//	return <DataTabs data={tabData} />
+}
+interface FriendRequest {
+	id: number;
+	senderNickname: string;
+	type: string;
 }
 
 const PendingRequest = () => {
+	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
+
+
+	useEffect(() => {
+		const getAllFriends = async () => {
+			const res = await axios.get(import.meta.env.VITE_BACKEND + '/friend/all', { withCredentials: true });
+			setFriendRequests(res.data.friendRequest);
+		}
+		getAllFriends();
+	}, []);
+
+
 	return (
 		<Box>
 			<Tabs variant='soft-rounded' colorScheme='blue'>
@@ -86,21 +104,27 @@ const PendingRequest = () => {
 				</TabList>
 				<TabPanels>
 					<TabPanel>
-						<Stack direction='row' align='center' m={2}>
-							<Avatar
-								src='https://bit.ly/sage-adebayo'
-								size='xs'
-								name='Segun Adebayo'
-								ml={-1}
-								mr={2}
-								/>
-								<Text><Text as='b'>Luther </Text>want .play. with you</Text>
-						</Stack>
-						<Stack spacing={2} direction='row' align='center'>
-							
-							<Button colorScheme='twitter' size='sm'>Accepter</Button>
-							<Button colorScheme='gray' size='sm'>Rejeter</Button>
-						</Stack>
+						{friendRequests.map((friendRequest) => (
+							<Flex key={friendRequest.id}>
+
+								<Stack direction='row' align='center' m={2}>
+									<Avatar
+										src='https://bit.ly/sage-adebayo'
+										size='xs'
+										name='Segun Adebayo'
+										ml={-1}
+										mr={2}
+									/>
+									<Text><Text as='b'>Luther </Text>want .play. with you</Text>
+								</Stack>
+								<Stack spacing={2} direction='row' align='center'>
+
+									<Button colorScheme='twitter' size='sm'>Accepter</Button>
+									<Button colorScheme='gray' size='sm'>Rejeter</Button>
+								</Stack>
+							</Flex>
+
+						))}
 
 					</TabPanel>
 					<TabPanel>
@@ -112,6 +136,14 @@ const PendingRequest = () => {
 	)
 }
 export default function Notification() {
+
+//userSocket.on('pendingRequest', () => {
+//	//auth: {
+//	//	token: localStorage.getItem("currentUser")
+//	//}
+//	console.log('receiv send');
+//})
+//
 	return (
 		<Popover>
 			<PopoverTrigger>

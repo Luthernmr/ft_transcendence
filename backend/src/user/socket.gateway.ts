@@ -13,7 +13,9 @@ import { FriendService } from 'src/social/friend.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import 'dotenv/config'
 
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND} })
+console.log("Websocket: " + process.env.FRONTEND);
+
+@WebSocketGateway({ cors: { origin: process.env.FRONTEND } })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
     @WebSocketServer()
     server: Server;
@@ -53,11 +55,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//faire les verif (if les deux user sont ou pas amis)
 		const userReceiv = await this.userService.getUserById(data.userReceiveId)
 		const otherId = userReceiv.socketId;
-		const request = await this.userService.createPendingRequest({
+		const pendingRequest = await this.userService.createPendingRequest({
 			type : "friend",
 			senderId : data.userSenderId,
 		})
-		client.to(otherId).emit('pendingRequest', request);
+		client.to(otherId).emit('pendingRequest', {pendingRequest , userReceiv });
 		//console.log("client: ", client.id + " request to ", ' other',otherId, )
 		
 			// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide

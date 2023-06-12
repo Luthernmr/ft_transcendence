@@ -1,4 +1,4 @@
-FROM node:latest
+FROM node:lts
 
 WORKDIR /app
 
@@ -9,6 +9,6 @@ RUN npm ci
 
 COPY . .
 
-EXPOSE 5001
+EXPOSE 5000
 
 CMD ["npm", "run", "start:dev"]

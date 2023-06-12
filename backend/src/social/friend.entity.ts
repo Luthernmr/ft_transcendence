@@ -17,5 +17,5 @@ export class Friend {
 
 	@ManyToOne(() => User, user => user.friends)
 	@JoinTable()
-	user: User[];
+	user: User;
 }

@@ -28,4 +28,8 @@ export class User {
   @OneToMany(() => Friend, friend => friend.user)
   @JoinTable()
   friends: Friend[];
+
+  @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
+  @JoinTable()
+  pendingRequest: PendingRequest[];
 }
