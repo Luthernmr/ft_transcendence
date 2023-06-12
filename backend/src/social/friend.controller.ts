@@ -17,8 +17,8 @@ export class FriendController {
 	){
 		this.addFriend(id);
 	}
-	@Get('allRequest')
-	async allRequest(
-		@Body()
-	)
+	//@Get('allRequest')
+	//async allRequest(
+	//	@Body()
+	//)
 }
