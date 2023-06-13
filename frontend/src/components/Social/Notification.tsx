@@ -88,8 +88,9 @@ const PendingRequest = () => {
 
 	useEffect(() => {
 		const getAllFriends = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + '/friend/all', { withCredentials: true });
-			setFriendRequests(res.data.friendRequest);
+			const res = await axios.get(import.meta.env.VITE_BACKEND + '/social/allRequest', { withCredentials: true });
+			setFriendRequests(res.data);
+			console.log("here",res.data);
 		}
 		getAllFriends();
 	}, []);
@@ -115,7 +116,7 @@ const PendingRequest = () => {
 										ml={-1}
 										mr={2}
 									/>
-									<Text><Text as='b'>Luther </Text>want .play. with you</Text>
+									<Text><Text as='b'>{friendRequest.senderNickname}</Text> you have {friendRequest.type} request </Text>
 								</Stack>
 								<Stack spacing={2} direction='row' align='center'>
 
@@ -137,13 +138,10 @@ const PendingRequest = () => {
 }
 export default function Notification() {
 
-//userSocket.on('pendingRequest', () => {
-//	//auth: {
-//	//	token: localStorage.getItem("currentUser")
-//	//}
-//	console.log('receiv send');
-//})
-//
+userSocket.on('pendingRequest', () => {
+	console.log('receiv send');
+})
+
 	return (
 		<Popover>
 			<PopoverTrigger>

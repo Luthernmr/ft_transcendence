@@ -12,9 +12,7 @@ import AuthElement from "./components/User/AuthElement";
 export default function App() {
 
 	userSocket.on('connect', () => {
-		//auth: {
-		//	token: localStorage.getItem("currentUser")
-		//}
+	
 		console.log('front connect')
 	})
 
