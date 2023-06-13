@@ -90,7 +90,7 @@ const PendingRequest = () => {
 		const getAllFriends = async () => {
 			const res = await axios.get(import.meta.env.VITE_BACKEND + '/social/allRequest', { withCredentials: true });
 			setFriendRequests(res.data);
-			console.log("here",res.data);
+			console.log("here", res.data);
 		}
 		getAllFriends();
 	}, []);
@@ -104,27 +104,24 @@ const PendingRequest = () => {
 					<Tab>New Message</Tab>
 				</TabList>
 				<TabPanels>
-					<TabPanel>
+					<TabPanel >
 						{friendRequests.map((friendRequest) => (
-							<Flex key={friendRequest.id}>
-
-								<Stack direction='row' align='center' m={2}>
-									<Avatar
-										src='https://bit.ly/sage-adebayo'
-										size='xs'
-										name='Segun Adebayo'
-										ml={-1}
-										mr={2}
-									/>
-									<Text><Text as='b'>{friendRequest.senderNickname}</Text> you have {friendRequest.type} request </Text>
-								</Stack>
-								<Stack spacing={2} direction='row' align='center'>
-
-									<Button colorScheme='twitter' size='sm'>Accepter</Button>
-									<Button colorScheme='gray' size='sm'>Rejeter</Button>
-								</Stack>
-							</Flex>
-
+								<Flex key={friendRequest.id} flexDirection={'column'} >
+									<Flex direction='row' align='center' p={3}>
+										<Avatar
+											src='https://bit.ly/sage-adebayo'
+											size='xs'
+											name='Segun Adebayo'
+											ml={-1}
+											mr={2}
+										/>
+										<Text><Text as='b'>{friendRequest.senderNickname}</Text> You have {friendRequest.type} Request </Text>
+									</Flex>
+									<Stack spacing={2} direction='row' align='center'>
+										<Button colorScheme='twitter' size='sm'>Accepter</Button>
+										<Button colorScheme='gray' size='sm'>Rejeter</Button>
+									</Stack>
+								</Flex>
 						))}
 
 					</TabPanel>
@@ -138,9 +135,9 @@ const PendingRequest = () => {
 }
 export default function Notification() {
 
-userSocket.on('pendingRequest', () => {
-	console.log('receiv send');
-})
+	userSocket.on('pendingRequest', () => {
+		console.log('receiv send');
+	})
 
 	return (
 		<Popover>
