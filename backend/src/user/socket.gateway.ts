@@ -12,6 +12,8 @@ import { SocketAddress } from 'net';
 import { FriendService } from 'src/social/friend.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import 'dotenv/config'
+import { AuthService } from 'src/auth/auth.service';
+import { NotificationKind } from 'rxjs';
 
 console.log("Websocket: " + process.env.FRONTEND);
 
@@ -21,6 +23,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
     server: Server;
 	constructor(
 		private readonly userService: UserService,
+		private readonly authService: AuthService,
+
 	) { }
 
     //@SubscribeMessage('events')
@@ -32,9 +36,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//recup le jwt dqns le socket et le decoder pour recup les data
 
 		
-		//await this.userService.setSocket(userId, client.id);
-		console.log("token", console.log(client.handshake.auth.token));
-		console.log("connected socket id : ", client.id);
+		const user : any = this.authService.getUserByToken(client.handshake.auth.token)
+		if (user)
+		{
+			await this.userService.setSocket(user.id, client.id);
+		}
 
     }
 
@@ -53,14 +59,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		}){
 		console.log('friendRequest : ', data.userSenderId , data.userReceiveId, client.id);
 		//faire les verif (if les deux user sont ou pas amis)
-		const userReceiv = await this.userService.getUserById(data.userReceiveId)
+		const userReceiv : any = await this.userService.getUserById(data.userReceiveId)
 		const otherId = userReceiv.socketId;
 		const pendingRequest = await this.userService.createPendingRequest({
 			type : "friend",
 			senderId : data.userSenderId,
+			user : userReceiv
 		})
-		client.to(otherId).emit('pendingRequest', {pendingRequest , userReceiv });
-		//console.log("client: ", client.id + " request to ", ' other',otherId, )
+		client.to(otherId).emit('pendingRequest');
+		console.log("client: ", client.id + " request to ", ' other',otherId, )
 		
 			// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
 	}

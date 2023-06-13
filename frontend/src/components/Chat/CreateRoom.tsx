@@ -1,11 +1,6 @@
-import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Button, Flex, Heading, IconButton, Input } from "@chakra-ui/react";
+import { Button, Flex, Heading, Input } from "@chakra-ui/react";
 
-
-interface CreateRoomProps {
-  setShowCreateRoom: (show: boolean) => void;
-}
-const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
+function CreateRoom() {
   return (
     <Flex
       borderRadius={"md"}
@@ -16,11 +11,6 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       direction="column"
     >
       <Flex justifyContent={"space-between"} alignItems={"center"} mb={4}>
-      <IconButton
-          aria-label={"Go back"}
-          icon={<ArrowBackIcon />}
-          onClick={() => setShowCreateRoom(false)}
-        />
         <Heading size={"md"} textAlign={"center"} flex={"1"}>
           Create Room
         </Heading>
