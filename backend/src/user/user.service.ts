@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
 		@InjectRepository(PendingRequest)
-			private pendingRequest: Repository<PendingRequest>
+			private pendingRequest: Repository<PendingRequest>,
 	) { }
 
 	async create(data: any): Promise<User> {
@@ -22,6 +23,9 @@ export class UserService {
 	async getUser(email: any): Promise<User> {
 		return this.userRepository.findOne({ where: { email: email } });
 	}
+
+
+
 
 	async getAllUser(): Promise<any> {
 		//this.userRepository.find()
@@ -59,12 +63,14 @@ export class UserService {
 	}
 
 	async createPendingRequest(data : any) : Promise<PendingRequest> {
+		console.log("data", data);
 		return await this.pendingRequest.save(data);
 	}
 
-	async getAllPendingRequest(): Promise<any> {
+	async getAllPendingRequest(user: any): Promise<any> {
 		//this.userRepository.find()
-		const pendingRequests = await this.pendingRequest.find();
+		const pendingRequests = await this.pendingRequest.find({ where: { user : user } });
+		console.log("pending list",pendingRequests)
 		return pendingRequests;
 	}
 	

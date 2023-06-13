@@ -13,7 +13,7 @@ export default function AuthElement () {
 			const getAuthToken = async () => {
 				try{
 					const res = await axios.get(import.meta.env.VITE_BACKEND + '/auth/42' + location.search, { withCredentials: true });
-					console.log("res", res.data);
+					console.log("res token", res.data.jwt);
 					if (res.data.jwt)
 						localStorage.setItem('jwt', res.data.jwt);
 						navigate('/home');
@@ -30,7 +30,7 @@ export default function AuthElement () {
 
 	return(
 		<Center h='100vh'>
-			<Spinner color='red.500' size='xl' />
+			<Spinner color='blue.500' size='xl' />
 		</Center>
 	)
 }
