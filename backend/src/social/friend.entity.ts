@@ -8,6 +8,9 @@ export class Friend {
 
 	@ManyToOne(() => User, user => user.friends)
 	@JoinTable()
-	user: User;
+	userA: User;
 
+	@ManyToOne(() => User, user => user.friends)
+	@JoinTable()
+	userB : User;
 }

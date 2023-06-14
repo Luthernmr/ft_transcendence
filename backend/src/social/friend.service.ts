@@ -23,8 +23,8 @@ export class FriendService {
 	}
 
 	
-	async getFriendList() : Promise<any>
+	async getFriendList(user) : Promise<any>
 	{
-		console.log(this.friendRepository);
+		
 	}
 }

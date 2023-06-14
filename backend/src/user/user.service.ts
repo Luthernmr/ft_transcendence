@@ -24,9 +24,6 @@ export class UserService {
 		return this.userRepository.findOne({ where: { email: email } });
 	}
 
-
-
-
 	async getAllUser(): Promise<any> {
 		//this.userRepository.find()
 		const users = await this.userRepository.find();
@@ -97,5 +94,12 @@ export class UserService {
 		console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
 	  }
+
+	  async getFriends(user: any): Promise<any> {
+		const userWithFriends= await this.userRepository.findOne({where : user, relations: ['friends'] });
+		console.log("friends list", userWithFriends.friends);
+		return userWithFriends.friends;
+	  }
 	
+	  
 }
