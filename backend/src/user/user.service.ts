@@ -1,7 +1,7 @@
 /*
 https://docs.nestjs.com/providers#services
 */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -64,9 +64,33 @@ export class UserService {
 
 	async createPendingRequest(data : any) : Promise<PendingRequest> {
 		console.log("data", data);
-		return await this.pendingRequest.save(data);
+		try {
+			const existingRequest = await this.pendingRequest.findOne({
+			  where: {
+				type: data.type,
+				senderId: data.senderId
+			  }
+			});
+		
+			if (existingRequest) {
+			  throw new BadRequestException('Request already exists for this person.');
+			}
+		
+			return await this.pendingRequest.save(data);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
+	async getPendingRequestById(id: number): Promise <PendingRequest>
+	{
+		return await this.pendingRequest.findOne({where: {id : id}})
+	}
+
+	async deletePendingRequestById(id : number)
+	{
+		await this.pendingRequest.delete(await this.getPendingRequestById(id))
+	}
 	async getAllPendingRequest(user: any): Promise<any> {
 		//this.userRepository.find()
 		const pendingRequests = await this.pendingRequest.find({ where: { user : user } });

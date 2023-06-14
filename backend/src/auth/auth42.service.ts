@@ -24,7 +24,8 @@ export class Auth42Service {
 				nickname: request.user._json.login,
 				email: request.user._json.email,
 				imgPdp: request.user._json.image.link,
-				isOnline: false
+				isOnline: false,
+				pendingRequests: []
 			});
 		}
 		await this.userService.setOnline(user);
