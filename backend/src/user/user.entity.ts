@@ -1,3 +1,5 @@
+import { Message } from 'src/room/entities/message.entity';
+import { Room } from 'src/room/entities/room.entity';
 import { Friend } from 'src/social/friend.entity';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
@@ -32,4 +34,15 @@ export class User {
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()
   pendingRequest: PendingRequest[];
+
+  @JoinTable()
+  @ManyToOne(() => Room, (room: Room) => room.users)
+  room: Room;
+
+  @JoinTable()
+  @ManyToMany(() => Room, (room: Room) => room.bannedUsers, { eager: true })
+  bannedRooms: Array<Room>;
+
+  @OneToMany(() => Message, (message: Message) => message.user)
+  messages: Array<Message>;
 }
