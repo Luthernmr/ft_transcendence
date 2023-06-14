@@ -17,13 +17,9 @@ export class FriendService {
 			private readonly userService: UserService,
 	) { }
 
-	async addFriend(id : number) : Promise <any>
-	{
-		const user = await this.userService.getUserById(id);
-		
-		return this.friendRepository.save({
-			name: user.nickname
-		})
+	async addFriend(data) : Promise <any>
+	{		
+		return this.friendRepository.save(data)
 	}
 
 	

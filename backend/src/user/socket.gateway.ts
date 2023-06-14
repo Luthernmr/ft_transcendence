@@ -75,16 +75,28 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	}
 
 	@SubscribeMessage('acceptFriendRequest')
-	acceptFriendRequest(@MessageBody() data: {
+	async acceptFriendRequest(client : Socket, @MessageBody() data: {
 		requestId : any,
-		userReceiveId : any}){
+	}){
 		console.log('accepted', data.requestId)
 
-		const ret = this.userService.getPendingRequestById(data.requestId);
+		const request : any = this.userService.getPendingRequestById(data.requestId);
+		const currentUser : any = this.authService.getUserByToken(client.handshake.auth.token)
+		const friendUser = this.userService.getUserById(request.senderId)
+		this.friendService.addFriend({
+			userA : currentUser,
+			userB : friendUser
+		})
 
-		console.log('ret', ret);
+	
+		console.log('ret', );
 		this.userService.deletePendingRequestById(data.requestId);
 			//add user to friendship
+	}
+
+	@SubscribeMessage('getFriends')
+	async getFriendsList(client :Socket){
+		
 	}
 
 	@SubscribeMessage('rejectFriendRequest')
@@ -94,4 +106,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		userReceiveId : any}){
 			
 	}
+
+
 }

@@ -91,11 +91,11 @@ export class UserService {
 	{
 		await this.pendingRequest.delete(await this.getPendingRequestById(id))
 	}
+
 	async getAllPendingRequest(user: any): Promise<any> {
-		//this.userRepository.find()
-		const pendingRequests = await this.pendingRequest.find({ where: { user : user } });
-		console.log("pending list",pendingRequests)
-		return pendingRequests;
-	}
+		const userWithPendingRequests = await this.userRepository.findOne({where : user, relations: ['pendingRequests'] });
+		console.log("pending list", userWithPendingRequests.pendingRequests);
+		return userWithPendingRequests.pendingRequests;
+	  }
 	
 }

@@ -31,5 +31,5 @@ export class User {
 
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()
-  pendingRequest: PendingRequest[];
+  pendingRequests: PendingRequest[];
 }
