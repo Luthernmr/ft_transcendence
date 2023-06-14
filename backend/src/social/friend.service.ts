@@ -22,7 +22,6 @@ export class FriendService {
 		const user = await this.userService.getUserById(id);
 		
 		return this.friendRepository.save({
-			id: user.id,
 			name: user.nickname
 		})
 	}

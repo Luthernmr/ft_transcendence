@@ -16,5 +16,6 @@ import { AuthModule } from 'src/auth/auth.module';
 	imports: [TypeOrmModule.forFeature([Friend]), UserModule, AuthModule],
 	controllers: [FriendController],
 	providers: [FriendService],
+	exports: [FriendService],
 })
 export class FriendModule { }

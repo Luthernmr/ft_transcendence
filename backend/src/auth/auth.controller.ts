@@ -15,6 +15,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
+import { PendingRequest } from 'src/social/pendingRequest.entity';
 
 
 @Controller('api')
@@ -37,7 +38,8 @@ export class AuthController {
 			nickname,
 			email,
 			password: hashedPassword,
-			img: img
+			img: img,
+			pendingRequests : []
 		});
 		delete user.password
 		return user;

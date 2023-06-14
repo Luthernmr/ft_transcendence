@@ -12,9 +12,6 @@ export class Friend {
 	@Column()
 	img: string;
 
-	@Column()
-	blocked: boolean;
-
 	@ManyToOne(() => User, user => user.friends)
 	@JoinTable()
 	user: User;

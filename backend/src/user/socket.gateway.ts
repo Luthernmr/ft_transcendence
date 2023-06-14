@@ -13,7 +13,6 @@ import { FriendService } from 'src/social/friend.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
-import { NotificationKind } from 'rxjs';
 
 console.log("Websocket: " + process.env.FRONTEND);
 
@@ -24,6 +23,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	constructor(
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
+		private readonly friendService: FriendService,
 
 	) { }
 
@@ -60,10 +60,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		console.log('friendRequest : ', data.userSenderId , data.userReceiveId, client.id);
 		//faire les verif (if les deux user sont ou pas amis)
 		const userReceiv : any = await this.userService.getUserById(data.userReceiveId)
+		const userSender : any = await this.userService.getUserById(data.userSenderId)
 		const otherId = userReceiv.socketId;
 		const pendingRequest = await this.userService.createPendingRequest({
-			type : "friend",
+			type : "Friend",
 			senderId : data.userSenderId,
+			senderNickname : userSender.nickname,
 			user : userReceiv
 		})
 		client.to(otherId).emit('pendingRequest');
@@ -74,11 +76,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	@SubscribeMessage('acceptFriendRequest')
 	acceptFriendRequest(@MessageBody() data: {
-		validate : any,
+		requestId : any,
+		userReceiveId : any}){
+		console.log('accepted', data.requestId)
+
+		const ret = this.userService.getPendingRequestById(data.requestId);
+
+		console.log('ret', ret);
+		this.userService.deletePendingRequestById(data.requestId);
+			//add user to friendship
+	}
+
+	@SubscribeMessage('rejectFriendRequest')
+	rejectFriendRequest(@MessageBody() data: {
+		requestId : any,
 		userSenderId : any,
 		userReceiveId : any}){
-		if (validate)
-			console.log('accepted')
-			//add user to friendship
+			
 	}
 }
