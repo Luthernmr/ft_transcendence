@@ -39,7 +39,7 @@ export class UserService {
 
 	async setSocket(id: number, socketId: string) {
 		var user: any = await this.getUserById(id);
-		console.log('test', user.nickname);
+		// console.log('test', user.nickname);
 		user.socketId = socketId;
 		await this.userRepository.save(user);
 	}
