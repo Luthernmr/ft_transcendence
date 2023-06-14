@@ -94,12 +94,8 @@ export class UserService {
 		console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
 	  }
-
-	  async getFriends(user: any): Promise<any> {
-		const userWithFriends= await this.userRepository.findOne({where : user, relations: ['friends'] });
-		console.log("friends list", userWithFriends.friends);
-		return userWithFriends.friends;
-	  }
 	
+	
+	  
 	  
 }

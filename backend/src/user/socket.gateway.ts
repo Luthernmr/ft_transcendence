@@ -108,7 +108,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		try
 		{
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
-			const friendList =  await this.userService.getFriends(currentUser);
+			const friendList =  await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList)
 
 		}

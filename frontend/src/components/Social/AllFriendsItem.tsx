@@ -2,6 +2,7 @@ import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge
 import axios from "axios";
 import { AddIcon, DragHandleIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
+import { userSocket } from "../../sockets/sockets";
 
 
 interface Friend {
@@ -14,13 +15,12 @@ export default function AllfriendItem() {
 
 	const [friends, setFriends] = useState<Friend[]>([]);
 
-
+	userSocket.on('friendsList',(data) => {
+		console.log('friendlist', data);
+		setFriends(data)
+	})
 	useEffect(() => {
-		const getAllFriends = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + '/friend/all', { withCredentials: true });
-			setFriends(res.data.friends);
-		}
-		getAllFriends();
+		userSocket.emit('getFriends');
 	}, []);
 
 	return (

@@ -33,7 +33,7 @@ export class User {
 
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()
-  pendingRequest: PendingRequest[];
+  pendingRequests: PendingRequest[];
 
   @JoinTable()
   @ManyToOne(() => Room, (room: Room) => room.users)
