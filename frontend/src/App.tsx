@@ -6,7 +6,7 @@ import SidebarWithHeader from "./components/Dashboard/SidebarWithHeader";
 import LoginCard from "./components/User/loginCard";
 import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
-import { userSocket } from "./sockets/sockets";
+import { chatSocket, userSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
 
 export default function App() {
@@ -14,6 +14,11 @@ export default function App() {
 	userSocket.on('connect', () => {
 	
 		console.log('front connect')
+	})
+
+	chatSocket.on('connect', () => {
+	
+		console.log('front  chtconnect')
 	})
 
 

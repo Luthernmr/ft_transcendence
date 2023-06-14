@@ -6,3 +6,11 @@ export const userSocket = io(import.meta.env.VITE_BACKEND, {
 		token: localStorage.getItem("jwt")
 	}
 });
+
+
+export const chatSocket = io(import.meta.env.VITE_BACKEND, {
+	reconnectionDelayMax: 10000, 
+	auth: {
+		token: localStorage.getItem("jwt")
+	}
+});

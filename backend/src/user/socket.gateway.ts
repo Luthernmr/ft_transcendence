@@ -36,11 +36,20 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//recup le jwt dqns le socket et le decoder pour recup les data
 
 		
-		const user : any = this.authService.getUserByToken(client.handshake.auth.token)
-		if (user)
+		try
 		{
-			await this.userService.setSocket(user.id, client.id);
+			const user : any = this.authService.getUserByToken(client.handshake.auth.token)
+			console.log('usser', user)
+			if (user)
+			{
+				await this.userService.setSocket(user.id, client.id);
+			}
 		}
+		catch(error)
+		{
+			console.log(error);
+		}
+		
 
     }
 
