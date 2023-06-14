@@ -33,12 +33,13 @@ export class AuthService {
 
 	async getUserByToken(token : any): Promise<User>
 	{
-		console.log('token:', token);
-
 		if (token)
 		{
 			const data = await this.jwtService.verifyAsync(token);
-			return await this.userService.getUser(data.email);
+			const user : User  = await this.userService.getUser(data.email);
+			delete user.password
+
+			return user;
 		}
 		
 	}

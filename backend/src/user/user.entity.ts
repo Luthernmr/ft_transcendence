@@ -27,7 +27,7 @@ export class User {
   @Column({nullable: true})
   socketId: string;
 
-  @OneToMany(() => Friend, friend => friend.user)
+  @OneToMany(() => Friend, friend => friend.userA)
   @JoinTable()
   friends: Friend[];
 
