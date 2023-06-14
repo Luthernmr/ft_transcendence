@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import GroupList from './GroupList';
-import ChatRoom from './ChatRoom';
+import GroupList from "./GroupList";
+import ChatRoom from "./ChatRoom";
 import CreateRoom from "./CreateRoom";
 
 interface User {
@@ -38,6 +38,7 @@ function Chat() {
   const [groups, setGroups] = useState<Group[]>([]);
   const [messages, setMessages] = useState<Message[]>(fakeMessagesData);
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [showCreateRoom, setShowCreateRoom] = useState(false);
 
   useEffect(() => {
     const fakeGroupsData: Group[] = [
@@ -61,13 +62,21 @@ function Chat() {
     ];
     setGroups(fakeGroupsData);
   }, []);
+  
 
+  if (showCreateRoom) {
+    return <CreateRoom setShowCreateRoom={setShowCreateRoom} />;
+  }
   if (selectedGroup) {
     return <ChatRoom messages={messages} setSelectedGroup={setSelectedGroup} />;
   }
-
-  return <GroupList groups={groups} setSelectedGroup={setSelectedGroup} />;
-  // return <CreateRoom />
+  return (
+    <GroupList
+      groups={groups}
+      setSelectedGroup={setSelectedGroup}
+      setShowCreateRoom={setShowCreateRoom}
+    />
+  );
 }
 
 export default Chat;
