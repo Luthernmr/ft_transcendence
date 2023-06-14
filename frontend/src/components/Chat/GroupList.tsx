@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Flex,
@@ -12,17 +12,18 @@ import {
 import { AddIcon } from "@chakra-ui/icons";
 
 interface User {
-	id: number;
-	name: string;
-	src: string;
-  }
+  id: number;
+  name: string;
+  src: string;
+}
 
 interface GroupListProps {
   groups: any[];
   setSelectedGroup: (group: any) => void;
+  setShowCreateRoom: (show: boolean) => void;
 }
 
-const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup }) => {
+const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup, setShowCreateRoom}) => {
   return (
     <Flex
       borderRadius={"md"}
@@ -34,7 +35,11 @@ const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup }) => {
       maxH={"100%"}
     >
       <Flex justifyContent={"space-between"} alignItems={"center"} mb={4}>
-        <IconButton aria-label={"Add room"} icon={<AddIcon />} />
+        <IconButton
+          aria-label={"Add room"}
+          icon={<AddIcon />}
+          onClick={() => setShowCreateRoom(true)}
+        />
         <Heading size={"md"} textAlign={"center"} flex={"1"}>
           Rooms
         </Heading>
@@ -58,6 +63,6 @@ const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup }) => {
       </VStack>
     </Flex>
   );
-}
+};
 
 export default GroupList;
