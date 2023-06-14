@@ -15,6 +15,9 @@ export class PendingRequest {
 	@Column()
 	senderId: number
 
+	@Column({nullable : true})
+	senderNickname: string
+
 	@ManyToOne(() => User, user => user.pendingRequest)
 	@JoinTable()
 	user : User

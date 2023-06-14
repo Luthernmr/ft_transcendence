@@ -35,47 +35,6 @@ import {
 import { userSocket } from '../../sockets/sockets';
 import axios from 'axios';
 
-function Example() {
-	// 1. Create the component
-	//function DataTabs({ data}) {
-	//	return (
-	//		<Tabs>
-	//			<TabList>
-	//				{data.map((tab, index) => (
-	//					<Tab key={index}>{tab.label}</Tab>
-	//				))}
-	//			</TabList>
-	//			<TabPanels>
-	//				{data.map((tab, index) => (
-	//					<TabPanel p={4} key={index}>
-	//						{tab.content}
-	//					</TabPanel>
-	//				))}
-	//			</TabPanels>
-	//		</Tabs>
-	//	)
-	//}
-
-
-	// 2. Create an array of data
-	//TODO - 1 stocker la requete dans la bdd / creer des entity requetes pending
-	//TODO - 2 recuperer ces requetes et rmplir le content avec les data
-	//TODO - si la requete est accepter ou pas faire les bail (creer la rellation amis)/ delet le requeste dans la bdd
-	const tabData = [
-		{
-			label: 'Friend Request',
-			content: 'noar veut etre ton amis',
-		},
-		{
-			label: 'Play request',
-			content:
-				'noar veux jouer avec toi',
-		},
-	]
-
-	// 3. Pass the props and chill!
-	//	return <DataTabs data={tabData} />
-}
 interface FriendRequest {
 	id: number;
 	senderNickname: string;
@@ -95,6 +54,9 @@ const PendingRequest = () => {
 		getAllFriends();
 	}, []);
 
+	const handleAccept = async (id : number) => {
+		userSocket.emit('acceptFriendRequest', {requestId : id})
+	}
 
 	return (
 		<Box>
@@ -115,10 +77,10 @@ const PendingRequest = () => {
 											ml={-1}
 											mr={2}
 										/>
-										<Text><Text as='b'>{friendRequest.senderNickname}</Text> You have {friendRequest.type} Request </Text>
+										<Text><Text as='b'>{friendRequest.senderNickname}</Text> send you a {friendRequest.type} Request </Text>
 									</Flex>
 									<Stack spacing={2} direction='row' align='center'>
-										<Button colorScheme='twitter' size='sm'>Accepter</Button>
+										<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id)} >Accepter</Button>
 										<Button colorScheme='gray' size='sm'>Rejeter</Button>
 									</Stack>
 								</Flex>
