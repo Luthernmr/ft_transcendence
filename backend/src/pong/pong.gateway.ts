@@ -13,7 +13,7 @@ interface ChangeDirData {
 }
 
 @Injectable()
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND}, namespace: 'pong' })
+@WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
 export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server
@@ -34,7 +34,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   afterInit(socket: Socket) {
     console.log("Pong Gateway successfully init");
     this.pongService.LaunchUpdates();
-    //setInterval(this.updateBall.bind(this), 12);
   }
   
   @SubscribeMessage('start')
@@ -45,6 +44,5 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   EmitChangeDir(datas: ChangeDirData) {
     const payload = { x: datas.ballX, y: datas.ballY, dX: datas.dX, dY: datas.dY }
     datas.socket.emit('ChangeDir', payload);
-    console.log("Emitted change dir");
   }
 }
