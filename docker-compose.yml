@@ -61,13 +61,11 @@ volumes:
     driver_opts:
       type: none
       o: bind
-      #device: ./backend
-      device: /home/fbelthoi/ft_transcendence/backend #use this with absolute path if docker doesn't want to compile because of relative path
+      device: ${BACKEND_VOLUME}
 
   frontend-data:
     driver: local
     driver_opts:
       type: none
       o: bind
-      #device: ./frontend
-      device: /home/fbelthoi/ft_transcendence/frontend #use this with absolute path if docker doesn't want to compile because of relative path
+      device: ${FRONTEND_VOLUME}

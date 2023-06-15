@@ -65,22 +65,22 @@ export class PongService {
 			data.ballY += data.dY * (16 / 100);
 
 			if (data.ballX <= 90) { // leftWall.x + wallWidth
-				data.ballX = 90;
 				data.dX = -data.dX;
+				data.ballX = 90;
 				console.log("Touched left wall: " + data.ballX + ", " + data.dX);
 			} else if (data.ballX >= 660) { // rightWall.x - ballRadius
-				data.ballX = 660;
 				data.dX = -data.dX;
+				data.ballX = 660;
 				console.log("Touched right wall: " + data.ballX + ", " + data.dX);
 			}
 
 			if (data.ballY <= 50){
-				data.ballY = 50;
 				data.dY = -data.dY;
+				data.ballY = 50;
 				console.log("Touched up wall: " + data.ballY + ", " + data.dY);
 			} else if (data.ballY >= 430) {
-				data.ballY = 430;
 				data.dY = -data.dY;
+				data.ballY = 430;
 				console.log("Touched bottom wall: " + data.ballY + ", " + data.dY);
 			}
 
