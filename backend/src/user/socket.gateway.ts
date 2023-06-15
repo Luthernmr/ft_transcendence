@@ -16,7 +16,7 @@ import { AuthService } from 'src/auth/auth.service';
 
 console.log("Websocket: " + process.env.FRONTEND);
 
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND } })
+@WebSocketGateway({ cors: { origin: process.env.FRONTEND },namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
 	@WebSocketServer()
 	server: Server;
@@ -38,9 +38,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 		try {
 			const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-			console.log('userAuthed', user)
 			if (user) {
 				await this.userService.setSocket(user.id, client.id);
+				console.log('userAuthed', user)
 			}
 		}
 		catch (error) {
@@ -84,7 +84,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async acceptFriendRequest(client: Socket, data: {
 		requestId: any,
 	}) {
-		console.log('accepted', data.requestId)
+		//console.log('accepted', data.requestId)
 
 		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
