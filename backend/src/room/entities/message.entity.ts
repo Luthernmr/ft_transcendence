@@ -25,7 +25,7 @@ export class Message {
   @ManyToMany(() => Room, (room: Room) => room.messages)
   room: Room;
 
-  @JoinTable()
-  @ManyToOne(() => User, (user: User) => user.messages)
-  user: User;
+  // @JoinTable()
+  // @ManyToOne(() => User, (user: User) => user.messages)
+  // user: User;
 }
