@@ -68,6 +68,7 @@ export class UserService {
 				senderId: data.senderId
 			  }
 			});
+
 		
 			if (existingRequest) {
 			  throw new BadRequestException('Request already exists for this person.');

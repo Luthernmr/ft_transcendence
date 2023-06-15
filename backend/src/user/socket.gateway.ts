@@ -95,7 +95,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				userA: currentUser,
 				userB: friendUser
 			})
-			
+			client.emit('getFriends')
+			client.emit('pendingRequestsList')
 			await this.userService.deletePendingRequestById(data.requestId);
 		}
 		catch (error) { console.log(error) }
@@ -110,6 +111,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
 			const friendList =  await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList)
+
+		}
+		catch(error)
+		{
+			console.log(error);
+		}
+	}
+
+	@SubscribeMessage('getPendingRequest')
+	async getPendingRequest(client: Socket) {
+
+		try
+		{
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
+			const pendingRequests=  await this.userService.getAllPendingRequest(currentUser)
+			client.emit('pendingRequestsList', pendingRequests)
 
 		}
 		catch(error)

@@ -41,18 +41,23 @@ interface FriendRequest {
 	type: string;
 }
 
+
 const PendingRequest = () => {
+	
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 
-
+	userSocket.on('pendingRequestsList', (data) => {
+		console.log(data)
+		setFriendRequests(data);
+	})
+	
 	useEffect(() => {
-		const getAllFriends = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + '/social/allRequest', { withCredentials: true });
-			setFriendRequests(res.data);
-			console.log("here", res.data);
-		}
-		getAllFriends();
+		userSocket.on('pendingRequest', () => {
+			userSocket.emit('getPendingRequest')
+		})
+		userSocket.emit('getPendingRequest')
 	}, []);
+
 
 	const handleAccept = async (id : number) => {
 		userSocket.emit('acceptFriendRequest', {requestId : id})
@@ -96,10 +101,6 @@ const PendingRequest = () => {
 	)
 }
 export default function Notification() {
-
-	userSocket.on('pendingRequest', () => {
-		console.log('receiv send');
-	})
 
 	return (
 		<Popover>

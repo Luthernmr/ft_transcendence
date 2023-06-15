@@ -20,6 +20,9 @@ export default function AllfriendItem() {
 		setFriends(data)
 	})
 	useEffect(() => {
+		userSocket.on('getFriends', () => {
+			userSocket.emit('getFriends');
+		})
 		userSocket.emit('getFriends');
 	}, []);
 
