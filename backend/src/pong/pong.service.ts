@@ -14,11 +14,11 @@ interface PongRuntimeData {
 
 @Injectable()
 export class PongService {
-	runtimeDatas: PongRuntimeData[] = [];
+	runtimeDatas: PongRuntimeData[];
 	pongGateway : PongGateway;
 	
 	constructor() {
-		
+		this.runtimeDatas = [];
 	}
 
 	RegisterGateway(pongGateway : PongGateway) {
@@ -30,6 +30,7 @@ export class PongService {
 	}
 
 	StartRoom(socket: Socket) {
+		console.log("Starting new pong room");
 		const datas: PongRuntimeData = {
 			socket: socket,
 			ballX: 390,
@@ -42,15 +43,14 @@ export class PongService {
 	}
 
 	CloseRoom(socketID: string) {
-		this.runtimeDatas.forEach(function (data) {
+		console.log("Closing pong room");
+		this.runtimeDatas.forEach((data) => {
 			if (data.socket.id === socketID) {
-				const index = this.runtimeDatas.indexOf(data);
+				const index: number = this.runtimeDatas.indexOf(data);
+				console.log("Found index: " + index);
 				this.runtimeDatas.splice(index, 1);
-				console.log("Closed room");
-
-				return;
 			}
-		})
+		});
 	}
 
 	GlobalUpdate() {
@@ -67,21 +67,21 @@ export class PongService {
 			if (data.ballX <= 90) { // leftWall.x + wallWidth
 				data.dX = -data.dX;
 				data.ballX = 90;
-				console.log("Touched left wall: " + data.ballX + ", " + data.dX);
+				//console.log("Touched left wall: " + data.ballX + ", " + data.dX);
 			} else if (data.ballX >= 660) { // rightWall.x - ballRadius
 				data.dX = -data.dX;
 				data.ballX = 660;
-				console.log("Touched right wall: " + data.ballX + ", " + data.dX);
+				//console.log("Touched right wall: " + data.ballX + ", " + data.dX);
 			}
 
 			if (data.ballY <= 50){
 				data.dY = -data.dY;
 				data.ballY = 50;
-				console.log("Touched up wall: " + data.ballY + ", " + data.dY);
+				//console.log("Touched up wall: " + data.ballY + ", " + data.dY);
 			} else if (data.ballY >= 430) {
 				data.dY = -data.dY;
 				data.ballY = 430;
-				console.log("Touched bottom wall: " + data.ballY + ", " + data.dY);
+				//console.log("Touched bottom wall: " + data.ballY + ", " + data.dY);
 			}
 
 
