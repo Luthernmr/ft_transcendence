@@ -11,6 +11,8 @@ services:
       POSTGRES_DB: ft_db
     ports:
       - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - transcendence-network
 
@@ -23,6 +25,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: root
     ports:
       - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
     networks:
       - transcendence-network
 
@@ -62,7 +66,6 @@ volumes:
       type: none
       o: bind
       device: ./backend
-      #device: /home/fbelthoi/ft_transcendence/backend #use this with absolute path if docker doesn't want to compile because of relative path
 
   frontend-data:
     driver: local
@@ -70,4 +73,8 @@ volumes:
       type: none
       o: bind
       device: ./frontend
-      #device: /home/fbelthoi/ft_transcendence/frontend #use this with absolute path if docker doesn't want to compile because of relative path
+
+  postgres-data:
+    driver: local
+  pgadmin-data:
+    driver: local
