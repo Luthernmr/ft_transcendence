@@ -74,7 +74,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			senderNickname: userSender.nickname,
 			user: userReceiv
 		})
-		client.to(otherId).emit('pendingRequest');
+		client.to(otherId).emit('notifyRequest');
 		console.log("client: ", client.id + " request to ", ' other', otherId,)
 
 		// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
@@ -95,8 +95,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				userA: currentUser,
 				userB: friendUser
 			})
-			client.emit('getFriends')
-			client.emit('pendingRequestsList')
+			//client.emit('getFriends')
+			client.emit('requestAcccepted')
 			await this.userService.deletePendingRequestById(data.requestId);
 		}
 		catch (error) { console.log(error) }

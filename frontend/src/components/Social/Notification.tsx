@@ -46,13 +46,17 @@ const PendingRequest = () => {
 	
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 
-	userSocket.on('pendingRequestsList', (data) => {
-		console.log(data)
-		setFriendRequests(data);
-	})
-	
 	useEffect(() => {
-		userSocket.on('pendingRequest', () => {
+		userSocket.on('pendingRequestsList', (data) => {
+			console.log(data)
+			setFriendRequests(data);
+		})
+		
+		userSocket.on('notifyRequest', () => {
+			userSocket.emit('getPendingRequest')
+		})
+
+		userSocket.on('requestAcccepted', () => {
 			userSocket.emit('getPendingRequest')
 		})
 		userSocket.emit('getPendingRequest')

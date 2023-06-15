@@ -15,12 +15,12 @@ export default function AllfriendItem() {
 
 	const [friends, setFriends] = useState<Friend[]>([]);
 
-	userSocket.on('friendsList',(data) => {
-		console.log('friendlist', data);
-		setFriends(data)
-	})
 	useEffect(() => {
-		userSocket.on('getFriends', () => {
+		userSocket.on('friendsList',(data) => {
+			console.log('friendlist', data);
+			setFriends(data)
+		})
+		userSocket.on('requestAcccepted', () => {
 			userSocket.emit('getFriends');
 		})
 		userSocket.emit('getFriends');
