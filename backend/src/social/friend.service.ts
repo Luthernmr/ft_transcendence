@@ -15,52 +15,57 @@ import { request } from 'http';
 export class FriendService {
 	constructor(
 		@InjectRepository(Friend)
-			private friendRepository: Repository<Friend>,
-			private readonly userService: UserService,
+		private friendRepository: Repository<Friend>,
+		private readonly userService: UserService,
 	) { }
 
-	async addFriend(data) : Promise <any>
-	{		
+	async addFriend(data): Promise<any> {
 		return this.friendRepository.save(data)
 	}
 
 	async getFriends(currentUser: User): Promise<any> {
-	
+
 		const theyRequested = await this.friendRepository.find({ //The relations when They send me a Friend request;
-			where : { 
-				userA : currentUser,
-		}, 
-		relations: ['userB'],
-		select :{
-				userB :{
-					id : true,
-					nickname : true,
-					imgPdp : true
+			where: {
+				userA: currentUser,
+			},
+			relations: ['userB'],
+			select: {
+				userB: {
+					id: true,
+					nickname: true,
+					imgPdp: true
 				}
-		}});
+			}
+		});
 
 		const iRequested = await this.friendRepository.find({ //The relations when i send a Friend request to someone;
-			where : { 
-				userB : currentUser,
-		}, 
-		relations: ['userA'],
-		select :{
-				userA :{
-					id : true,
-					nickname : true,
-					imgPdp : true
+			where: {
+				userB: currentUser,
+			},
+			relations: ['userA'],
+			select: {
+				userA: {
+					id: true,
+					nickname: true,
+					imgPdp: true
 				}
-		}});
-	
+			}
+		});
+		
+		const friendList = [];
 
-
-		const friendList =  [];
-
-		for(let i = 0; i < theyRequested.length; i++){
-			friendList.push(theyRequested[i].userB)
+		
+		
+		for (let i = 0; i < theyRequested.length; i++) {
+			friendList.push(theyRequested[i].userB);
 		}
-		console.log("FriendList",friendList)
+		for (let i = 0; i < iRequested.length; i++) {
+			friendList.push(iRequested[i].userA);
+		}
+		
+		console.log("FriendList", friendList)
 		return friendList;
-	  }
+	}
 
 }

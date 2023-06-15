@@ -13,7 +13,7 @@ export default function App() {
 
 	userSocket.on('connect', () => {
 	
-		console.log('front connect')
+		console.log('user socket connect')
 	})
 
 	pongSocket.on('connect', () => {
@@ -22,7 +22,7 @@ export default function App() {
 
 	chatSocket.on('connect', () => {
 	
-		console.log('front  chtconnect')
+		console.log('chat socket connect')
 	})
 
 	return (
