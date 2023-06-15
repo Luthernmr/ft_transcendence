@@ -28,7 +28,20 @@ export class AuthService {
 	{
 		const cookie = request.cookies['jwt'];
 		const data = await this.jwtService.verifyAsync(cookie);
-		return this.userService.getUser(data.email);
+		return await this.userService.getUser(data.email);
+	}
+
+	async getUserByToken(token : any): Promise<User>
+	{
+		if (token)
+		{
+			const data = await this.jwtService.verifyAsync(token);
+			const user : User  = await this.userService.getUser(data.email);
+			delete user.password
+
+			return user;
+		}
+		
 	}
 
 	async logout(request: Request, response : Response)

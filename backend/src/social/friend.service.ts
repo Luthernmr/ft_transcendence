@@ -8,6 +8,8 @@ import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { Friend } from './friend.entity';
 import { PendingRequest } from './pendingRequest.entity';
+import { User } from 'src/user/user.entity';
+import { request } from 'http';
 
 @Injectable()
 export class FriendService {
@@ -17,18 +19,48 @@ export class FriendService {
 			private readonly userService: UserService,
 	) { }
 
-	async addFriend(id : number) : Promise <any>
-	{
-		const user = await this.userService.getUserById(id);
-		
-		return this.friendRepository.save({
-			id: user.id,
-			name: user.nickname
-		})
+	async addFriend(data) : Promise <any>
+	{		
+		return this.friendRepository.save(data)
 	}
 
-	async getFriendList() : Promise<any>
-	{
-		console.log(this.friendRepository);
-	}
+	async getFriends(currentUser: User): Promise<any> {
+	
+		const theyRequested = await this.friendRepository.find({ //The relations when They send me a Friend request;
+			where : { 
+				userA : currentUser,
+		}, 
+		relations: ['userB'],
+		select :{
+				userB :{
+					id : true,
+					nickname : true,
+					imgPdp : true
+				}
+		}});
+
+		const iRequested = await this.friendRepository.find({ //The relations when i send a Friend request to someone;
+			where : { 
+				userB : currentUser,
+		}, 
+		relations: ['userA'],
+		select :{
+				userA :{
+					id : true,
+					nickname : true,
+					imgPdp : true
+				}
+		}});
+	
+
+
+		const friendList =  [];
+
+		for(let i = 0; i < theyRequested.length; i++){
+			friendList.push(theyRequested[i].userB)
+		}
+		console.log("FriendList",friendList)
+		return friendList;
+	  }
+
 }

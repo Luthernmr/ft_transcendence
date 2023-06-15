@@ -1,11 +1,12 @@
 /*
 https://docs.nestjs.com/providers#services
 */
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
@@ -13,7 +14,7 @@ export class UserService {
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
 		@InjectRepository(PendingRequest)
-			private pendingRequest: Repository<PendingRequest>
+			private pendingRequest: Repository<PendingRequest>,
 	) { }
 
 	async create(data: any): Promise<User> {
@@ -35,7 +36,7 @@ export class UserService {
 
 	async setSocket(id: number, socketId: string) {
 		var user: any = await this.getUserById(id);
-		console.log('test', user.nickname);
+		// console.log('test', user.nickname);
 		user.socketId = socketId;
 		await this.userRepository.save(user);
 	}
@@ -59,7 +60,42 @@ export class UserService {
 	}
 
 	async createPendingRequest(data : any) : Promise<PendingRequest> {
-		return await this.pendingRequest.save(data);
+		console.log("data", data);
+		try {
+			const existingRequest = await this.pendingRequest.findOne({
+			  where: {
+				type: data.type,
+				senderId: data.senderId
+			  }
+			});
+		
+			if (existingRequest) {
+			  throw new BadRequestException('Request already exists for this person.');
+			}
+		
+			return await this.pendingRequest.save(data);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
+	async getPendingRequestById(id: number): Promise <PendingRequest>
+	{
+		return await this.pendingRequest.findOne({where: {id : id}})
+	}
+
+	async deletePendingRequestById(id : number)
+	{
+		await this.pendingRequest.delete(await this.getPendingRequestById(id))
+	}
+
+	async getAllPendingRequest(user: any): Promise<any> {
+		const userWithPendingRequests = await this.userRepository.findOne({where : user, relations: ['pendingRequests'] });
+		console.log("pending list", userWithPendingRequests.pendingRequests);
+		return userWithPendingRequests.pendingRequests;
+	  }
+	
+	
+	  
+	  
 }

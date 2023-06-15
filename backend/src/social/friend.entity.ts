@@ -6,16 +6,11 @@ export class Friend {
 	@PrimaryGeneratedColumn()
 	id: number;
 
-	@Column()
-	name: string;
-
-	@Column()
-	img: string;
-
-	@Column()
-	blocked: boolean;
+	@ManyToOne(() => User, user => user.friends)
+	@JoinTable()
+	userA: User;
 
 	@ManyToOne(() => User, user => user.friends)
 	@JoinTable()
-	user: User[];
+	userB : User;
 }

@@ -6,20 +6,23 @@ import SidebarWithHeader from "./components/Dashboard/SidebarWithHeader";
 import LoginCard from "./components/User/loginCard";
 import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
-import { pongSocket, userSocket } from "./sockets/sockets";
+import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
 
 export default function App() {
 
 	userSocket.on('connect', () => {
-		//auth: {
-		//	token: localStorage.getItem("currentUser")
-		//}
+	
 		console.log('front connect')
 	})
 
 	pongSocket.on('connect', () => {
 		console.log("pong socket connecting");
+	})
+
+	chatSocket.on('connect', () => {
+	
+		console.log('front  chtconnect')
 	})
 
 	return (

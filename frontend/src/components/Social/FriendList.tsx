@@ -2,6 +2,7 @@ import { Text, Tabs, TabList, TabPanels, Tab, TabPanel, Button, Drawer, DrawerBo
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import AllUserItem from './AllUserItem';
+import AllfriendItem from './AllFriendsItem';
 
 
 
@@ -17,7 +18,7 @@ export default function FriendList() {
 				</TabList>
 				<TabPanels>
 					<TabPanel>
-						<p>friends list</p>
+						<AllfriendItem />
 					</TabPanel>
 					<TabPanel>
 						<AllUserItem />

@@ -10,10 +10,12 @@ import { UserService } from 'src/user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Friend } from './friend.entity';
 import { PendingRequest } from './pendingRequest.entity';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Friend]), UserModule,],
+	imports: [TypeOrmModule.forFeature([Friend]), UserModule, AuthModule],
 	controllers: [FriendController],
 	providers: [FriendService],
+	exports: [FriendService],
 })
 export class FriendModule { }

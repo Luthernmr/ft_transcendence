@@ -81,7 +81,7 @@ export default function SidebarWithHeader({ children }: {
 					w={{ base: 'full', md: 60 }}
 				>
 			</Box > */}
-				<Flex h={'100%'} ml={{ base: 0, md: 60 }} p={"4"} overflow={"auto"} >
+				<Flex h={'100%'} ml={{ base: 0, md: 60 }} p={"4"} overflow={"auto"} justifyContent={'space-between'}>
 
 					{children}
 					<Box ml={5}>
