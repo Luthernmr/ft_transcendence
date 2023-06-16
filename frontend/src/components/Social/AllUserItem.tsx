@@ -53,6 +53,16 @@ export default function AllUserItem() {
 									<Box ml='2'>
 										<Text fontSize='sm' fontWeight='bold'>
 											{user.nickname}
+											{user.isOnline &&
+												<Badge ml='1' colorScheme='purple'>
+													inGame
+												</Badge>
+											}
+											{!user.isOnline &&
+												<Badge ml='1' colorScheme='red'>
+													offline
+												</Badge>
+											}
 										</Text>
 										<Text fontSize='xs'>Student</Text>
 									</Box>

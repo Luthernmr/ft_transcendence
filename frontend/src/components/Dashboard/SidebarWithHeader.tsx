@@ -198,11 +198,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 		}
 	}
 
-	userSocket.on('pendingRequest', (userSocket)=> {
-		
-		console.log('pending');
-	})
-	
+
 	return (
 		<Flex
 			ml={{ base: 0, md: 60 }}

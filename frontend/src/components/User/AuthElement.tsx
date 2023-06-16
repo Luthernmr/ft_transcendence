@@ -9,7 +9,7 @@ export default function AuthElement () {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (location.search.includes('code') && !authTokenCalled) {
+		if ( location.search.includes('code') && !authTokenCalled) {
 			const getAuthToken = async () => {
 				try{
 					const res = await axios.get(import.meta.env.VITE_BACKEND + '/auth/42' + location.search, { withCredentials: true });

@@ -36,7 +36,7 @@ import { userSocket } from '../../sockets/sockets';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react'
 
-interface FriendRequest {
+export interface FriendRequest {
 	id: number;
 	senderNickname: string;
 	type: string;

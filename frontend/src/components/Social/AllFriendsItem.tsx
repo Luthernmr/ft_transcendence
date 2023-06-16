@@ -1,6 +1,6 @@
-import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Icon } from "@chakra-ui/react";
+import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Icon, HStack } from "@chakra-ui/react";
 import axios from "axios";
-import { AddIcon, DeleteIcon, DragHandleIcon } from '@chakra-ui/icons'
+import { AddIcon, ChatIcon, DeleteIcon, DragHandleIcon, ViewIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
 import { User } from "./AllUserItem";
@@ -61,6 +61,16 @@ export default function AllfriendItem() {
 									<Box ml='2'>
 										<Text fontSize='sm' fontWeight='bold'>
 											{friend.nickname}
+											{friend.isOnline &&
+												<Badge ml='1' colorScheme='purple'>
+													inGame
+												</Badge>
+											}
+											{!friend.isOnline &&
+												<Badge ml='1' colorScheme='red'>
+													offline
+												</Badge>
+											}
 										</Text>
 										<Text fontSize='xs'>Student</Text>
 									</Box>
@@ -75,14 +85,31 @@ export default function AllfriendItem() {
 							<PopoverHeader>{friend.nickname}</PopoverHeader>
 							<PopoverCloseButton />
 							<PopoverBody>
-								<IconButton
-									onClick={(e) => deleteFriend(e, friend.id)}
-									colorScheme='blue'
-									variant={'outline'}
-									aria-label='Call Segun'
-									size='lg'
-									icon={<DeleteIcon />}
-								/>
+								<HStack>
+
+									<IconButton
+										onClick={(e) => deleteFriend(e, friend.id)}
+										colorScheme='blue'
+										variant={'outline'}
+										aria-label='Call Segun'
+										size='lg'
+										icon={<DeleteIcon />}
+									/>
+									<IconButton
+										colorScheme='blue'
+										variant={'outline'}
+										aria-label='Call Segun'
+										size='lg'
+										icon={<ChatIcon />}
+									/>
+									<IconButton
+										colorScheme='blue'
+										variant={'outline'}
+										aria-label='Call Segun'
+										size='lg'
+										icon={<ViewIcon />}
+									/>
+								</HStack>
 							</PopoverBody>
 						</PopoverContent>
 					</Portal>
