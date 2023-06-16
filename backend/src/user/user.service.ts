@@ -7,6 +7,7 @@ import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { JwtService } from '@nestjs/jwt';
+import { FriendService } from 'src/social/friend.service';
 
 @Injectable()
 export class UserService {
@@ -18,10 +19,10 @@ export class UserService {
 	) { }
 
 	async create(data: any): Promise<User> {
-		return this.userRepository.save(data);
+		return await this.userRepository.save(data);
 	}
 	async getUser(email: any): Promise<User> {
-		return this.userRepository.findOne({ where: { email: email } });
+		return await this.userRepository.findOne({ where: { email: email } });
 	}
 
 	async getAllUser(): Promise<any> {
@@ -36,9 +37,13 @@ export class UserService {
 
 	async setSocket(id: number, socketId: string) {
 		var user: any = await this.getUserById(id);
-		// console.log('test', user.nickname);
+		console.log('before', user.socketId)
+
 		user.socketId = socketId;
-		await this.userRepository.save(user);
+		user = await this.userRepository.save(user);
+		console.log('after', await this.getUserById(id))
+		return user
+
 	}
 
 	async setOnline(user: User) {
@@ -61,23 +66,18 @@ export class UserService {
 
 	async createPendingRequest(data : any) : Promise<PendingRequest> {
 		console.log("data", data);
-		try {
 			const existingRequest = await this.pendingRequest.findOne({
 			  where: {
 				type: data.type,
 				senderId: data.senderId
 			  }
 			});
-
-		
+			console.log('exiting', existingRequest)
 			if (existingRequest) {
 			  throw new BadRequestException('Request already exists for this person.');
 			}
 		
 			return await this.pendingRequest.save(data);
-		} catch (error) {
-			console.log(error);
-		}
 	}
 
 	async getPendingRequestById(id: number): Promise <PendingRequest>

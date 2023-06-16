@@ -4,20 +4,11 @@ import { AddIcon, DragHandleIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
 
-interface User {
+export interface User {
 	id: number;
 	nickname: string;
 	imgPdp: string;
-}
-
-interface Friend {
-	id: number;
-	nickname: string;
-	imgPdp: string;
-}
-
-interface FriendRequest {
-	id: number;
+	isOnline: boolean;
 }
 
 export default function AllUserItem() {
@@ -26,17 +17,18 @@ export default function AllUserItem() {
 
 
 	useEffect(() => {
-		const getAllUser = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + '/user/all', { withCredentials: true });
-			setUsers(res.data.users);
-		}
-		getAllUser();
+		userSocket.on('userList', (data) => {
+			console.log('userList', data);
+			setUsers(data)
+		})
+		userSocket.emit('getAllUsers')
+
 	}, []);
 
-	function sendFriendRequest(e : any, id : number){
+	function sendFriendRequest(e: any, id: number) {
 		e.preventDefault()
-		var current : User = JSON.parse(localStorage.getItem('currentUser')!)
-		userSocket.emit("friendRequest", {userSenderId :  current.id ,userReceiveId: id})
+		var current: User = JSON.parse(localStorage.getItem('currentUser')!)
+		userSocket.emit("friendRequest", { userSenderId: current.id, userReceiveId: id })
 		console.log('test');
 	}
 
@@ -46,23 +38,27 @@ export default function AllUserItem() {
 				<Popover key={user.id}>
 					<Box >
 						<ListItem  >
-								<PopoverTrigger>
-							<Flex alignItems={'center'} _hover={{bg: 'gray.200', cursor : 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
-								<Avatar
-									size="sm"
-									src={user.imgPdp}>
-									<AvatarBadge boxSize='1em' bg='green.500' />
-									<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
-								</Avatar>
-								<Box ml='2'>
-									<Text fontSize='sm' fontWeight='bold'>
-										{user.nickname}
-									</Text>
-									<Text fontSize='xs'>Student</Text>
-								</Box>
-							</Flex>
-									
-								</PopoverTrigger>
+							<PopoverTrigger>
+								<Flex alignItems={'center'} _hover={{ bg: 'gray.200', cursor: 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
+									<Avatar
+										size="sm"
+										src={user.imgPdp}>
+										{user.isOnline &&
+											<AvatarBadge boxSize='1em' bg='green.500' />
+										}
+										{!user.isOnline &&
+											<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
+										}
+									</Avatar>
+									<Box ml='2'>
+										<Text fontSize='sm' fontWeight='bold'>
+											{user.nickname}
+										</Text>
+										<Text fontSize='xs'>Student</Text>
+									</Box>
+								</Flex>
+
+							</PopoverTrigger>
 						</ListItem>
 					</Box>
 					<Portal>
@@ -72,7 +68,7 @@ export default function AllUserItem() {
 							<PopoverCloseButton />
 							<PopoverBody>
 								<IconButton
-								onClick={(e) => sendFriendRequest(e, user.id)}
+									onClick={(e) => sendFriendRequest(e, user.id)}
 									variant='outline'
 									colorScheme='blue'
 									aria-label='addFriend'

@@ -3,7 +3,7 @@ import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from "socket.io"
 
 @Injectable()
-@WebSocketGateway({cors: {origin: '*'}})
+@WebSocketGateway({cors: {origin: '*'}, namespace : 'chat'})
 export class ChatService {
   private logger: Logger;
 

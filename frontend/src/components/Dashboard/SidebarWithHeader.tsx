@@ -241,10 +241,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 							_focus={{ boxShadow: 'none' }}>
 							<HStack>
 								<Box
-									borderRadius="full"
-									boxShadow='outline'
 									bg='white'>
 									<Avatar
+										name = {user.nickname}
 										size={'md'}
 										src={user.imgPdp}
 									/>
