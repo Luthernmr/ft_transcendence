@@ -34,6 +34,7 @@ import {
 } from 'react-icons/fi';
 import { userSocket } from '../../sockets/sockets';
 import axios from 'axios';
+import { useToast } from '@chakra-ui/react'
 
 interface FriendRequest {
 	id: number;
@@ -46,11 +47,14 @@ const PendingRequest = () => {
 	
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 
-	userSocket.on('notifyRequest', () => {
-		userSocket.emit('getPendingRequest')
-	})
 	
+	const toast = useToast()
 	useEffect(() => {
+		userSocket.on('notifyRequest', () => {
+			console.log('notify');
+			userSocket.emit('getPendingRequest')
+		})
+
 		userSocket.on('pendingRequestsList', (data) => {
 			console.log(data)
 			setFriendRequests(data);
@@ -61,12 +65,24 @@ const PendingRequest = () => {
 			userSocket.emit('getPendingRequest')
 		})
 		userSocket.emit('getPendingRequest')
+
+		userSocket.on('alreadyFriend', () => {
+			toast({
+                title: `You can't send more friend request`,
+                status: 'error',
+                isClosable: true,
+				position: 'top'
+              })
+			  console.log('test');
+
+		})
 	}, []);
 
 
 	const handleAccept = async (id : number) => {
 		userSocket.emit('acceptFriendRequest', {requestId : id})
 	}
+
 
 	return (
 		<Box>
