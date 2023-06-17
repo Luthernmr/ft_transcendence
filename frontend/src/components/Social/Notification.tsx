@@ -67,6 +67,16 @@ const PendingRequest = () => {
 		})
 		userSocket.emit('getPendingRequest')
 
+		userSocket.on('sendSuccess', () => {
+			toast({
+				title: `A request has been sent`,
+				status: 'success',
+				isClosable: true,
+				position: 'top'
+			})
+			console.log('test');
+
+		})
 		userSocket.on('alreadyFriend', () => {
 			toast({
 				title: `You can't send more friend request`,

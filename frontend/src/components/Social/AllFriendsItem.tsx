@@ -87,14 +87,6 @@ export default function AllfriendItem() {
 								<HStack>
 
 									<IconButton
-										onClick={(e) => deleteFriend(e, friend.id)}
-										colorScheme='blue'
-										variant={'ghost'}
-										aria-label='Call Segun'
-										size='lg'
-										icon={<DeleteIcon />}
-									/>
-									<IconButton
 										colorScheme='blue'
 										variant={'ghost'}
 										aria-label='Call Segun'
@@ -107,6 +99,14 @@ export default function AllfriendItem() {
 										aria-label='Call Segun'
 										size='lg'
 										icon={<ViewIcon />}
+									/>
+									<IconButton
+										onClick={(e) => deleteFriend(e, friend.id)}
+										colorScheme='blue'
+										variant={'ghost'}
+										aria-label='Call Segun'
+										size='lg'
+										icon={<DeleteIcon />}
 									/>
 								</HStack>
 							</PopoverBody>
