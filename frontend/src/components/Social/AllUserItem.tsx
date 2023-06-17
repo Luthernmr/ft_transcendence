@@ -1,6 +1,6 @@
 import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal } from "@chakra-ui/react";
 import axios from "axios";
-import { AddIcon, DragHandleIcon } from '@chakra-ui/icons'
+import { AddIcon, DragHandleIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
 
@@ -27,10 +27,16 @@ export default function AllUserItem() {
 
 	function sendFriendRequest(e: any, id: number) {
 		e.preventDefault()
-		var current: User = JSON.parse(sessionStorage.getItem('currentUser')!)
-		userSocket.emit("friendRequest", { userSenderId: current.id, userReceiveId: id })
+		userSocket.emit("friendRequest", { userReceiveId: id })
 		console.log('test');
 	}
+
+	function blockUser(e: any, id: number) {
+		e.preventDefault()
+		userSocket.emit("blockUser", { userBlockedId: id })
+		console.log('test');
+	}
+
 
 	return (
 		<List>
@@ -83,6 +89,13 @@ export default function AllUserItem() {
 									colorScheme='blue'
 									aria-label='addFriend'
 									icon={<AddIcon />}
+								/>
+								<IconButton
+									onClick={(e) => blockUser(e, user.id)}
+									variant='ghost'
+									colorScheme='blue'
+									aria-label='addFriend'
+									icon={<NotAllowedIcon />}
 								/>
 							</PopoverBody>
 						</PopoverContent>

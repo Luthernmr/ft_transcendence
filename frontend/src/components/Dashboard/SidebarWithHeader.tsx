@@ -45,7 +45,7 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
 	{ name: 'Play', icon: RiGamepadLine, routeName: "/Play" },
 	{ name: 'Chat', icon: FiMessageSquare, routeName: "/Chat" },
-	{ name: 'Settings', icon: FiSettings, routeName: "/Settings" },
+	{ name: 'Profile', icon: FiSettings, routeName: "/Profile" },
 ];
 
 export default function SidebarWithHeader({ children }: {

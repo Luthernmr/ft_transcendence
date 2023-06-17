@@ -1,5 +1,6 @@
 import { Message } from 'src/room/entities/message.entity';
 import { Room } from 'src/room/entities/room.entity';
+import { BlockedUser } from 'src/social/blockedUser.entity';
 import { Friend } from 'src/social/friend.entity';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
@@ -34,6 +35,11 @@ export class User {
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()
   pendingRequests: PendingRequest[];
+
+  @OneToMany(() => BlockedUser, friend => friend.currentUser)
+  @JoinTable()
+  blockedUsers: BlockedUser[];
+
 
   // @JoinTable()
   // @ManyToOne(() => Room, (room: Room) => room.users)

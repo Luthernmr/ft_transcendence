@@ -1,7 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./components/Chat/Chat";
 import Pong from "./components/Pong/Pong";
-import Settings from "./components/User/Settings";
 import SidebarWithHeader from "./components/Dashboard/SidebarWithHeader";
 import LoginCard from "./components/User/loginCard";
 import RegisterCard from "./components/User/registerCard";
@@ -9,6 +8,7 @@ import Home from "./components/Dashboard/Home";
 import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
 import { ReactNode, useEffect, useState } from "react";
+import UserProfile from "./components/User/Profile";
 
 
 function PrivateRoute({ children }: { children: ReactNode }) {
@@ -63,9 +63,9 @@ export default function App() {
 				</PrivateRoute>
 			}
 			/>
-			<Route path="/Settings" element={
+			<Route path="/profile" element={
 				<PrivateRoute>
-					<SidebarWithHeader children={<Settings />} />
+					<SidebarWithHeader children={<UserProfile />} />
 				</PrivateRoute>
 			}
 			/>
