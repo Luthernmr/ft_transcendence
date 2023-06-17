@@ -63,6 +63,12 @@ export default function App() {
 				</PrivateRoute>
 			}
 			/>
+			<Route path="/Settings" element={
+				<PrivateRoute>
+					<SidebarWithHeader children={<Settings />} />
+				</PrivateRoute>
+			}
+			/>
 
 		</Routes>
 	);
