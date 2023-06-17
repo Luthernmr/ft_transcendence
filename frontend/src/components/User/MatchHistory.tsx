@@ -22,14 +22,15 @@ export default function MatchHistory() {
 					<CardBody >
 						<Flex justifyContent={'space-around'} alignItems={'center'}>
 							<HStack spacing={'2'} >
-								<Avatar name='Adversaire' src='https://bit.ly/ryan-florence' size='xl' />
-								<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white' }> +15 XP</Text>
+								<Avatar name='Adversaire' src='https://bit.ly/kent-c-dodds' size='xl' />
+								<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white' }>VS</Text>
+								<Avatar name='Adversaire' src='https://bit.ly/code-beast' size='xl' />
 							</HStack>
 							<Flex flexDirection={'column'}  alignItems={'center'}>
 								<Text fontWeight={'thin'} fontSize={'2xl'} color={'yellow.300'}>{handleIssue({size})}</Text>
 							<Text fontSize={'4xl'} color={'white' }>11 - 9</Text>
 							</Flex>
-							<Text fontSize={'2xl'} color={'white' }>MODE</Text>
+							<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white' }> +15 XP</Text>
 						</Flex>
 					</CardBody>
 				</Card>

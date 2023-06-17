@@ -18,6 +18,5 @@ export class UserController {
 		const users = await this.userService.getAllUser();
 		const allUsers = { users : users}
 		response.send(allUsers);
-		//response.send(this.userService.getAllUser);
 	}
 }

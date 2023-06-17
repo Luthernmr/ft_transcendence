@@ -13,6 +13,7 @@ import { FriendService } from 'src/social/friend.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
+import { BadRequestException } from '@nestjs/common';
 
 console.log("Websocket: " + process.env.FRONTEND);
 
@@ -27,20 +28,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	) { }
 
-	//@SubscribeMessage('events')
-	// handleEvent(@MessageBody() data: string) {
-	//     this.server.emit('events', data);
-	// }
-
 	async handleConnection(client: Socket) {
-		//recup le jwt dqns le socket et le decoder pour recup les dat
-
-		let user: any = await this.authService.getUserByToken(client.handshake.auth.token)
+		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
-
-			console.log('userAuthed', user, 'socket : ', client.id)
 		}
 	}
 
@@ -50,8 +42,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		if (user) {
 			await this.userService.setOffline(user);
 		}
-
-		console.log("disconnected socket id : ", client.id);
 	}
 
 	afterInit(server: Socket) {
@@ -62,121 +52,58 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async Friend(client: Socket, data: {
 		userReceiveId: any,
 	}) {
-		console.log('friendRequest : ', data.userReceiveId, client.id);
-		//faire les verif (if les deux user sont ou pas amis)
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: any = await this.userService.getUserById(data.userReceiveId)
 
 		const otherId = userReceiv.socketId;
 
-		const alreadyFriend: any = await this.friendService.getRelation(userSender, userReceiv)
-		console.log('alreadyFriend', alreadyFriend)
-		if (!alreadyFriend) {
-			try {
-				await this.userService.createPendingRequest({
-					type: "Friend",
-					senderId: userSender.id,
-					senderNickname: userSender.nickname,
-					user: userReceiv
-				})
-				client.to(otherId).emit('notifyRequest');
-				console.log("client: ", client.id + " request to ", ' other', otherId,)
-			}
-			catch (error) {
-				console.log(error)
-				client.emit('alreadyFriend');
-			}
+		try {
+			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
+			if (alreadyExist)
+				throw new BadRequestException('Request already exists for this person.');	
+			await this.userService.createPendingRequest({
+				type: "Friend",
+				senderId: userSender.id,
+				senderNickname: userSender.nickname,
+				user: userReceiv
+			})
+			client.emit('sendSuccess');
+			client.to(otherId).emit('notifyRequest');
 		}
-		else
+		catch (error) {
+			console.log(error)
 			client.emit('alreadyFriend');
-
-		// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
-	}
-
-	@SubscribeMessage('blockUser')
-	async blockUser(client: Socket, data: {
-		userBlockedId: any,
-	}) {
-		console.log('friendRequest : ', data.userBlockedId, client.id);
-		//faire les verif (if les deux user sont ou pas amis)
-		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		const userBlocked: any = await this.userService.getUserById(data.userBlockedId)
-
-
-		const alreadyBlock: any = await this.friendService.getBlockedRelation(userSender, userBlocked)
-		console.log('alreadyBlocked', alreadyBlock)
-
-		if (!alreadyBlock) {
-			try {
-				await this.friendService.blockUser({
-					currentUser: userSender,
-					otherUser: userBlocked
-				})
-				client.emit('userHasBlocked');
-			}
-			catch (error) {
-				console.log(error)
-				client.emit('alreadyBlocked');
-			}
 		}
-		else
-			client.emit('alreadyBlocked');
-
-		// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
 	}
-	
+
 	@SubscribeMessage('acceptFriendRequest')
 	async acceptFriendRequest(client: Socket, data: {
 		requestId: any,
 	}) {
-		//console.log('accepted', data.requestId)
-
 		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
 			const friendUser = await this.userService.getUserById(request.senderId)
 			const otherId = friendUser.socketId;
-
-			console.log('friendUser', friendUser)
 			await this.friendService.addFriend({
 				userA: currentUser,
 				userB: friendUser
 			})
-			//client.emit('getFriends')
 			client.to(otherId).emit('reload');
-
 			client.emit('requestAcccepted')
-
-
 			await this.userService.deletePendingRequestById(data.requestId);
 		}
 		catch (error) {
 			console.log(error)
 		}
-		//add user to friendship
 	}
 
 	@SubscribeMessage('getFriends')
 	async getFriendsList(client: Socket) {
-
 		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
 			const friendList = await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList)
-
-		}
-		catch (error) {
-			console.log(error);
-		}
-	}
-	
-	@SubscribeMessage('getBlockedList')
-	async getBlockList(client: Socket) {
-
-		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
-			const blockedList = await this.friendService.getBlockedUsers(currentUser);
-			client.emit('blockedList', blockedList)
 		}
 		catch (error) {
 			console.log(error);
@@ -185,13 +112,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	@SubscribeMessage('deleteFriend')
 	async deleteFriend(client: Socket, data: { friendId: number }) {
-
 		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
 			const friendUser: any = await this.userService.getUserById(data.friendId);
 			await this.friendService.deleteFriend(currentUser, friendUser);
 			client.emit('reload');
-
 		}
 		catch (error) {
 			console.log(error);
@@ -200,19 +125,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	@SubscribeMessage('getAllUsers')
 	async getAllUsers(client: Socket) {
-
 		const users = await this.userService.getAllUser();
 		client.emit('userList', users);
 	}
 
 	@SubscribeMessage('getPendingRequest')
 	async getPendingRequest(client: Socket) {
-
 		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
 			const pendingRequests = await this.userService.getAllPendingRequest(currentUser)
 			client.emit('pendingRequestsList', pendingRequests)
-
 		}
 		catch (error) {
 			console.log(error);
@@ -228,5 +150,55 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	}
 
+	/* -------------------------------------------------------------------------- */
+	/*                             BlockUser Features                             */
+	/* -------------------------------------------------------------------------- */
 
+	@SubscribeMessage('blockUser')
+	async blockUser(client: Socket, data: {
+		userBlockedId: any,
+	}) {
+		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		const userBlocked: any = await this.userService.getUserById(data.userBlockedId)
+
+		try {
+				const alreadyBlock: any = await this.friendService.getBlockedRelation(userSender, userBlocked)
+				if (userSender.id == userBlocked.id || alreadyBlock)
+					throw new BadRequestException('block error');	
+				await this.friendService.blockUser({
+					currentUser: userSender,
+					otherUser: userBlocked
+				})
+				client.emit('userHasBlocked');
+			}
+			catch (error) {
+				console.log(error)
+				client.emit('alreadyBlocked');
+			}
+		}
+		
+	@SubscribeMessage('getBlockedList')
+	async getBlockList(client: Socket) {
+		try {
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
+			const blockedList: any = await this.friendService.getBlockedUsers(currentUser);
+			client.emit('blockedList', blockedList)
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
+
+	@SubscribeMessage('unblockUser')
+	async unBlockUser(client: Socket, data: { blockedId: any }) {
+		try {
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
+			const otherUser: any = await this.userService.getUserById(data.blockedId);
+			await this.friendService.unblockUser(currentUser, otherUser)
+			client.emit('userHasBlocked');
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
 }

@@ -2,7 +2,7 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
@@ -31,15 +31,14 @@ export class FriendService {
 	
 
 	async deleteFriend(currentUser : User , friendUser : User){
-		const relation : any = await this.getRelation(currentUser, friendUser);
 		try {
+			const relation : any = await this.getRelation(currentUser, friendUser);
 			await this.friendRepository.delete(relation)
 		}
 		catch(error)
 		{
 			console.log(error)
 		}
-		console.log(relation)
 	}
 	async getFriends(currentUser: User): Promise<any> {
 
@@ -114,41 +113,28 @@ export class FriendService {
 		})
 		
 		if (relation1.length)
-		{
-			console.log('relqtion 1', relation1)
 			return relation1
-		}
 		else if (relation2.length)
-		{
-			console.log('relqtion 2', relation2)
 			return relation2
-		}
 	}
 
-	async getBlockedRelation(currentUser: User, userReceived: User)
+	/* -------------------------------------------------------------------------- */
+	/*                              Blocked Features                              */
+	/* -------------------------------------------------------------------------- */
+
+	async getBlockedRelation(currentUser: User, otherUser: User)
 	{
 		const relation1 = await this.blockedUserRepository.find({
 			where: {
 				currentUser: currentUser,
-				otherUser: userReceived
-			}
-		})
-		const relation2= await this.blockedUserRepository.find({
-			where: {
-				currentUser: userReceived,
-				otherUser: currentUser
+				otherUser: otherUser
 			}
 		})
 		
 		if (relation1.length)
 		{
-			console.log('relqtion 1', relation1)
+			console.log('relqtion bloc-k 1', relation1)
 			return relation1
-		}
-		else if (relation2.length)
-		{
-			console.log('relqtion 2', relation2)
-			return relation2
 		}
 	}
 
@@ -179,5 +165,17 @@ export class FriendService {
 		return blockedList2;
 	}
 
+	async unblockUser (currentUser : User, otherUser : User ) {
+		try{
+			console.log('here', currentUser, otherUser)
+			let relation : any = await this.getBlockedRelation(currentUser, otherUser)
+			console.log('unblock',relation);
+			 await	this.blockedUserRepository.delete(relation)
+		}
+		catch (error)
+		{
+			console.log(error);
+		}
+	}
 
 }
