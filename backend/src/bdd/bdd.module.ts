@@ -7,6 +7,7 @@ import { User } from '../user/user.entity'
 import { Module } from '@nestjs/common';
 import { Friend } from 'src/social/friend.entity';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
+import { BlockedUser } from 'src/social/blockedUser.entity';
 
 @Module({
    		imports: [TypeOrmModule.forRoot({
@@ -16,7 +17,7 @@ import { PendingRequest } from 'src/social/pendingRequest.entity';
 		username: 'root',
 		password: 'root',
 		database: 'ft_db',
-		entities: [User,Friend, PendingRequest],
+		entities: [User,Friend, PendingRequest,BlockedUser],
 		synchronize: true,
 	})
 	],

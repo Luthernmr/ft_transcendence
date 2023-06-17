@@ -41,10 +41,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			await this.userService.setOnline(user);
 
 			console.log('userAuthed', user, 'socket : ', client.id)
-
 		}
-
-
 	}
 
 	async handleDisconnect(client: Socket) {
@@ -63,10 +60,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	@SubscribeMessage('friendRequest')
 	async Friend(client: Socket, data: {
-		userSenderId: any,
 		userReceiveId: any,
 	}) {
-		console.log('friendRequest : ', data.userSenderId, data.userReceiveId, client.id);
+		console.log('friendRequest : ', data.userReceiveId, client.id);
 		//faire les verif (if les deux user sont ou pas amis)
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: any = await this.userService.getUserById(data.userReceiveId)
@@ -79,7 +75,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			try {
 				await this.userService.createPendingRequest({
 					type: "Friend",
-					senderId: data.userSenderId,
+					senderId: userSender.id,
 					senderNickname: userSender.nickname,
 					user: userReceiv
 				})
@@ -97,6 +93,38 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
 	}
 
+	@SubscribeMessage('blockUser')
+	async blockUser(client: Socket, data: {
+		userBlockedId: any,
+	}) {
+		console.log('friendRequest : ', data.userBlockedId, client.id);
+		//faire les verif (if les deux user sont ou pas amis)
+		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		const userBlocked: any = await this.userService.getUserById(data.userBlockedId)
+
+
+		const alreadyBlock: any = await this.friendService.getBlockedRelation(userSender, userBlocked)
+		console.log('alreadyBlocked', alreadyBlock)
+
+		if (!alreadyBlock) {
+			try {
+				await this.friendService.blockUser({
+					currentUser: userSender,
+					otherUser: userBlocked
+				})
+				client.emit('userHasBlocked');
+			}
+			catch (error) {
+				console.log(error)
+				client.emit('alreadyBlocked');
+			}
+		}
+		else
+			client.emit('alreadyBlocked');
+
+		// Gérer le cas où l'ID du socket de l'autre utilisateur est invalide
+	}
+	
 	@SubscribeMessage('acceptFriendRequest')
 	async acceptFriendRequest(client: Socket, data: {
 		requestId: any,
@@ -136,6 +164,19 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const friendList = await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList)
 
+		}
+		catch (error) {
+			console.log(error);
+		}
+	}
+	
+	@SubscribeMessage('getBlockedList')
+	async getBlockList(client: Socket) {
+
+		try {
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
+			const blockedList = await this.friendService.getBlockedUsers(currentUser);
+			client.emit('blockedList', blockedList)
 		}
 		catch (error) {
 			console.log(error);

@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Friend } from './friend.entity';
 import { PendingRequest } from './pendingRequest.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { BlockedUser } from './blockedUser.entity';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([Friend]), UserModule, AuthModule],
