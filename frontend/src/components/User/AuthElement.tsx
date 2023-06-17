@@ -9,15 +9,17 @@ export default function AuthElement () {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if ( location.search.includes('code') && !authTokenCalled) {
+		
+		if ( location && location.search.includes('code') && !authTokenCalled) {
 			const getAuthToken = async () => {
 				try{
 					const res = await axios.get(import.meta.env.VITE_BACKEND + '/auth/42' + location.search, { withCredentials: true });
 					console.log("res token", res.data.jwt);
 					if (res.data.jwt)
 					{
-						localStorage.setItem('jwt', res.data.jwt);
-						navigate('/home');
+						sessionStorage.setItem('jwt', res.data.jwt);
+						if (sessionStorage.getItem('jwt'))
+							navigate('/home');
 					}
 				}
 				catch(error)

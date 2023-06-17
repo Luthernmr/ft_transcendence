@@ -8,7 +8,7 @@ import {
 	useBreakpointValue,
   } from '@chakra-ui/react';
 
-import { Link as RouteLink, useNavigate } from "react-router-dom";
+import { Link as RouteLink} from "react-router-dom";
 
   
   export default function Home() {
