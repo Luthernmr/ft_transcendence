@@ -27,7 +27,7 @@ export default function AllUserItem() {
 
 	function sendFriendRequest(e: any, id: number) {
 		e.preventDefault()
-		var current: User = JSON.parse(localStorage.getItem('currentUser')!)
+		var current: User = JSON.parse(sessionStorage.getItem('currentUser')!)
 		userSocket.emit("friendRequest", { userSenderId: current.id, userReceiveId: id })
 		console.log('test');
 	}
@@ -79,7 +79,7 @@ export default function AllUserItem() {
 							<PopoverBody>
 								<IconButton
 									onClick={(e) => sendFriendRequest(e, user.id)}
-									variant='outline'
+									variant='ghost'
 									colorScheme='blue'
 									aria-label='addFriend'
 									icon={<AddIcon />}

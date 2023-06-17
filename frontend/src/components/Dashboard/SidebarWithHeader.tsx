@@ -43,9 +43,9 @@ interface LinkItemProps {
 	routeName: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-	{ name: 'Play', icon: RiGamepadLine, routeName: "/home/Play" },
-	{ name: 'Chat', icon: FiMessageSquare, routeName: "/home/Chat" },
-	{ name: 'Settings', icon: FiSettings, routeName: "/home/Settings" },
+	{ name: 'Play', icon: RiGamepadLine, routeName: "/Play" },
+	{ name: 'Chat', icon: FiMessageSquare, routeName: "/Chat" },
+	{ name: 'Settings', icon: FiSettings, routeName: "/Settings" },
 ];
 
 export default function SidebarWithHeader({ children }: {
@@ -71,18 +71,8 @@ export default function SidebarWithHeader({ children }: {
 						<SidebarContent onClose={onClose} />
 					</DrawerContent>
 				</Drawer>
-				{/* mobilenav */}
 				<MobileNav onOpen={onOpen} />
-				{/* <Box
-					pos="fixed"
-					right="0"
-					bg={useColorModeValue('white', 'gray.900')}
-					h="full"
-					w={{ base: 'full', md: 60 }}
-				>
-			</Box > */}
 				<Flex h={'100%'} ml={{ base: 0, md: 60 }} p={"4"} overflow={"auto"} justifyContent={'space-between'}>
-
 					{children}
 					<Box ml={5}>
 						<FriendList />
@@ -172,6 +162,7 @@ interface User {
 	nickname: string;
 	imgPdp: string;
 }
+
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	const [user, setUser] = useState<User>({
 		nickname: "",
@@ -182,8 +173,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 		const getUser = async () => {
 			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
 			setUser(res.data.user);
-			localStorage.setItem('currentUser', JSON.stringify(res.data.user))
-			console.log(localStorage.getItem('currentUser'))
+			sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
+			console.log(sessionStorage.getItem('currentUser'))
 		}
 		getUser();
 	}, []);
@@ -192,9 +183,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 		try {
 			const response = await axios.get(import.meta.env.VITE_BACKEND + 'api/logout', { withCredentials: true })
 			console.log(response.data);
-			navigate('/Login')
-		} catch
+			sessionStorage.removeItem('jwt');
+			console.log('jwwwr', sessionStorage.getItem('jwt'))
+			//navigate('/Login')
+		} catch (error)
 		{
+			console.log(error)
 		}
 	}
 
@@ -227,7 +221,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			</Text>
 
 			<HStack spacing={{ base: '0', md: '6' }}>
-				
+
 				<Notification />
 				<Flex alignItems={'center'}>
 					<Menu>
@@ -239,7 +233,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 								<Box
 									bg='white'>
 									<Avatar
-										name = {user.nickname}
+										name={user.nickname}
 										size={'md'}
 										src={user.imgPdp}
 									/>

@@ -23,6 +23,8 @@ import {
 	Text,
 	Flex,
 	Stack,
+	AvatarBadge,
+	Badge,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import {
@@ -44,10 +46,9 @@ export interface FriendRequest {
 
 
 const PendingRequest = () => {
-	
+
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 
-	
 	const toast = useToast()
 	useEffect(() => {
 		userSocket.on('notifyRequest', () => {
@@ -59,7 +60,7 @@ const PendingRequest = () => {
 			console.log(data)
 			setFriendRequests(data);
 		})
-		
+
 
 		userSocket.on('requestAcccepted', () => {
 			userSocket.emit('getPendingRequest')
@@ -68,20 +69,21 @@ const PendingRequest = () => {
 
 		userSocket.on('alreadyFriend', () => {
 			toast({
-                title: `You can't send more friend request`,
-                status: 'error',
-                isClosable: true,
+				title: `You can't send more friend request`,
+				status: 'error',
+				isClosable: true,
 				position: 'top'
-              })
-			  console.log('test');
+			})
+			console.log('test');
 
 		})
 	}, []);
 
 
-	const handleAccept = async (id : number) => {
-		userSocket.emit('acceptFriendRequest', {requestId : id})
+	const handleAccept = async (id: number) => {
+		userSocket.emit('acceptFriendRequest', { requestId: id })
 	}
+
 
 
 	return (
@@ -94,22 +96,22 @@ const PendingRequest = () => {
 				<TabPanels>
 					<TabPanel >
 						{friendRequests.map((friendRequest) => (
-								<Flex key={friendRequest.id} flexDirection={'column'} >
-									<Flex direction='row' align='center' p={3}>
-										<Avatar
-											src='https://bit.ly/sage-adebayo'
-											size='xs'
-											name='Segun Adebayo'
-											ml={-1}
-											mr={2}
-										/>
-										<Text><Text as='b'>{friendRequest.senderNickname}</Text> send you a {friendRequest.type} Request </Text>
-									</Flex>
-									<Stack spacing={2} direction='row' align='center'>
-										<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id)} >Accepter</Button>
-										<Button colorScheme='gray' size='sm'>Rejeter</Button>
-									</Stack>
+							<Flex key={friendRequest.id} flexDirection={'column'} >
+								<Flex direction='row' align='center' p={3}>
+									<Avatar
+										src='https://bit.ly/sage-adebayo'
+										size='xs'
+										name='Segun Adebayo'
+										ml={-1}
+										mr={2}
+									/>
+									<Text><Text as='b'>{friendRequest.senderNickname}</Text> send you a {friendRequest.type} Request </Text>
 								</Flex>
+								<Stack spacing={2} direction='row' align='center'>
+									<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id)} >Accepter</Button>
+									<Button colorScheme='gray' size='sm'>Rejeter</Button>
+								</Stack>
+							</Flex>
 						))}
 
 					</TabPanel>
@@ -121,18 +123,57 @@ const PendingRequest = () => {
 		</Box>
 	)
 }
-export default function Notification() {
 
-	return (
-		<Popover>
+const BellButton = () => {
+	const [notified, setNotified] = useState(false);
+
+	const handleNotify = async () => {
+		setNotified(false);
+	}
+
+	useEffect(() => {
+		userSocket.on('notifyRequest', () => {
+			console.log('notify');
+			setNotified(true);
+		})
+	}, [notified])
+
+	
+	if (notified)
+		return (
 			<PopoverTrigger>
+				<IconButton
+					size="lg"
+					colorScheme='red'
+					variant="ghost"
+					aria-label="open menu"
+					icon={<FiBell />}
+					onClick={handleNotify}
+				/>
+			</PopoverTrigger>
+
+		)
+	else
+		return (
+			<PopoverTrigger>
+
 				<IconButton
 					size="lg"
 					variant="ghost"
 					aria-label="open menu"
 					icon={<FiBell />}
+					onClick={handleNotify}
 				/>
 			</PopoverTrigger>
+		)
+
+}
+
+export default function Notification() {
+
+	return (
+		<Popover>
+			<BellButton />
 			<Portal>
 				<PopoverContent>
 					<PopoverArrow />

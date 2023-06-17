@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Chat from "./components/Chat/Chat";
 import Pong from "./components/Pong/Pong";
 import Settings from "./components/User/Settings";
@@ -8,11 +8,21 @@ import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
 import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
+import { ReactNode, useEffect, useState } from "react";
+
+
+function PrivateRoute({ children }: { children: ReactNode }) {
+
+	if (!sessionStorage.getItem('jwt')) {
+		return (<Navigate to="/Login" />)
+	}
+	return <>{children}</>
+}
 
 export default function App() {
 
+
 	userSocket.on('connect', () => {
-	
 		console.log('user socket connect')
 	})
 
@@ -21,9 +31,11 @@ export default function App() {
 	})
 
 	chatSocket.on('connect', () => {
-	
+
 		console.log('chat socket connect')
 	})
+
+
 
 	return (
 		<Routes>
@@ -32,13 +44,26 @@ export default function App() {
 			<Route path="/Auth" element={<AuthElement />} />
 			<Route path="/" element={<Home />} />
 
-			<Route path="/home/*" element={<SidebarWithHeader>
-				<Routes>
-					<Route path="/Play" element={<Pong />} />
-					<Route path="/Chat" element={<Chat />} />
-					<Route path="/Settings" element={<Settings />} />
-				</Routes>
-			</SidebarWithHeader>} />
+
+			<Route path="/Home" element={
+				<PrivateRoute>
+					<SidebarWithHeader children={<></>} />
+				</PrivateRoute>
+			}
+			/>
+			<Route path="/Chat" element={
+				<PrivateRoute>
+					<SidebarWithHeader children={<Chat />} />
+				</PrivateRoute>
+			}
+			/>
+			<Route path="/Play" element={
+				<PrivateRoute>
+					<SidebarWithHeader children={<Pong />} />
+				</PrivateRoute>
+			}
+			/>
+
 		</Routes>
 	);
 }

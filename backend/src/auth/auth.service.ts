@@ -48,7 +48,7 @@ export class AuthService {
 	{
 		const user = await this.getUserCookie(request);
 
-		this.userService.setOffline(user)
+		await this.userService.setOffline(user)
 		return response.clearCookie('jwt');
 	}
 }

@@ -16,7 +16,7 @@ import { AuthService } from 'src/auth/auth.service';
 
 console.log("Websocket: " + process.env.FRONTEND);
 
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND },namespace: 'user' })
+@WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
 	@WebSocketServer()
 	server: Server;
@@ -34,22 +34,23 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	async handleConnection(client: Socket) {
 		//recup le jwt dqns le socket et le decoder pour recup les dat
-		
-			let user: any = await this.authService.getUserByToken(client.handshake.auth.token)
-			
-				user = await this.userService.setSocket(user.id, client.id);
-				await this.userService.setOnline(user);
-			
+
+		let user: any = await this.authService.getUserByToken(client.handshake.auth.token)
+		if (user) {
+			user = await this.userService.setSocket(user.id, client.id);
+			await this.userService.setOnline(user);
+
 			console.log('userAuthed', user, 'socket : ', client.id)
-			
+
+		}
+
 
 	}
 
-	async handleDisconnect(client: Socket)    {
+	async handleDisconnect(client: Socket) {
 
 		const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		if (user)
-		{
+		if (user) {
 			await this.userService.setOffline(user);
 		}
 
@@ -69,15 +70,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//faire les verif (if les deux user sont ou pas amis)
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: any = await this.userService.getUserById(data.userReceiveId)
-		
+
 		const otherId = userReceiv.socketId;
-		
-		const alreadyFriend  : any = await this.friendService.getRelation(userSender, userReceiv)
+
+		const alreadyFriend: any = await this.friendService.getRelation(userSender, userReceiv)
 		console.log('alreadyFriend', alreadyFriend)
-		if (!alreadyFriend)
-		{
-			try
-			{
+		if (!alreadyFriend) {
+			try {
 				await this.userService.createPendingRequest({
 					type: "Friend",
 					senderId: data.userSenderId,
@@ -87,8 +86,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				client.to(otherId).emit('notifyRequest');
 				console.log("client: ", client.id + " request to ", ' other', otherId,)
 			}
-			catch(error)
-			{
+			catch (error) {
 				console.log(error)
 				client.emit('alreadyFriend');
 			}
@@ -124,8 +122,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 			await this.userService.deletePendingRequestById(data.requestId);
 		}
-		catch (error) { 
-			console.log(error) 
+		catch (error) {
+			console.log(error)
 		}
 		//add user to friendship
 	}
@@ -133,56 +131,49 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	@SubscribeMessage('getFriends')
 	async getFriendsList(client: Socket) {
 
-		try
-		{
+		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
-			const friendList =  await this.friendService.getFriends(currentUser);
+			const friendList = await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList)
 
 		}
-		catch(error)
-		{
+		catch (error) {
 			console.log(error);
 		}
 	}
 
 	@SubscribeMessage('deleteFriend')
-	async deleteFriend(client: Socket, data : {friendId : number}) {
+	async deleteFriend(client: Socket, data: { friendId: number }) {
 
-		try
-		{
+		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
-			const friendUser : any = await this.userService.getUserById(data.friendId);
+			const friendUser: any = await this.userService.getUserById(data.friendId);
 			await this.friendService.deleteFriend(currentUser, friendUser);
 			client.emit('reload');
 
 		}
-		catch(error)
-		{
+		catch (error) {
 			console.log(error);
 		}
 	}
 
 	@SubscribeMessage('getAllUsers')
-	async getAllUsers(client : Socket)
-	{
-		
-			const users = await this.userService.getAllUser();
-			client.emit('userList', users);
+	async getAllUsers(client: Socket) {
+
+		const users = await this.userService.getAllUser();
+		client.emit('userList', users);
 	}
 
 	@SubscribeMessage('getPendingRequest')
 	async getPendingRequest(client: Socket) {
 
-		try
-		{
+		try {
 			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
-			const pendingRequests=  await this.userService.getAllPendingRequest(currentUser)
+			const pendingRequests = await this.userService.getAllPendingRequest(currentUser)
 			client.emit('pendingRequestsList', pendingRequests)
 
 		}
-		catch(error)
-		{
+		catch (error) {
 			console.log(error);
 		}
 	}

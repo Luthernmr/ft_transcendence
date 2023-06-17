@@ -21,11 +21,9 @@ export class Auth42Controller {
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: any
 	) {
-		//console.log("here", request)
 		let token = await this.auth42Service.login(request.user);
 
 		response.cookie('jwt', token, { httpOnly: true });
-		//response.redirect('http://212.227.209.204:3000/home');
 		return ({ jwt : token});
 	}
 }

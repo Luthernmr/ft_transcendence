@@ -79,32 +79,31 @@ export default function AllfriendItem() {
 							</PopoverTrigger>
 						</ListItem>
 					</Box>
-					<Portal>
-						<PopoverContent>
+						<PopoverContent >
 							<PopoverArrow />
 							<PopoverHeader>{friend.nickname}</PopoverHeader>
 							<PopoverCloseButton />
-							<PopoverBody>
+							<PopoverBody >
 								<HStack>
 
 									<IconButton
 										onClick={(e) => deleteFriend(e, friend.id)}
 										colorScheme='blue'
-										variant={'outline'}
+										variant={'ghost'}
 										aria-label='Call Segun'
 										size='lg'
 										icon={<DeleteIcon />}
 									/>
 									<IconButton
 										colorScheme='blue'
-										variant={'outline'}
+										variant={'ghost'}
 										aria-label='Call Segun'
 										size='lg'
 										icon={<ChatIcon />}
 									/>
 									<IconButton
 										colorScheme='blue'
-										variant={'outline'}
+										variant={'ghost'}
 										aria-label='Call Segun'
 										size='lg'
 										icon={<ViewIcon />}
@@ -112,7 +111,6 @@ export default function AllfriendItem() {
 								</HStack>
 							</PopoverBody>
 						</PopoverContent>
-					</Portal>
 				</Popover>
 			))}
 		</List>

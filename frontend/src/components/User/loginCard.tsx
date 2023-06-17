@@ -44,8 +44,8 @@ export default function loginCard() {
 				"email": formValue.email,
 				"password": formValue.password
 			}, { withCredentials: true });
-			console.log('token,normql',response.data.token);
-			localStorage.setItem('jwt', response.data.token);
+			console.log('token,normal',response.data.token);
+			sessionStorage.setItem('jwt', response.data.token);
 			navigate('/Home');
 		} catch (error) {
 			console.log(error);
