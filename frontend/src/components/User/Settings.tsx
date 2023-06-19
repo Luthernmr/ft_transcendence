@@ -1,7 +1,8 @@
-import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image } from "@chakra-ui/react";
+import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
+import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, ButtonGroup, Editable, EditableInput, EditablePreview, Flex, IconButton, useEditableControls } from "@chakra-ui/react";
 import axios from "axios";
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
+import QRCode from 'qrcode.react';
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
@@ -9,7 +10,18 @@ export interface Profile {
 }
 
 
+
 export default function Settings() {
+
+	const [secret, setSecret] = useState('');
+	const otpAuthUrl = otpauthURL({ secret, label: 'My App', issuer: 'My Company' });
+  
+	useEffect(() => {
+	  const generatedSecret = generateSecret({ length: 20 });
+	  setSecret(generatedSecret.base32);
+	});
+  
+  
 	const [profile, setProfile] = useState<Profile>({
 		imgPdp: '',
 		nickname: '',
@@ -41,46 +53,52 @@ export default function Settings() {
 			console.log(error);
 		}
 	}
-	return(
 	
-			<VStack spacing={4} align="stretch">
-				<FormControl>
-					<FormLabel>Avatar</FormLabel>
-					<HStack spacing={4}>
-						<Image
-							borderRadius="full"
-							boxSize="50px"
-							src={profilePreview}
-							alt="User avatar"
-						/>
-						<input
-							type="file"
-							id="avatar"
-							name="avatar"
-							accept="image/*"
-							onChange={handleAvatarChange}
-						/>
-					</HStack>
-				</FormControl>
-				<FormControl>
-					<FormLabel>Nom</FormLabel>
-					<Input
-						type="text"
-						value={profile.nickname}
-						onChange={handleNameChange}
-						placeholder="Entrez votre nom"
-					/>
-				</FormControl>
-				<FormControl>
-					<HStack justifyContent="space-between">
-						<FormLabel>Vérification en deux étapes (2FA)</FormLabel>
-						<Switch
-							isChecked={profile.twoFactorAuthEnabled}
-							colorScheme="teal"
-						/>
-					</HStack>
-				</FormControl>
-				<Button colorScheme="teal" type="submit" onClick={SendModif}>Enregistrer</Button>
-			</VStack>
-		);
+	function handleCheck2FA() {
+		
 	}
+	
+	return (
+		
+		<VStack spacing={4} align="stretch">
+			<FormControl>
+				<FormLabel>Avatar</FormLabel>
+				<HStack spacing={4}>
+					<Image
+						borderRadius="full"
+						boxSize="50px"
+						src={profilePreview}
+						alt="User avatar"
+					/>
+					<Input
+						type="file"
+						id="avatar"
+						name="avatar"
+						accept="image/*"
+						onChange={handleAvatarChange}
+					/>
+				</HStack>
+			</FormControl>
+			<FormControl>
+				<FormLabel>Nom</FormLabel>
+				<Input
+					type="text"
+					value={profile.nickname}
+					onChange={handleNameChange}
+					placeholder="Entrez votre nom"
+				/>
+			</FormControl>
+			<FormControl>
+				<HStack justifyContent="space-between">
+					<FormLabel>Vérification en deux étapes (2FA)</FormLabel>
+					<Switch
+						onChange={handleCheck2FA}
+						colorScheme="teal"
+					/>
+				</HStack>
+				<Image src={secret}/>
+			</FormControl>
+			<Button colorScheme="teal" type="submit" onClick={SendModif}>Enregistrer</Button>
+		</VStack>
+	);
+}

@@ -35,19 +35,15 @@ export default function App() {
 		console.log('chat socket connect')
 	})
 
-
-
 	return (
 		<Routes>
 			<Route path="/Register" element={<RegisterCard />} />
 			<Route path="/Login" element={<LoginCard />} />
 			<Route path="/Auth" element={<AuthElement />} />
 			<Route path="/" element={<Home />} />
-
-
 			<Route path="/Home" element={
 				<PrivateRoute>
-					<SidebarWithHeader children={<></>} />
+					<SidebarWithHeader children={<Chat />} />
 				</PrivateRoute>
 			}
 			/>
@@ -69,7 +65,6 @@ export default function App() {
 				</PrivateRoute>
 			}
 			/>
-
 		</Routes>
 	);
 }

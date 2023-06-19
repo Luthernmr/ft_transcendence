@@ -11,11 +11,12 @@ import { UserService } from 'src/user/user.service';
 import { auth42Strategy } from './auth42.strategy';
 import { Auth42Service } from './auth42.service';
 import { Auth42Controller } from './auth42.controller';
+import { TwoFAService } from './twofa.service';
 
 @Module({
 	imports: [JwtModule.register({secret: 'secret', signOptions: { expiresIn: '999d' }}), UserModule],
 	controllers: [AuthController, Auth42Controller],
-	providers: [auth42Strategy, AuthService, Auth42Service],
+	providers: [auth42Strategy, AuthService, Auth42Service, TwoFAService],
 	exports : [AuthService,  Auth42Service]
 })
 export class AuthModule { }

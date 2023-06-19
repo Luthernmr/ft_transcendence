@@ -15,12 +15,13 @@ export class UserService {
 		@InjectRepository(User)
 		private userRepository: Repository<User>,
 		@InjectRepository(PendingRequest)
-			private pendingRequest: Repository<PendingRequest>,
+		private pendingRequest: Repository<PendingRequest>,
 	) { }
 
 	async create(data: any): Promise<User> {
 		return await this.userRepository.save(data);
 	}
+
 	async getUser(email: any): Promise<User> {
 		return await this.userRepository.findOne({ where: { email: email } });
 	}
@@ -64,39 +65,41 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 
-	async createPendingRequest(data : any) : Promise<PendingRequest> {
+	async createPendingRequest(data: any): Promise<PendingRequest> {
 		console.log("data", data);
-			const existingRequest = await this.pendingRequest.findOne({
-			  where: {
+		const existingRequest = await this.pendingRequest.findOne({
+			where: {
 				type: data.type,
 				senderId: data.senderId
-			  }
-			});
-			console.log('exiting', existingRequest)
-			if (existingRequest) {
-			  throw new BadRequestException('Request already exists for this person.');
 			}
-		
-			return await this.pendingRequest.save(data);
+		});
+		console.log('exiting', existingRequest)
+		if (existingRequest) {
+			throw new BadRequestException('Request already exists for this person.');
+		}
+
+		return await this.pendingRequest.save(data);
 	}
 
-	async getPendingRequestById(id: number): Promise <PendingRequest>
-	{
-		return await this.pendingRequest.findOne({where: {id : id}})
+	async getPendingRequestById(id: number): Promise<PendingRequest> {
+		return await this.pendingRequest.findOne({ where: { id: id } })
 	}
 
-	async deletePendingRequestById(id : number)
-	{
+	async deletePendingRequestById(id: number) {
 		await this.pendingRequest.delete(await this.getPendingRequestById(id))
 	}
 
 	async getAllPendingRequest(user: any): Promise<any> {
-		const userWithPendingRequests = await this.userRepository.findOne({where : user, relations: ['pendingRequests'] });
+		const userWithPendingRequests = await this.userRepository.findOne({ where: user, relations: ['pendingRequests'] });
 		//console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
-	  }
-	
-	
-	  
-	  
+	}
+
+	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+		return this.userRepository.update(userId, {
+			twoFactorAuthenticationSecret: secret
+		});
+	}
+
+
 }

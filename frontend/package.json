@@ -1,37 +1,37 @@
 {
-  "name": "front",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@chakra-ui/icons": "^2.0.19",
-    "@chakra-ui/react": "^2.5.5",
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@types/node": "^20.2.5",
-    "@types/socket.io-client": "^3.0.0",
-    "axios": "^1.4.0",
-    "framer-motion": "^10.12.4",
-    "js-cookie": "^3.0.5",
-    "konva": "^9.0.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-icons": "^4.8.0",
-    "react-konva": "^18.2.7",
-    "react-router-dom": "^6.11.0",
-    "socket.io-client": "^4.6.1",
-    "universal-cookie": "^4.0.4"
-  },
-  "devDependencies": {
-    "@types/react": "^18.0.28",
-    "@types/react-dom": "^18.0.11",
-    "@vitejs/plugin-react": "^3.1.0",
-    "typescript": "^4.9.3",
-    "vite": "^4.3.9"
-  }
+	"name": "front",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
+	"dependencies": {
+		"@chakra-ui/icons": "^2.0.19",
+		"@chakra-ui/react": "^2.5.5",
+		"@emotion/react": "^11.10.6",
+		"@emotion/styled": "^11.10.6",
+		"@types/node": "^20.2.5",
+		"@types/socket.io-client": "^3.0.0",
+		"axios": "^1.4.0",
+		"framer-motion": "^10.12.4",
+		"js-cookie": "^3.0.5",
+		"konva": "^9.0.1",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-icons": "^4.8.0",
+		"react-konva": "^18.2.7",
+		"react-router-dom": "^6.11.0",
+		"socket.io-client": "^4.6.1",
+		"universal-cookie": "^4.0.4"
+	},
+	"devDependencies": {
+		"@types/react": "^18.0.28",
+		"@types/react-dom": "^18.0.11",
+		"@vitejs/plugin-react": "^3.1.0",
+		"typescript": "^4.9.3",
+		"vite": "^4.3.9"
+	}
 }

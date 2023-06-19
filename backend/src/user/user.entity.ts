@@ -28,9 +28,14 @@ export class User {
   @Column({nullable: true})
   socketId: string;
 
+  @Column({nullable: true})
+  twoFactorAuthenticationSecret : string
+
   @OneToMany(() => Friend, friend => friend.userA)
   @JoinTable()
   friends: Friend[];
+
+
 
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()

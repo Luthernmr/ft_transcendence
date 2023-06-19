@@ -16,6 +16,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
+import { TwoFAService } from './twofa.service';
 
 
 @Controller('api')
@@ -23,6 +24,7 @@ export class AuthController {
 	constructor(
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
+		private readonly twoFAService: TwoFAService,
 	) { }
 	@Post('register')
 	async register(
@@ -39,7 +41,7 @@ export class AuthController {
 			email,
 			password: hashedPassword,
 			img: img,
-			pendingRequests : []
+			pendingRequests: []
 		});
 		delete user.password
 		return user;
@@ -58,19 +60,18 @@ export class AuthController {
 		if (!await bcrypt.compare(loginDto.password, user.password)) {
 			throw new BadRequestException('bad password');
 		}
-
 		return (await this.authService.login(user, response));
 	}
 
 	@Get('user')
 	async user(@Req() request: Request,
-	@Res() response : Response) {
+		@Res() response: Response) {
 		try {
 			const user = await this.authService.getUserCookie(request);
 			if (!user)
 				return ("no user");
 			const { password, ...result } = user;
-			return response.send({user : result});
+			return response.send({ user: result });
 		}
 		catch (e) {
 			return {
@@ -117,5 +118,15 @@ export class AuthController {
 	@UseInterceptors(FileInterceptor('file'))
 	uploadFile(@UploadedFile() file: Express.Multer.File) {
 		console.log(file);
+	}
+
+	@Post('generate')
+	@UseGuards()
+	async qrcode(@Res() response: any, @Req() request: Request) {
+		const user = await this.authService.getUserCookie(request);
+
+		const { otpauthUrl } = await this.twoFAService.generateTwoFactorAuthenticationSecret(user);
+
+		return this.twoFAService.pipeQrCodeStream(response, otpauthUrl);
 	}
 }

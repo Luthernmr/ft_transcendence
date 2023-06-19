@@ -15,7 +15,6 @@ export default function AllUserItem() {
 
 	const [users, setUsers] = useState<User[]>([]);
 
-
 	useEffect(() => {
 		userSocket.on('userList', (data) => {
 			console.log('userList', data);
