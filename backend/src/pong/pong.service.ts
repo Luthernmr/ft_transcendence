@@ -118,9 +118,13 @@ export class PongService {
 		const index: number = this.FindIndexBySocketId(socketID);
 		console.log("Found index: " + index);
 		
-
-		if (index >= 0)
+		if (index >= 0) {
 			this.runtimeDatas.splice(index, 1);
+		}
+
+		const pendingIndex: number = this.pendingPlayers.findIndex(data => data.id === socketID);
+		if (pendingIndex >= 0)
+			this.pendingPlayers.splice(pendingIndex, 1);
 	}
 
 	GlobalUpdate() {
