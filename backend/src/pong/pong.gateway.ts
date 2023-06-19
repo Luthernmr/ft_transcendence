@@ -2,15 +2,9 @@ import { ConnectedSocket, OnGatewayConnection, OnGatewayDisconnect, OnGatewayIni
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
-import { PongService } from './pong.service';
-
-interface ChangeDirData {
-  socket: Socket,
-  ballX: number,
-  ballY: number,
-  dX: number,
-  dY: number
-}
+import { PongService, PongRuntimeData } from './pong.service';
+import { initialize } from 'passport';
+import { DataSource } from 'typeorm';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
@@ -24,6 +18,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
+    const initDatas = this.pongService.Init(socket);
+    console.log("Initing pong");
+    socket.emit('init', initDatas);
   }
 
   handleDisconnect(socket: Socket) {
@@ -35,14 +32,18 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     console.log("Pong Gateway successfully init");
     this.pongService.LaunchUpdates();
   }
-  
+
   @SubscribeMessage('start')
   handleEvent(@ConnectedSocket() socket: Socket) {
-    this.pongService.StartRoom(socket)
+    if (this.pongService.StartRoom(socket))
+      return true;
+    return false;
   }
 
-  EmitChangeDir(datas: ChangeDirData) {
-    const payload = { x: datas.ballX, y: datas.ballY, dX: datas.dX, dY: datas.dY }
-    datas.socket.emit('ChangeDir', payload);
+  EmitChangeDir(datas: PongRuntimeData) {
+    const payload = { ballPosition: datas.ballPosition, ballDelta: datas.ballDelta }
+    console.log("emitChangeDir");
+    datas.socketP1.emit('ChangeDir', payload);
+    datas.socketP2.emit('ChangeDir', payload);
   }
 }
