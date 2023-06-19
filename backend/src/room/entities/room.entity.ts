@@ -8,22 +8,22 @@ import {
 	ManyToMany,
   } from 'typeorm';
   
-  @Entity()
+  @Entity('Room')
   export class Room {
 	@PrimaryGeneratedColumn('uuid')
 	id: string;
   
-	@Column({ length: 20 })
+	@Column({ length: 20 , nullable: true})
 	name: string;
   
-	@Column({ length: 60 })
-	description: string;
+	// @Column({ length: 60 })
+	// description: string;
   
-	@Column()
-	avatar: string;
+	// @Column()
+	// avatar: string;
   
-	@Column('uuid')
-	ownerId: string;
+	// @Column('uuid')
+	// ownerId: string;
   
 	// @OneToMany(() => User, (user: User) => user.room)
 	// users: Array<User>;
@@ -31,6 +31,6 @@ import {
 	// @ManyToMany(() => User, (user: User) => user.bannedRooms)
 	// bannedUsers: Array<User>;
   
-	@OneToMany(() => Message, (message: Message) => message.room)
-	messages: Array<Message>;
+	// @OneToMany(() => Message, (message: Message) => message.room)
+	// messages: Message[];
   }
