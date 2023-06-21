@@ -7,6 +7,8 @@ import {
   Input,
   Select,
   Text,
+  Spacer,
+  Box,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { chatSocket, userSocket } from "../../sockets/sockets";
@@ -57,7 +59,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
   function handleCreate(e: any) {
     e.preventDefault();
     if (roomName.trim() !== "") {
-      chatSocket.emit("createRoom", { name: roomName, ownweId: userSocket.id ,members: members });
+      chatSocket.emit("createRoom", { name: roomName, members: members });
       setShowCreateRoom(false);
     }
   }
@@ -81,34 +83,42 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           Create Room
         </Heading>
       </Flex>
-      <Input
-        value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
-        placeholder="Type the name of the room..."
-        borderRadius="md"
-      />
+      <Box mb={4}>
+        <Input
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
+          placeholder="Type the name of the room..."
+          borderRadius="md"
+        />
+      </Box>
 
-      <Select
-        placeholder="Select user"
-        value={selectedUser}
-        onChange={(e) => setSelectedUser(e.target.value)}
-      >
-        {allUsers.map((user) => (
-          <option key={user.id} value={user.id}>
-            {user.nickname}
-          </option>
-        ))}
-      </Select>
+      <Box mb={4}>
+        <Select
+          placeholder="Select group members"
+          value={selectedUser}
+          onChange={(e) => setSelectedUser(e.target.value)}
+        >
+          {allUsers.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.nickname}
+            </option>
+          ))}
+        </Select>
+      </Box>
 
-      <Flex direction="column">
+      <Flex direction="column" mb={4}>
         {members.map((member) => (
           <Text key={member.id}>{member.nickname}</Text>
         ))}
       </Flex>
 
-      <Button colorScheme="teal" size="md" onClick={handleCreate}>
-        Create
-      </Button>
+      <Spacer />
+
+      <Box>
+        <Button width="full" colorScheme="teal" size="md" onClick={handleCreate}>
+          Create
+        </Button>
+      </Box>
     </Flex>
   );
 };

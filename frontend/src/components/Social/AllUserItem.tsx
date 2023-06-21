@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
 
 export interface User {
+  avatarUrl: string | undefined;
 	id: number;
 	nickname: string;
 	imgPdp: string;

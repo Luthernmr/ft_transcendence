@@ -11,13 +11,13 @@ import {
   @Entity('Room')
   export class Room {
 	@PrimaryGeneratedColumn('uuid')
-	id: string;
+	id: number;
   
 	@Column({ length: 20 , nullable: true})
 	name: string;
   
-	@Column('uuid')
-	ownerId: string;
+	@Column()
+	ownerId: number;
   
 	@OneToMany(() => User, (user: User) => user.room)
 	users: Array<User>;

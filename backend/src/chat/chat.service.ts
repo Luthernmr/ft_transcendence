@@ -6,7 +6,10 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { AuthService } from 'src/auth/auth.service';
 import { Room } from 'src/room/entities/room.entity';
+import { FriendService } from 'src/social/friend.service';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 
 @Injectable()
@@ -14,7 +17,10 @@ import { Repository } from 'typeorm';
 export class ChatService {
   private logger: Logger;
 
-  constructor(@InjectRepository(Room) private repo: Repository<Room>) {
+  constructor(@InjectRepository(Room) private repo: Repository<Room>,
+  private readonly userService: UserService,
+  private readonly authService: AuthService,
+  private readonly friendService: FriendService,) {
     this.logger = new Logger(ChatService.name);
   }
 
@@ -37,15 +43,18 @@ export class ChatService {
   async createRoom(
     client: Socket,
     data: Partial<Room>,
-    ): Promise<Room> {
-    console.log(data);
+    ) {
     try {
       const room = await this.repo.findOne({ where: { name: data.name } });
+      const user = await this.authService.getUserByToken(client.handshake.auth.token);
       if (room) {
         throw new BadRequestException('Room already exist');
       }
-      // Object.assign(room, data.name);
-      return this.repo.save(data);
+      const prout = {
+        name: data.name,
+        ownerId: user.id,
+      }
+        await this.repo.save(prout);
     } catch (error) {
       this.logger.log(error);
       client.emit('roomAlreadyExist');
