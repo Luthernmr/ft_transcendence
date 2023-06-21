@@ -6,7 +6,6 @@ import { userSocket } from "../../sockets/sockets";
 import { User } from "./AllUserItem";
 
 
-
 export interface Friend {
 	id: number;
 	nickname: string;
