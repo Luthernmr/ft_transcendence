@@ -16,21 +16,15 @@ import {
 	@Column({ length: 20 , nullable: true})
 	name: string;
   
-	// @Column({ length: 60 })
-	// description: string;
+	@Column('uuid')
+	ownerId: string;
   
-	// @Column()
-	// avatar: string;
+	@OneToMany(() => User, (user: User) => user.room)
+	users: Array<User>;
   
-	// @Column('uuid')
-	// ownerId: string;
+	@ManyToMany(() => User, (user: User) => user.bannedRooms)
+	bannedUsers: Array<User>;
   
-	// @OneToMany(() => User, (user: User) => user.room)
-	// users: Array<User>;
-  
-	// @ManyToMany(() => User, (user: User) => user.bannedRooms)
-	// bannedUsers: Array<User>;
-  
-	// @OneToMany(() => Message, (message: Message) => message.room)
-	// messages: Message[];
+	@OneToMany(() => Message, (message: Message) => message.room)
+	messages: Message[];
   }

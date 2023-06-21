@@ -21,11 +21,11 @@ export class Message {
   @CreateDateColumn()
   created_at: Date;
 
-  // @JoinTable()
-  // @ManyToMany(() => Room, (room: Room) => room.messages)
-  // room: Room;
+  @JoinTable()
+  @ManyToMany(() => Room, (room: Room) => room.messages)
+  room: Room;
 
-  // @JoinTable()
-  // @ManyToOne(() => User, (user: User) => user.messages)
-  // user: User;
+  @JoinTable()
+  @ManyToOne(() => User, (user: User) => user.messages)
+  user: User;
 }
