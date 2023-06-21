@@ -9,6 +9,7 @@ import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
 import { ReactNode, useEffect, useState } from "react";
 import UserProfile from "./components/User/Profile";
+import TwoFA from "./components/User/TwoFA";
 
 
 function PrivateRoute({ children }: { children: ReactNode }) {
@@ -40,6 +41,7 @@ export default function App() {
 			<Route path="/Register" element={<RegisterCard />} />
 			<Route path="/Login" element={<LoginCard />} />
 			<Route path="/Auth" element={<AuthElement />} />
+			<Route path="/2fa" element={<TwoFA />} />
 			<Route path="/" element={<Home />} />
 			<Route path="/Home" element={
 				<PrivateRoute>

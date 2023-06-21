@@ -38,19 +38,26 @@ import { useNavigate } from 'react-router-dom';
 	
 	  const handleSubmit = async () => {
 		
-		axios.post(import.meta.env.VITE_BACKEND + '/api/register',
-			{
-				"nickname" : formValue.nickname,
-				"email" : formValue.email,
-				"password" : formValue.password
-			}
-		);
-		navigate('/login');
+		try
+		{
+			const res = await axios.post(import.meta.env.VITE_BACKEND + '/api/register',
+				{
+					"nickname" : formValue.nickname,
+					"email" : formValue.email,
+					"password" : formValue.password
+				}
+			);
+			console.log('res', res)
+			navigate('/login');
+		}
+		catch(error)
+		{
+			console.log('error', error)
+		}
 		//console.log(response.data);
 		
 	  };
 	return (
-	<form onSubmit={handleSubmit}>
 	 	<Flex
 		minH={'100vh'}
 		align={'center'}
@@ -79,7 +86,7 @@ import { useNavigate } from 'react-router-dom';
 				<Input type="password" name="password"  placeholder="enter an password" value={formValue.password} onChange={handleChange} />
 			  </FormControl>
 			  <Stack spacing={10}>
-				<Button bg={'blue.400'} color={'white'}  _hover={{bg: 'blue.500'}} type="submit">
+				<Button bg={'blue.400'} color={'white'}  _hover={{bg: 'blue.500'}} onClick={handleSubmit}>
 				  Register 👋
 				</Button>
 				<Text>
@@ -93,6 +100,5 @@ import { useNavigate } from 'react-router-dom';
 		  </Box>
 		</Stack>
 	  	</Flex>
-	  </form>
 	);
   }

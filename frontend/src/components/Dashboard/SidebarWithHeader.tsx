@@ -134,7 +134,7 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
 				role="group"
 				cursor="pointer"
 				_hover={{
-					bg: 'cyan.400',
+					bg: 'blue.500',
 					color: 'white',
 				}}
 				{...rest}>
@@ -158,15 +158,17 @@ interface MobileProps extends FlexProps {
 	onOpen: () => void;
 }
 
-interface User {
+export interface User {
 	nickname: string;
 	imgPdp: string;
+	isTwoFa: boolean;
 }
 
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	const [user, setUser] = useState<User>({
 		nickname: "",
-		imgPdp: ""
+		imgPdp: "",
+		isTwoFa: false
 	});
 
 	useEffect(() => {
