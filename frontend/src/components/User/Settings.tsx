@@ -115,76 +115,80 @@ export default function Settings() {
 	}
 
 	return (
-
-		<VStack spacing={4} align="stretch">
-			<FormControl>
-				<FormLabel>Avatar</FormLabel>
-				<HStack spacing={4}>
-					<Image
-						borderRadius="full"
-						boxSize="50px"
-						src={profilePreview}
-						alt="User avatar"
-					/>
-					<Input
-						type="file"
-						id="avatar"
-						name="avatar"
-						accept="image/*"
-						onChange={handleAvatarChange}
-					/>
-				</HStack>
-			</FormControl>
-			<FormControl>
-				<FormLabel>Nom</FormLabel>
-				<Input
-					type="text"
-					value={profile.nickname}
-					onChange={handleNameChange}
-					placeholder="Entrez votre nom"
-				/>
-			</FormControl>
-			<FormControl>
-				<HStack justifyContent="space-between">
-					<FormLabel>Vérification en deux étapes (2FA)</FormLabel>
-					{isChecked && <Switch
-						onChange={handleCheck2FA}
-						colorScheme="blue"
-						defaultChecked
-					/>}
-					{!isChecked && <Switch
-						onChange={handleCheck2FA}
-						colorScheme="blue"
-					/>}
-				</HStack>
-				<Modal onClose={onClose} isOpen={isOpen} isCentered>
-					<ModalOverlay />
-					<ModalContent alignItems={'center'}>
-						<ModalHeader>Init 2FA</ModalHeader>
-						<ModalCloseButton />
-						<ModalBody>
-							<Image src={qrCode} />
-						</ModalBody>
-						<ModalFooter >
-							<VStack>
-								<FormLabel>Verification code</FormLabel>
-								<HStack>
-									<PinInput onChange={(e) => (setPinCode(e))}>
-										<PinInputField />
-										<PinInputField />
-										<PinInputField />
-										<PinInputField />
-										<PinInputField />
-										<PinInputField />
-									</PinInput>
-									<Button colorScheme="blue" onClick={sendCode}>Verify</Button>
-								</HStack>
-							</VStack>
-						</ModalFooter>
-					</ModalContent>
-				</Modal>
-			</FormControl>
-			<Button colorScheme="blue" type="submit" onClick={SendModif}>Enregistrer</Button>
-		</VStack>
-	);
+    <VStack spacing={4} align="stretch">
+      <FormControl>
+        <FormLabel>Avatar</FormLabel>
+        <HStack spacing={4}>
+          <Image
+            borderRadius="full"
+            boxSize="50px"
+            src={profilePreview}
+            alt="User avatar"
+          />
+          <Input
+            type="file"
+            id="avatar"
+            name="avatar"
+            accept="image/*"
+            onChange={handleAvatarChange}
+          />
+        </HStack>
+      </FormControl>
+      <FormControl>
+        <FormLabel>Nom</FormLabel>
+        <Input
+          type="text"
+          value={profile.nickname}
+          onChange={handleNameChange}
+          placeholder="Entrez votre nom"
+        />
+      </FormControl>
+      <FormControl>
+        <HStack justifyContent="space-between">
+          <FormLabel>Vérification en deux étapes (2FA)</FormLabel>
+          {isChecked && (
+            <Switch
+              onChange={handleCheck2FA}
+              colorScheme="teal"
+              defaultChecked
+            />
+          )}
+          {!isChecked && (
+            <Switch onChange={handleCheck2FA} colorScheme="teal" />
+          )}
+        </HStack>
+        <Modal onClose={onClose} isOpen={isOpen} isCentered>
+          <ModalOverlay />
+          <ModalContent alignItems={"center"}>
+            <ModalHeader>Init 2FA</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Image src={qrCode} />
+            </ModalBody>
+            <ModalFooter>
+              <VStack>
+                <FormLabel>Verification code</FormLabel>
+                <HStack>
+                  <PinInput onChange={(e) => setPinCode(e)}>
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                    <PinInputField />
+                  </PinInput>
+                  <Button colorScheme="teal" onClick={sendCode}>
+                    Verify
+                  </Button>
+                </HStack>
+              </VStack>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      </FormControl>
+      <Button colorScheme="teal" type="submit" onClick={SendModif}>
+        Enregistrer
+      </Button>
+    </VStack>
+  );
 }

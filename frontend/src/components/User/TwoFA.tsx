@@ -42,29 +42,31 @@ export default function TwoFA() {
 	}
 
 	return (
-		<>
-			<ModalOverlay />
-			<ModalContent alignItems={'center'}>
-				<ModalHeader>Init 2FA</ModalHeader>
-				<ModalCloseButton />
+    <>
+      <ModalOverlay />
+      <ModalContent alignItems={"center"}>
+        <ModalHeader>Init 2FA</ModalHeader>
+        <ModalCloseButton />
 
-				<ModalFooter >
-					<VStack>
-						<FormLabel>Verification code</FormLabel>
-						<HStack>
-							<PinInput onChange={(e) => (setPinCode(e))}>
-								<PinInputField />
-								<PinInputField />
-								<PinInputField />
-								<PinInputField />
-								<PinInputField />
-								<PinInputField />
-							</PinInput>
-							<Button colorScheme="blue" onClick={sendCode}>Verify</Button>
-						</HStack>
-					</VStack>
-				</ModalFooter>
-			</ModalContent>
-		</>
-	)
+        <ModalFooter>
+          <VStack>
+            <FormLabel>Verification code</FormLabel>
+            <HStack>
+              <PinInput onChange={(e) => setPinCode(e)}>
+                <PinInputField />
+                <PinInputField />
+                <PinInputField />
+                <PinInputField />
+                <PinInputField />
+                <PinInputField />
+              </PinInput>
+              <Button colorScheme="teal" onClick={sendCode}>
+                Verify
+              </Button>
+            </HStack>
+          </VStack>
+        </ModalFooter>
+      </ModalContent>
+    </>
+  );
 }
