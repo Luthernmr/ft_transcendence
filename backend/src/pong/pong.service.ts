@@ -15,12 +15,21 @@ const BALL_START_POS_Y: number = 200;
 const BALL_START_DELTA_X: number = 30;
 const BALL_START_DELTA_Y: number = 30;
 
+const PADDLE_WIDTH: number = 10;
+const PADDLE_HEIGHT: number = 100;
+const PADDLE_START_HEIGHT: number = 200;
+
+const PADDLE_SPEED: number = 20;
+
 const BASE_INIT_DATAS: PongInitData = {
 	width: PONG_WIDTH,
 	height: PONG_HEIGHT,
 	ballRadius: BALL_RADIUS,
 	ballStartPosition: {x: BALL_START_POS_X, y: BALL_START_POS_Y},
-	ballStartDelta: {x: 0, y: 0}
+	ballStartDelta: {x: 0, y: 0},
+	paddleWidth: PADDLE_WIDTH,
+	paddleHeight: PADDLE_HEIGHT,
+	paddleStartHeight: PADDLE_START_HEIGHT
 }
 
 export interface Vector2 {
@@ -33,28 +42,46 @@ export interface PongInitData {
 	height: number,
 	ballRadius: number,
 	ballStartPosition: Vector2,
-	ballStartDelta: Vector2
+	ballStartDelta: Vector2,
+	paddleWidth: number,
+	paddleHeight: number
+	paddleStartHeight: number,
 }
 
-export interface PongRuntimeData {
+export interface PongRuntimeData extends BallRuntimeData, PaddleRuntimeData {
 	socketP1: Socket,
 	socketP2: Socket,
+}
+
+export interface BallRuntimeData {
 	ballPosition: Vector2,
 	ballDelta: Vector2,
 	collided: boolean
 }
 
+export interface PaddleRuntimeData {
+	paddle1Height: number,
+	paddle1Delta: number,
+	paddle2Height: number,
+	paddle2Delta: number
+}
+
 @Injectable()
 export class PongService {
 	runtimeDatas: Array<PongRuntimeData>;
+	ballEvents: Set<number>;
+	paddleEvents: Set<number>;
 	pendingPlayers: Socket[];
 
 	pongGateway : PongGateway;
 	
 	constructor() {
 		this.runtimeDatas = [];
+		this.ballEvents = new Set<number>();
+		this.paddleEvents = new Set<number>();
 		this.pendingPlayers = [];
 	}
+
 
 	RegisterGateway(pongGateway : PongGateway) {
 		this.pongGateway = pongGateway;
@@ -102,6 +129,10 @@ export class PongService {
 		const datas: PongRuntimeData = {
 			socketP1: socket,
 			socketP2: opponent,
+			paddle1Height: PADDLE_START_HEIGHT,
+			paddle1Delta: 0,
+			paddle2Height: PADDLE_START_HEIGHT,
+			paddle2Delta: 0,
 			ballPosition: { ...BASE_INIT_DATAS.ballStartPosition },
 			ballDelta: {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y},
 			collided: false
@@ -127,25 +158,90 @@ export class PongService {
 			this.pendingPlayers.splice(pendingIndex, 1);
 	}
 
+	PaddleKeyDown(socketID: string, input: number) {
+		const instanceIndex = this.FindIndexBySocketId(socketID);
+		if (instanceIndex < 0)
+			return;
+		
+		if (this.runtimeDatas[instanceIndex].socketP1.id === socketID) {
+			this.runtimeDatas[instanceIndex].paddle1Delta = input * PADDLE_SPEED;
+		} else {
+			this.runtimeDatas[instanceIndex].paddle2Delta = input * PADDLE_SPEED;
+		}
+
+		this.paddleEvents.add(instanceIndex);
+	}
+
+	PaddleKeyUp(socketID: string, input: number) {
+		const instanceIndex = this.FindIndexBySocketId(socketID);
+		if (instanceIndex < 0)
+			return;
+
+		if (this.runtimeDatas[instanceIndex].socketP1.id === socketID
+			&& Math.sign(this.runtimeDatas[instanceIndex].paddle1Delta) === Math.sign(input)) {
+			this.runtimeDatas[instanceIndex].paddle1Delta = 0;
+		} else if (this.runtimeDatas[instanceIndex].socketP2.id === socketID
+			&& Math.sign(this.runtimeDatas[instanceIndex].paddle2Delta) === Math.sign(input)) {
+			this.runtimeDatas[instanceIndex].paddle2Delta = 0;
+		} else
+			return;
+
+		this.paddleEvents.add(instanceIndex);
+	}
+
 	GlobalUpdate() {
-		//console.log("PongService Updating...");
-		this.runtimeDatas.forEach(function (data) {
-			//console.log("Updating room...");
+
+		this.runtimeDatas.forEach(function (data, index) {
 			
 			const oldDelta: Vector2 = { ...data.ballDelta};
 
 			data.ballPosition.x += data.ballDelta.x * FRAMERATE;
 			data.ballPosition.y += data.ballDelta.y * FRAMERATE;
 
-			if (data.ballPosition.x <= 0) {
-				data.ballDelta.x = -data.ballDelta.x;
-				data.ballPosition.x = 0;
-			} else if (data.ballPosition.x >= PONG_WIDTH - BALL_RADIUS) {
-				data.ballDelta.x = -data.ballDelta.x;
-				data.ballPosition.x = PONG_WIDTH - BALL_RADIUS;
+			const oldPaddle1Delta = data.paddle1Delta;
+			const oldPaddle2Delta = data.paddle2Delta;
+
+			data.paddle1Height += data.paddle1Delta * FRAMERATE;
+			data.paddle2Height += data.paddle2Delta * FRAMERATE;
+
+			if (data.paddle1Height < 0) {
+				data.paddle1Delta = 0;
+				data.paddle1Height = 0;
+			} else if (data.paddle1Height > (PONG_HEIGHT - PADDLE_HEIGHT)) {
+				data.paddle1Delta = 0;
+				data.paddle1Height = PONG_HEIGHT - PADDLE_HEIGHT;
 			}
 
-			if (data.ballPosition.y <= 0){
+			if (data.paddle2Height < 0) {
+				data.paddle2Delta = 0;
+				data.paddle2Height = 0;
+			} else if (data.paddle2Height > (PONG_HEIGHT - PADDLE_HEIGHT)) {
+				data.paddle2Delta = 0;
+				data.paddle2Height = PONG_HEIGHT - PADDLE_HEIGHT;
+			}
+
+			if (oldPaddle1Delta != data.paddle1Delta || oldPaddle2Delta != data.paddle2Delta)
+				this.paddleEvents.add(index);
+
+			if (data.ballPosition.x < PADDLE_WIDTH) {
+				if (data.paddle1Height < data.ballPosition.y && data.ballPosition.y < data.paddle1Height + PADDLE_HEIGHT) {
+				data.ballDelta.x = -data.ballDelta.x;
+				data.ballPosition.x = PADDLE_WIDTH;
+				} else {
+					this.StartRoom(data.socketP1);
+					return;
+				}
+			} else if (data.ballPosition.x > (PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH)) {
+				if (data.paddle2Height < data.ballPosition.y && data.ballPosition.y < data.paddle2Height + PADDLE_HEIGHT) {
+					data.ballDelta.x = -data.ballDelta.x;
+					data.ballPosition.x = PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH;
+				} else {
+					this.StartRoom(data.socketP1);
+					return;
+				}
+			}
+
+			if (data.ballPosition.y <= 0) {
 				data.ballDelta.y = -data.ballDelta.y;
 				data.ballPosition.y = 0;
 			} else if (data.ballPosition.y >= PONG_HEIGHT - BALL_RADIUS) {
@@ -153,18 +249,22 @@ export class PongService {
 				data.ballPosition.y = PONG_HEIGHT - BALL_RADIUS;
 			}
 
-			if (data.ballDelta.x != oldDelta.x || data.ballDelta.y != oldDelta.y) {
-				console.log("Changing Direction");
-				data.collided = true;
-			}
+			if (data.ballDelta.x != oldDelta.x || data.ballDelta.y != oldDelta.y)
+				this.ballEvents.add(index);
 		}, this);
 
 		// Collisions
-		const collisions = this.runtimeDatas.filter(data => data.collided);
-
-		collisions.forEach(function(data) {
-			this.pongGateway.EmitChangeDir(data);
-			data.collided = false;
+		this.ballEvents.forEach(function(index) {
+			this.pongGateway.EmitChangeDir(this.runtimeDatas[index]);
 		}, this);
+
+		this.ballEvents.clear();
+
+		// Paddles
+		this.paddleEvents.forEach(function(index) {
+			this.pongGateway.EmitPaddleDelta(this.runtimeDatas[index]);
+		}, this);
+
+		this.paddleEvents.clear();
 	}
 }
