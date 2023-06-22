@@ -131,64 +131,53 @@ interface NavItemProps extends FlexProps {
   onClose: () => void;
 }
 
-const NavItem = ({
-  icon,
-  children,
-  onClose,
-  routeName,
-  ...rest
-}: NavItemProps) => {
-  return (
-    <Link
-      as={RouteLink}
-      to={routeName}
-      onClick={onClose}
-      style={{ textDecoration: "none" }}
-      _focus={{ boxShadow: "none" }}
-    >
-      <Flex
-        align="center"
-        p="4"
-        mx="4"
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        _hover={{
-          bg: "cyan.400",
-          color: "white",
-        }}
-        {...rest}
-      >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="16"
-            _groupHover={{
-              color: "white",
-            }}
-            as={icon}
-          />
-        )}
-        {children}
-      </Flex>
-    </Link>
-  );
+const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
+	return (
+		<Link as={RouteLink} to={routeName} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+			<Flex
+				align="center"
+				p="4"
+				mx="4"
+				borderRadius="lg"
+				role="group"
+				cursor="pointer"
+				_hover={{
+					bg: 'blue.500',
+					color: 'white',
+				}}
+				{...rest}>
+				{icon && (
+					<Icon
+						mr="4"
+						fontSize="16"
+						_groupHover={{
+							color: 'white',
+						}}
+						as={icon}
+					/>
+				)}
+				{children}
+			</Flex>
+		</Link>
+	);
 };
 
 interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 
-interface User {
-  nickname: string;
-  imgPdp: string;
+export interface User {
+	nickname: string;
+	imgPdp: string;
+	isTwoFa: boolean;
 }
 
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-  const [user, setUser] = useState<User>({
-    nickname: "",
-    imgPdp: "",
-  });
+	const [user, setUser] = useState<User>({
+		nickname: "",
+		imgPdp: "",
+		isTwoFa: false
+	});
 
 	useEffect(() => {
 		const getUser = async () => {

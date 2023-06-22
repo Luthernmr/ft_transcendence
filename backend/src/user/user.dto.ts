@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, Length, Min } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, Length, Matches, MaxLength, Min, MinLength } from 'class-validator';
 
 export class LoginDto {
 	@IsEmail()
@@ -13,7 +13,7 @@ export class LoginDto {
 export class RegisterDto {
 	@IsString()
 	@IsNotEmpty()
-	@Length(1,20)
+	@Length(4,20)
 	nickname: string;
 
 	@IsEmail()
@@ -21,8 +21,12 @@ export class RegisterDto {
   
 	@IsString()
 	@IsNotEmpty()
+	@MinLength(6)
+	@MaxLength(50)
+	@Matches(
+		/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+		message: 'The password must have a Uppercase, lowercase letter and a number'
+	})
 	password: string;
-	
-	@IsString()
-	img : string;
+
 }
