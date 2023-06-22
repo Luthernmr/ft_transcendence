@@ -94,11 +94,7 @@ export class UserService {
 	}
 
 	async getAllPendingRequest(user: any): Promise<any> {
-<<<<<<< HEAD
-		const userWithPendingRequests = await this.userRepository.findOne({ where: user, relations: ['pendingRequests'] });
-=======
 		const userWithPendingRequests = await this.userRepository.findOne({where : user, relations: ['pendingRequests'] });
->>>>>>> 9be1bc6363ce3b7bd0cb3e1b1fab1f363c17b986
 		//console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
 	}
