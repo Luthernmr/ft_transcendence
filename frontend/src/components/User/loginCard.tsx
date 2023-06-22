@@ -1,4 +1,5 @@
 import {
+	Image,
 	Flex,
 	Box,
 	FormControl,
@@ -10,12 +11,26 @@ import {
 	Heading,
 	Text,
 	useColorModeValue,
+	useToast,
+	HStack,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
+	PinInput,
+	PinInputField,
+	VStack,
+	useDisclosure,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { FormEventHandler } from 'react';
 import { useState, ChangeEvent, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
+import TwoFA from './TwoFA';
 interface FormValue {
 	email: string;
 	password: string;
@@ -36,6 +51,7 @@ export default function loginCard() {
 		setFormValue({ ...formValue, [event.target.name]: event.target.value });
 	};
 	const navigate = useNavigate();
+	const toast = useToast()
 
 	const handleSubmit = async (event: any) => {
 		event.preventDefault();
@@ -44,20 +60,46 @@ export default function loginCard() {
 				"email": formValue.email,
 				"password": formValue.password
 			}, { withCredentials: true });
-			console.log('token,normal',response.data.token);
-			sessionStorage.setItem('jwt', response.data.token);
-			navigate('/Home');
+			if (response.data.token) {
+				navigate('/Home');
+				console.log('token,normal', response.data.token);
+				sessionStorage.setItem('jwt', response.data.token);
+			}
+			if (!response.data) {
+				onOpen()
+			}
+			console.log(response.data.status)
+			if (response.data.status == 401 || response.data.status == 400) {
+				toast({
+					title: `invalid login , do you have an account ?`,
+					status: 'error',
+					isClosable: true,
+					position: 'top'
+				})
+			}
+
+
+
 		} catch (error) {
+
+			toast({
+				title: `Empty information`,
+				status: 'error',
+				isClosable: true,
+				position: 'top'
+			})
 			console.log(error);
-			console.log(formValue.email);
-			console.log(formValue.password);
 		}
 	};
 
 	const connectAPI = async (event: any) => {
 		window.location.href = import.meta.env.VITE_42AUTH;
 	}
+	const [pinCode, setPinCode] = useState("");
 
+	const { isOpen, onOpen, onClose } = useDisclosure();
+
+	
 
 	return (
 		<form onSubmit={handleSubmit}>
@@ -88,8 +130,8 @@ export default function loginCard() {
 								<Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} type="submit">
 									Login 👋
 								</Button>
-								<Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={ connectAPI }>
-									Login with 42👋
+								<Button bg={'#00babb'} color={'white'} _hover={{ bg: 'blue.500' }} onClick={connectAPI}>
+									<Image boxSize='30px' src="./src/assets/42_Logo.svg"></Image>
 								</Button>
 								<Text>
 									T'as pas encore de compte mon reuf ? {' '}
@@ -102,7 +144,12 @@ export default function loginCard() {
 					</Box>
 				</Stack>
 			</Flex>
+		<Modal onClose={onClose} isOpen={isOpen} isCentered>
+			<TwoFA />
+		</Modal>
+			
 		</form>
+
 	)
 }
 

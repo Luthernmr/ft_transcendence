@@ -42,15 +42,9 @@ interface LinkItemProps {
   routeName: string;
 }
 const LinkItems: Array<LinkItemProps> = [
-<<<<<<< HEAD
 	{ name: 'Play', icon: RiGamepadLine, routeName: "/Play" },
 	{ name: 'Chat', icon: FiMessageSquare, routeName: "/Chat" },
 	{ name: 'Profile', icon: FiSettings, routeName: "/Profile" },
-=======
-  { name: "Play", icon: RiGamepadLine, routeName: "/Play" },
-  { name: "Chat", icon: FiMessageSquare, routeName: "/Chat" },
-  { name: "Profile", icon: FiSettings, routeName: "/Profile" },
->>>>>>> 9be1bc6363ce3b7bd0cb3e1b1fab1f363c17b986
 ];
 
 export default function SidebarWithHeader({
@@ -137,66 +131,54 @@ interface NavItemProps extends FlexProps {
   onClose: () => void;
 }
 
-const NavItem = ({
-  icon,
-  children,
-  onClose,
-  routeName,
-  ...rest
-}: NavItemProps) => {
-  return (
-    <Link
-      as={RouteLink}
-      to={routeName}
-      onClick={onClose}
-      style={{ textDecoration: "none" }}
-      _focus={{ boxShadow: "none" }}
-    >
-      <Flex
-        align="center"
-        p="4"
-        mx="4"
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        _hover={{
-          bg: "cyan.400",
-          color: "white",
-        }}
-        {...rest}
-      >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="16"
-            _groupHover={{
-              color: "white",
-            }}
-            as={icon}
-          />
-        )}
-        {children}
-      </Flex>
-    </Link>
-  );
+const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
+	return (
+		<Link as={RouteLink} to={routeName} style={{ textDecoration: 'none' }} _focus={{ boxShadow: 'none' }}>
+			<Flex
+				align="center"
+				p="4"
+				mx="4"
+				borderRadius="lg"
+				role="group"
+				cursor="pointer"
+				_hover={{
+					bg: 'blue.500',
+					color: 'white',
+				}}
+				{...rest}>
+				{icon && (
+					<Icon
+						mr="4"
+						fontSize="16"
+						_groupHover={{
+							color: 'white',
+						}}
+						as={icon}
+					/>
+				)}
+				{children}
+			</Flex>
+		</Link>
+	);
 };
 
 interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 
-interface User {
-  nickname: string;
-  imgPdp: string;
+export interface User {
+	nickname: string;
+	imgPdp: string;
+	isTwoFa: boolean;
 }
 
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-  const [user, setUser] = useState<User>({
-    nickname: "",
-    imgPdp: "",
-  });
+	const [user, setUser] = useState<User>({
+		nickname: "",
+		imgPdp: "",
+		isTwoFa: false
+	});
 
-<<<<<<< HEAD
 	useEffect(() => {
 		const getUser = async () => {
 			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
@@ -239,53 +221,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 				aria-label="open menu"
 				icon={<FiMenu />}
 			/>
-=======
-  useEffect(() => {
-    const getUser = async () => {
-      const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-        withCredentials: true,
-      });
-      setUser(res.data.user);
-      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-      console.log(sessionStorage.getItem("currentUser"));
-    };
-    getUser();
-  }, []);
-  const navigate = useNavigate();
-  const signOut = async (event: any) => {
-    try {
-      const response = await axios.get(
-        import.meta.env.VITE_BACKEND + "api/logout",
-        { withCredentials: true }
-      );
-      console.log(response.data);
-      sessionStorage.removeItem("jwt");
-      console.log("jwwwr", sessionStorage.getItem("jwt"));
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  return (
-    <Flex
-      ml={{ base: 0, md: 60 }}
-      px={{ base: 4, md: 4 }}
-      height="20"
-      alignItems="center"
-      bg={useColorModeValue("white", "gray.900")}
-      borderBottomWidth="1px"
-      borderBottomColor={useColorModeValue("gray.200", "gray.700")}
-      justifyContent={{ base: "space-between", md: "flex-end" }}
-      {...rest}
-    >
-      <IconButton
-        display={{ base: "flex", md: "none" }}
-        onClick={onOpen}
-        variant="outline"
-        aria-label="open menu"
-        icon={<FiMenu />}
-      />
->>>>>>> 9be1bc6363ce3b7bd0cb3e1b1fab1f363c17b986
 
       <Text
         display={{ base: "flex", md: "none" }}
@@ -296,7 +231,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         Pong
       </Text>
 
-<<<<<<< HEAD
 			<HStack spacing={{ base: '0', md: '6' }}>
 
 				<Notification />
@@ -340,49 +274,3 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 		</Flex>
 	);
 };
-=======
-      <HStack spacing={{ base: "0", md: "6" }}>
-        <Notification />
-        <Flex alignItems={"center"}>
-          <Menu>
-            <MenuButton
-              py={2}
-              transition="all 0.3s"
-              _focus={{ boxShadow: "none" }}
-            >
-              <HStack>
-                <Box bg="white">
-                  <Avatar name={user.nickname} size={"md"} src={user.imgPdp} />
-                </Box>
-                <VStack
-                  display={{ base: "none", md: "flex" }}
-                  alignItems="flex-start"
-                  spacing="1px"
-                  ml="2"
-                >
-                  <Text fontSize="sm">{user.nickname}</Text>
-                </VStack>
-                <Box display={{ base: "none", md: "flex" }}>
-                  <FiChevronDown />
-                </Box>
-              </HStack>
-            </MenuButton>
-            <MenuList
-              bg={useColorModeValue("white", "gray.900")}
-              borderColor={useColorModeValue("gray.200", "gray.700")}
-            >
-              <MenuItem as={RouteLink} to="/Settings">
-                Settings
-              </MenuItem>
-              <MenuDivider />
-              <MenuItem onClick={signOut} as={RouteLink} to="/Login">
-                Sign out
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </HStack>
-    </Flex>
-  );
-};
->>>>>>> 9be1bc6363ce3b7bd0cb3e1b1fab1f363c17b986

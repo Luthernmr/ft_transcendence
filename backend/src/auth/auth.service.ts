@@ -25,6 +25,13 @@ export class AuthService {
 		response.send({ token: jwt })
 	}
 
+	async setCookie(user: User, response: Response)
+	{
+		const payload = { id: user.id, nickname: user.nickname, email: user.email, isOnline: user.isOnline };
+		const jwt = await this.jwtService.signAsync(payload);
+		response.cookie('jwt', jwt, { httpOnly: true });
+	}
+
 	async getUserCookie(request: Request): Promise<User> {
 		const cookie = request.cookies['jwt'];
 		const data = await this.jwtService.verifyAsync(cookie);

@@ -22,6 +22,7 @@ export class UserService {
 		return await this.userRepository.save(data);
 	}
 
+
 	async getUser(email: any): Promise<User> {
 		return await this.userRepository.findOne({ where: { email: email } });
 	}
@@ -48,8 +49,11 @@ export class UserService {
 	}
 
 	async setOnline(user: User) {
-		user.isOnline = true;
-		await this.userRepository.save(user);
+		if(user)
+		{
+			user.isOnline = true;
+			await this.userRepository.save(user);
+		}
 	}
 	async setOffline(user: User) {
 		user.isOnline = false;
@@ -90,20 +94,30 @@ export class UserService {
 	}
 
 	async getAllPendingRequest(user: any): Promise<any> {
-<<<<<<< HEAD
-		const userWithPendingRequests = await this.userRepository.findOne({ where: user, relations: ['pendingRequests'] });
-=======
 		const userWithPendingRequests = await this.userRepository.findOne({where : user, relations: ['pendingRequests'] });
->>>>>>> 9be1bc6363ce3b7bd0cb3e1b1fab1f363c17b986
 		//console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
 	}
 
-	async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
-		return this.userRepository.update(userId, {
-			twoFactorAuthenticationSecret: secret
+	async setTwoFASecret(secret: string, userId: number) {
+		return await this.userRepository.update(userId, {
+			twoFASecret: secret
 		});
 	}
 
+	async turnOnTwoFA(userId: number) {
+		return await this.userRepository.update(userId, {
+		  isTwoFA: true
+		});
+	}
 
+	async turnOffTwoFA(userId: number) {
+
+		await this.userRepository.update(userId, {
+			twoFASecret : ""
+		})
+		return await this.userRepository.update(userId, {
+		  isTwoFA: false
+		});
+	}
 }

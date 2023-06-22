@@ -1,31 +1,21 @@
 import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
-import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, ButtonGroup, Editable, EditableInput, EditablePreview, Flex, IconButton, useEditableControls } from "@chakra-ui/react";
+import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, ButtonGroup, Editable, EditableInput, EditablePreview, Flex, IconButton, useEditableControls, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, PinInput, PinInputField, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import QRCode from 'qrcode.react';
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
-	twoFactorAuthEnabled: boolean;
+	isTwoFA:  boolean;
 }
 
 
 
 export default function Settings() {
 
-	const [secret, setSecret] = useState('');
-	const otpAuthUrl = otpauthURL({ secret, label: 'My App', issuer: 'My Company' });
-  
-	useEffect(() => {
-	  const generatedSecret = generateSecret({ length: 20 });
-	  setSecret(generatedSecret.base32);
-	});
-  
-  
 	const [profile, setProfile] = useState<Profile>({
 		imgPdp: '',
 		nickname: '',
-		twoFactorAuthEnabled: false
+		isTwoFA: false
 	});
 
 	const [profilePreview, setPreview] = useState('');
@@ -53,13 +43,79 @@ export default function Settings() {
 			console.log(error);
 		}
 	}
-	
-	function handleCheck2FA() {
+
+	const [isChecked, setIsChecked] = useState(false);
+	const [qrCode, setQrcode] = useState("");
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [pinCode, setPinCode] = useState("");
+
+
+	useEffect(() => {
+		const getUser = async () => {
+			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
+			setProfile(res.data.user);
+			console.log(res.data.user)
+			sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
+		}
+		getUser();
+		if (profile.isTwoFA)
+			setIsChecked(true);
+			
+		console.log('isTwoFa', profile.isTwoFA, isChecked)
 		
+		
+	}, [profile.isTwoFA, isChecked]);
+	async function handleCheck2FA() {
+		if (profile.isTwoFA) {
+			const resp = await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-off' + location.search, {
+				"twoFACode": pinCode
+			}, { withCredentials: true });
+			console.log('0')
+			setIsChecked(false);
+		}
+		else {
+			console.log('ischeck',isChecked, profile.isTwoFA)
+			const resp: any = await axios.get(import.meta.env.VITE_BACKEND + '/api/generate' + location.search, { withCredentials: true, responseType: "blob" });
+			console.log(resp)
+			const qrUrl = URL.createObjectURL(resp.data);
+			setQrcode(qrUrl);
+			onOpen()
+		}
 	}
-	
+
+	const toast = useToast()
+
+	async function sendCode() {
+		try {
+			const resp = await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-on' + location.search, {
+				"twoFACode": pinCode
+			}, { withCredentials: true });
+			console.log(resp.data.status);
+			if (resp.data.status == 401)
+				throw new Error('test');
+			console.log('1')
+			setIsChecked(true);
+			toast({
+				title: `2FA is now activate`,
+				status: 'success',
+				isClosable: true,
+				position: 'top'
+			})
+			onClose()
+		}
+		catch (error) {
+			toast({
+				title: `invalid code`,
+				status: 'error',
+				isClosable: true,
+				position: 'top'
+			})
+			console.log(error)
+		}
+	}
+
 	return (
-		
+
 		<VStack spacing={4} align="stretch">
 			<FormControl>
 				<FormLabel>Avatar</FormLabel>
@@ -91,14 +147,44 @@ export default function Settings() {
 			<FormControl>
 				<HStack justifyContent="space-between">
 					<FormLabel>Vérification en deux étapes (2FA)</FormLabel>
-					<Switch
+					{isChecked && <Switch
 						onChange={handleCheck2FA}
-						colorScheme="teal"
-					/>
+						colorScheme="blue"
+						defaultChecked
+					/>}
+					{!isChecked && <Switch
+						onChange={handleCheck2FA}
+						colorScheme="blue"
+					/>}
 				</HStack>
-				<Image src={secret}/>
+				<Modal onClose={onClose} isOpen={isOpen} isCentered>
+					<ModalOverlay />
+					<ModalContent alignItems={'center'}>
+						<ModalHeader>Init 2FA</ModalHeader>
+						<ModalCloseButton />
+						<ModalBody>
+							<Image src={qrCode} />
+						</ModalBody>
+						<ModalFooter >
+							<VStack>
+								<FormLabel>Verification code</FormLabel>
+								<HStack>
+									<PinInput onChange={(e) => (setPinCode(e))}>
+										<PinInputField />
+										<PinInputField />
+										<PinInputField />
+										<PinInputField />
+										<PinInputField />
+										<PinInputField />
+									</PinInput>
+									<Button colorScheme="blue" onClick={sendCode}>Verify</Button>
+								</HStack>
+							</VStack>
+						</ModalFooter>
+					</ModalContent>
+				</Modal>
 			</FormControl>
-			<Button colorScheme="teal" type="submit" onClick={SendModif}>Enregistrer</Button>
+			<Button colorScheme="blue" type="submit" onClick={SendModif}>Enregistrer</Button>
 		</VStack>
 	);
 }
