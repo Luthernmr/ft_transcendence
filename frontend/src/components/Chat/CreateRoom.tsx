@@ -10,7 +10,6 @@ import {
   IconButton,
   Input,
   Spacer,
-  Stack,
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -60,6 +59,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       setMembers(members.filter((m) => m.id !== user.id));
     }
   }
+
   return (
     <Flex
       borderRadius={"md"}
@@ -79,7 +79,6 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           Create Room
         </Heading>
       </Flex>
-
       <Input
         value={roomName}
         onChange={(e) => setRoomName(e.target.value)}
@@ -89,40 +88,50 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       />
 
       <Text mb={2} fontWeight="semibold">
-        Click on a user to add them to the room:
+        Choose members:
       </Text>
 
       <Box
+        mb={4}
         overflowY="scroll"
+        maxHeight="200px"
         border="1px solid"
         borderColor="gray.200"
         borderRadius="md"
         p={2}
-        mb={4}
-        maxH="200px"
       >
         {allUsers.map((user) => (
           <Flex
             key={user.id}
-            alignItems={"center"}
-            _hover={{ bg: "gray.200", cursor: "pointer" }}
-            padding={"2"}
-            w={"100%"}
-            borderRadius={"8"}
+            align="center"
+            _hover={{ bg: "gray.100" }}
+            cursor="pointer"
+            p={2}
+            borderRadius="md"
             onClick={() => handleAddMember(user)}
           >
             <Avatar size="sm" src={user.imgPdp}>
-              <AvatarBadge boxSize="1em" bg={user.isOnline ? "green.500" : "tomato"} />
+              <AvatarBadge
+                boxSize="1em"
+                bg={user.isOnline ? "green.500" : "tomato"}
+              />
             </Avatar>
             <Box ml="2">
-              <Flex alignItems="center">
-                <Heading size="sm">{user.nickname}</Heading>
+              <Text fontSize="sm" fontWeight="bold">
+                {user.nickname}
+              </Text>
+              <Flex align="center">
                 <Badge ml="1" colorScheme={user.isOnline ? "green" : "red"}>
                   {user.isOnline ? "Online" : "Offline"}
                 </Badge>
               </Flex>
             </Box>
-            {members.find((m) => m.id === user.id) && <CheckIcon ml="auto" color="green.500" />}
+            {members.some((member) => member.id === user.id) && (
+              <>
+                <Spacer />
+                <CheckIcon color="green.500" />
+              </>
+            )}
           </Flex>
         ))}
       </Box>
@@ -130,18 +139,22 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       <Text mb={2} fontWeight="semibold">
         Selected members:
       </Text>
-
-      <Stack direction="row" spacing={2} overflowX="auto" mb={4}>
-        {members.map((user) => (
-          <Avatar key={user.id} size="sm" src={user.imgPdp}>
-            <AvatarBadge boxSize="1em" bg={user.isOnline ? "green.500" : "tomato"} />
-          </Avatar>
+      <Flex wrap="wrap" justify="start">
+        {members.map((member) => (
+          <Box key={member.id} mr={2}>
+            <Avatar size="sm" name={member.nickname} src={member.imgPdp}>
+              <AvatarBadge
+                boxSize="1em"
+                bg={member.isOnline ? "green.500" : "tomato"}
+              />
+            </Avatar>
+          </Box>
         ))}
-      </Stack>
+      </Flex>
 
       <Spacer />
 
-      <Button colorScheme="teal" size="md" w="100%" onClick={handleCreate}>
+      <Button colorScheme="teal" w="100%" size="md" onClick={handleCreate}>
         Create
       </Button>
     </Flex>

@@ -47,14 +47,15 @@ export class ChatService {
     try {
       const room = await this.repo.findOne({ where: { name: data.name } });
       const user = await this.authService.getUserByToken(client.handshake.auth.token);
+      client.emit('currentUser', user);
       if (room) {
         throw new BadRequestException('Room already exist');
       }
-      const prout = {
+      const payload = {
         name: data.name,
         ownerId: user.id,
       }
-        await this.repo.save(prout);
+        await this.repo.save(payload);
     } catch (error) {
       this.logger.log(error);
       client.emit('roomAlreadyExist');
