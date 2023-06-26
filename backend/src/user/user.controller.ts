@@ -2,9 +2,10 @@
 https://docs.nestjs.com/controllers#controllers
 */
 import { Request, Response } from 'express';
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user.service';
+import JwtTwoFactorGuard from 'src/auth/twofa.guard';
 
 @Controller('user')
 export class UserController { 
@@ -13,6 +14,7 @@ export class UserController {
 	) {}
 
 	@Get('all')
+	@UseGuards(JwtTwoFactorGuard)
 	async all(@Res() response: Response)
 	{
 		const users = await this.userService.getAllUser();
