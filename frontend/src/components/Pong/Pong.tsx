@@ -66,6 +66,12 @@ interface Score {
 	scoreP2: number
 }
 
+enum PongState {
+  Out,
+  Queue,
+  Play
+}
+
 function Add(first: Vector2, second: Vector2): Vector2 {
   return {x: first.x + second.x, y: first.y + second.y};
 }
@@ -88,6 +94,8 @@ function Pong() {
   const rightPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
   
   const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
+
+  const pongState = useRef<PongState>(PongState.Out);
 
   useEffect(() => {
     function Init(datas: PongInitData) {
@@ -154,6 +162,12 @@ function Pong() {
   }, []);
 
   useEffect(() => {
+    function Start() {
+      pongState.current = PongState.Play;
+    }
+
+    pongSocket.on('StartGame', Start);
+
     function BallDelta(values: BallRuntimeData) {
       ballDelta.current = values.ballDelta;
       setBall(Add(Offset, values.ballPosition));
@@ -175,12 +189,17 @@ function Pong() {
     pongSocket.on('UpdateScore', UpdateScore);
 
     return () => {
+      pongSocket.off('StartGame', Start);
       pongSocket.off('BallDelta', BallDelta);
       pongSocket.off('PaddleDelta', PaddleDelta);
+      pongSocket.off('UpdateScore', UpdateScore);
     }
   }, []);
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    if (pongState.current != PongState.Play)
+      return;
+    
     if (e.repeat)
       return;
     
@@ -194,6 +213,9 @@ function Pong() {
   }
 
   const handleKeyUp = (e: KeyboardEvent) => {
+    if (pongState.current != PongState.Play)
+      return;
+    
     let input = 0;
     
     if (e.code == 'ArrowUp') input = -1;
@@ -212,30 +234,41 @@ function Pong() {
     }
   }, []);
 
-  const StartRoom = () => {
-    pongSocket.emit('start', (start: boolean) => {
-      if (start === true)
-        console.log("Game started");
-    });
+  const JoinQueue = () => {
+    pongState.current = PongState.Queue;
+    pongSocket.emit('queue');
   }
 
-  return (
-    <div>
-      <Button onClick={ StartRoom }>
-        Start
-      </Button>
-      <Stage width={800} height={500}>
-        <Layer>
-          <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
-          <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
-          <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
-          <Rect x={ball.x} y={ball.y} width={20} height={20} fill='black' cornerRadius={10}/>
-          <Rect x={Offset.x} y={leftPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' />
-          <Rect x={walls.current[2].x - paddleDatas.current.width} y={rightPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black'/>
-        </Layer>
-      </Stage>
-    </div>
-  )
+  if (pongState.current === PongState.Out) {
+    return (
+      <div>
+        <Button onClick={ JoinQueue }>
+          JoinQueue
+        </Button>
+      </div>
+    )
+  } else if (pongState.current === PongState.Queue) {
+    return (
+      <div>
+        <h1>In Queue...</h1>
+      </div>
+    )
+  } else if (pongState.current === PongState.Play) {
+    return (
+      <div>
+        <Stage width={800} height={500}>
+          <Layer>
+            <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
+            <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
+            <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
+            <Rect x={ball.x} y={ball.y} width={20} height={20} fill='black' cornerRadius={10}/>
+            <Rect x={Offset.x} y={leftPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' />
+            <Rect x={walls.current[2].x - paddleDatas.current.width} y={rightPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black'/>
+          </Layer>
+        </Stage>
+      </div>
+      )
+  }
 }
 
 export default Pong;

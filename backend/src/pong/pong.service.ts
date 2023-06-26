@@ -4,6 +4,8 @@ import { Socket } from 'socket.io';
 
 const SINGLE_PLAYER_MODE: boolean = true;
 
+const COUNTDOWN: number = 3000;
+
 const FRAMERATE: number = 16 / 100;
 
 const PONG_WIDTH: number = 600;
@@ -22,6 +24,7 @@ const PADDLE_START_HEIGHT: number = 200;
 const PADDLE_SPEED: number = 20;
 
 const BASE_INIT_DATAS: PongInitData = {
+	startCountdown: COUNTDOWN,
 	width: PONG_WIDTH,
 	height: PONG_HEIGHT,
 	ballRadius: BALL_RADIUS,
@@ -38,6 +41,7 @@ export interface Vector2 {
 }
 
 export interface PongInitData {
+	startCountdown: number,
 	width: number,
 	height: number,
 	ballRadius: number,
@@ -116,39 +120,33 @@ export class PongService {
 	}
 
 	GetOpponent(socket: Socket): Socket {
-		const currentIndex = this.pendingPlayers.findIndex(player => player.id === socket.id);
-		this.pendingPlayers.splice(currentIndex, 1);
 		const opponent = this.pendingPlayers[0];
 		this.pendingPlayers.splice(0, 1);
 		return opponent;
 	}
 
-	StartRoom(socket: Socket): boolean {
-		const index = this.FindIndexBySocketId(socket.id);
-		if (index >= 0)
-		{
-			this.RestartRoom(index);
-			return true;
+	JoinQueue(socket: Socket) {
+		if (this.pendingPlayers.length >= 1) {
+			const opponent = this.GetOpponent(socket);
+			this.CreateRoom(socket, opponent);
+		} else {
+			this.pendingPlayers.push(socket);
 		}
-		
-		if (this.pendingPlayers.length <= 1) {
-			console.log("No other player connected");
-			return false;
-		}
+	}
 
-		console.log("Starting new pong room");
-		const opponent = this.GetOpponent(socket);
+	CreateRoom(socket1: Socket, socket2: Socket) {
+		console.log("Creating new pong room with sockets " + socket1 + " & " + socket2);
 		
 		const sockets: SocketPair = {
-			socketP1: socket,
-			socketP2: opponent
+			socketP1: socket1,
+			socketP2: socket2
 		}
 
 		this.socketsRuntime.push(sockets);
 
 		const ball: BallRuntimeData = {
 			ballPosition: { ...BASE_INIT_DATAS.ballStartPosition },
-			ballDelta: {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y},
+			ballDelta: {x: 0, y: 0},
 		};
 
 		this.ballRuntime.push(ball);
@@ -169,8 +167,16 @@ export class PongService {
 
 		this.scoreData.push(score);
 
-		this.pongGateway.EmitBallDelta(sockets, ball);
-		return true;
+		this.pongGateway.EmitInit(sockets, { ...BASE_INIT_DATAS });
+		this.pongGateway.EmitStartGame(sockets);
+		
+		this.StartGameAtCountdown(this.socketsRuntime.length - 1, COUNTDOWN);
+	}
+
+	async StartGameAtCountdown(index: number, countdown: number) {
+		await new Promise(r => setTimeout(r, countdown));
+		this.ballRuntime[index].ballDelta = {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y};
+		this.pongGateway.EmitBallDelta(this.socketsRuntime[index], this.ballRuntime[index]);
 	}
 
 	RestartRoom(index: number) {

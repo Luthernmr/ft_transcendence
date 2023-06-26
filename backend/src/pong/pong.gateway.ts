@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
-import { PongService, BallRuntimeData, PaddleRuntimeData, SocketPair, Score } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score } from './pong.service';
 import { initialize } from 'passport';
 import { DataSource } from 'typeorm';
 
@@ -18,9 +18,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
-    const initDatas = this.pongService.Init(socket);
-    console.log("Initing pong");
-    socket.emit('init', initDatas);
+    //const initDatas = this.pongService.Init(socket);
+    //console.log("Initing pong");
+    //socket.emit('init', initDatas);
   }
 
   handleDisconnect(socket: Socket) {
@@ -33,9 +33,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.LaunchUpdates();
   }
 
-  @SubscribeMessage('start')
-  handleStart(@ConnectedSocket() socket: Socket) {
-    return this.pongService.StartRoom(socket);
+  @SubscribeMessage('queue')
+  handleQueue(@ConnectedSocket() socket: Socket) {
+    this.pongService.JoinQueue(socket);
   }
 
   @SubscribeMessage('keydown')
@@ -46,6 +46,16 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('keyup')
   handlePaddleKeyup(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyUp(socket.id, input);
+  }
+
+  EmitInit(sockets: SocketPair, initDatas: PongInitData) {
+    sockets.socketP1.emit('init', initDatas);
+    sockets.socketP2.emit('init', initDatas);
+  }
+
+  EmitStartGame(sockets: SocketPair) {
+    sockets.socketP1.emit('StartGame');
+    sockets.socketP2.emit('StartGame');
   }
 
   EmitBallDelta(sockets: SocketPair, datas: BallRuntimeData) {
