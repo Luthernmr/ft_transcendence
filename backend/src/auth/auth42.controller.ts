@@ -23,12 +23,9 @@ export class Auth42Controller {
 	) {
 		let token = await this.auth42Service.login(request.user);
 
-		if(request.user.isTwoFA == false)
-		{
+	
 			response.cookie('jwt', token, { httpOnly: true });
 			return ({ jwt : token});
-		}
-		else
-			return
+	
 	}
 }
