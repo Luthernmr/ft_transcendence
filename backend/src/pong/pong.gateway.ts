@@ -18,9 +18,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
-    //const initDatas = this.pongService.Init(socket);
-    //console.log("Initing pong");
-    //socket.emit('init', initDatas);
   }
 
   handleDisconnect(socket: Socket) {
@@ -53,9 +50,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     sockets.socketP2.emit('init', initDatas);
   }
 
-  EmitStartGame(sockets: SocketPair) {
-    sockets.socketP1.emit('StartGame');
-    sockets.socketP2.emit('StartGame');
+  EmitStartGame(sockets: SocketPair, delaySeconds: number) {
+    sockets.socketP1.emit('StartGame', delaySeconds);
+    sockets.socketP2.emit('StartGame', delaySeconds);
   }
 
   EmitBallDelta(sockets: SocketPair, datas: BallRuntimeData) {

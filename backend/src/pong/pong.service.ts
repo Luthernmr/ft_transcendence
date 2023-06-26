@@ -168,8 +168,8 @@ export class PongService {
 		this.scoreData.push(score);
 
 		this.pongGateway.EmitInit(sockets, { ...BASE_INIT_DATAS });
-		this.pongGateway.EmitStartGame(sockets);
-		
+		this.pongGateway.EmitStartGame(sockets, COUNTDOWN / 1000);
+
 		this.StartGameAtCountdown(this.socketsRuntime.length - 1, COUNTDOWN);
 	}
 
@@ -179,11 +179,14 @@ export class PongService {
 		this.pongGateway.EmitBallDelta(this.socketsRuntime[index], this.ballRuntime[index]);
 	}
 
-	RestartRoom(index: number) {
-		console.log("Restarting pong room");
+	RestartGame(index: number) {
 		this.ballRuntime[index].ballPosition = { ...BASE_INIT_DATAS.ballStartPosition };
-		this.ballRuntime[index].ballDelta = {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y};
+		this.ballRuntime[index].ballDelta = {x: 0, y: 0};
+
 		this.pongGateway.EmitBallDelta(this.socketsRuntime[index], this.ballRuntime[index]);
+		this.pongGateway.EmitStartGame(this.socketsRuntime[index], COUNTDOWN / 1000);
+		
+		this.StartGameAtCountdown(this.socketsRuntime.length - 1, COUNTDOWN);
 	}
 
 	CloseRoom(socketID: string) {
@@ -237,7 +240,7 @@ export class PongService {
 
 	OnPlayerWin(index: number) {
 		this.pongGateway.EmitScore(this.socketsRuntime[index], this.scoreData[index]);
-		this.RestartRoom(index);
+		this.RestartGame(index);
 	}
 
 	GlobalUpdate() {

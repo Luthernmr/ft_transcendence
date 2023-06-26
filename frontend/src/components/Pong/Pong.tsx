@@ -97,6 +97,8 @@ function Pong() {
 
   const pongState = useRef<PongState>(PongState.Out);
 
+  const countdown = useRef<number>(0);
+
   useEffect(() => {
     function Init(datas: PongInitData) {
       console.log("Initing Pong");
@@ -162,8 +164,17 @@ function Pong() {
   }, []);
 
   useEffect(() => {
-    function Start() {
+    function Start(delay: number) {
       pongState.current = PongState.Play;
+      countdown.current = delay;
+      MakeCountdown();
+
+      async function MakeCountdown() {
+        while (countdown.current > 0) {
+          await new Promise(r => setTimeout(r, 1000));
+          countdown.current -= 1;
+        }
+      }
     }
 
     pongSocket.on('StartGame', Start);
@@ -258,6 +269,7 @@ function Pong() {
       <div>
         <Stage width={800} height={500}>
           <Layer>
+            <Text fontSize={50} width={700} y={170} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
             <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
             <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
             <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
