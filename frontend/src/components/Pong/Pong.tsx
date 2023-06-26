@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { useColorModeValue, Button, NumberIncrementStepperProps, useUpdateEffect } from '@chakra-ui/react';
+import { useColorModeValue, Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 
 const OFFSET_X: number = 40;
@@ -32,7 +32,7 @@ interface PongInitData {
   paddleStartHeight: number
 }
 
-interface PongRuntimeData {
+interface BallRuntimeData {
 	ballPosition: Vector2,
 	ballDelta: Vector2,
 }
@@ -61,6 +61,11 @@ interface Paddle {
   delta: number,
 }
 
+interface Score {
+	scoreP1: number,
+	scoreP2: number
+}
+
 function Add(first: Vector2, second: Vector2): Vector2 {
   return {x: first.x + second.x, y: first.y + second.y};
 }
@@ -82,6 +87,8 @@ function Pong() {
   const leftPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
   const rightPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
   
+  const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
+
   useEffect(() => {
     function Init(datas: PongInitData) {
       console.log("Initing...");
@@ -97,21 +104,22 @@ function Pong() {
           y: Offset.y - WALL_HEIGHT,
           width: datas.width + 2 * WALL_WIDTH,
           height: WALL_HEIGHT
-        }, { // LEFT
-          x: Offset.x - WALL_WIDTH,
-          y: Offset.y - WALL_HEIGHT,
-          width: WALL_WIDTH,
-          height: datas.height + 2 * WALL_HEIGHT
-        }, { // RIGHT
-          x: Offset.x + datas.width,
-          y: Offset.y - WALL_HEIGHT,
-          width: WALL_WIDTH,
-          height: datas.height + 2 * WALL_HEIGHT
         }, { // BOTTOM
           x: Offset.x - WALL_WIDTH,
           y: Offset.y + datas.height,
           width: datas.width + 2 * WALL_WIDTH,
           height: WALL_HEIGHT
+        }, { // RIGHT
+          x: Offset.x + datas.width,
+          y: Offset.y - WALL_HEIGHT,
+          width: WALL_WIDTH,
+          height: datas.height + 2 * WALL_HEIGHT
+        }, { // LEFT
+          
+          x: Offset.x - WALL_WIDTH,
+          y: Offset.y - WALL_HEIGHT,
+          width: WALL_WIDTH,
+          height: datas.height + 2 * WALL_HEIGHT
         }
       ];
     }
@@ -146,28 +154,29 @@ function Pong() {
   }, []);
 
   useEffect(() => {
-    function ChangeDeltas(values: PongRuntimeData) {
+    function BallDelta(values: BallRuntimeData) {
       ballDelta.current = values.ballDelta;
       setBall(Add(Offset, values.ballPosition));
     }
 
-    pongSocket.on('onCollision', ChangeDeltas);
+    pongSocket.on('BallDelta', BallDelta);
 
-    return () => {
-      pongSocket.off('onCollision', ChangeDeltas);
-    }
-  }, []);
-
-  useEffect(() => {
-    function MovePaddles(values: PaddleRuntimeData) {
+    function PaddleDelta(values: PaddleRuntimeData) {
       leftPaddle.current = {height: Offset.y + values.paddle1Height, delta: values.paddle1Delta };
       rightPaddle.current = {height: Offset.y + values.paddle2Height, delta: values.paddle2Delta };
     };
 
-    pongSocket.on('onPaddleMove', MovePaddles);
+    pongSocket.on('PaddleDelta', PaddleDelta);
+
+    function UpdateScore(values: Score) {
+      score.current = values;
+    }
+
+    pongSocket.on('UpdateScore', UpdateScore);
 
     return () => {
-      pongSocket.off('onPaddleMove', MovePaddles);
+      pongSocket.off('BallDelta', BallDelta);
+      pongSocket.off('PaddleDelta', PaddleDelta);
     }
   }, []);
 
@@ -217,13 +226,12 @@ function Pong() {
       </Button>
       <Stage width={800} height={500}>
         <Layer>
-          <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill={useColorModeValue('red.500', 'red.300')}/>
-          <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill={useColorModeValue('red.500', 'red.300')}/>
-          <Rect x={walls.current[2].x} y={walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill={useColorModeValue('red.500', 'red.300')}/>
-          <Rect x={walls.current[3].x} y={walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill={useColorModeValue('red.500', 'red.300')}/>
-          <Rect x={ball.x} y={ball.y} width={20} height={20} fill={useColorModeValue('red.500', 'red.300')} cornerRadius={10}/>
-          <Rect x={Offset.x} y={leftPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill={useColorModeValue('red.500', 'red.300')} />
-          <Rect x={walls.current[2].x - paddleDatas.current.width} y={rightPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill={useColorModeValue('red.500', 'red.300')}/>
+          <Text fontSize={30} align='right' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
+          <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
+          <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
+          <Rect x={ball.x} y={ball.y} width={20} height={20} fill='black' cornerRadius={10}/>
+          <Rect x={Offset.x} y={leftPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' />
+          <Rect x={walls.current[2].x - paddleDatas.current.width} y={rightPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black'/>
         </Layer>
       </Stage>
     </div>

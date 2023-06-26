@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
-import { PongService, BallRuntimeData, PaddleRuntimeData, SocketPair } from './pong.service';
+import { PongService, BallRuntimeData, PaddleRuntimeData, SocketPair, Score } from './pong.service';
 import { initialize } from 'passport';
 import { DataSource } from 'typeorm';
 
@@ -48,23 +48,20 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.PaddleKeyUp(socket.id, input);
   }
 
-  EmitOnCollision(sockets: SocketPair, datas: BallRuntimeData) {
-    const payload = { ballPosition: datas.ballPosition, ballDelta: datas.ballDelta };
-    console.log("onCollision");
-    sockets.socketP1.emit('onCollision', payload);
-    sockets.socketP2.emit('onCollision', payload);
+  EmitBallDelta(sockets: SocketPair, datas: BallRuntimeData) {
+    //console.log("BallDelta");
+    sockets.socketP1.emit('BallDelta', datas);
+    sockets.socketP2.emit('BallDelta', datas);
   }
 
-  EmitOnPaddleMove(sockets: SocketPair, datas: PaddleRuntimeData) {
-    const payload = {
-      paddle1Height: datas.paddle1Height,
-      paddle1Delta: datas.paddle1Delta,
-      paddle2Height: datas.paddle2Height,
-      paddle2Delta: datas.paddle2Delta,
-    };
-    
-    console.log("onPaddleMove");
-    sockets.socketP1.emit('onPaddleMove', payload);
-    sockets.socketP2.emit('onPaddleMove', payload);
+  EmitPaddleDelta(sockets: SocketPair, datas: PaddleRuntimeData) {
+    //console.log("PaddleDelta");
+    sockets.socketP1.emit('PaddleDelta', datas);
+    sockets.socketP2.emit('PaddleDelta', datas);
+  }
+
+  EmitScore(sockets: SocketPair, datas: Score) {
+    sockets.socketP1.emit('UpdateScore', datas);
+    sockets.socketP2.emit('UpdateScore', datas);
   }
 }
