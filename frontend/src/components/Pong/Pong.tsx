@@ -91,7 +91,7 @@ function Pong() {
 
   useEffect(() => {
     function Init(datas: PongInitData) {
-      console.log("Initing...");
+      console.log("Initing Pong");
       setBall(Add(Offset, datas.ballStartPosition));
       ballDelta.current = datas.ballStartDelta;
       
