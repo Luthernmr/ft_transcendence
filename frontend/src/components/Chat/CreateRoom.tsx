@@ -1,4 +1,11 @@
-import { ArrowBackIcon, CheckIcon } from "@chakra-ui/icons";
+import {
+  ArrowBackIcon,
+  CheckIcon,
+  ViewIcon,
+  ViewOffIcon,
+  LockIcon,
+  UnlockIcon,
+} from "@chakra-ui/icons";
 import {
   Avatar,
   AvatarBadge,
@@ -12,6 +19,7 @@ import {
   Spacer,
   Switch,
   Text,
+  VStack,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { chatSocket, userSocket } from "../../sockets/sockets";
@@ -68,8 +76,6 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
     }
   }
 
-  // localStorage.getItem("currentUser");
-
   return (
     <Flex
       borderRadius={"md"}
@@ -89,37 +95,61 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           Create Room
         </Heading>
       </Flex>
-      <Input
-        value={roomName}
-        onChange={(e) => setRoomName(e.target.value)}
-        placeholder="Type the name of the room..."
-        borderRadius="md"
-        mb={4}
-      />
 
-      <Switch
-        isChecked={passwordEnabled}
-        onChange={() => setPasswordEnabled(!passwordEnabled)}
-        mb={4}
-      >
-        Enable Password
-      </Switch>
+      <Flex alignItems="center" mb={4}>
+        <Input
+          value={roomName}
+          onChange={(e) => setRoomName(e.target.value)}
+          placeholder="Type the name of the room..."
+          borderRadius="md"
+          flexGrow={1}
+          mr={4}
+        />
+        <VStack alignItems="start" spacing={0.5}>
+          <Text fontWeight={"bold"} fontSize={"xs"}>
+            Private
+          </Text>
+          <Flex alignItems="center">
+            <Switch
+              isChecked={isPrivate}
+              onChange={() => setIsPrivate(!isPrivate)}
+            />
+            {isPrivate ? (
+              <ViewOffIcon boxSize={6} ml={2} />
+            ) : (
+              <ViewIcon boxSize={6} ml={2} />
+            )}
+          </Flex>
+        </VStack>
+      </Flex>
 
-      <Input
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter password..."
-        borderRadius="md"
-        mb={4}
-        isDisabled={!passwordEnabled}
-      />
-      <Switch
-        isChecked={isPrivate}
-        onChange={() => setIsPrivate(!isPrivate)}
-        mb={4}
-      >
-        Private Room
-      </Switch>
+      <Flex alignItems="center" mb={4}>
+        <Input
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Enter password..."
+          borderRadius="md"
+          isDisabled={!passwordEnabled}
+          flexGrow={1}
+          mr={4}
+        />
+        <VStack alignItems="start" spacing={0.5}>
+          <Text fontWeight={"bold"} fontSize={"xs"}>
+            Password
+          </Text>
+          <Flex alignItems="center">
+            <Switch
+              isChecked={passwordEnabled}
+              onChange={() => setPasswordEnabled(!passwordEnabled)}
+            />
+            {passwordEnabled ? (
+              <LockIcon boxSize={6} ml={2} />
+            ) : (
+              <UnlockIcon boxSize={6} ml={2} />
+            )}
+          </Flex>
+        </VStack>
+      </Flex>
 
       <Text mb={2} fontWeight="semibold">
         Choose members:
