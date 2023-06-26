@@ -17,7 +17,8 @@ import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { TwoFAService } from './twofa.service';
-import { AuthGuard } from './auth.guard';
+import JwtTwoFactorGuard from './twofa.guard';
+import { LocalAuthGuard } from './auth.guard';
 
 
 @Controller('api')
@@ -35,8 +36,8 @@ export class AuthController {
 		const hashedPassword = await bcrypt.hash(registerDto.password, salt);
 
 		const user = await this.userService.create({
-			nickname : registerDto.nickname,
-			email  : registerDto.email,
+			nickname: registerDto.nickname,
+			email: registerDto.email,
 			password: hashedPassword,
 			pendingRequests: []
 		});
@@ -51,7 +52,6 @@ export class AuthController {
 		@Res({ passthrough: true }) response: Response
 	) {
 		try {
-
 			const user = await this.userService.getUser(loginDto.email);
 
 			if (!user) {
@@ -60,17 +60,20 @@ export class AuthController {
 			if (!await bcrypt.compare(loginDto.password, user.password)) {
 				throw new BadRequestException('bad password');
 			}
-			if (!user.isTwoFA)
-				return (await this.authService.login(user, response));
+			const token = await this.authService.login(user, response);
+			await this.authService.loginTwoFa(user, response)
+			if(!user.isTwoFA)
+				return (token);
+			return;
 		}
 		catch (error) {
 			console.log(error)
-			return(error)
+			return (error)
 		}
 	}
 
 	@Get('user')
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	async user(@Req() request: Request,
 		@Res() response: Response) {
 		try {
@@ -88,13 +91,13 @@ export class AuthController {
 	}
 
 	@Get('logout')
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	async logout(@Res({ passthrough: true }) response: Response, @Req() request: Request) {
 		return this.authService.logout(request, response);
 	}
 
 	@Get('isOnline')
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	async isOnline(@Req() request: Request, @Res() response: Response) {
 		try {
 			const user = await this.authService.getUserCookie(request);
@@ -110,7 +113,7 @@ export class AuthController {
 	}
 
 	@Post('settings')
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	async settings(
 		@Body('img') img: string,
 		@Body('nickname') nickname: string,
@@ -125,7 +128,7 @@ export class AuthController {
 		return response.send({ img, user });
 	}
 	@Post('upload')
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	@UseInterceptors(FileInterceptor('file'))
 	uploadFile(@UploadedFile() file: Express.Multer.File) {
 		console.log(file);
@@ -136,7 +139,7 @@ export class AuthController {
 	/* -------------------------------------------------------------------------- */
 
 	@Get('generate')
-	@UseGuards(AuthGuard)
+	@UseGuards(LocalAuthGuard)
 	async qrcode(@Req() request: Request, @Res() response: Response) {
 		const user = await this.authService.getUserCookie(request);
 		console.log("0", user);
@@ -150,7 +153,7 @@ export class AuthController {
 	}
 
 	@Post('turn-on')
-	@UseGuards(AuthGuard)
+	@UseGuards(LocalAuthGuard)
 	async turnOnTwoFA(
 		@Req() request: Request,
 		@Body('twoFACode') twoFACode: string
@@ -170,13 +173,13 @@ export class AuthController {
 			return await this.userService.turnOnTwoFA(user.id);
 		}
 		catch (error) {
-			console.log(error) 
-		return error
+			console.log(error)
+			return error
 		}
 	}
 
 	@Post('turn-off')
-	@UseGuards(AuthGuard)
+	@UseGuards(JwtTwoFactorGuard)
 	async turnOffTwoFA(
 		@Req() request: Request,
 	) {
@@ -186,21 +189,24 @@ export class AuthController {
 	}
 
 	@Post('2fa')
+	@UseGuards(LocalAuthGuard)
 	async authenticate(
 		@Res() response: Response,
-		@Body('twoFACode') twoFACode: string,
-		@Body('email') email: string
+		@Req() request: Request,
+		@Body('twoFACode') twoFACode: string
 	) {
 		try {
-			const user = await this.userService.getUser(email);
+			const user = await this.authService.getUserCookie(request)
 			if (!user)
 				throw new UnauthorizedException('user not here');
-			const isCodeValid = this.twoFAService.isTwoFACodeValid(twoFACode, user);
+			const isCodeValid = await this.twoFAService.isTwoFACodeValid(twoFACode, user);
 			if (!isCodeValid) {
 				throw new UnauthorizedException('Wrong authentication code');
 			}
-			console.log('yess')
-			return (await this.authService.login(user, response));
+			const jwtToken = request.cookies['jwt'];
+			await this.authService.loginTwoFa(user, response, true)
+			response.send({jwt : jwtToken});
+			return ({jwt : jwtToken});
 		}
 		catch (error) {
 			console.log(error)

@@ -81,7 +81,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		requestId: any,
 	}) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
 			const friendUser = await this.userService.getUserById(request.senderId)
 			const otherId = friendUser.socketId;

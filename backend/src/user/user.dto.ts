@@ -13,20 +13,20 @@ export class LoginDto {
 export class RegisterDto {
 	@IsString()
 	@IsNotEmpty()
-	@Length(4,20)
 	nickname: string;
+	//@Length(4,20)
 
 	@IsEmail()
 	email: string;
   
 	@IsString()
 	@IsNotEmpty()
-	@MinLength(6)
-	@MaxLength(50)
-	@Matches(
-		/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-		message: 'The password must have a Uppercase, lowercase letter and a number'
-	})
 	password: string;
+	//@MinLength(6)
+	//@MaxLength(50)
+	//@Matches(
+	//	/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+	//	message: 'The password must have a Uppercase, lowercase letter and a number'
+	//})
 
 }

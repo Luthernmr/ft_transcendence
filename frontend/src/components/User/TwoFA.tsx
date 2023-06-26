@@ -18,8 +18,8 @@ export default function TwoFA() {
 			console.log(resp2);
 			if (resp2) {
 				navigate('/Home');
-				console.log('token,normal', resp2.data.token);
-				sessionStorage.setItem('jwt', resp2.data.token);
+				console.log('token,normal', resp2.data.jwt);
+				sessionStorage.setItem('jwt', resp2.data.jwt);
 				toast({
 					title: `2fa Validate`,
 					status: 'success',
