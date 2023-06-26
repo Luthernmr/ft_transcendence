@@ -1,27 +1,6 @@
-import {
-  ArrowBackIcon,
-  CheckIcon,
-  ViewIcon,
-  ViewOffIcon,
-  LockIcon,
-  UnlockIcon,
-} from "@chakra-ui/icons";
-import {
-  Avatar,
-  AvatarBadge,
-  Badge,
-  Box,
-  Button,
-  Flex,
-  Heading,
-  IconButton,
-  Input,
-  Spacer,
-  Switch,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from 'react';
+import { ArrowBackIcon, CheckIcon, ViewIcon, ViewOffIcon, LockIcon, UnlockIcon } from "@chakra-ui/icons";
+import { Avatar, AvatarBadge, Badge, Box, Button, Flex, Heading, IconButton, Input, Spacer, Switch, Text, VStack } from "@chakra-ui/react";
 import { chatSocket, userSocket } from "../../sockets/sockets";
 
 interface User {
@@ -41,41 +20,54 @@ interface CreateRoomProps {
 }
 
 const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
-  const [roomName, setRoomName] = useState("");
+  const [roomName, setRoomName] = useState<string>("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [members, setMembers] = useState<User[]>([]);
-  const [password, setPassword] = useState("");
-  const [passwordEnabled, setPasswordEnabled] = useState(false);
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [password, setPassword] = useState<string>("");
+  const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
-  useEffect(() => {
-    userSocket.on("userList", (data) => {
-      setAllUsers(data);
-    });
-    userSocket.emit("getAllUsers");
+  const userListListener = useCallback((data: User[]) => {
+    setAllUsers(data);
   }, []);
 
-  function handleCreate(e: any) {
+  useEffect(() => {
+    userSocket.on("userList", userListListener);
+    userSocket.emit("getAllUsers");
+    return () => {
+      userSocket.off("userList", userListListener);
+    };
+  }, [userListListener]);
+
+  const handleCreate = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     if (roomName.trim() !== "") {
       chatSocket.emit("createRoom", {
         name: roomName,
-        members: members,
-        password: password,
+        users: members,
+        password: passwordEnabled ? password : null,
+        isPrivate: isPrivate
       });
       setShowCreateRoom(false);
     }
-  }
+  }, [roomName, members, password, passwordEnabled, isPrivate, setShowCreateRoom]);
 
-  function handleAddMember(user: User) {
+  const handleAddMember = useCallback((user: User) => {
     const memberExists = members.find((m) => m.id === user.id);
     if (!memberExists) {
       setMembers([...members, user]);
     } else {
       setMembers(members.filter((m) => m.id !== user.id));
     }
-  }
+  }, [members]);
 
+  localStorage.getItem("user")
+
+  const AvatarWithBadge = ({ src, isOnline, ...props }: { src: string, isOnline: boolean, props?: any }) => (
+    <Avatar size="sm" src={src} {...props}>
+      <AvatarBadge boxSize="1em" bg={isPrivate ? "green.500" : "tomato"} />
+    </Avatar>
+  );
   return (
     <Flex
       borderRadius={"md"}

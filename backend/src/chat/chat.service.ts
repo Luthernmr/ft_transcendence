@@ -44,6 +44,7 @@ export class ChatService {
     client: Socket,
     data: Partial<Room>,
     ) {
+      this.logger.log('Received isPrivate: ' + data.isPrivate);
     try {
       const room = await this.repo.findOne({ where: { name: data.name } });
       const user = await this.authService.getUserByToken(client.handshake.auth.token);
@@ -54,8 +55,11 @@ export class ChatService {
       const payload = {
         name: data.name,
         ownerId: user.id,
-      }
-        await this.repo.save(payload);
+        isPrivate: data.isPrivate,
+        password: data.password,
+        users: [user],
+      };
+      await this.repo.save(payload);      
     } catch (error) {
       this.logger.log(error);
       client.emit('roomAlreadyExist');
