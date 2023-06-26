@@ -10,6 +10,7 @@ import {
   IconButton,
   Input,
   Spacer,
+  Switch,
   Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -35,6 +36,9 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
   const [roomName, setRoomName] = useState("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [members, setMembers] = useState<User[]>([]);
+  const [password, setPassword] = useState("");
+  const [passwordEnabled, setPasswordEnabled] = useState(false);
+  const [isPrivate, setIsPrivate] = useState(false);
 
   useEffect(() => {
     userSocket.on("userList", (data) => {
@@ -46,7 +50,11 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
   function handleCreate(e: any) {
     e.preventDefault();
     if (roomName.trim() !== "") {
-      chatSocket.emit("createRoom", { name: roomName, members: members });
+      chatSocket.emit("createRoom", {
+        name: roomName,
+        members: members,
+        password: password,
+      });
       setShowCreateRoom(false);
     }
   }
@@ -59,6 +67,8 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       setMembers(members.filter((m) => m.id !== user.id));
     }
   }
+
+  // localStorage.getItem("currentUser");
 
   return (
     <Flex
@@ -86,6 +96,30 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
         borderRadius="md"
         mb={4}
       />
+
+      <Switch
+        isChecked={passwordEnabled}
+        onChange={() => setPasswordEnabled(!passwordEnabled)}
+        mb={4}
+      >
+        Enable Password
+      </Switch>
+
+      <Input
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter password..."
+        borderRadius="md"
+        mb={4}
+        isDisabled={!passwordEnabled}
+      />
+      <Switch
+        isChecked={isPrivate}
+        onChange={() => setIsPrivate(!isPrivate)}
+        mb={4}
+      >
+        Private Room
+      </Switch>
 
       <Text mb={2} fontWeight="semibold">
         Choose members:
