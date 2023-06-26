@@ -151,10 +151,10 @@ function Pong() {
       setBall(Add(Offset, values.ballPosition));
     }
 
-    pongSocket.on('ChangeDir', ChangeDeltas);
+    pongSocket.on('onCollision', ChangeDeltas);
 
     return () => {
-      pongSocket.off('ChangeDir', ChangeDeltas);
+      pongSocket.off('onCollision', ChangeDeltas);
     }
   }, []);
 
@@ -164,10 +164,10 @@ function Pong() {
       rightPaddle.current = {height: Offset.y + values.paddle2Height, delta: values.paddle2Delta };
     };
 
-    pongSocket.on('PaddleDelta', MovePaddles);
+    pongSocket.on('onPaddleMove', MovePaddles);
 
     return () => {
-      pongSocket.off('PaddleDelta', MovePaddles);
+      pongSocket.off('onPaddleMove', MovePaddles);
     }
   }, []);
 
@@ -208,7 +208,6 @@ function Pong() {
       if (start === true)
         console.log("Game started");
     });
-    //ballDelta.current = {x: BALL_START_DX, y: BALL_START_DY};
   }
 
   return (

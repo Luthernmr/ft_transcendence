@@ -2,14 +2,9 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
-import { PongService, BallRuntimeData, PaddleRuntimeData } from './pong.service';
+import { PongService, BallRuntimeData, PaddleRuntimeData, SocketPair } from './pong.service';
 import { initialize } from 'passport';
 import { DataSource } from 'typeorm';
-
-interface SocketPair {
-  socketP1: Socket,
-  socketP2: Socket
-}
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
@@ -40,39 +35,36 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('start')
   handleStart(@ConnectedSocket() socket: Socket) {
-    if (this.pongService.StartRoom(socket))
-      return true;
-    return false;
+    return this.pongService.StartRoom(socket);
   }
 
   @SubscribeMessage('keydown')
   handlePaddleKeydown(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyDown(socket.id, input);
-    console.log("Received keydown input " + input + " from socketID: " + socket.id);
   }
 ;
   @SubscribeMessage('keyup')
   handlePaddleKeyup(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyUp(socket.id, input);
-    console.log("Received keyup input " + input + " from socketID: " + socket.id);
   }
 
-  EmitPaddleDelta(datas: PaddleRuntimeData & SocketPair) {
+  EmitOnCollision(sockets: SocketPair, datas: BallRuntimeData) {
+    const payload = { ballPosition: datas.ballPosition, ballDelta: datas.ballDelta };
+    console.log("onCollision");
+    sockets.socketP1.emit('onCollision', payload);
+    sockets.socketP2.emit('onCollision', payload);
+  }
+
+  EmitOnPaddleMove(sockets: SocketPair, datas: PaddleRuntimeData) {
     const payload = {
       paddle1Height: datas.paddle1Height,
       paddle1Delta: datas.paddle1Delta,
       paddle2Height: datas.paddle2Height,
       paddle2Delta: datas.paddle2Delta,
     };
-    console.log("emitPaddleDelta");
-    datas.socketP1.emit('PaddleDelta', payload);
-    datas.socketP2.emit('PaddleDelta', payload);
-  }
-
-  EmitChangeDir(datas: BallRuntimeData & SocketPair) {
-    const payload = { ballPosition: datas.ballPosition, ballDelta: datas.ballDelta };
-    console.log("emitChangeDir");
-    datas.socketP1.emit('ChangeDir', payload);
-    datas.socketP2.emit('ChangeDir', payload);
+    
+    console.log("onPaddleMove");
+    sockets.socketP1.emit('onPaddleMove', payload);
+    sockets.socketP2.emit('onPaddleMove', payload);
   }
 }

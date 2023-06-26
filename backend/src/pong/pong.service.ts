@@ -48,15 +48,9 @@ export interface PongInitData {
 	paddleStartHeight: number,
 }
 
-export interface PongRuntimeData extends BallRuntimeData, PaddleRuntimeData {
-	socketP1: Socket,
-	socketP2: Socket,
-}
-
 export interface BallRuntimeData {
 	ballPosition: Vector2,
-	ballDelta: Vector2,
-	collided: boolean
+	ballDelta: Vector2
 }
 
 export interface PaddleRuntimeData {
@@ -66,12 +60,23 @@ export interface PaddleRuntimeData {
 	paddle2Delta: number
 }
 
+export interface SocketPair {
+	socketP1: Socket,
+	socketP2: Socket
+}
+
+export interface PongRuntimeData extends BallRuntimeData, PaddleRuntimeData {
+
+}
+
 @Injectable()
 export class PongService {
 	runtimeDatas: Array<PongRuntimeData>;
 	ballEvents: Set<number>;
 	paddleEvents: Set<number>;
 	pendingPlayers: Socket[];
+
+	socketsRuntime: Array<SocketPair>;
 
 	pongGateway : PongGateway;
 	
@@ -80,8 +85,9 @@ export class PongService {
 		this.ballEvents = new Set<number>();
 		this.paddleEvents = new Set<number>();
 		this.pendingPlayers = [];
-	}
 
+		this.socketsRuntime = [];
+	}
 
 	RegisterGateway(pongGateway : PongGateway) {
 		this.pongGateway = pongGateway;
@@ -97,7 +103,7 @@ export class PongService {
 	}
 
 	FindIndexBySocketId(socketID: string): number {
-		return this.runtimeDatas.findIndex(data => (data.socketP1.id === socketID || data.socketP2.id === socketID));
+		return this.socketsRuntime.findIndex(sockets => (sockets.socketP1.id === socketID || sockets.socketP2.id === socketID));
 	}
 
 	GetOpponent(socket: Socket): Socket {
@@ -112,10 +118,7 @@ export class PongService {
 		const index = this.FindIndexBySocketId(socket.id);
 		if (index >= 0)
 		{
-			console.log("Reinitializing pong room");
-			this.runtimeDatas[index].ballPosition = { ...BASE_INIT_DATAS.ballStartPosition };
-			this.runtimeDatas[index].ballDelta = {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y};
-			this.pongGateway.EmitChangeDir(this.runtimeDatas[index]);
+			this.RestartRoom(index);
 			return true;
 		}
 		
@@ -126,21 +129,31 @@ export class PongService {
 
 		const opponent = this.GetOpponent(socket);
 		console.log("Starting new pong room");
-		const datas: PongRuntimeData = {
+		const sockets: SocketPair = {
 			socketP1: socket,
-			socketP2: opponent,
+			socketP2: opponent
+		}
+
+		const datas: PongRuntimeData = {
 			paddle1Height: PADDLE_START_HEIGHT,
 			paddle1Delta: 0,
 			paddle2Height: PADDLE_START_HEIGHT,
 			paddle2Delta: 0,
 			ballPosition: { ...BASE_INIT_DATAS.ballStartPosition },
 			ballDelta: {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y},
-			collided: false
 		};
 		
+		this.socketsRuntime.push(sockets);
 		this.runtimeDatas.push(datas);
-		this.pongGateway.EmitChangeDir(datas);
+		this.pongGateway.EmitOnCollision(sockets, datas);
 		return true;
+	}
+
+	RestartRoom(index: number) {
+		console.log("Reinitializing pong room");
+		this.runtimeDatas[index].ballPosition = { ...BASE_INIT_DATAS.ballStartPosition };
+		this.runtimeDatas[index].ballDelta = {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y};
+		this.pongGateway.EmitOnCollision(this.socketsRuntime[index], this.runtimeDatas[index]);
 	}
 
 	CloseRoom(socketID: string) {
@@ -150,6 +163,7 @@ export class PongService {
 		console.log("Found index: " + index);
 		
 		if (index >= 0) {
+			this.socketsRuntime.splice(index, 1);
 			this.runtimeDatas.splice(index, 1);
 		}
 
@@ -163,7 +177,7 @@ export class PongService {
 		if (instanceIndex < 0)
 			return;
 		
-		if (this.runtimeDatas[instanceIndex].socketP1.id === socketID) {
+		if (this.socketsRuntime[instanceIndex].socketP1.id === socketID) {
 			this.runtimeDatas[instanceIndex].paddle1Delta = input * PADDLE_SPEED;
 		} else {
 			this.runtimeDatas[instanceIndex].paddle2Delta = input * PADDLE_SPEED;
@@ -177,10 +191,10 @@ export class PongService {
 		if (instanceIndex < 0)
 			return;
 
-		if (this.runtimeDatas[instanceIndex].socketP1.id === socketID
+		if (this.socketsRuntime[instanceIndex].socketP1.id === socketID
 			&& Math.sign(this.runtimeDatas[instanceIndex].paddle1Delta) === Math.sign(input)) {
 			this.runtimeDatas[instanceIndex].paddle1Delta = 0;
-		} else if (this.runtimeDatas[instanceIndex].socketP2.id === socketID
+		} else if (this.socketsRuntime[instanceIndex].socketP2.id === socketID
 			&& Math.sign(this.runtimeDatas[instanceIndex].paddle2Delta) === Math.sign(input)) {
 			this.runtimeDatas[instanceIndex].paddle2Delta = 0;
 		} else
@@ -228,7 +242,7 @@ export class PongService {
 				data.ballDelta.x = -data.ballDelta.x;
 				data.ballPosition.x = PADDLE_WIDTH;
 				} else {
-					this.StartRoom(data.socketP1);
+					this.RestartRoom(index);
 					return;
 				}
 			} else if (data.ballPosition.x > (PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH)) {
@@ -236,7 +250,7 @@ export class PongService {
 					data.ballDelta.x = -data.ballDelta.x;
 					data.ballPosition.x = PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH;
 				} else {
-					this.StartRoom(data.socketP1);
+					this.RestartRoom(index);
 					return;
 				}
 			}
@@ -255,14 +269,14 @@ export class PongService {
 
 		// Collisions
 		this.ballEvents.forEach(function(index) {
-			this.pongGateway.EmitChangeDir(this.runtimeDatas[index]);
+			this.pongGateway.EmitOnCollision(this.socketsRuntime[index], this.runtimeDatas[index]);
 		}, this);
 
 		this.ballEvents.clear();
 
 		// Paddles
 		this.paddleEvents.forEach(function(index) {
-			this.pongGateway.EmitPaddleDelta(this.runtimeDatas[index]);
+			this.pongGateway.EmitOnPaddleMove(this.socketsRuntime[index], this.runtimeDatas[index]);
 		}, this);
 
 		this.paddleEvents.clear();
