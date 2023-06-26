@@ -226,7 +226,7 @@ function Pong() {
       </Button>
       <Stage width={800} height={500}>
         <Layer>
-          <Text fontSize={30} align='right' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
+          <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
           <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
           <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
           <Rect x={ball.x} y={ball.y} width={20} height={20} fill='black' cornerRadius={10}/>
