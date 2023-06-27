@@ -22,6 +22,6 @@ async function bootstrap() {
 		 forbidNonWhitelisted: true, 
 		}));
 
-	await app.listen(5000);
+	await app.listen(process.env.BACKEND_PORT);
 }
 bootstrap();
