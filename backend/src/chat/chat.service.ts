@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   SubscribeMessage,
@@ -11,16 +16,19 @@ import { Room } from 'src/room/entities/room.entity';
 import { FriendService } from 'src/social/friend.service';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
 export class ChatService {
   private logger: Logger;
 
-  constructor(@InjectRepository(Room) private repo: Repository<Room>,
-  private readonly userService: UserService,
-  private readonly authService: AuthService,
-  private readonly friendService: FriendService,) {
+  constructor(
+    @InjectRepository(Room) private repo: Repository<Room>,
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+    private readonly friendService: FriendService,
+  ) {
     this.logger = new Logger(ChatService.name);
   }
 
@@ -40,26 +48,27 @@ export class ChatService {
   }
 
   @SubscribeMessage('createRoom')
-  async createRoom(
-    client: Socket,
-    data: Partial<Room>,
-    ) {
-      this.logger.log('Received isPrivate: ' + data.isPrivate);
+  async createRoom(client: Socket, data: Partial<Room>) {
+    this.logger.log('Received isPrivate: ' + data.isPrivate);
     try {
       const room = await this.repo.findOne({ where: { name: data.name } });
-      const user = await this.authService.getUserByToken(client.handshake.auth.token);
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
       client.emit('currentUser', user);
       if (room) {
         throw new BadRequestException('Room already exist');
       }
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(data.password, salt);
       const payload = {
         name: data.name,
         ownerId: user.id,
         isPrivate: data.isPrivate,
-        password: data.password,
+        password: hashedPassword,
         users: [user],
       };
-      await this.repo.save(payload);      
+      await this.repo.save(payload);
     } catch (error) {
       this.logger.log(error);
       client.emit('roomAlreadyExist');
