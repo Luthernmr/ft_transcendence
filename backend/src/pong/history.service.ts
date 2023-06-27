@@ -32,7 +32,7 @@ export class HistoryService {
 		await this.pongHistory.save(history);
 	}
 
-	async getUserHistory(user: User) {
+	async getUserHistory(user: User) : Promise<PongHistory[]> {
 		const history = await this.pongHistory.find({ where: [
 															{ user1: user },
 															{ user2: user },
