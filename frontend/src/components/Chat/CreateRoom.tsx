@@ -42,7 +42,7 @@ interface CreateRoomProps {
 }
 
 const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
   const [roomName, setRoomName] = useState<string>("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [members, setMembers] = useState<User[]>([currentUser]);
