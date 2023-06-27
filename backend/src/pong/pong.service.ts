@@ -24,7 +24,7 @@ const PADDLE_START_HEIGHT: number = 200;
 
 const PADDLE_SPEED: number = 20;
 
-const WIN_SCORE: number = 5;
+const WIN_SCORE: number = 1;
 
 const BASE_INIT_DATAS: PongInitData = {
 	startCountdown: COUNTDOWN,
@@ -101,6 +101,8 @@ export class PongService {
 	scoreData: Array<Score>;
 	idPairs: Array<IDPair>;
 
+	waitingState: Array<boolean>;
+
 	pongGateway : PongGateway;
 	
 	constructor(private readonly historyService: HistoryService) {
@@ -115,6 +117,8 @@ export class PongService {
 
 		this.scoreData = [];
 		this.idPairs = [];
+
+		this.waitingState = [];
 	}
 
 	RegisterGateway(pongGateway : PongGateway) {
@@ -188,7 +192,10 @@ export class PongService {
 			scoreP2: 0
 		}
 
+
 		this.scoreData.push(score);
+
+		this.waitingState.push(false);
 
 		this.pongGateway.EmitInit(sockets, { ...BASE_INIT_DATAS });
 		this.pongGateway.EmitStartGame(sockets, COUNTDOWN / 1000);
@@ -224,6 +231,7 @@ export class PongService {
 			this.paddleRuntime.splice(index, 1);
 			this.scoreData.splice(index, 1);
 			this.idPairs.splice(index, 1);
+			this.waitingState.splice(index, 1);
 			return;
 		}
 
@@ -272,16 +280,39 @@ export class PongService {
 	}
 
 	EndGame(index: number) {
+		const winner: number = (this.scoreData[index].scoreP1 > this.scoreData[index].scoreP2) ? 1 : 2;
+
 		this.ballRuntime[index].ballPosition = { ...BASE_INIT_DATAS.ballStartPosition };
 		this.ballRuntime[index].ballDelta = {x: 0, y: 0};
 
 		this.pongGateway.EmitBallDelta(this.socketsRuntime[index], this.ballRuntime[index]);
+		this.pongGateway.EmitEnd(this.socketsRuntime[index], winner);
 
 		this.historyService.addEntry(this.idPairs[index], this.scoreData[index]);
 	}
 
-	GlobalUpdate() {
+	RestartNewGame(socket: Socket) {
+		const index = this.FindIndexBySocketId(socket.id);
 
+		if (this.waitingState[index] == false) {
+			this.waitingState[index] = true;
+			return;
+		}
+
+		this.waitingState[index] = false;
+
+		const score: Score = {
+			scoreP1: 0,
+			scoreP2: 0
+		}
+
+		this.scoreData[index] = score;
+		this.pongGateway.EmitScore(this.socketsRuntime[index], score);
+
+		this.RestartGame(index);
+	}
+
+	GlobalUpdate() {
 		// PADDLE CALCULATIONS
 		this.paddleRuntime.forEach(function (data, index) {
 			const oldPaddle1Delta = data.paddle1Delta;
