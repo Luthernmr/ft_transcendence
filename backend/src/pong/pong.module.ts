@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PongGateway } from './pong.gateway';
 import { PongService } from './pong.service';
-import { PongEntity } from './pong.entity'
+import { PongHistory } from './pong.entity'
 
 @Module({
-	imports: [TypeOrmModule.forFeature([PongEntity])],
+	imports: [TypeOrmModule.forFeature([PongHistory])],
 	providers: [PongGateway, PongService],
 })
 export class PongModule {}

@@ -1,16 +1,22 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-export class PongEntity {
+export class PongHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column()
-  firstName: string;
+  user1ID: number;
 
   @Column()
-  lastName: string;
+  user2ID: number;
 
-  @Column({ default: true })
-  isActive: boolean;
+  @Column()
+  scoreUser1: number;
+
+  @Column()
+  scoreUser2: number;
+
+  @Column({default: false})
+  customMode: boolean;
 }
