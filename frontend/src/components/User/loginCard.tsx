@@ -60,6 +60,7 @@ export default function loginCard() {
 				"email": formValue.email,
 				"password": formValue.password
 			}, { withCredentials: true });
+			console.log('data', response.data)
 			if (response.data.token) {
 				navigate('/Home');
 				console.log('token,normal', response.data.token);
@@ -77,9 +78,6 @@ export default function loginCard() {
 					position: 'top'
 				})
 			}
-
-
-
 		} catch (error) {
 
 			toast({

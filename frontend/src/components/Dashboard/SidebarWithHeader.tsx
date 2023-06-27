@@ -210,13 +210,13 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   const signOut = async (event: any) => {
     try {
       const response = await axios.get(
-        import.meta.env.VITE_BACKEND + "api/logout",
+        import.meta.env.VITE_BACKEND + "/api/logout",
         { withCredentials: true }
       );
       console.log(response.data);
       sessionStorage.removeItem("jwt");
+      sessionStorage.removeItem("currentUser");
       console.log("jwwwr", sessionStorage.getItem("jwt"));
-      //navigate('/Login')
     } catch (error) {
       console.log(error);
     }

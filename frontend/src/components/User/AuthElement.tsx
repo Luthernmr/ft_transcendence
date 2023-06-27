@@ -18,6 +18,7 @@ export default function AuthElement() {
 					const res = await axios.get(import.meta.env.VITE_BACKEND + '/auth/42' + location.search, { withCredentials: true });
 					console.log("res token", res.data);
 					if (res.data.jwt) {
+						
 						sessionStorage.setItem('jwt', res.data.jwt);
 						if (sessionStorage.getItem('jwt'))
 							navigate('/home');

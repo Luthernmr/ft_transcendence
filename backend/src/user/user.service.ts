@@ -22,13 +22,11 @@ export class UserService {
 		return await this.userRepository.save(data);
 	}
 
-
 	async getUser(email: any): Promise<User> {
 		return await this.userRepository.findOne({ where: { email: email } });
 	}
 
 	async getAllUser(): Promise<any> {
-		//this.userRepository.find()
 		const users = await this.userRepository.find();
 		return users;
 	}
@@ -39,18 +37,13 @@ export class UserService {
 
 	async setSocket(id: number, socketId: string) {
 		var user: any = await this.getUserById(id);
-		console.log('before', user.socketId)
-
 		user.socketId = socketId;
 		user = await this.userRepository.save(user);
-		console.log('after', await this.getUserById(id))
 		return user
-
 	}
 
 	async setOnline(user: User) {
-		if(user)
-		{
+		if (user) {
 			user.isOnline = true;
 			await this.userRepository.save(user);
 		}
@@ -81,7 +74,6 @@ export class UserService {
 		if (existingRequest) {
 			throw new BadRequestException('Request already exists for this person.');
 		}
-
 		return await this.pendingRequest.save(data);
 	}
 
@@ -94,7 +86,7 @@ export class UserService {
 	}
 
 	async getAllPendingRequest(user: any): Promise<any> {
-		const userWithPendingRequests = await this.userRepository.findOne({where : user, relations: ['pendingRequests'] });
+		const userWithPendingRequests = await this.userRepository.findOne({ where: user, relations: ['pendingRequests'] });
 		//console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
 	}
@@ -107,17 +99,16 @@ export class UserService {
 
 	async turnOnTwoFA(userId: number) {
 		return await this.userRepository.update(userId, {
-		  isTwoFA: true
+			isTwoFA: true
 		});
 	}
 
 	async turnOffTwoFA(userId: number) {
-
 		await this.userRepository.update(userId, {
-			twoFASecret : ""
+			twoFASecret: ""
 		})
 		return await this.userRepository.update(userId, {
-		  isTwoFA: false
+			isTwoFA: false
 		});
 	}
 }

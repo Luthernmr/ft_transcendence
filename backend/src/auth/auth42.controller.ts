@@ -7,12 +7,14 @@ import { Response } from 'express';
 import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
 import axios from "axios";
+import { AuthService } from './auth.service';
 
 
 @Controller('auth')
 export class Auth42Controller {
 	constructor(
 		private readonly auth42Service: Auth42Service,
+		private authService: AuthService
 	) { }
 
 	@Get('42')
@@ -22,10 +24,11 @@ export class Auth42Controller {
 		@Req() request: any
 	) {
 		let token = await this.auth42Service.login(request.user);
-
-	
-			response.cookie('jwt', token, { httpOnly: true });
-			return ({ jwt : token});
-	
+		const user = await this.authService.getUserByToken(token);
+		await this.authService.loginTwoFa(user, response, true)
+		response.cookie('jwt', token, { httpOnly: true });
+		if (!user.isTwoFA)
+			return ({ jwt: token });
+		return;
 	}
 }

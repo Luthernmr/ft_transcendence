@@ -19,10 +19,18 @@ export class AuthService {
 	) { }
 	async login(user: User, response: Response): Promise<any> {
 		await this.userService.setOnline(user);
-		const payload = { id: user.id, nickname: user.nickname, email: user.email, isOnline: user.isOnline };
+		const payload = { id: user.id, nickname: user.nickname, email: user.email, isOnline: user.isOnline, isTwoFa: user.isTwoFA };
 		const jwt = await this.jwtService.signAsync(payload);
 		response.cookie('jwt', jwt, { httpOnly: true });
-		response.send({ token: jwt })
+		return({ token: jwt });
+	}
+
+	async loginTwoFa(user : User, response : Response, isSecondFactorAuthenticated = false)
+	{
+		await this.userService.setOnline(user);
+		const payload = { id: user.id,  isSecondFactorAuthenticated};
+		const twofaToken = await this.jwtService.signAsync(payload);
+		response.cookie('twofa', twofaToken, { httpOnly: true });
 	}
 
 	async setCookie(user: User, response: Response)
@@ -42,7 +50,7 @@ export class AuthService {
 		if (token) {
 			const data = await this.jwtService.verifyAsync(token);
 			const user: User = await this.userService.getUser(data.email);
-			delete user.password
+			delete user?.password
 
 			return user;
 		}
@@ -53,7 +61,10 @@ export class AuthService {
 		const user = await this.getUserCookie(request);
 
 		await this.userService.setOffline(user)
-		return response.clearCookie('jwt');
+		response.clearCookie('jwt');
+		response.clearCookie('twofa');
+		console.log('prout', response.cookie['jwt']);
+
 	}
 
 }

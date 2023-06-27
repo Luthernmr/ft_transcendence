@@ -2,11 +2,12 @@
 https://docs.nestjs.com/controllers#controllers
 */
 
-import { Controller, Post, Body, Get, Req, Res } from '@nestjs/common';
+import { Controller, Post, Body, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { Response, Request, request, response } from 'express';
 import { UserService } from 'src/user/user.service';
 import { FriendService } from './friend.service';
 import { AuthService } from 'src/auth/auth.service';
+import JwtTwoFactorGuard from 'src/auth/twofa.guard';
 
 @Controller('social')
 export class FriendController {
@@ -23,6 +24,7 @@ export class FriendController {
 		this.friendService.addFriend(id);
 	}
 	@Get('allRequest')
+	@UseGuards(JwtTwoFactorGuard)
 	async allRequest(
 		@Req() request: Request,
 		@Res() response : Response
