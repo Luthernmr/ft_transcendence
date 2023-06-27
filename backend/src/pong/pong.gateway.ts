@@ -31,8 +31,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('queue')
-  handleQueue(@ConnectedSocket() socket: Socket) {
-    this.pongService.JoinQueue(socket);
+  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() userID: number) {
+    this.pongService.JoinQueue(socket, userID);
+    console.log("Joined queue, userID: " + userID);
   }
 
   @SubscribeMessage('keydown')
