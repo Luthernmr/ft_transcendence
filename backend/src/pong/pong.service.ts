@@ -136,8 +136,6 @@ export class PongService {
 	}
 
 	JoinQueue(socket: Socket, userId: number) {
-		this.historyService.getUserHistoryById(userId);
-		
 		const currentPlayer = {
 			socket: socket,
 			userId: userId,

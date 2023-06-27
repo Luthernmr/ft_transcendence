@@ -3,10 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PongHistory } from 'src/pong/pongHistory.entity'
 import { Repository } from 'typeorm';
 import { Score, IDPair } from './pong.service';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/user.entity';
 
 @Injectable()
 export class HistoryService {
 	constructor(
+		private userService: UserService,
 		@InjectRepository(PongHistory)
 		private pongHistory: Repository<PongHistory>
 	) {
@@ -14,9 +17,12 @@ export class HistoryService {
 	}
 
 	async addEntry(ids: IDPair, score: Score) {
+		const user1 = await this.userService.getUserById(ids.idP1);
+		const user2 = await this.userService.getUserById(ids.idP2);
+		
 		const history = {
-			user1ID: ids.idP1,
-			user2ID: ids.idP2,
+			user1: user1,
+			user2: user2,
 			scoreUser1: score.scoreP1,
 			scoreUser2: score.scoreP2
 		};
@@ -26,10 +32,10 @@ export class HistoryService {
 		await this.pongHistory.save(history);
 	}
 
-	async getUserHistoryById(id: number) {
+	async getUserHistoryById(user: User) {
 		const history = await this.pongHistory.find({ where: [
-															{ user1ID: id },
-															{ user2ID: id },
+															{ user1: user },
+															{ user2: user },
 														]
 													});
 		return history;
