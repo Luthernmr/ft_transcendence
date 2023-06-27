@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { useColorModeValue, Button, Center } from '@chakra-ui/react';
+import { Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import { RiContrastDropLine } from 'react-icons/ri';
 
@@ -70,7 +70,8 @@ interface Score {
 enum PongState {
   Out,
   Queue,
-  Play
+  Play,
+  Finished
 }
 
 function Add(first: Vector2, second: Vector2): Vector2 {
@@ -99,6 +100,8 @@ function Pong() {
   const pongState = useRef<PongState>(PongState.Out);
 
   const countdown = useRef<number>(0);
+
+  const winner = useRef<number>(1);
 
   useEffect(() => {
     function Init(datas: PongInitData) {
@@ -200,18 +203,26 @@ function Pong() {
 
     pongSocket.on('UpdateScore', UpdateScore);
 
+    function EndGame(winnerNumber: number) {
+      winner.current = winnerNumber;
+      pongState.current = PongState.Finished;
+    }
+
+    pongSocket.on('End', EndGame);
+
     return () => {
       pongSocket.off('StartGame', Start);
       pongSocket.off('BallDelta', BallDelta);
       pongSocket.off('PaddleDelta', PaddleDelta);
       pongSocket.off('UpdateScore', UpdateScore);
+      pongSocket.off('End', EndGame);
     }
   }, []);
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (pongState.current != PongState.Play)
+    if (pongState.current != PongState.Play && pongState.current != PongState.Finished)
       return;
-    
+
     if (e.repeat)
       return;
     
@@ -225,7 +236,7 @@ function Pong() {
   }
 
   const handleKeyUp = (e: KeyboardEvent) => {
-    if (pongState.current != PongState.Play)
+    if (pongState.current != PongState.Play && pongState.current != PongState.Finished)
       return;
     
     let input = 0;
@@ -258,6 +269,10 @@ function Pong() {
     pongSocket.emit('queue', Number(user.id));
   }
 
+  const RestartRequest = () => {
+    pongSocket.emit('restart');
+  }
+
   if (pongState.current === PongState.Out) {
     return (
       <div>
@@ -272,13 +287,15 @@ function Pong() {
         <h1>In Queue...</h1>
       </div>
     )
-  } else if (pongState.current === PongState.Play) {
+  } else if (pongState.current === PongState.Play || pongState.current === PongState.Finished) {
     return (
       <div>
+        <Button onClick= { RestartRequest }> Start again ? </Button>
         <Stage width={800} height={500}>
           <Layer>
             <Text fontSize={50} width={700} y={170} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
             <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
+            <Text fontSize={30} width={700} y={170} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
             <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
             <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
             <Rect x={ball.x} y={ball.y} width={20} height={20} fill='black' cornerRadius={10}/>
