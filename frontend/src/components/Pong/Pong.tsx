@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { useColorModeValue, Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
+import { RiContrastDropLine } from 'react-icons/ri';
 
 const OFFSET_X: number = 40;
 const OFFSET_Y: number = 40;
@@ -246,8 +247,15 @@ function Pong() {
   }, []);
 
   const JoinQueue = () => {
+    const userString = sessionStorage.getItem("currentUser");
+    if (userString === null)
+      return;
+
+    const user = JSON.parse(userString);
+    console.log("userID :" + Number(user.id))
+
     pongState.current = PongState.Queue;
-    pongSocket.emit('queue');
+    pongSocket.emit('queue', Number(user.id));
   }
 
   if (pongState.current === PongState.Out) {

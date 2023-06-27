@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PongGateway } from './pong.gateway'
 import { Socket } from 'socket.io';
+import { HistoryService } from './history.service';
 
 const SINGLE_PLAYER_MODE: boolean = true;
 
@@ -22,6 +23,8 @@ const PADDLE_HEIGHT: number = 100;
 const PADDLE_START_HEIGHT: number = 200;
 
 const PADDLE_SPEED: number = 20;
+
+const WIN_SCORE: number = 5;
 
 const BASE_INIT_DATAS: PongInitData = {
 	startCountdown: COUNTDOWN,
@@ -74,9 +77,19 @@ export interface Score {
 	scoreP2: number
 }
 
+export interface PlayerInfos {
+	socket: Socket,
+	userId: number
+}
+
+export interface IDPair {
+	idP1: number,
+	idP2: number
+}
+
 @Injectable()
 export class PongService {
-	pendingPlayers: Socket[];
+	pendingPlayers: PlayerInfos[];
 
 	socketsRuntime: Array<SocketPair>;
 	ballRuntime: Array<BallRuntimeData>;
@@ -86,10 +99,11 @@ export class PongService {
 	paddleEvents: Set<number>;
 
 	scoreData: Array<Score>;
+	idPairs: Array<IDPair>;
 
 	pongGateway : PongGateway;
 	
-	constructor() {
+	constructor(private readonly historyService: HistoryService) {
 		this.pendingPlayers = [];
 
 		this.socketsRuntime = [];
@@ -100,6 +114,7 @@ export class PongService {
 		this.paddleEvents = new Set<number>();
 
 		this.scoreData = [];
+		this.idPairs = [];
 	}
 
 	RegisterGateway(pongGateway : PongGateway) {
@@ -110,39 +125,49 @@ export class PongService {
 		setInterval(this.GlobalUpdate.bind(this), 16);
 	}
 
-	Init(socket: Socket): PongInitData {		
-		this.pendingPlayers.push(socket);
-		return { ...BASE_INIT_DATAS };
-	}
-
 	FindIndexBySocketId(socketID: string): number {
 		return this.socketsRuntime.findIndex(sockets => (sockets.socketP1.id === socketID || sockets.socketP2.id === socketID));
 	}
 
-	GetOpponent(socket: Socket): Socket {
+	GetOpponent(socket: Socket): PlayerInfos {
 		const opponent = this.pendingPlayers[0];
 		this.pendingPlayers.splice(0, 1);
 		return opponent;
 	}
 
-	JoinQueue(socket: Socket) {
+	JoinQueue(socket: Socket, userId: number) {
+		this.historyService.getUserHistoryById(userId);
+		
+		const currentPlayer = {
+			socket: socket,
+			userId: userId,
+		};
+		
 		if (this.pendingPlayers.length >= 1) {
 			const opponent = this.GetOpponent(socket);
-			this.CreateRoom(socket, opponent);
+			this.CreateRoom(currentPlayer, opponent);
 		} else {
-			this.pendingPlayers.push(socket);
+			this.pendingPlayers.push({
+				socket: socket,
+				userId: userId,
+			});
 		}
 	}
 
-	CreateRoom(socket1: Socket, socket2: Socket) {
-		console.log("Creating new pong room with sockets " + socket1 + " & " + socket2);
-		
+	CreateRoom(player1: PlayerInfos, player2: PlayerInfos) {
 		const sockets: SocketPair = {
-			socketP1: socket1,
-			socketP2: socket2
+			socketP1: player1.socket,
+			socketP2: player2.socket
 		}
 
 		this.socketsRuntime.push(sockets);
+
+		const ids: IDPair = {
+			idP1: player1.userId,
+			idP2: player2.userId
+		}
+
+		this.idPairs.push(ids);
 
 		const ball: BallRuntimeData = {
 			ballPosition: { ...BASE_INIT_DATAS.ballStartPosition },
@@ -200,9 +225,11 @@ export class PongService {
 			this.ballRuntime.splice(index, 1);
 			this.paddleRuntime.splice(index, 1);
 			this.scoreData.splice(index, 1);
+			this.idPairs.splice(index, 1);
+			return;
 		}
 
-		const pendingIndex: number = this.pendingPlayers.findIndex(data => data.id === socketID);
+		const pendingIndex: number = this.pendingPlayers.findIndex(data => data.socket.id === socketID);
 		if (pendingIndex >= 0)
 			this.pendingPlayers.splice(pendingIndex, 1);
 	}
@@ -240,7 +267,19 @@ export class PongService {
 
 	OnPlayerWin(index: number) {
 		this.pongGateway.EmitScore(this.socketsRuntime[index], this.scoreData[index]);
-		this.RestartGame(index);
+		if (this.scoreData[index].scoreP1 >= WIN_SCORE || this.scoreData[index].scoreP2 >= WIN_SCORE)
+			this.EndGame(index);
+		else
+			this.RestartGame(index);
+	}
+
+	EndGame(index: number) {
+		this.ballRuntime[index].ballPosition = { ...BASE_INIT_DATAS.ballStartPosition };
+		this.ballRuntime[index].ballDelta = {x: 0, y: 0};
+
+		this.pongGateway.EmitBallDelta(this.socketsRuntime[index], this.ballRuntime[index]);
+
+		this.historyService.addEntry(this.idPairs[index], this.scoreData[index]);
 	}
 
 	GlobalUpdate() {

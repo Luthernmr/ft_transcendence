@@ -10,6 +10,7 @@ import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { BlockedUser } from 'src/social/blockedUser.entity';
 import { Room } from 'src/room/entities/room.entity';
 import { Message } from 'src/room/entities/message.entity';
+import { PongHistory } from 'src/pong/pongHistory.entity';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { Message } from 'src/room/entities/message.entity';
       username: 'root',
       password: 'root',
       database: 'ft_db',
-      entities: [User, Friend, PendingRequest, BlockedUser, Room, Message],
+      entities: [User, Friend, PendingRequest, BlockedUser, Room, Message, PongHistory],
       synchronize: true,
     }),
   ],

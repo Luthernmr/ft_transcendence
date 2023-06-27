@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity()
+@Entity('pong')
 export class PongHistory {
   @PrimaryGeneratedColumn()
   id: number;
