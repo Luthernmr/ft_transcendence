@@ -1,6 +1,28 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ArrowBackIcon, CheckIcon, ViewIcon, ViewOffIcon, LockIcon, UnlockIcon } from "@chakra-ui/icons";
-import { Avatar, AvatarBadge, Badge, Box, Button, Flex, Heading, IconButton, Input, Spacer, Switch, Text, VStack } from "@chakra-ui/react";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ArrowBackIcon,
+  CheckIcon,
+  ViewIcon,
+  ViewOffIcon,
+  LockIcon,
+  UnlockIcon,
+  StarIcon,
+} from "@chakra-ui/icons";
+import {
+  Avatar,
+  AvatarBadge,
+  Badge,
+  Box,
+  Button,
+  Flex,
+  Heading,
+  IconButton,
+  Input,
+  Spacer,
+  Switch,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { chatSocket, userSocket } from "../../sockets/sockets";
 
 interface User {
@@ -20,9 +42,10 @@ interface CreateRoomProps {
 }
 
 const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
+  const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
   const [roomName, setRoomName] = useState<string>("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [members, setMembers] = useState<User[]>([]);
+  const [members, setMembers] = useState<User[]>([currentUser]);
   const [password, setPassword] = useState<string>("");
   const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
@@ -39,31 +62,45 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
     };
   }, [userListListener]);
 
-  const handleCreate = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    if (roomName.trim() !== "") {
-      chatSocket.emit("createRoom", {
-        name: roomName,
-        users: members,
-        password: passwordEnabled ? password : null,
-        isPrivate: isPrivate
-      });
-      setShowCreateRoom(false);
-    }
-  }, [roomName, members, password, passwordEnabled, isPrivate, setShowCreateRoom]);
+  const handleCreate = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (roomName.trim() !== "") {
+        chatSocket.emit("createRoom", {
+          name: roomName,
+          users: members,
+          password: passwordEnabled ? password : null,
+          isPrivate: isPrivate,
+        });
+        setShowCreateRoom(false);
+      }
+    },
+    [roomName, members, password, passwordEnabled, isPrivate, setShowCreateRoom]
+  );
 
-  const handleAddMember = useCallback((user: User) => {
-    const memberExists = members.find((m) => m.id === user.id);
-    if (!memberExists) {
-      setMembers([...members, user]);
-    } else {
-      setMembers(members.filter((m) => m.id !== user.id));
-    }
-  }, [members]);
+  const handleAddMember = useCallback(
+    (user: User) => {
+      if (user.id !== currentUser.id) {
+        const memberExists = members.find((m) => m.id === user.id);
+        if (!memberExists) {
+          setMembers([...members, user]);
+        } else {
+          setMembers(members.filter((m) => m.id !== user.id));
+        }
+      }
+    },
+    [members, currentUser]
+  );
 
-  localStorage.getItem("user")
-
-  const AvatarWithBadge = ({ src, isOnline, ...props }: { src: string, isOnline: boolean, props?: any }) => (
+  const AvatarWithBadge = ({
+    src,
+    isOnline,
+    ...props
+  }: {
+    src: string;
+    isOnline: boolean;
+    props?: any;
+  }) => (
     <Avatar size="sm" src={src} {...props}>
       <AvatarBadge boxSize="1em" bg={isPrivate ? "green.500" : "tomato"} />
     </Avatar>
@@ -182,7 +219,8 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
                 </Badge>
               </Flex>
             </Box>
-            {members.some((member) => member.id === user.id) && (
+            {(members.some((member) => member.id === user.id) ||
+              user.id === currentUser.id) && (
               <>
                 <Spacer />
                 <CheckIcon color="green.500" />
@@ -197,13 +235,18 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       </Text>
       <Flex wrap="wrap" justify="start">
         {members.map((member) => (
-          <Box key={member.id} mr={2}>
+          <Box key={member.id} mr={2} position="relative">
             <Avatar size="sm" name={member.nickname} src={member.imgPdp}>
               <AvatarBadge
                 boxSize="1em"
                 bg={member.isOnline ? "green.500" : "tomato"}
               />
             </Avatar>
+            {member.id === currentUser.id && (
+              <Box position="absolute" top="-2" left="-2">
+                <StarIcon boxSize={4} color="yellow.500" />
+              </Box>
+            )}
           </Box>
         ))}
       </Flex>
