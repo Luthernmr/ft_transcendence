@@ -10,6 +10,7 @@ import AuthElement from "./components/User/AuthElement";
 import { ReactNode, useEffect, useState } from "react";
 import UserProfile from "./components/User/Profile";
 import TwoFA from "./components/User/TwoFA";
+import OtherProfilPage from "./components/Social/OtherProfilPage";
 
 
 function PrivateRoute({ children }: { children: ReactNode }) {
@@ -66,6 +67,13 @@ export default function App() {
 			<Route path="/profile" element={
 				<PrivateRoute>
 					<SidebarWithHeader children={<UserProfile />} />
+				</PrivateRoute>
+			}
+			/>
+
+			<Route path="/profile/:id" element={
+				<PrivateRoute>
+					<SidebarWithHeader children={<OtherProfilPage/>} />
 				</PrivateRoute>
 			}
 			/>

@@ -33,9 +33,6 @@ export class TwoFAService {
 	}
 
 	public async isTwoFACodeValid(twoFACode: string, user: User) {
-		console.log('code should be:', authenticator.generate(user.twoFASecret))
-		console.log('codeee',twoFACode);
-		console.log('twofasecrettt',user.twoFASecret);
 		return authenticator.verify({
 			token: twoFACode,
 			secret: user.twoFASecret

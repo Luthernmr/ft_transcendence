@@ -37,12 +37,26 @@ export default function AuthElement() {
 		}
 	}, [authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
 
+
+	async function handleclick() {
+		const response = await axios.get(
+			import.meta.env.VITE_BACKEND + "/api/logout",
+			{ withCredentials: true }
+		  );
+		  console.log(response.data);
+		  sessionStorage.removeItem("jwt");
+		  sessionStorage.removeItem("currentUser");
+			navigate('/login');
+	}
 	return (
 		<>
 			<Center h='100vh'>
-				<Spinner color='blue.500' size='xl' />
-			</Center>
+				<VStack spacing={10}>
 
+				<Spinner color='blue.500' size='xl' />
+				<Button colorScheme="teal" onClick={handleclick}>Back to login page</Button>
+				</VStack>
+			</Center>
 			<Modal onClose={onClose} isOpen={isOpen} isCentered>
 				<TwoFA />
 			</Modal>

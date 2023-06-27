@@ -124,7 +124,7 @@ export default function loginCard() {
 								<FormLabel>Password</FormLabel>
 								<Input type="password" name="password" placeholder="enter an password" value={formValue.password} onChange={handleChange} />
 							</FormControl>
-							<Stack spacing={10}>
+							<Stack spacing={4}>
 								<Button bg={'blue.400'} color={'white'} _hover={{ bg: 'blue.500' }} type="submit">
 									Login 👋
 								</Button>
@@ -132,9 +132,9 @@ export default function loginCard() {
 									<Image boxSize='30px' src="./src/assets/42_Logo.svg"></Image>
 								</Button>
 								<Text>
-									T'as pas encore de compte mon reuf ? {' '}
+									You don't have an account my rockstar ? {' '}
 									<Link color='teal.500' href='/Register'>
-										J'arrive l'equipe.
+										Register !
 									</Link>
 								</Text>
 							</Stack>

@@ -10,6 +10,7 @@ import { UserService } from 'src/user/user.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { FriendModule } from 'src/social/friend.module';
 import { BlockedUser } from 'src/social/blockedUser.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([User]),  TypeOrmModule.forFeature([PendingRequest]), TypeOrmModule.forFeature([BlockedUser])],

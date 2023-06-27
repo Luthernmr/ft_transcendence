@@ -31,15 +31,12 @@ export class User {
   @Column({nullable: true})
   twoFASecret : string
 
-
   @Column({ nullable: true, default: false })
   isTwoFA: boolean;
 
   @OneToMany(() => Friend, friend => friend.userA)
   @JoinTable()
   friends: Friend[];
-
-
 
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()

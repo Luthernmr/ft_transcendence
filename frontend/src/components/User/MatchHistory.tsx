@@ -17,7 +17,7 @@ export default function MatchHistory() {
 	return (
 		<>
 		<Stack spacing='1'>
-			{[1, 1, 0, 1, 0, 1].map((size) => (
+			{[1].map((size) => (
 				<Card key={size} size={'sm'} bg={handleBg({ size })}>
 					<CardBody >
 						<Flex justifyContent={'space-around'} alignItems={'center'}>

@@ -1,8 +1,10 @@
-import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal } from "@chakra-ui/react";
+import { IconButton, Box, Text, Link , List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, HStack, Icon } from "@chakra-ui/react";
 import axios from "axios";
-import { AddIcon, DragHandleIcon, NotAllowedIcon } from '@chakra-ui/icons'
+import { AddIcon, ChatIcon, ChevronRightIcon, DragHandleIcon, NotAllowedIcon, SmallAddIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
+import { Link as RouteLink, useNavigate } from "react-router-dom";
+
 
 export interface User {
 	id: number;
@@ -46,6 +48,7 @@ export default function AllUserItem() {
 							<PopoverTrigger>
 								<Flex alignItems={'center'} _hover={{ bg: 'gray.200', cursor: 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
 									<Avatar
+										name={user.nickname}
 										size="sm"
 										src={user.imgPdp}>
 										{user.isOnline &&
@@ -79,23 +82,39 @@ export default function AllUserItem() {
 					<Portal>
 						<PopoverContent>
 							<PopoverArrow />
-							<PopoverHeader>{user.nickname}</PopoverHeader>
+							<PopoverHeader>
+								<Link  as={RouteLink} to={'/profile/' + user.id}>
+									Visit profile of 
+									{user.nickname}
+									<ChevronRightIcon />
+								</Link>
+							</PopoverHeader>
 							<PopoverCloseButton />
 							<PopoverBody>
-								<IconButton
-									onClick={(e) => sendFriendRequest(e, user.id)}
-									variant='ghost'
-									colorScheme='blue'
-									aria-label='addFriend'
-									icon={<AddIcon />}
-								/>
-								<IconButton
-									onClick={(e) => blockUser(e, user.id)}
-									variant='ghost'
-									colorScheme='blue'
-									aria-label='addFriend'
-									icon={<NotAllowedIcon />}
-								/>
+								<HStack>
+
+									<Button colorScheme="teal">
+										<IconButton
+											onClick={(e) => sendFriendRequest(e, user.id)}
+											variant='ghost'
+											colorScheme='white'
+											aria-label='addFriend'
+											icon={<AddIcon />}
+										/>
+										Add to friends
+									</Button>
+
+									<Button colorScheme="gray">
+										<IconButton
+											onClick={(e) => blockUser(e, user.id)}
+											variant='ghost'
+											colorScheme='white'
+											aria-label='addFriend'
+											icon={<NotAllowedIcon />}
+										/>
+									</Button>
+								</HStack>
+
 							</PopoverBody>
 						</PopoverContent>
 					</Portal>

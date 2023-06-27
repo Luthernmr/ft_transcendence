@@ -41,7 +41,7 @@ export class AuthService {
 	}
 
 	async getUserCookie(request: Request): Promise<User> {
-		const cookie = request.cookies['jwt'];
+		const cookie = await request.cookies['jwt'];
 		const data = await this.jwtService.verifyAsync(cookie);
 		return await this.userService.getUser(data.email);
 	}
@@ -64,6 +64,7 @@ export class AuthService {
 		response.clearCookie('jwt');
 		response.clearCookie('twofa');
 		console.log('prout', response.cookie['jwt']);
+		console.log('prout', response.cookie['twofa']);
 
 	}
 
