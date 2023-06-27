@@ -37,7 +37,7 @@ services:
       dockerfile: Dockerfile
     image: backend
     ports:
-      - "5001:5001"
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
     volumes:
       - backend-data:/app
     networks:
