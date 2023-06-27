@@ -22,6 +22,7 @@ import {
   Switch,
   Text,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
 import { chatSocket, userSocket } from "../../sockets/sockets";
 
@@ -49,6 +50,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
   const [password, setPassword] = useState<string>("");
   const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
   const [isPrivate, setIsPrivate] = useState<boolean>(false);
+  const toast = useToast();
 
   const userListListener = useCallback((data: User[]) => {
     setAllUsers(data);
@@ -65,17 +67,54 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
   const handleCreate = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (roomName.trim() !== "") {
-        chatSocket.emit("createRoom", {
-          name: roomName,
-          users: members,
-          password: passwordEnabled ? password : null,
-          isPrivate: isPrivate,
+
+      if (roomName.trim() === "") {
+        toast({
+          title: "Room name is required",
+          status: "error",
+          isClosable: true,
+          position: "top",
         });
-        setShowCreateRoom(false);
+        return;
       }
+
+      if (passwordEnabled && password.trim() === "") {
+        toast({
+          title: "Password is required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      if (members.length < 2) {
+        toast({
+          title: "At least two members are required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      chatSocket.emit("createRoom", {
+        name: roomName,
+        users: members,
+        password: passwordEnabled ? password : null,
+        isPrivate: isPrivate,
+      });
+      setShowCreateRoom(false);
     },
-    [roomName, members, password, passwordEnabled, isPrivate, setShowCreateRoom]
+    [
+      roomName,
+      members,
+      password,
+      passwordEnabled,
+      isPrivate,
+      setShowCreateRoom,
+      toast,
+    ]
   );
 
   const handleAddMember = useCallback(
