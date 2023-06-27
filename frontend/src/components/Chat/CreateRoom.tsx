@@ -193,6 +193,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
 
       <Flex alignItems="center" mb={4}>
         <Input
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter password..."
