@@ -31,15 +31,12 @@ export class User {
   @Column({nullable: true})
   twoFASecret : string
 
-
   @Column({ nullable: true, default: false })
   isTwoFA: boolean;
 
   @OneToMany(() => Friend, friend => friend.userA)
   @JoinTable()
   friends: Friend[];
-
-
 
   @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
   @JoinTable()
@@ -56,6 +53,10 @@ export class User {
   @JoinTable()
   @ManyToMany(() => Room, (room: Room) => room.bannedUsers, { eager: true })
   bannedRooms: Array<Room>;
+
+  @ManyToMany(() => Room, (room: Room) => room.admins)
+  @JoinTable()
+  adminRooms: Room[];
 
   @OneToMany(() => Message, (message: Message) => message.user)
   messages: Array<Message>;

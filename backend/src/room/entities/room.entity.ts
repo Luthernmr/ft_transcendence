@@ -23,13 +23,17 @@ export class Room {
   @Column({default: false})
   isPrivate: boolean;
 
-  @Column({ nullable: true })
+  @Column({length: 20, nullable: true })
   password: string;
 
   @ManyToMany(() => User, (user: User) => user.room)
   @JoinTable()
   users: User[];
 
+  @ManyToMany(() => User, (user: User) => user.adminRooms)
+  @JoinTable()
+  admins: User[];
+  
   @ManyToMany(() => User, (user: User) => user.bannedRooms)
   @JoinTable()
   bannedUsers: User[];

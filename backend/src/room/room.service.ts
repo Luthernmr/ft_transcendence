@@ -1,29 +1,33 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger, ValidationError } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Room } from 'src/room/entities/room.entity';
 import { Repository } from 'typeorm';
 import { Socket } from 'socket.io';
 import * as bcrypt from 'bcrypt';
+import { plainToClass } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
+import { CreateRoomDto } from './dto/create-room.dto';
 
 @Injectable()
 export class RoomService {
   private logger: Logger;
 
   constructor(
-    @InjectRepository(Room) private repo: Repository<Room>,
+    @InjectRepository(Room) private roomRepo: Repository<Room>,
     private readonly authService: AuthService,
   ) {
     this.logger = new Logger(RoomService.name);
   }
 
   async createRoom(client: Socket, data: Partial<Room>) {
-    this.logger.log('Received name: ' + data.name); //To delete (Debug)
-    this.logger.log('Received isPrivate: ' + data.isPrivate); //To delete (Debug)
-    this.logger.log('Received password: ' + data.password); //To delete (Debug)
-    this.logger.log('Received users: ' + data.users); //To delete (Debug)
     try {
-      const room = await this.repo.findOne({ where: { name: data.name } });
+      const dto = plainToClass(CreateRoomDto, data);
+      await validateOrReject(dto).catch((errors: ValidationError[]) => {
+        throw new BadRequestException(errors);
+      });
+
+      const room = await this.roomRepo.findOne({ where: { name: dto.name } });
       const user = await this.authService.getUserByToken(
         client.handshake.auth.token,
       );
@@ -31,18 +35,18 @@ export class RoomService {
         throw new BadRequestException('Room already exist');
       }
       let hashedPassword = null;
-      if (data.password){
+      if (dto.password) {
         const salt = await bcrypt.genSalt();
-        hashedPassword = await bcrypt.hash(data.password, salt);
+        hashedPassword = await bcrypt.hash(dto.password, salt);
       }
       const payload = {
-        name: data.name,
+        name: dto.name,
         ownerId: user.id,
-        isPrivate: data.isPrivate,
+        isPrivate: dto.isPrivate,
         password: hashedPassword,
         users: [user],
       };
-      await this.repo.save(payload);
+      await this.roomRepo.save(payload);
     } catch (error) {
       this.logger.log(error);
       return error;
