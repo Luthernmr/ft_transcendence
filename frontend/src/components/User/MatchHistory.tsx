@@ -12,18 +12,24 @@ export interface MatchHistory {
 }
 
 export default function MatchHistory(props :any) {
-
 	const [matchHistorys, setMatchHistorys] = useState<MatchHistory[]>([])
+	console.log('ici:',props.user)
 	useEffect(() => {
 		try {
-			const getUser = async () => {
-				const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/matchHistory/' + props.user.id, {
-					withCredentials: true,
-				})
-				console.log('history : ' ,resp.data);
-				setMatchHistorys(resp.data.matchHistory)
+			const getHistory = async () => {
+				try {
+					console.log('before getHIsto')
+					const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/history/7' , {
+						withCredentials: true,
+					})
+					console.log('history : ', resp);
+					setMatchHistorys(resp.data.matchHistory)
+				} catch(error)
+				{
+					console.log('error', error);
+				}
 			}
-			getUser();
+			getHistory()
 		}
 		catch (error) {
 			console.log(error)
@@ -36,6 +42,7 @@ export default function MatchHistory(props :any) {
 			return ('#68b7a1')
 		return ('red.400')
 	}
+
 	function handleIssue(issue: any) {
 		console.log('issue', issue)
 		if (issue.size)
@@ -57,7 +64,7 @@ export default function MatchHistory(props :any) {
 								</HStack>
 								<Flex flexDirection={'column'} alignItems={'center'}>
 									<Text fontWeight={'thin'} fontSize={'2xl'} color={'yellow.300'}>{handleIssue( 0 )}</Text>
-									<Text fontSize={'4xl'} color={'white'}>{matchHistory.scoreUser1} - 9</Text>
+									<Text fontSize={'4xl'} color={'white'}>- 9</Text>
 								</Flex>
 								<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}> +15 XP</Text>
 							</Flex>

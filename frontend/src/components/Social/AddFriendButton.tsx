@@ -11,12 +11,7 @@ export default function AddFriendButton(props : any) {
 	
 	return (
 		<Button colorScheme="teal" onClick={(e) => sendFriendRequest(e, props.user.id)}>
-			<IconButton
-				variant='ghost'
-				colorScheme='white'
-				aria-label='addFriend'
-				icon={<AddIcon />}
-			/>
+			<AddIcon />
 			Add to friends
 		</Button>
 	)

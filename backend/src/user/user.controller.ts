@@ -38,23 +38,19 @@ export class UserController {
 	}
 
 	@Get('history/:id')
-	@UseGuards(JwtTwoFactorGuard)
+	@UseGuards()
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-			console.log('here')
+			console.log('pitch');
 			const user = await this.userService.getUserById(id)
 			delete user.password;
-			const history = await this.historyService.getUserHistory(user);
-			console.log('test', user, history);
+			const history : any = await this.historyService.getUserHistory(user);
+			console.log('history', history);
 			response.send({history : history});
 		} catch (error) {
 			console.log(error);
 		}
 	}
-
-
-
-
 
 	@Post('settings')
 	@UseGuards(JwtTwoFactorGuard)
@@ -80,6 +76,6 @@ export class UserController {
 		})
 	}))
 	async addAvatar(@Req() request: Request, @UploadedFile() file: Express.Multer.File) {
-
+		
 	}
 }

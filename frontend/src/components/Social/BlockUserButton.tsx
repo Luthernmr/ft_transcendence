@@ -11,13 +11,7 @@ export default function BlockUserButton(props : any) {
 
 	return (
 		<Button colorScheme="red" onClick={(e) => blockUser(e, props.user.id)}>
-			<IconButton
-
-				variant='ghost'
-				colorScheme='white'
-				aria-label='addFriend'
-				icon={<NotAllowedIcon />}
-			/>
+			<NotAllowedIcon />
 		</Button>
 	)
 }

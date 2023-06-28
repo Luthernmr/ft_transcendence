@@ -32,6 +32,7 @@ import { BlockList } from "net";
 import BlockedList from "./BlockedList";
 
 interface User {
+	id : number,
 	nickname: string,
 	imgPdp: string,
 	isTwoFa: boolean,
@@ -39,21 +40,8 @@ interface User {
 
 export default function UserProfile() {
 
-	const [user, setUser] = useState<User>({
-		nickname: "",
-		imgPdp: "",
-		isTwoFa: false
-	  });
-	
-	  useEffect(() => {
-		const getUser = async () => {
-			const test : any = sessionStorage.getItem("currentUser")
-			setUser(test);
-		};
-		getUser();
-	  }, []);
+	const currentUser : any = sessionStorage.getItem("currentUser");
 
-	  
   return (
     <Flex
       borderRadius={"md"}
@@ -75,7 +63,7 @@ export default function UserProfile() {
             <Settings />
           </TabPanel>
           <TabPanel>
-            <MatchHistory user={user}/>
+            <MatchHistory user={currentUser}/>
           </TabPanel>
           <TabPanel>
             <BlockedList />

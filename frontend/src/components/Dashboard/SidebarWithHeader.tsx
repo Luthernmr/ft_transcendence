@@ -201,7 +201,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         withCredentials: true,
       });
       setUser(res.data.user);
-      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+      sessionStorage.setItem("currentUser", res.data.user);
       console.log(sessionStorage.getItem("currentUser"));
     };
     getUser();
