@@ -41,7 +41,7 @@ export class ChatService {
   async createRoom(client: Socket, data: Partial<Room>) {
     const error = await this.roomService.createRoom(client, data);
     if (error) {
-      client.emit('roomAlreadyExist');
+      client.emit('error', { message: error.message });
     }
   }
 }

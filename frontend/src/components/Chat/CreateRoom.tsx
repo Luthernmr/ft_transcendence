@@ -100,9 +100,9 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
         isPrivate: isPrivate,
       });
 
-      chatSocket.on("roomAlreadyExist", () => {
+      chatSocket.on("error", (error) => {
         toast({
-          title: "Room already exists.",
+          title: error.message,
           status: "error",
           isClosable: true,
           position: "top",
