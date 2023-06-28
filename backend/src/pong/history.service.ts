@@ -19,15 +19,15 @@ export class HistoryService {
 		const user1 = await this.userService.getUserById(ids.idP1);
 		const user2 = await this.userService.getUserById(ids.idP2);
 
+		const winner = score.scoreP1 > score.scoreP2 ? user1 : user2;
+
 		const history = {
 			user1: user1,
 			user2: user2,
+			winner: winner,
 			scoreUser1: score.scoreP1,
 			scoreUser2: score.scoreP2
 		};
-
-		
-		console.log(history);
 
 		await this.pongHistory.save(history);
 	}
