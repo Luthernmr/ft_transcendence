@@ -46,6 +46,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.PaddleKeyUp(socket.id, input);
   }
 
+  @SubscribeMessage('restart')
+  handleRestart(@ConnectedSocket() socket: Socket) {
+    this.pongService.RestartNewGame(socket);
+  }
+
   EmitInit(sockets: SocketPair, initDatas: PongInitData) {
     sockets.socketP1.emit('init', initDatas);
     sockets.socketP2.emit('init', initDatas);
@@ -71,5 +76,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   EmitScore(sockets: SocketPair, datas: Score) {
     sockets.socketP1.emit('UpdateScore', datas);
     sockets.socketP2.emit('UpdateScore', datas);
+  }
+
+  
+  EmitEnd(sockets: SocketPair, datas: number) {
+    sockets.socketP1.emit('End', datas);
+    sockets.socketP2.emit('End', datas);
   }
 }
