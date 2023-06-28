@@ -35,6 +35,10 @@ export class HistoryService {
 		this.getUserHistory(user1);
 	}
 
+	async getAllHistories(): Promise<PongHistory[]> {
+		return await this.pongHistory.find();
+	}
+
 	async getUserHistory(user: User): Promise<PongHistory[]> {
 		const history = await this.pongHistory.find({
 			where: [
@@ -43,11 +47,11 @@ export class HistoryService {
 			]
 		});
 
-		console.log(history);
+		// console.log(history);
 
-		console.log("allHistories: ");
-		const allHistory = await this.pongHistory.find();
-		console.log(allHistory);
+		// console.log("allHistories: ");
+		// const allHistory = await this.pongHistory.find();
+		// console.log(allHistory);
 
 		return history;
 	}
