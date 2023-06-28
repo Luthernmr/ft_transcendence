@@ -6,17 +6,23 @@ export class PongHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  user1: User;
+  //@ManyToMany(() => User)
+  //@JoinTable()
+  //user1: User;
+  @Column()
+  user1ID: number;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  user2: User;
+  //@ManyToMany(() => User)
+  //@JoinTable()
+  //user1: User;
+  @Column()
+  user2ID: number;
 
-  @ManyToMany(() => User)
-  @JoinTable()
-  winner: User;
+  //@ManyToMany(() => User)
+  //@JoinTable()
+  //user1: User;
+  @Column()
+  winnerID: number;
 
   @Column()
   scoreUser1: number;
