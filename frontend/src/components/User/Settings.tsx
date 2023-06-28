@@ -160,13 +160,11 @@ export default function Settings() {
           <FormLabel>Vérification en deux étapes (2FA)</FormLabel>
           {isChecked && (
             <Switch
+			isChecked={isChecked}
               onChange={handleCheck2FA}
               colorScheme="teal"
               defaultChecked
             />
-          )}
-          {!isChecked && (
-            <Switch onChange={handleCheck2FA} colorScheme="teal" />
           )}
         </HStack>
         <Modal onClose={onClose} isOpen={isOpen} isCentered>

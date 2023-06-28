@@ -26,13 +26,34 @@ import {
 import axios from "axios";
 import { BsJustify } from "react-icons/bs";
 import AllfriendItem from "../Social/AllFriendsItem";
-import AllUserItem from "../Social/AllUserItem";
 import Settings from "./Settings";
 import MatchHistory from "./MatchHistory";
 import { BlockList } from "net";
 import BlockedList from "./BlockedList";
 
+interface User {
+	nickname: string,
+	imgPdp: string,
+	isTwoFa: boolean,
+}
+
 export default function UserProfile() {
+
+	const [user, setUser] = useState<User>({
+		nickname: "",
+		imgPdp: "",
+		isTwoFa: false
+	  });
+	
+	  useEffect(() => {
+		const getUser = async () => {
+			const test : any = sessionStorage.getItem("currentUser")
+			setUser(test);
+		};
+		getUser();
+	  }, []);
+
+	  
   return (
     <Flex
       borderRadius={"md"}
@@ -54,7 +75,7 @@ export default function UserProfile() {
             <Settings />
           </TabPanel>
           <TabPanel>
-            <MatchHistory />
+            <MatchHistory user={user}/>
           </TabPanel>
           <TabPanel>
             <BlockedList />

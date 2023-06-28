@@ -19,7 +19,7 @@ export class HistoryService {
 	async addEntry(ids: IDPair, score: Score) {
 		const user1 = await this.userService.getUserById(ids.idP1);
 		const user2 = await this.userService.getUserById(ids.idP2);
-		
+
 		const history = {
 			user1: user1,
 			user2: user2,
@@ -32,12 +32,13 @@ export class HistoryService {
 		await this.pongHistory.save(history);
 	}
 
-	async getUserHistory(user: User) : Promise<PongHistory[]> {
-		const history = await this.pongHistory.find({ where: [
-															{ user1: user },
-															{ user2: user },
-														]
-													});
+	async getUserHistory(user: User): Promise<PongHistory[]> {
+		const history = await this.pongHistory.find({
+			where: [
+				{ user1: user },
+				{ user2: user },
+			]
+		});
 		return history;
 	}
 }

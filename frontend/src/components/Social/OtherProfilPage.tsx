@@ -1,12 +1,34 @@
-import { Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react"
+import { Box, CircularProgress, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react"
 import BlockedList from "../User/BlockedList"
 import MatchHistory from "../User/MatchHistory"
 import Settings from "../User/Settings"
 import OtherProfilInfo from "./OtherUserInfo"
+import axios from "axios"
+import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
+import { User } from "./AllUserItem"
 
 export default function OtherProfilPage() {
 
+	const [user, setUser] = useState<User>();
+	const { id } = useParams();
+	useEffect(() => {
+		try {
+			const getUser = async () => {
+				const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/' + id, {
+					withCredentials: true,
+				})
+				setUser(resp.data.user)
+			}
+			getUser();
+		}
+		catch (error) {
+			console.log(error)
+		}
+	}, [id])
+	
 	return (
+
 		<>
 			<Flex
 				borderRadius={"md"}
@@ -16,22 +38,16 @@ export default function OtherProfilPage() {
 				flex={"1"}
 				direction={"column"}
 				maxH={"100%"}
+				overflowY={"auto"}
 			>
-				<Tabs variant="soft-rounded">
-					<TabList mb="1em">
-						<Tab>Profile Infos</Tab>
-						<Tab>Match History</Tab>
-					</TabList>
-					<TabPanels>
-						<TabPanel>
-							<OtherProfilInfo />
-						</TabPanel>
-						<TabPanel>
-							<MatchHistory />
-						</TabPanel>
-					</TabPanels>
-				</Tabs>
+				<HStack>
+					<OtherProfilInfo user={user}/>
+				</HStack>
+				<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}>
+
+					<MatchHistory user={user} />
+				</Box>
 			</Flex>
-			</>
+		</>
 	)
 }

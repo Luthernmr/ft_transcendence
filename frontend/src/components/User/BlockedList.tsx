@@ -61,8 +61,9 @@ export default function BlockedList() {
 							</HStack>
 							<IconButton
 								onClick={(e) => unblockUser(e, blockedUser.id)}
-								colorScheme='blue'
-								variant={'ghost'}
+								color='gray'
+								_hover={{color: 'red'}}
+								bg={'none'}
 								aria-label='Call Segun'
 								size='lg'
 								icon={<DeleteIcon />}

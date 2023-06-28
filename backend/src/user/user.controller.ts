@@ -9,32 +9,52 @@ import JwtTwoFactorGuard from 'src/auth/twofa.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from './user.entity';
 import { diskStorage } from 'multer';
+import { HistoryService } from 'src/pong/history.service';
+import { request } from 'http';
 
 @Controller('user')
-export class UserController { 
-	constructor (
-		private readonly userService : UserService,
-	) {}
+export class UserController {
+	constructor(
+		private readonly userService: UserService,
+		private historyService: HistoryService
+	) { }
 
 	@Get('all')
 	@UseGuards(JwtTwoFactorGuard)
-	async all(@Res() response: Response)
-	{
+	async all(@Res() response: Response) {
 		const users = await this.userService.getAllUser();
-		const allUsers = { users : users}
+		const allUsers = { users: users }
 		response.send(allUsers);
 	}
 
 	@Get(':id')
 	@UseGuards(JwtTwoFactorGuard)
-	async userT(@Res() response: Response, @Param('id') id: number)
-	{
+	async user(@Res() response: Response, @Param('id') id: number) {
 		console.log('here')
 		const user = await this.userService.getUserById(id)
 		delete user.password;
 		console.log('test', user)
-		response.send({user : user});
+		response.send({ user: user });
 	}
+
+	@Get('history/:id')
+	@UseGuards(JwtTwoFactorGuard)
+	async history(@Res() response: Response, @Param('id') id: number) {
+		try {
+			console.log('here')
+			const user = await this.userService.getUserById(id)
+			delete user.password;
+			const history = await this.historyService.getUserHistory(user);
+			console.log('test', user, history);
+			response.send({history : history});
+		} catch (error) {
+			console.log(error);
+		}
+	}
+
+
+
+
 
 	@Post('settings')
 	@UseGuards(JwtTwoFactorGuard)
@@ -44,7 +64,7 @@ export class UserController {
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: Request
 	) {
-		const user : any = request.user;
+		const user: any = request.user;
 		if (!user)
 			return ("no user");
 		this.userService.changeImg(user, img);
@@ -52,14 +72,14 @@ export class UserController {
 		return response.send({ img, user });
 	}
 
-  @Post('avatar')
- @UseGuards(JwtTwoFactorGuard)
-  @UseInterceptors(FileInterceptor('file', {
-    storage: diskStorage({
-      destination: './uploadedFiles/avatars'
-    })
-  }))
-  async addAvatar(@Req() request: Request , @UploadedFile() file: Express.Multer.File) {
-    
-  }
+	@Post('avatar')
+	@UseGuards(JwtTwoFactorGuard)
+	@UseInterceptors(FileInterceptor('file', {
+		storage: diskStorage({
+			destination: './uploadedFiles/avatars'
+		})
+	}))
+	async addAvatar(@Req() request: Request, @UploadedFile() file: Express.Multer.File) {
+
+	}
 }
