@@ -13,7 +13,6 @@ export class HistoryService {
 		@InjectRepository(PongHistory)
 		private pongHistory: Repository<PongHistory>
 	) {
-		console.log(pongHistory);
 	}
 
 	async addEntry(ids: IDPair, score: Score) {
@@ -27,6 +26,7 @@ export class HistoryService {
 			scoreUser2: score.scoreP2
 		};
 
+		
 		console.log(history);
 
 		await this.pongHistory.save(history);

@@ -1,17 +1,17 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { User } from 'src/user/user.entity';
 
-@Entity('pong')
+@Entity('history')
 export class PongHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToMany(() => User)
+  @JoinTable()
   user1: User;
 
-  @OneToOne(() => User)
-  @JoinColumn()
+  @ManyToMany(() => User)
+  @JoinTable()
   user2: User;
 
   @Column()

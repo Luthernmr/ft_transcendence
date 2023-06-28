@@ -1,30 +1,39 @@
 import { Message } from './message.entity';
 import { User } from 'src/user/user.entity';
 import {
-	Entity,
-	PrimaryGeneratedColumn,
-	Column,
-	OneToMany,
-	ManyToMany,
-  } from 'typeorm';
-  
-  @Entity('Room')
-  export class Room {
-	@PrimaryGeneratedColumn('uuid')
-	id: number;
-  
-	@Column({ length: 20 , nullable: true})
-	name: string;
-  
-	@Column()
-	ownerId: number;
-  
-	@OneToMany(() => User, (user: User) => user.room)
-	users: Array<User>;
-  
-	@ManyToMany(() => User, (user: User) => user.bannedRooms)
-	bannedUsers: Array<User>;
-  
-	@OneToMany(() => Message, (message: Message) => message.room)
-	messages: Message[];
-  }
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToMany,
+  OneToMany,
+  JoinTable,
+} from 'typeorm';
+
+@Entity('Room')
+export class Room {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column({ length: 20, nullable: true })
+  name: string;
+
+  @Column()
+  ownerId: number;
+
+  @Column({default: false})
+  isPrivate: boolean;
+
+  @Column({ nullable: true })
+  password: string;
+
+  @ManyToMany(() => User, (user: User) => user.room)
+  @JoinTable()
+  users: User[];
+
+  @ManyToMany(() => User, (user: User) => user.bannedRooms)
+  @JoinTable()
+  bannedUsers: User[];
+
+  @OneToMany(() => Message, (message: Message) => message.room)
+  messages: Message[];
+}

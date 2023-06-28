@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react";
 import {
   ArrowBackIcon,
   CheckIcon,
@@ -5,6 +6,7 @@ import {
   ViewOffIcon,
   LockIcon,
   UnlockIcon,
+  StarIcon,
 } from "@chakra-ui/icons";
 import {
   Avatar,
@@ -20,8 +22,8 @@ import {
   Switch,
   Text,
   VStack,
+  useToast,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import { chatSocket, userSocket } from "../../sockets/sockets";
 
 interface User {
@@ -31,50 +33,108 @@ interface User {
   isOnline: boolean;
 }
 
-interface Room {
-  name: string;
-  members: User[];
-}
-
 interface CreateRoomProps {
   setShowCreateRoom: (show: boolean) => void;
 }
 
 const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
-  const [roomName, setRoomName] = useState("");
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
+  const [roomName, setRoomName] = useState<string>("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [members, setMembers] = useState<User[]>([]);
-  const [password, setPassword] = useState("");
-  const [passwordEnabled, setPasswordEnabled] = useState(false);
-  const [isPrivate, setIsPrivate] = useState(false);
+  const [members, setMembers] = useState<User[]>([currentUser]);
+  const [password, setPassword] = useState<string>("");
+  const [passwordEnabled, setPasswordEnabled] = useState<boolean>(false);
+  const [isPrivate, setIsPrivate] = useState<boolean>(false);
 
-  useEffect(() => {
-    userSocket.on("userList", (data) => {
-      setAllUsers(data);
-    });
-    userSocket.emit("getAllUsers");
+  const toast = useToast();
+  const userListListener = useCallback((data: User[]) => {
+    setAllUsers(data);
   }, []);
 
-  function handleCreate(e: any) {
-    e.preventDefault();
-    if (roomName.trim() !== "") {
+  useEffect(() => {
+    userSocket.on("userList", userListListener);
+    userSocket.emit("getAllUsers");
+    return () => {
+      userSocket.off("userList", userListListener);
+    };
+  }, [userListListener]);
+
+  const handleCreate = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+
+      if (roomName.trim() === "") {
+        toast({
+          title: "Room name is required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      if (passwordEnabled && password.trim() === "") {
+        toast({
+          title: "Password is required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      if (members.length < 2) {
+        toast({
+          title: "At least two members are required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
       chatSocket.emit("createRoom", {
         name: roomName,
-        members: members,
-        password: password,
+        users: members,
+        password: passwordEnabled ? password : null,
+        isPrivate: isPrivate,
       });
-      setShowCreateRoom(false);
-    }
-  }
 
-  function handleAddMember(user: User) {
-    const memberExists = members.find((m) => m.id === user.id);
-    if (!memberExists) {
-      setMembers([...members, user]);
-    } else {
-      setMembers(members.filter((m) => m.id !== user.id));
-    }
-  }
+      chatSocket.on("roomAlreadyExist", () => {
+        toast({
+          title: "Room already exists.",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+      });
+
+      setShowCreateRoom(false);
+    },
+    [
+      roomName,
+      members,
+      password,
+      passwordEnabled,
+      isPrivate,
+      setShowCreateRoom,
+      toast,
+    ]
+  );
+
+  const handleAddMember = useCallback(
+    (user: User) => {
+      if (user.id !== currentUser.id) {
+        const memberExists = members.find((m) => m.id === user.id);
+        if (!memberExists) {
+          setMembers([...members, user]);
+        } else {
+          setMembers(members.filter((m) => m.id !== user.id));
+        }
+      }
+    },
+    [members, currentUser]
+  );
 
   return (
     <Flex
@@ -122,9 +182,9 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           </Flex>
         </VStack>
       </Flex>
-
       <Flex alignItems="center" mb={4}>
         <Input
+          type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Enter password..."
@@ -190,7 +250,8 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
                 </Badge>
               </Flex>
             </Box>
-            {members.some((member) => member.id === user.id) && (
+            {(members.some((member) => member.id === user.id) ||
+              user.id === currentUser.id) && (
               <>
                 <Spacer />
                 <CheckIcon color="green.500" />
@@ -199,25 +260,27 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           </Flex>
         ))}
       </Box>
-
       <Text mb={2} fontWeight="semibold">
         Selected members:
       </Text>
       <Flex wrap="wrap" justify="start">
         {members.map((member) => (
-          <Box key={member.id} mr={2}>
+          <Box key={member.id} mr={2} position="relative">
             <Avatar size="sm" name={member.nickname} src={member.imgPdp}>
               <AvatarBadge
                 boxSize="1em"
                 bg={member.isOnline ? "green.500" : "tomato"}
               />
             </Avatar>
+            {member.id === currentUser.id && (
+              <Box position="absolute" top="-2" left="-2">
+                <StarIcon boxSize={4} color="yellow.500" />
+              </Box>
+            )}
           </Box>
         ))}
       </Flex>
-
       <Spacer />
-
       <Button colorScheme="teal" w="100%" size="md" onClick={handleCreate}>
         Create
       </Button>

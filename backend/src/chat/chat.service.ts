@@ -1,26 +1,24 @@
-import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import {
+  Injectable,
+  Logger,
+} from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AuthService } from 'src/auth/auth.service';
+import { RoomService } from 'src/room/room.service';
 import { Room } from 'src/room/entities/room.entity';
-import { FriendService } from 'src/social/friend.service';
-import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
 export class ChatService {
   private logger: Logger;
 
-  constructor(@InjectRepository(Room) private repo: Repository<Room>,
-  private readonly userService: UserService,
-  private readonly authService: AuthService,
-  private readonly friendService: FriendService,) {
+  constructor(
+    private readonly roomService: RoomService,
+  ) {
     this.logger = new Logger(ChatService.name);
   }
 
@@ -40,24 +38,9 @@ export class ChatService {
   }
 
   @SubscribeMessage('createRoom')
-  async createRoom(
-    client: Socket,
-    data: Partial<Room>,
-    ) {
-    try {
-      const room = await this.repo.findOne({ where: { name: data.name } });
-      const user = await this.authService.getUserByToken(client.handshake.auth.token);
-      client.emit('currentUser', user);
-      if (room) {
-        throw new BadRequestException('Room already exist');
-      }
-      const payload = {
-        name: data.name,
-        ownerId: user.id,
-      }
-        await this.repo.save(payload);
-    } catch (error) {
-      this.logger.log(error);
+  async createRoom(client: Socket, data: Partial<Room>) {
+    const error = await this.roomService.createRoom(client, data);
+    if (error) {
       client.emit('roomAlreadyExist');
     }
   }
