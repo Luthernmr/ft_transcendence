@@ -23,7 +23,7 @@ export class Room {
   @Column({default: false})
   isPrivate: boolean;
 
-  @Column({length: 20, nullable: true })
+  @Column({length: 80, nullable: true })
   password: string;
 
   @ManyToMany(() => User, (user: User) => user.room)
