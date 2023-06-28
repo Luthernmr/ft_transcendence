@@ -42,6 +42,8 @@ export class ChatService {
     const error = await this.roomService.createRoom(client, data);
     if (error) {
       client.emit('error', { message: error.message });
+    } else {
+      client.emit('roomCreated');
     }
   }
 }

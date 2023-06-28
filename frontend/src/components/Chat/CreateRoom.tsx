@@ -62,7 +62,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
   const handleCreate = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-
+  
       if (roomName.trim() === "") {
         toast({
           title: "Room name is required",
@@ -72,7 +72,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
         });
         return;
       }
-
+  
       if (passwordEnabled && password.trim() === "") {
         toast({
           title: "Password is required",
@@ -82,7 +82,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
         });
         return;
       }
-
+  
       if (members.length < 2) {
         toast({
           title: "At least two members are required",
@@ -92,24 +92,37 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
         });
         return;
       }
-
-      chatSocket.emit("createRoom", {
-        name: roomName,
-        users: members,
-        password: passwordEnabled ? password : null,
-        isPrivate: isPrivate,
-      });
-
-      chatSocket.on("error", (error) => {
+  
+      const handleError = (error: { message: any; }) => {
         toast({
           title: error.message,
           status: "error",
           isClosable: true,
           position: "top",
         });
+        chatSocket.off("error", handleError);
+      };
+  
+      const handleRoomCreated = () => {
+        toast({
+          title: "Room created",
+          status: "success",
+          isClosable: true,
+          position: "top",
+        });
+        setShowCreateRoom(false);
+        chatSocket.off('roomCreated', handleRoomCreated);
+      };
+  
+      chatSocket.on("error", handleError);
+      chatSocket.on('roomCreated', handleRoomCreated);
+  
+      chatSocket.emit("createRoom", {
+        name: roomName,
+        users: members,
+        password: passwordEnabled ? password : null,
+        isPrivate: isPrivate,
       });
-
-      setShowCreateRoom(false);
     },
     [
       roomName,
@@ -121,7 +134,8 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       toast,
     ]
   );
-
+  
+  
   const handleAddMember = useCallback(
     (user: User) => {
       if (user.id !== currentUser.id) {
