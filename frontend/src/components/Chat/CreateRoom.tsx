@@ -33,11 +33,6 @@ interface User {
   isOnline: boolean;
 }
 
-interface Room {
-  name: string;
-  members: User[];
-}
-
 interface CreateRoomProps {
   setShowCreateRoom: (show: boolean) => void;
 }
@@ -64,58 +59,68 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
     };
   }, [userListListener]);
 
+  const handleCreate = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
 
-  const handleCreate = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (roomName.trim() === "") {
-      toast({
-        title: "Room name is required",
-        status: "error",
-        isClosable: true,
-        position: "top"
-      });
-      return;
-    }
-  
-    if (passwordEnabled && password.trim() === "") {
-      toast({
-        title: "Password is required",
-        status: "error",
-        isClosable: true,
-        position: "top"
-      });
-      return;
-    }
-  
-    if (members.length < 2) {
-      toast({
-        title: "At least two members are required",
-        status: "error",
-        isClosable: true,
-        position: "top"
-      });
-      return;
-    }
-  
-    chatSocket.emit("createRoom", {
-      name: roomName,
-      users: members,
-      password: passwordEnabled ? password : null,
-      isPrivate: isPrivate
-    });
+      if (roomName.trim() === "") {
+        toast({
+          title: "Room name is required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
 
-    chatSocket.on("roomAlreadyExist", () => {
-      toast({
-        title: "Room already exists.",
-        status: "error",
-        isClosable: true,
-        position: "top"
+      if (passwordEnabled && password.trim() === "") {
+        toast({
+          title: "Password is required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      if (members.length < 2) {
+        toast({
+          title: "At least two members are required",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+
+      chatSocket.emit("createRoom", {
+        name: roomName,
+        users: members,
+        password: passwordEnabled ? password : null,
+        isPrivate: isPrivate,
       });
-    });
-    
-    setShowCreateRoom(false);
-  }, [roomName, members, password, passwordEnabled, isPrivate, setShowCreateRoom, toast]);
+
+      chatSocket.on("roomAlreadyExist", () => {
+        toast({
+          title: "Room already exists.",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+      });
+
+      setShowCreateRoom(false);
+    },
+    [
+      roomName,
+      members,
+      password,
+      passwordEnabled,
+      isPrivate,
+      setShowCreateRoom,
+      toast,
+    ]
+  );
 
   const handleAddMember = useCallback(
     (user: User) => {
@@ -131,19 +136,6 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
     [members, currentUser]
   );
 
-  const AvatarWithBadge = ({
-    src,
-    isOnline,
-    ...props
-  }: {
-    src: string;
-    isOnline: boolean;
-    props?: any;
-  }) => (
-    <Avatar size="sm" src={src} {...props}>
-      <AvatarBadge boxSize="1em" bg={isPrivate ? "green.500" : "tomato"} />
-    </Avatar>
-  );
   return (
     <Flex
       borderRadius={"md"}
@@ -190,7 +182,6 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           </Flex>
         </VStack>
       </Flex>
-
       <Flex alignItems="center" mb={4}>
         <Input
           type="password"
@@ -269,7 +260,6 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           </Flex>
         ))}
       </Box>
-
       <Text mb={2} fontWeight="semibold">
         Selected members:
       </Text>
@@ -290,9 +280,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
           </Box>
         ))}
       </Flex>
-
       <Spacer />
-
       <Button colorScheme="teal" w="100%" size="md" onClick={handleCreate}>
         Create
       </Button>
