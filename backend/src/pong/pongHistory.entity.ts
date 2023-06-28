@@ -14,6 +14,10 @@ export class PongHistory {
   @JoinTable()
   user2: User;
 
+  @ManyToMany(() => User)
+  @JoinTable()
+  winner: User;
+
   @Column()
   scoreUser1: number;
 

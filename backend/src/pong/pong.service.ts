@@ -15,16 +15,24 @@ const BALL_RADIUS: number = 20;
 const BALL_START_POS_X: number = 300;
 const BALL_START_POS_Y: number = 200;
 
-const BALL_START_DELTA_X: number = 30;
-const BALL_START_DELTA_Y: number = 30;
+const BALL_SPEED: number = 6;
+
+const OUTER_ANGLE_DELTA: number = 5 * BALL_SPEED;
+const INNER_ANGLE_DELTA: number = 2.5 * BALL_SPEED;
+
+const BALL_START_DELTA_X: number = OUTER_ANGLE_DELTA;
+const BALL_START_DELTA_Y: number = BALL_START_DELTA_X;
 
 const PADDLE_WIDTH: number = 10;
 const PADDLE_HEIGHT: number = 100;
+const PADDLE_SECTION: number = PADDLE_HEIGHT / 5;
 const PADDLE_START_HEIGHT: number = 200;
 
 const PADDLE_SPEED: number = 20;
 
-const WIN_SCORE: number = 1;
+const WIN_SCORE: number = 5;
+
+const BALL_RIGHT_LIMIT = PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH;
 
 const BASE_INIT_DATAS: PongInitData = {
 	startCountdown: COUNTDOWN,
@@ -358,18 +366,62 @@ export class PongService {
 			data.ballPosition.x += data.ballDelta.x * FRAMERATE;
 			data.ballPosition.y += data.ballDelta.y * FRAMERATE;
 
-			if (data.ballPosition.x < PADDLE_WIDTH) {
-				if (paddles.paddle1Height < data.ballPosition.y && data.ballPosition.y < paddles.paddle1Height + PADDLE_HEIGHT) {
+			function paddleCollision(paddleHeight: number) : number {
+				if (data.ballPosition.y < (paddleHeight - BALL_RADIUS) || (paddleHeight + PADDLE_HEIGHT) < data.ballPosition.y)
+					return 0;
+
+				if ((paddleHeight - BALL_RADIUS) <= data.ballPosition.y && data.ballPosition.y < (paddleHeight + 0.5 * PADDLE_SECTION))
+					return 1;
+				else if ((paddleHeight + 0.5 * PADDLE_SECTION) <= data.ballPosition.y && data.ballPosition.y < (paddleHeight + 1.5 * PADDLE_SECTION))
+					return 2;
+				else if ((paddleHeight + 1.5 * PADDLE_SECTION) <= data.ballPosition.y && data.ballPosition.y < (paddleHeight + 2.5 * PADDLE_SECTION))
+					return 3;
+				else if ((paddleHeight + 2.5 * PADDLE_SECTION) <= data.ballPosition.y && data.ballPosition.y < (paddleHeight + 3.5 * PADDLE_SECTION))
+					return 4;
+				else if ((paddleHeight + 3.5 * PADDLE_SECTION) <= data.ballPosition.y && data.ballPosition.y <= (paddleHeight + PADDLE_HEIGHT))
+					return 5;
+				
+				return 0;
+			}
+
+			function bounceBall(paddleSection: number) {
+				let angle: number = 0;
+
+				switch (paddleSection) {
+					case 1:
+						angle = -OUTER_ANGLE_DELTA;
+						break;
+					case 2:
+						angle = -INNER_ANGLE_DELTA;
+						break;
+					case 4:
+						angle = INNER_ANGLE_DELTA;
+						break;
+					case 5:
+						angle = OUTER_ANGLE_DELTA;
+						break;
+					default:
+						break;
+				}
+
 				data.ballDelta.x = -data.ballDelta.x;
-				data.ballPosition.x = PADDLE_WIDTH;
+				data.ballDelta.y = angle;
+			}
+
+			if (data.ballPosition.x < PADDLE_WIDTH) {
+				const paddleSection = paddleCollision(paddles.paddle1Height);
+				if (paddleSection > 0) {
+					bounceBall(paddleSection);
+					data.ballPosition.x = PADDLE_WIDTH;
 				} else {
 					this.scoreData[index].scoreP2 += 1;
 					this.OnPlayerWin(index);
 					return;
 				}
 			} else if (data.ballPosition.x > (PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH)) {
-				if (paddles.paddle2Height < data.ballPosition.y && data.ballPosition.y < paddles.paddle2Height + PADDLE_HEIGHT) {
-					data.ballDelta.x = -data.ballDelta.x;
+				const paddleSection = paddleCollision(paddles.paddle2Height);
+				if (paddleSection > 0) {
+					bounceBall(paddleSection);
 					data.ballPosition.x = PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH;
 				} else {
 					this.scoreData[index].scoreP1 += 1;
