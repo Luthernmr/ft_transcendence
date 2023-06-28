@@ -53,7 +53,7 @@ export class AuthController {
 	) {
 		try {
 			const user = await this.userService.getUser(loginDto.email);
-
+			console.log('user login', user);
 			if (!user) {
 				throw new BadRequestException('invalid credentials or not register');
 			}
@@ -61,7 +61,7 @@ export class AuthController {
 				throw new BadRequestException('bad password');
 			}
 			const token = await this.authService.login(user, response);
-			await this.authService.loginTwoFa(user, response)
+			 await this.authService.loginTwoFa(user, response, false)
 			if(!user.isTwoFA)
 				return (token);
 			return;
@@ -112,27 +112,6 @@ export class AuthController {
 		}
 	}
 
-	@Post('settings')
-	@UseGuards(JwtTwoFactorGuard)
-	async settings(
-		@Body('img') img: string,
-		@Body('nickname') nickname: string,
-		@Res({ passthrough: true }) response: Response,
-		@Req() request: Request
-	) {
-		const user = await this.authService.getUserCookie(request);
-		if (!user)
-			return ("no user");
-		this.userService.changeImg(user, img);
-		this.userService.changeNickname(user, nickname);
-		return response.send({ img, user });
-	}
-	@Post('upload')
-	@UseGuards(JwtTwoFactorGuard)
-	@UseInterceptors(FileInterceptor('file'))
-	uploadFile(@UploadedFile() file: Express.Multer.File) {
-		console.log(file);
-	}
 
 	/* -------------------------------------------------------------------------- */
 	/*                                     2FA                                    */
@@ -142,10 +121,7 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	async qrcode(@Req() request: Request, @Res() response: Response) {
 		const user = await this.authService.getUserCookie(request);
-		console.log("0", user);
 		const { otpauthUrl } = await this.twoFAService.generateTwoFASecret(user);
-		console.log(otpauthUrl)
-		console.log("1", await this.authService.getUserCookie(request));
 
 		response.setHeader('Content-Type', 'image/png');
 		response.setHeader('Content-Disposition', 'attachment; filename="qrcode.png"');
@@ -159,13 +135,9 @@ export class AuthController {
 		@Body('twoFACode') twoFACode: string
 	) {
 		const user = await this.authService.getUserCookie(request);
-
-		console.log('twofacode', twoFACode)
-		console.log('userturnningon', user)
 		const isCodeValid = await this.twoFAService.isTwoFACodeValid(
 			twoFACode, user
 		);
-		console.log('isvalidecode', isCodeValid)
 		try {
 			if (!isCodeValid) {
 				throw new UnauthorizedException('Wrong authentication code');

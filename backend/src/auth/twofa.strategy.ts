@@ -16,7 +16,7 @@ export class JwtTwoFactorStrategy extends PassportStrategy( Strategy,'jwt-two-fa
 	console.log('test')
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-		console.log('here1',request?.cookies)
+		console.log(request.cookies);
         return request?.cookies?.twofa;
       }]),
       secretOrKey: 'secret'
@@ -24,8 +24,8 @@ export class JwtTwoFactorStrategy extends PassportStrategy( Strategy,'jwt-two-fa
   }
  
   async validate(payload : any) {
-	console.log('here', payload)
-    const user = await this.userService.getUserById(payload.userId);
+	console.log(payload)
+    const user = await this.userService.getUserById(payload.id);
     if (!user.isTwoFA) {
       return user;
     }

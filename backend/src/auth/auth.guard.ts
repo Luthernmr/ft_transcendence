@@ -22,10 +22,8 @@ export class LocalAuthGuard implements CanActivate {
 		}
 		catch(error)
 		{
-			console.log("You can't pass this guard looser",error)
 			return (false)
 		}
-		console.log('The mission is a success')
 		return true;
 	}
 }

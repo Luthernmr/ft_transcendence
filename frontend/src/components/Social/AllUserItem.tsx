@@ -1,14 +1,19 @@
-import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal } from "@chakra-ui/react";
+import { IconButton, Box, Text, Link, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, HStack, Icon } from "@chakra-ui/react";
 import axios from "axios";
-import { AddIcon, DragHandleIcon, NotAllowedIcon } from '@chakra-ui/icons'
+import { AddIcon, ChatIcon, ChevronRightIcon, DragHandleIcon, NotAllowedIcon, SmallAddIcon } from '@chakra-ui/icons'
 import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
+import { Link as RouteLink, useNavigate } from "react-router-dom";
+import BlockUserButton from "./BlockUserButton";
+import AddFriendButton from "./AddFriendButton";
+
 
 export interface User {
 	id: number;
 	nickname: string;
 	imgPdp: string;
 	isOnline: boolean;
+	isTwoFa: boolean;
 }
 
 export default function AllUserItem() {
@@ -24,19 +29,6 @@ export default function AllUserItem() {
 
 	}, []);
 
-	function sendFriendRequest(e: any, id: number) {
-		e.preventDefault()
-		userSocket.emit("friendRequest", { userReceiveId: id })
-		console.log('test');
-	}
-
-	function blockUser(e: any, id: number) {
-		e.preventDefault()
-		userSocket.emit("blockUser", { userBlockedId: id })
-		console.log('test');
-	}
-
-
 	return (
 		<List>
 			{users.map((user) => (
@@ -46,6 +38,7 @@ export default function AllUserItem() {
 							<PopoverTrigger>
 								<Flex alignItems={'center'} _hover={{ bg: 'gray.200', cursor: 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
 									<Avatar
+										name={user.nickname}
 										size="sm"
 										src={user.imgPdp}>
 										{user.isOnline &&
@@ -79,23 +72,20 @@ export default function AllUserItem() {
 					<Portal>
 						<PopoverContent>
 							<PopoverArrow />
-							<PopoverHeader>{user.nickname}</PopoverHeader>
+							<PopoverHeader>
+								<Button w={'100%'} as={RouteLink} to={'/profile/' + user.id} alignItems={'center'} _hover={{ bg: 'gray.200' }} p={2} borderRadius={5}>
+									<Text>
+										Visit<Text as='b' color="teal"> {user.nickname}</Text> profile
+									</Text>
+									<ChevronRightIcon />
+								</Button>
+							</PopoverHeader>
 							<PopoverCloseButton />
 							<PopoverBody>
-								<IconButton
-									onClick={(e) => sendFriendRequest(e, user.id)}
-									variant='ghost'
-									colorScheme='blue'
-									aria-label='addFriend'
-									icon={<AddIcon />}
-								/>
-								<IconButton
-									onClick={(e) => blockUser(e, user.id)}
-									variant='ghost'
-									colorScheme='blue'
-									aria-label='addFriend'
-									icon={<NotAllowedIcon />}
-								/>
+								<Flex justifyContent={'space-between'}>
+									<AddFriendButton user={user} />
+									<BlockUserButton user={user} />
+								</Flex>
 							</PopoverBody>
 						</PopoverContent>
 					</Portal>

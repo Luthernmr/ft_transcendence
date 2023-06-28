@@ -2,6 +2,7 @@ import { CheckIcon, CloseIcon, EditIcon } from "@chakra-ui/icons";
 import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, ButtonGroup, Editable, EditableInput, EditablePreview, Flex, IconButton, useEditableControls, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, PinInput, PinInputField, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
@@ -33,7 +34,7 @@ export default function Settings() {
 	const SendModif = async (event: any) => {
 		event.preventDefault();
 		try {
-			const response = await axios.post(import.meta.env.VITE_BACKEND + '/api/settings', {
+			const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/settings', {
 				"img": profile.imgPdp,
 				"nickname": profile.nickname
 
@@ -49,6 +50,7 @@ export default function Settings() {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [pinCode, setPinCode] = useState("");
 
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const getUser = async () => {
@@ -73,13 +75,13 @@ export default function Settings() {
 			console.log('0')
 			setIsChecked(false);
 		}
-		else {
+		else  {
 			console.log('ischeck',isChecked, profile.isTwoFA)
 			const resp: any = await axios.get(import.meta.env.VITE_BACKEND + '/api/generate' + location.search, { withCredentials: true, responseType: "blob" });
 			console.log(resp)
 			const qrUrl = URL.createObjectURL(resp.data);
 			setQrcode(qrUrl);
-			onOpen()
+			onOpen();
 		}
 	}
 
@@ -96,12 +98,22 @@ export default function Settings() {
 			console.log('1')
 			setIsChecked(true);
 			toast({
-				title: `2FA is now activate`,
+				title: `2FA is now activate please log in again`,
 				status: 'success',
 				isClosable: true,
 				position: 'top'
 			})
+			const resp2 = await axios.get(
+				import.meta.env.VITE_BACKEND + "/api/logout",
+				{ withCredentials: true }
+			  );
+			  console.log(resp2.data);
+			  sessionStorage.removeItem("jwt");
+			  sessionStorage.removeItem("currentUser");
+			  console.log("jwwwr", sessionStorage.getItem("jwt"));
+
 			onClose()
+			navigate('/login');
 		}
 		catch (error) {
 			toast({
@@ -148,13 +160,11 @@ export default function Settings() {
           <FormLabel>Vérification en deux étapes (2FA)</FormLabel>
           {isChecked && (
             <Switch
+			isChecked={isChecked}
               onChange={handleCheck2FA}
               colorScheme="teal"
               defaultChecked
             />
-          )}
-          {!isChecked && (
-            <Switch onChange={handleCheck2FA} colorScheme="teal" />
           )}
         </HStack>
         <Modal onClose={onClose} isOpen={isOpen} isCentered>

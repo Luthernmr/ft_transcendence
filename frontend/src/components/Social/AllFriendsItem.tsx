@@ -42,11 +42,11 @@ export default function AllfriendItem() {
 	return (
 		<List>
 			{friends.map((friend) => (
-				<Popover key={friend.id}>
+				<Popover key={friend.id} isLazy trigger="hover">
 					<Box >
 						<ListItem  >
 							<PopoverTrigger>
-								<Flex alignItems={'center'} _hover={{ bg: 'gray.200', }} padding={'2'} w={'100%'} borderRadius={'8'}>
+								<Flex alignItems={'center'} _hover={{ bg: 'gray.200'}} padding={'2'} w={'100%'} borderRadius={'8'}>
 									<Avatar
 										name={friend.nickname}
 										size="sm"
@@ -85,7 +85,7 @@ export default function AllfriendItem() {
 							<PopoverCloseButton />
 							<PopoverBody >
 								<HStack>
-
+									
 									<IconButton
 										colorScheme='blue'
 										variant={'ghost'}

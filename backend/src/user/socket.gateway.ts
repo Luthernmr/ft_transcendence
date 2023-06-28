@@ -52,6 +52,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async Friend(client: Socket, data: {
 		userReceiveId: any,
 	}) {
+		console.log('test')
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: any = await this.userService.getUserById(data.userReceiveId)
 

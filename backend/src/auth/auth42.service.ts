@@ -17,7 +17,6 @@ export class Auth42Service {
 	) { }
 
 	async login(request: any): Promise<any> {
-		//console.log(request)
 		var user: User = await this.userService.getUser(request.user._json.email);
 		if (!user) {
 			user = await this.userService.create({

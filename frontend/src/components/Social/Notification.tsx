@@ -25,6 +25,7 @@ import {
 	Stack,
 	AvatarBadge,
 	Badge,
+	css,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import {
@@ -37,6 +38,7 @@ import {
 import { userSocket } from '../../sockets/sockets';
 import axios from 'axios';
 import { useToast } from '@chakra-ui/react'
+import { count } from 'console';
 
 export interface FriendRequest {
 	id: number;
@@ -148,34 +150,38 @@ const BellButton = () => {
 		})
 	}, [notified])
 
-	
+
 	if (notified)
 		return (
 			<PopoverTrigger>
+
 				<IconButton
-					size="lg"
-					colorScheme='red'
-					variant="ghost"
-					aria-label="open menu"
-					icon={<FiBell />}
-					onClick={handleNotify}
+				size="lg"
+				variant="ghost"
+				aria-label="open menu"
+					icon={<>
+						<FiBell color={'gray.750'} />
+						<Box as={'span'} color={'white'} position={'absolute'} top={'10px'} right={'10px'} boxSize='0.7em'
+							bgColor={'red'} borderRadius={'100%'} zIndex={9999} p={'1px'}>
+						</Box>
+					</>}
 				/>
-			</PopoverTrigger>
+			</PopoverTrigger >
 
 		)
 	else
-		return (
-			<PopoverTrigger>
+return (
+	<PopoverTrigger>
 
-				<IconButton
-					size="lg"
-					variant="ghost"
-					aria-label="open menu"
-					icon={<FiBell />}
-					onClick={handleNotify}
-				/>
-			</PopoverTrigger>
-		)
+		<IconButton
+			size="lg"
+			variant="ghost"
+			aria-label="open menu"
+			icon={<FiBell />}
+			onClick={handleNotify}
+		/>
+	</PopoverTrigger>
+)
 
 }
 
