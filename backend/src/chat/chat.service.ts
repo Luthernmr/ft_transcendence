@@ -1,7 +1,4 @@
-import {
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -16,9 +13,7 @@ import { Room } from 'src/room/entities/room.entity';
 export class ChatService {
   private logger: Logger;
 
-  constructor(
-    private readonly roomService: RoomService,
-  ) {
+  constructor(private readonly roomService: RoomService) {
     this.logger = new Logger(ChatService.name);
   }
 
@@ -45,5 +40,11 @@ export class ChatService {
     } else {
       client.emit('roomCreated');
     }
+  }
+
+  @SubscribeMessage('getUserGroups')
+  async getUserGroups(client: Socket, payload: { userId: number }) {
+    const rooms = await this.roomService.getAllRoomsForUser(payload.userId);
+    client.emit('roomList', rooms);
   }
 }

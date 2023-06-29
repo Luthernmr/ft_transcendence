@@ -17,13 +17,17 @@ interface User {
   src: string;
 }
 
-interface GroupListProps {
-  groups: any[];
-  setSelectedGroup: (group: any) => void;
+interface RoomListProps {
+  rooms: any[];
+  setSelectedRoom: (room: any) => void;
   setShowCreateRoom: (show: boolean) => void;
 }
 
-const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup, setShowCreateRoom}) => {
+const RoomList: React.FC<RoomListProps> = ({
+  rooms,
+  setSelectedRoom,
+  setShowCreateRoom,
+}) => {
   return (
     <Flex
       borderRadius={"md"}
@@ -51,10 +55,10 @@ const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup, setShow
         height="100%"
         overflowY="auto"
       >
-        {groups.map((group, index) => (
-          <Box h={"40px"} key={index} onClick={() => setSelectedGroup(group)}>
+        {rooms.map((room, index) => (
+          <Box h={"40px"} key={index} onClick={() => setSelectedRoom(room)}>
             <AvatarGroup size={"md"} max={2}>
-              {group.users.map((user: User) => (
+              {room.users.map((user: User) => (
                 <Avatar name={user.name} src={user.src} key={user.id} />
               ))}
             </AvatarGroup>
@@ -65,4 +69,4 @@ const GroupList: React.FC<GroupListProps> = ({ groups, setSelectedGroup, setShow
   );
 };
 
-export default GroupList;
+export default RoomList;

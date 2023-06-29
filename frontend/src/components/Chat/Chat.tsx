@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import GroupList from "./GroupList";
+import RoomList from "./RoomList";
 import ChatRoom from "./ChatRoom";
 import CreateRoom from "./CreateRoom";
 
@@ -35,9 +35,9 @@ const fakeMessagesData: Message[] = [
 ];
 
 function Chat() {
-  const [groups, setGroups] = useState<Group[]>([]);
+  const [rooms, setGroups] = useState<Group[]>([]);
   const [messages, setMessages] = useState<Message[]>(fakeMessagesData);
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [selectedGroup, setSelectedRoom] = useState<Group | null>(null);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
 
   useEffect(() => {
@@ -62,18 +62,17 @@ function Chat() {
     ];
     setGroups(fakeGroupsData);
   }, []);
-  
 
   if (showCreateRoom) {
     return <CreateRoom setShowCreateRoom={setShowCreateRoom} />;
   }
   if (selectedGroup) {
-    return <ChatRoom messages={messages} setSelectedGroup={setSelectedGroup} />;
+    return <ChatRoom messages={messages} setSelectedRoom={setSelectedRoom} />;
   }
   return (
-    <GroupList
-      groups={groups}
-      setSelectedGroup={setSelectedGroup}
+    <RoomList
+      rooms={rooms}
+      setSelectedRoom={setSelectedRoom}
       setShowCreateRoom={setShowCreateRoom}
     />
   );

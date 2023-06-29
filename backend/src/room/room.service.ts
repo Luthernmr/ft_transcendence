@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger, ValidationError } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  ValidationError,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Room } from 'src/room/entities/room.entity';
@@ -51,5 +56,12 @@ export class RoomService {
       this.logger.log(error);
       return error;
     }
+  }
+
+  async getAllRoomsForUser(userId: number): Promise<Room[]> {
+    return await this.roomRepo
+      .createQueryBuilder('room')
+      .innerJoin('room.users', 'user', 'user.id = :userId', { userId })
+      .getMany();
   }
 }

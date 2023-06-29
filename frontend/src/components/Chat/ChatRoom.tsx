@@ -15,10 +15,10 @@ import { FiSend } from "react-icons/fi";
 
 interface ChatRoomProps {
   messages: any[];
-  setSelectedGroup: (group: any) => void;
+  setSelectedRoom: (room: any) => void;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedGroup }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedRoom }) => {
   return (
     <Flex
       borderRadius={"md"}
@@ -32,18 +32,13 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedGroup }) => {
         <IconButton
           aria-label={"Go back"}
           icon={<ArrowBackIcon />}
-          onClick={() => setSelectedGroup(null)}
+          onClick={() => setSelectedRoom(null)}
         />
         <Heading size={"md"} textAlign={"center"} flex={"1"}>
           Room
         </Heading>
       </Flex>
-      <VStack
-        flex="1"
-        spacing={4}
-        align={"stretch"}
-        overflowY={"auto"}
-      >
+      <VStack flex="1" spacing={4} align={"stretch"} overflowY={"auto"}>
         {messages.map((message) => (
           <Box
             key={message.id}
@@ -74,6 +69,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedGroup }) => {
       </InputGroup>
     </Flex>
   );
-}
+};
 
 export default ChatRoom;
