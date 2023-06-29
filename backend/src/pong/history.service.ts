@@ -106,8 +106,6 @@ export class HistoryService {
 
 		history.sort((a, b) => (a.id > b.id ? -1 : 1));
 
-		console.log(history);
-
 		return history;
 	}
 }
