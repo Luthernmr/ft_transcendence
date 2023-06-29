@@ -9,25 +9,25 @@ export class PongHistory {
   //@ManyToMany(() => User)
   //@JoinTable()
   //user1: User;
-  @Column()
+  @Column({nullable : true})
   user1ID: number;
 
   //@ManyToMany(() => User)
   //@JoinTable()
   //user1: User;
-  @Column()
+  @Column({nullable : true})
   user2ID: number;
 
   //@ManyToMany(() => User)
   //@JoinTable()
   //user1: User;
-  @Column()
+  @Column({nullable : true})
   winnerID: number;
 
-  @Column()
+  @Column({nullable : true})
   scoreUser1: number;
 
-  @Column()
+  @Column({nullable : true})
   scoreUser2: number;
 
   @Column({default: false})

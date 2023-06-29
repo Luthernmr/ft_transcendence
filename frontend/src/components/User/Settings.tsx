@@ -158,7 +158,7 @@ export default function Settings() {
       <FormControl>
         <HStack justifyContent="space-between">
           <FormLabel>Vérification en deux étapes (2FA)</FormLabel>
-          {isChecked && (
+          {(
             <Switch
 			isChecked={isChecked}
               onChange={handleCheck2FA}

@@ -15,7 +15,7 @@ export default function OtherProfilPage() {
 	useEffect(() => {
 		try {
 			const getUser = async () => {
-				const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/' + id, {
+				const resp : any  = await axios.get(import.meta.env.VITE_BACKEND + '/user/' + id, {
 					withCredentials: true,
 				})
 				console.log('je rep', resp);
