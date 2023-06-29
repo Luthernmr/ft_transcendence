@@ -105,6 +105,7 @@ export class FriendService {
 				userB: userReceived
 			}
 		})
+		
 		const relation2= await this.friendRepository.find({
 			where: {
 				userA: userReceived,

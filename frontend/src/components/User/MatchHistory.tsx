@@ -1,19 +1,18 @@
-import { Card, CardHeader, CardBody, CardFooter, Heading, Stack, Text, Box, Avatar, Flex, HStack } from '@chakra-ui/react'
+import { Card, CardHeader, CardBody, CardFooter, Heading, Stack, Text, Box, Avatar, Flex, HStack, Center } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { User } from '../Social/AllUserItem';
 import axios from 'axios';
 
 export interface MatchHistory {
 	id: number,
-	user1: number,
-	user2: number,
-	winnerID: number,
-	scoreUser1: number,
-	scoreUser2: number
+	opponent: User,
+	winner: boolean,
+	myScore: number,
+	opponentScore: number
 }
 
 export default function MatchHistory(props :any) {
-	const [matchHistorys, setMatchHistorys] = useState<MatchHistory>()
+	const [matchHistorys, setMatchHistorys] = useState<MatchHistory[]>([])
 	useEffect(() => {
 		try {
 			const getHistory = async () => {
@@ -37,7 +36,7 @@ export default function MatchHistory(props :any) {
 	
 	useEffect(() => {
 		console.log('id', props?.user?.id);
-		console.log('historyss winner id:', matchHistorys?.winnerID);
+		console.log('historyss winner id:', matchHistorys);
 	}, [matchHistorys]);
 	
 	function handleBg(issue: any) {
@@ -54,27 +53,38 @@ export default function MatchHistory(props :any) {
 		return ('LOOSE')
 	}
 
-	return (
+	if (matchHistorys.length)
+	{
+		return (
 		<>
 			<Stack spacing='1'>
-					<Card size={'sm'} bg={handleBg(props?.user?.id == matchHistorys?.winnerID)}>
-						<Text>--- {matchHistorys?.winnerID} , {props?.user?.id}</Text>
+				{ matchHistorys.map((matchHistory) => (
+					<Card size={'sm'} bg={handleBg(matchHistory?.winner)}>
 						<CardBody >
 							<Flex justifyContent={'space-around'} alignItems={'center'}>
 								<HStack spacing={'2'} >
-									<Avatar name='Adversaire' src='https://bit.ly/kent-c-dodds' size='xl' />
+									<Avatar name={props?.user?.nickname} src={props?.user?.imgPdp} size='xl' />
 									<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>VS</Text>
-									<Avatar name='Adversaire' src='https://bit.ly/code-beast' size='xl' />
+									<Avatar name='Adversaire' src={matchHistory.opponent.imgPdp} size='xl' />
 								</HStack>
 								<Flex flexDirection={'column'} alignItems={'center'}>
-									<Text fontWeight={'thin'} fontSize={'2xl'} color={'yellow.300'}>{handleIssue(props?.user?.id == matchHistorys?.winnerId )}</Text>
-									<Text fontSize={'4xl'} color={'white'}>{matchHistorys?.scoreUser1} - {matchHistorys?.scoreUser2} </Text>
+									<Text fontWeight={'thin'} fontSize={'2xl'} color={'yellow.300'}>{handleIssue(matchHistory?.winner )}</Text>
+									<Text fontSize={'4xl'} color={'white'}>{matchHistory.myScore} - {matchHistory.opponentScore} </Text>
 								</Flex>
 								<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>+15 XP</Text>
 							</Flex>
 						</CardBody>
 					</Card>
+				))}
 			</Stack>
 		</>
 	)
+	}
+	else
+		return (
+			<Center>
+
+			<Heading color={'gray.500'} >History is empty</Heading>
+			</Center>
+		)
 }

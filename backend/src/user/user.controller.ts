@@ -41,13 +41,13 @@ export class UserController {
 	@UseGuards()
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-			console.log('pitch',id);
-
+			console.log('usi id request hystory',id);
+			
 			const user : any = await this.userService.getUserById(id)
 			delete user.password;
 			const history : any = await this.historyService.getUserHistory(user);
-			console.log('history', history[0]);
-			response.send({history : history[0]});
+			console.log('history', history);
+			response.send({history : history});
 		} catch (error) {
 			console.log(error);
 		}
