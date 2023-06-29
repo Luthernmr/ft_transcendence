@@ -1,5 +1,7 @@
 import { Card, CardHeader, CardBody, CardFooter, Heading, Stack, Text, Box, Avatar, Flex, HStack, Center } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
+import { Link as RouteLink, useNavigate } from "react-router-dom";
+
 import { User } from '../Social/AllUserItem';
 import axios from 'axios';
 
@@ -40,14 +42,12 @@ export default function MatchHistory(props :any) {
 	}, [matchHistorys]);
 	
 	function handleBg(issue: any) {
-		console.log('issue', issue)
 		if (issue)
 			return ('#68b7a1')
 		return ('red.400')
 	}
 
 	function handleIssue(issue: any) {
-		console.log('issue', issue)
 		if (issue)
 			return ('WIN')
 		return ('LOOSE')
@@ -59,17 +59,17 @@ export default function MatchHistory(props :any) {
 		<>
 			<Stack spacing='1'>
 				{ matchHistorys.map((matchHistory) => (
-					<Card size={'sm'} bg={handleBg(matchHistory?.winner)}>
+					<Card key={matchHistory?.id} size={'sm'} bg={handleBg(matchHistory?.winner)}>
 						<CardBody >
 							<Flex justifyContent={'space-around'} alignItems={'center'}>
 								<HStack spacing={'2'} >
 									<Avatar name={props?.user?.nickname} src={props?.user?.imgPdp} size='xl' />
 									<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>VS</Text>
-									<Avatar name='Adversaire' src={matchHistory.opponent.imgPdp} size='xl' />
+									<Avatar _hover={{opacity : '50%'}} as={RouteLink} to={'/profile/' + matchHistory?.opponent?.id} name={matchHistory?.opponent?.nickname} src={matchHistory?.opponent?.imgPdp} size='xl' />
 								</HStack>
 								<Flex flexDirection={'column'} alignItems={'center'}>
 									<Text fontWeight={'thin'} fontSize={'2xl'} color={'yellow.300'}>{handleIssue(matchHistory?.winner )}</Text>
-									<Text fontSize={'4xl'} color={'white'}>{matchHistory.myScore} - {matchHistory.opponentScore} </Text>
+									<Text fontSize={'4xl'} color={'white'}>{matchHistory?.myScore} - {matchHistory?.opponentScore} </Text>
 								</Flex>
 								<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>+15 XP</Text>
 							</Flex>
