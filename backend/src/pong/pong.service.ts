@@ -30,7 +30,7 @@ const PADDLE_START_HEIGHT: number = 200;
 
 const PADDLE_SPEED: number = 20;
 
-const WIN_SCORE: number = 3;
+const WIN_SCORE: number = 1;
 
 const BALL_RIGHT_LIMIT = PONG_WIDTH - BALL_RADIUS - PADDLE_WIDTH;
 

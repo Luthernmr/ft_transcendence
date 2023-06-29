@@ -1,28 +1,22 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { User } from 'src/user/user.entity';
+import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata';
 
 @Entity('history')
 export class PongHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //@ManyToMany(() => User)
-  //@JoinTable()
-  //user1: User;
-  @Column({nullable : true})
-  user1ID: number;
+  @ManyToOne(() => User)
+  @JoinTable()
+  user1: User;
 
-  //@ManyToMany(() => User)
-  //@JoinTable()
-  //user1: User;
-  @Column({nullable : true})
-  user2ID: number;
+  @ManyToOne(() => User)
+  @JoinTable()
+  user2: User;
 
-  //@ManyToMany(() => User)
-  //@JoinTable()
-  //user1: User;
-  @Column({nullable : true})
-  winnerID: number;
+  @Column()
+  winner: number;
 
   @Column({nullable : true})
   scoreUser1: number;
