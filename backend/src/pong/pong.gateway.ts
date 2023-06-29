@@ -2,9 +2,10 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas } from './pong.service';
 import { initialize } from 'passport';
 import { DataSource } from 'typeorm';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
@@ -51,36 +52,44 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.RestartNewGame(socket);
   }
 
-  EmitInit(sockets: SocketPair, initDatas: PongInitData) {
-    sockets.socketP1.emit('init', initDatas);
-    sockets.socketP2.emit('init', initDatas);
+  @SubscribeMessage('watch')
+  handleWatch(@ConnectedSocket() socket: Socket, @MessageBody() roomIndex: number) {
+    this.pongService.AddWatcher(roomIndex, socket);
   }
 
-  EmitStartGame(sockets: SocketPair, delaySeconds: number) {
-    sockets.socketP1.emit('StartGame', delaySeconds);
-    sockets.socketP2.emit('StartGame', delaySeconds);
+  private EmitEvent(event: string, roomID: number, datas: any) {
+    this.server.to("room" + roomID).emit(event, datas);
   }
 
-  EmitBallDelta(sockets: SocketPair, datas: BallRuntimeData) {
-    //console.log("BallDelta");
-    sockets.socketP1.emit('BallDelta', datas);
-    sockets.socketP2.emit('BallDelta', datas);
+  CloseRoom(roomID: number) {
+    this.server.socketsLeave("room" + roomID);
   }
 
-  EmitPaddleDelta(sockets: SocketPair, datas: PaddleRuntimeData) {
-    //console.log("PaddleDelta");
-    sockets.socketP1.emit('PaddleDelta', datas);
-    sockets.socketP2.emit('PaddleDelta', datas);
+  EmitInit(roomID: number, initDatas: PongInitData) {
+    this.EmitEvent('Init', roomID, initDatas);
   }
 
-  EmitScore(sockets: SocketPair, datas: Score) {
-    sockets.socketP1.emit('UpdateScore', datas);
-    sockets.socketP2.emit('UpdateScore', datas);
+  EmitStartGame(roomID: number, delaySeconds: number) {
+    this.EmitEvent('StartGame', roomID, delaySeconds);
   }
 
-  
-  EmitEnd(sockets: SocketPair, datas: number) {
-    sockets.socketP1.emit('End', datas);
-    sockets.socketP2.emit('End', datas);
+  EmitBallDelta(roomID: number, datas: BallRuntimeData) {
+    this.EmitEvent('BallDelta', roomID, datas);
+  }
+
+  EmitPaddleDelta(roomID: number, datas: PaddleRuntimeData) {
+    this.EmitEvent('PaddleDelta', roomID, datas);
+  }
+
+  EmitScore(roomID: number, datas: Score) {
+    this.EmitEvent('UpdateScore', roomID, datas);
+  }
+
+  EmitEnd(roomID: number, datas: number) {
+    this.EmitEvent('End', roomID, datas);
+  }
+
+  EmitWatcher(socket: Socket, datas: WatcherInitDatas) {
+    socket.emit('Watcher', datas);
   }
 }
