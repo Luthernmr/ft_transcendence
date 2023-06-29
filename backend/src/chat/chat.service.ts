@@ -44,7 +44,7 @@ export class ChatService {
 
   @SubscribeMessage('getUserGroups')
   async getUserGroups(client: Socket, payload: { userId: number }) {
-    const groups = await this.roomService.getAllRoomsForUser(payload.userId);
-    client.emit('groupList', groups);
+    const rooms = await this.roomService.getAllRoomsForUser(payload.userId);
+    client.emit('roomList', rooms);
   }
 }
