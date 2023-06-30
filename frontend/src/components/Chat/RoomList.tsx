@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -10,6 +10,7 @@ import {
   StackDivider,
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
+import { chatSocket } from "../../sockets/sockets";
 
 interface User {
   id: number;
@@ -17,17 +18,38 @@ interface User {
   src: string;
 }
 
+interface Room {
+  id: string;
+  name: string;
+  users: User[];
+}
+
 interface RoomListProps {
-  rooms: any[];
-  setSelectedRoom: (room: any) => void;
+  setSelectedRoom: (room: Room) => void;
   setShowCreateRoom: (show: boolean) => void;
 }
 
 const RoomList: React.FC<RoomListProps> = ({
-  rooms,
   setSelectedRoom,
   setShowCreateRoom,
 }) => {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
+
+  useEffect(() => {
+    chatSocket.on("connect", () => {
+      chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    });
+
+    chatSocket.on("roomList", (rooms: Room[]) => {
+      setRooms(rooms);
+    });
+
+    return () => {
+      chatSocket.off("roomList");
+    };
+  }, [currentUser.id]);
+
   return (
     <Flex
       borderRadius={"md"}
@@ -58,9 +80,13 @@ const RoomList: React.FC<RoomListProps> = ({
         {rooms.map((room, index) => (
           <Box h={"40px"} key={index} onClick={() => setSelectedRoom(room)}>
             <AvatarGroup size={"md"} max={2}>
-              {room.users.map((user: User) => (
-                <Avatar name={user.name} src={user.src} key={user.id} />
-              ))}
+              {room.users?.map(
+                (
+                  user: User
+                ) => (
+                  <Avatar name={user.name} src={user.src} key={user.id} />
+                )
+              )}
             </AvatarGroup>
           </Box>
         ))}
