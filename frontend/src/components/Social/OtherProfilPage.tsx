@@ -15,9 +15,10 @@ export default function OtherProfilPage() {
 	useEffect(() => {
 		try {
 			const getUser = async () => {
-				const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/' + id, {
+				const resp : any  = await axios.get(import.meta.env.VITE_BACKEND + '/user/' + id, {
 					withCredentials: true,
 				})
+				console.log('je rep', resp);
 				setUser(resp.data.user)
 			}
 			getUser();
@@ -28,7 +29,6 @@ export default function OtherProfilPage() {
 	}, [id])
 	
 	return (
-
 		<>
 			<Flex
 				borderRadius={"md"}
@@ -44,7 +44,6 @@ export default function OtherProfilPage() {
 					<OtherProfilInfo user={user}/>
 				</HStack>
 				<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}>
-
 					<MatchHistory user={user} />
 				</Box>
 			</Flex>

@@ -43,6 +43,7 @@ import { count } from 'console';
 export interface FriendRequest {
 	id: number;
 	senderNickname: string;
+	senderPdp: string;
 	type: string;
 }
 
@@ -111,9 +112,9 @@ const PendingRequest = () => {
 							<Flex key={friendRequest.id} flexDirection={'column'} >
 								<Flex direction='row' align='center' p={3}>
 									<Avatar
-										src='https://bit.ly/sage-adebayo'
+										src={friendRequest.senderPdp}
 										size='xs'
-										name='Segun Adebayo'
+										name={friendRequest.senderNickname}
 										ml={-1}
 										mr={2}
 									/>

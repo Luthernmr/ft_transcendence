@@ -7,7 +7,6 @@ import { Link as RouteLink, useNavigate } from "react-router-dom";
 import BlockUserButton from "./BlockUserButton";
 import AddFriendButton from "./AddFriendButton";
 
-
 export interface User {
 	id: number;
 	nickname: string;

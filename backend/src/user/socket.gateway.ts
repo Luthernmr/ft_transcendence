@@ -66,6 +66,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				type: "Friend",
 				senderId: userSender.id,
 				senderNickname: userSender.nickname,
+				senderPdp: userSender.imgPdp,
 				user: userReceiv
 			})
 			client.emit('sendSuccess');

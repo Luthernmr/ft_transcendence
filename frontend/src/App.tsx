@@ -23,7 +23,6 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 
 export default function App() {
 
-
 	userSocket.on('connect', () => {
 		console.log('user socket connect')
 	})

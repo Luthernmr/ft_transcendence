@@ -20,6 +20,7 @@ export default function AuthElement() {
 					if (res.data.jwt) {
 						
 						sessionStorage.setItem('jwt', res.data.jwt);
+						
 						if (sessionStorage.getItem('jwt'))
 							navigate('/home');
 					}
