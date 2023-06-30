@@ -1,11 +1,14 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas, PongInitEntities } from './pong.service';
+import { User } from '../user/user.entity';
 import { initialize } from 'passport';
 import { DataSource } from 'typeorm';
 import { IoAdapter } from '@nestjs/platform-socket.io';
+import { AuthService } from 'src/auth/auth.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
@@ -13,7 +16,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @WebSocketServer()
   server: Server
 
-  constructor(private readonly pongService: PongService) {
+  constructor(
+    private readonly pongService: PongService) {
     pongService.RegisterGateway(this);
   }
 
@@ -24,6 +28,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   handleDisconnect(socket: Socket) {
     console.log("Socket disconnected from pong :" + socket.id);
     this.pongService.CloseRoom(socket.id);
+    this.pongService.UnregisterUserInfos(socket);
   }
 
   afterInit(socket: Socket) {
@@ -33,8 +38,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('queue')
   handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { userID: number, custom: boolean } ) {
-    this.pongService.JoinQueue(socket, datas.userID, datas.custom);
-    console.log("Joined queue, userID: " + datas.userID);
+    this.pongService.RegisterUserInfos(datas.userID, socket);
+    this.pongService.JoinQueue(socket, datas.custom);
   }
 
   @SubscribeMessage('keydown')

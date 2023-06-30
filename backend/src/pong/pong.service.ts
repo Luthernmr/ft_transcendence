@@ -3,6 +3,7 @@ import { PongGateway } from './pong.gateway'
 import { Socket } from 'socket.io';
 import { HistoryService } from './history.service';
 import { log } from 'console';
+import { User } from 'src/user/user.entity';
 
 const COUNTDOWN: number = 3000;
 
@@ -123,6 +124,8 @@ export interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRunt
 
 @Injectable()
 export class PongService {
+	playerInfos: PlayerInfos[];
+
 	pendingPlayers: PlayerInfos[];
 	pendingPlayersCustom: PlayerInfos[];
 
@@ -149,6 +152,8 @@ export class PongService {
 	pongGateway : PongGateway;
 	
 	constructor(private readonly historyService: HistoryService) {
+		this.playerInfos = [];
+		
 		this.pendingPlayers = [];
 		this.pendingPlayersCustom = [];
 
@@ -177,6 +182,33 @@ export class PongService {
 		this.pongGateway = pongGateway;
 	}
 
+	RegisterUserInfos(userID: number, socket: Socket) {
+		const index = this.playerInfos.findIndex(infos => (infos.userId === userID));
+		
+		if (index > 0)
+			this.playerInfos[index].socket = socket;
+		else {
+			
+			this.playerInfos.push({userId: userID, socket: socket});
+			console.log("Added new user to pong playerInfos (id: " + userID + ")");
+		}
+	}
+
+	UnregisterUserInfos(socket: Socket) {
+		const index = this.playerInfos.findIndex(infos => (infos.socket === socket));
+
+		if (index >= 0)
+			this.playerInfos.splice(index, 1);
+
+		const pendingIndex: number = this.pendingPlayers.findIndex(data => data.socket === socket);
+		if (pendingIndex >= 0)
+			this.pendingPlayers.splice(pendingIndex, 1);
+
+		const pendingCustomIndex: number = this.pendingPlayersCustom.findIndex(data => data.socket === socket);
+		if (pendingIndex >= 0)
+			this.pendingPlayersCustom.splice(pendingIndex, 1);
+	}
+
 	LaunchUpdates() {
 		setInterval(this.GlobalUpdate.bind(this), 16);
 	}
@@ -185,13 +217,18 @@ export class PongService {
 		return this.socketsRuntime.findIndex(sockets => (sockets.socketP1.id === socketID || sockets.socketP2.id === socketID));
 	}
 
-	JoinQueue(socket: Socket, userId: number, custom: boolean = false) {
-		const currentPlayer = {
-			socket: socket,
-			userId: userId,
-		};
-		
+	JoinQueue(socket: Socket, custom: boolean = false) {
+		const currentPlayerIndex = this.playerInfos.findIndex(infos => (infos.socket === socket));
+
+		if (currentPlayerIndex < 0) {
+			console.log("user not registered to pong");
+			return;
+		}
+
+		const currentPlayer = this.playerInfos[currentPlayerIndex];
 		const pendingPlayersArray = custom ? this.pendingPlayersCustom : this.pendingPlayers;
+
+		console.log("Joined queue, userID: " + currentPlayer.userId);
 
 		if (pendingPlayersArray.length >= 1) {
 			const opponent = pendingPlayersArray[0];
@@ -199,11 +236,20 @@ export class PongService {
 
 			this.CreateRoom(currentPlayer, opponent, custom);
 		} else {
-			pendingPlayersArray.push({
-				socket: socket,
-				userId: userId,
-			});
+			pendingPlayersArray.push(currentPlayer);
 		}
+	}
+
+	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) {
+		const user1Index = this.playerInfos.findIndex(infos => (infos.userId === user1ID));
+		const user2Index = this.playerInfos.findIndex(infos => (infos.userId === user2ID));
+		
+		if (user1Index < 0 || user2Index < 0) {
+			console.log("Error for users ", user1ID, " & ", user2ID, ", indexes = ", user1Index, " & ", user2Index);
+			return;
+		}
+
+		this.CreateRoom(this.playerInfos[user1Index], this.playerInfos[user2Index], custom);
 	}
 
 	CreateRoom(player1: PlayerInfos, player2: PlayerInfos, custom: boolean = false) {
@@ -320,10 +366,6 @@ export class PongService {
 			this.CleanDatas(index);
 			return;
 		}
-
-		const pendingIndex: number = this.pendingPlayers.findIndex(data => data.socket.id === socketID);
-		if (pendingIndex >= 0)
-			this.pendingPlayers.splice(pendingIndex, 1);
 	}
 
 	CleanDatas(index: number) {
