@@ -44,8 +44,8 @@ export class HistoryService {
 		await this.addXP(winnerUser, xpGained);
 		await this.addXP(loserUser, XP_GAIN_LOSS);
 
-		console.log("user1: ", user1.level, user1.experience);
-		console.log("user2: ", user2.level, user2.experience);
+		console.log("user1 lvl: ", user1.level, "xp: ", user1.experience);
+		console.log("user2 lvl: ", user2.level, "xp: ", user2.experience);
 
 		const history = {
 			user1: user1,
