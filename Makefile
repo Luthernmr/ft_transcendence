@@ -18,13 +18,15 @@ restart: down up
 build:
 	docker-compose -f docker-compose.yml build
 
-clean: stop
+clean: cleanDB
 	docker system prune -fa
+
+fclean: clean
+
+cleanDB: stop
 	@if [ -n "$(VOLUMES)" ]; then \
 		docker volume rm $(VOLUMES); \
 	fi
-
-fclean: clean
 
 re: fclean up
 
