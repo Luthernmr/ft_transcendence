@@ -7,6 +7,9 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
 import { cp } from 'fs';
 
+const XP_GAIN_WIN = 15;
+const XP_GAIN_LOSS = 5;
+
 interface History {
 	id: number,
 	winner: boolean,
@@ -20,7 +23,9 @@ export class HistoryService {
 	constructor(
 		private userService: UserService,
 		@InjectRepository(PongHistory)
-		private pongHistory: Repository<PongHistory>
+		private pongHistory: Repository<PongHistory>,
+		@InjectRepository(User)
+		private userRepository: Repository<User>
 	) {
 	}
 
@@ -29,6 +34,18 @@ export class HistoryService {
 		const user2 = await this.userService.getUserById(ids.idP2);
 
 		const winner = score.scoreP1 > score.scoreP2 ? 1 : 2;
+		
+		const winnerUser = winner === 1 ? user1 : user2;
+		const loserUser = winnerUser === user1 ? user2 : user1;
+
+		const levelDiff = loserUser.level - winnerUser.level;
+		const xpGained = levelDiff > 0 ? XP_GAIN_WIN * (levelDiff + 1) : XP_GAIN_WIN;
+
+		await this.addXP(winnerUser, xpGained);
+		await this.addXP(loserUser, XP_GAIN_LOSS);
+
+		console.log("user1: ", user1.level, user1.experience);
+		console.log("user2: ", user2.level, user2.experience);
 
 		const history = {
 			user1: user1,
@@ -39,8 +56,24 @@ export class HistoryService {
 		};
 
 		await this.pongHistory.save(history);
+	}
 
-		this.getUserHistory(user1);
+	async addXP(user: User, xp: number) {
+		let userXP = user.experience + xp;
+		let userLevel = user.level;
+
+		let nextLevelXP = 0;
+		for (let i = 0; i < user.level; i++) {
+			nextLevelXP += 100 * (i + 1);
+		}
+		
+		if (userXP >= nextLevelXP)
+			userLevel += 1;
+
+		await this.userRepository.update(user.id, {
+			level: userLevel,
+			experience: userXP 
+		});
 	}
 
 	async getAllHistories(): Promise<PongHistory[]> {
