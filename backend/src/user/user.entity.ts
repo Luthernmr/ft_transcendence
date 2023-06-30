@@ -60,4 +60,10 @@ export class User {
 
   @OneToMany(() => Message, (message: Message) => message.user)
   messages: Array<Message>;
+
+  @Column()
+  level: number
+
+  @Column()
+  experience: number
 }
