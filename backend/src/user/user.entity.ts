@@ -48,7 +48,7 @@ export class User {
 
   @JoinTable()
   @ManyToOne(() => Room, (room: Room) => room.users)
-  room: Room;
+  rooms: Room[];
 
   @JoinTable()
   @ManyToMany(() => Room, (room: Room) => room.bannedUsers, { eager: true })

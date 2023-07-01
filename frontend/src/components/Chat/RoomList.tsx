@@ -37,7 +37,7 @@ const RoomList: React.FC<RoomListProps> = ({
   const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
 
   useEffect(() => {
-    chatSocket.on("connect", () => {
+    chatSocket.on("roomList", () => {
       chatSocket.emit("getUserRooms", { userId: currentUser.id });
     });
 

@@ -26,7 +26,7 @@ export class Room {
   @Column({length: 80, nullable: true })
   password: string;
 
-  @ManyToMany(() => User, (user: User) => user.room)
+  @ManyToMany(() => User, (user: User) => user.rooms)
   @JoinTable()
   users: User[];
 
