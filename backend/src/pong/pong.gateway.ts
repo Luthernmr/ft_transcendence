@@ -46,8 +46,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('queue')
-  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { userID: number, custom: boolean } ) {
-    //this.pongService.RegisterUserInfos(datas.userID, socket);
+  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
     this.pongService.JoinQueue(socket, datas.custom);
   }
 

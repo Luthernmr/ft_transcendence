@@ -25,8 +25,8 @@ interface Vector2 {
 interface GameLayout {
   width: number,
 	height: number,
-	ballWidth: number,
-  paddleWidth: number,
+	ballHeight: number,
+  paddleHeight: number,
 }
 
 interface PongInitData extends GameLayout, PongInitEntities {
@@ -35,8 +35,8 @@ interface PongInitData extends GameLayout, PongInitEntities {
 }
 
 interface PongInitEntities {
-  ballHeight: number,
-  paddleHeight: number
+  ballWidth: number,
+  paddleWidth: number
 }
 
 interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRuntimeData, PaddleRuntimeData, Score {
@@ -46,7 +46,7 @@ interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRuntimeData
 interface BallRuntimeData {
 	ballPosition: Vector2,
 	ballDelta: Vector2,
-  ballHeight: number
+  ballWidth: number
 }
 
 interface PaddleRuntimeData {
@@ -69,7 +69,7 @@ interface Shape {
 }
 
 interface Paddle {
-  height: number,
+  pos: number,
   delta: number,
 }
 
@@ -105,8 +105,8 @@ function Pong() {
 
   const paddleDatas = useRef<Shape>({width: 0, height: 0});
 
-  const leftPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
-  const rightPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
+  const leftPaddle = useRef<Paddle>({ pos: Offset.x + 200, delta: 0 });
+  const rightPaddle = useRef<Paddle>({ pos: Offset.x + 200, delta: 0 });
   
   const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
 
@@ -155,8 +155,8 @@ function Pong() {
 
       setBall(Add(Offset, datas.ballPosition));
       ballDelta.current = {x: 0, y: 0};
-      leftPaddle.current.height = Offset.y + datas.paddlePos;
-      rightPaddle.current.height = Offset.y + datas.paddlePos;
+      leftPaddle.current.pos = Offset.x + datas.paddlePos;
+      rightPaddle.current.pos = Offset.x + datas.paddlePos;
     }
 
     pongSocket.on('Init', Init);
@@ -175,8 +175,8 @@ function Pong() {
         y: ball.y + ballDelta.current.y * (deltaTime / 100),
       }));
 
-      leftPaddle.current.height += leftPaddle.current.delta * deltaTime / 100;
-      rightPaddle.current.height += rightPaddle.current.delta * deltaTime / 100;
+      leftPaddle.current.pos += leftPaddle.current.delta * deltaTime / 100;
+      rightPaddle.current.pos += rightPaddle.current.delta * deltaTime / 100;
     }
 
     previousTimeRef.current = time;
@@ -207,14 +207,14 @@ function Pong() {
     function BallDelta(values: BallRuntimeData) {
       ballDelta.current = values.ballDelta;
       setBall(Add(Offset, values.ballPosition));
-      ballShape.current.height = values.ballHeight;
+      ballShape.current.width = values.ballWidth;
     }
 
     pongSocket.on('BallDelta', BallDelta);
 
     function PaddleDelta(values: PaddleRuntimeData) {
-      leftPaddle.current = {height: Offset.y + values.paddle1Pos, delta: values.paddle1Delta };
-      rightPaddle.current = {height: Offset.y + values.paddle2Pos, delta: values.paddle2Delta };
+      leftPaddle.current = { pos: Offset.x + values.paddle1Pos, delta: values.paddle1Delta };
+      rightPaddle.current = { pos: Offset.x + values.paddle2Pos, delta: values.paddle2Delta };
     };
 
     pongSocket.on('PaddleDelta', PaddleDelta);
@@ -238,8 +238,8 @@ function Pong() {
 
       setBall(Add(Offset, datas.ballPosition));
       ballDelta.current = datas.ballDelta;
-      leftPaddle.current.height = Offset.y + datas.paddle1Pos;
-      rightPaddle.current.height = Offset.y + datas.paddle2Pos;
+      leftPaddle.current.pos = Offset.x + datas.paddle1Pos;
+      rightPaddle.current.pos = Offset.x + datas.paddle2Pos;
       leftPaddle.current.delta = datas.paddle1Delta;
       rightPaddle.current.delta = datas.paddle2Delta;
 
@@ -269,8 +269,8 @@ function Pong() {
     
     let input = 0;
 
-    if (e.code == 'ArrowUp') input = -1;
-    else if (e.code == 'ArrowDown') input = 1;
+    if (e.code == 'ArrowLeft') input = -1;
+    else if (e.code == 'ArrowRight') input = 1;
     else return;
 
     pongSocket.emit('keydown', input);
@@ -282,8 +282,8 @@ function Pong() {
     
     let input = 0;
     
-    if (e.code == 'ArrowUp') input = -1;
-    else if (e.code == 'ArrowDown') input = 1;
+    if (e.code == 'ArrowLeft') input = -1;
+    else if (e.code == 'ArrowRight') input = 1;
     else return;
     
     pongSocket.emit('keyup', input);
@@ -303,11 +303,9 @@ function Pong() {
     if (userString === null)
       return;
 
-    const user = JSON.parse(userString);
-    console.log("userID :" + Number(user.id))
+    pongSocket.emit('queue', { custom: custom });
 
     pongState.current = PongState.Queue;
-    pongSocket.emit('queue', {userID: Number(user.id), custom: custom });
   }
 
   const RestartRequest = () => {
@@ -342,16 +340,16 @@ function Pong() {
     return (
       <div>
         <Button onClick= { RestartRequest }> Start again ? </Button>
-        <Stage width={800} height={500}>
+        <Stage width={500} height={800}>
           <Layer>
             <Text fontSize={50} width={700} y={170} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
             <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
             <Text fontSize={30} width={700} y={170} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
-            <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
-            <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
-            <Rect x={ball.x} y={ball.y} width={ballShape.current.width} height={ballShape.current.height} fill='black' cornerRadius={ballShape.current.width / 2}/>
-            <Rect x={Offset.x} y={leftPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' cornerRadius={5} />
-            <Rect x={walls.current[2].x - paddleDatas.current.width} y={rightPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' cornerRadius={5}/>
+            <Rect x={walls.current[2].x} y={walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill='black'/>
+            <Rect x={walls.current[3].x} y={walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill='black'/>
+            <Rect x={ball.x} y={ball.y} width={ballShape.current.width} height={ballShape.current.height} fill='black' cornerRadius={ballShape.current.height / 2}/>
+            <Rect x={leftPaddle.current.pos} y={Offset.y} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' cornerRadius={10} />
+            <Rect x={rightPaddle.current.pos} y={ walls.current[1].y - paddleDatas.current.height } width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' cornerRadius={10}/>
           </Layer>
         </Stage>
       </div>
