@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner, Center, Button, FormLabel, HStack, Modal, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, PinInput, PinInputField, VStack, useDisclosure } from '@chakra-ui/react'
 import TwoFA from "./TwoFA";
+import { pongSocket } from "../../sockets/sockets";
 
 export default function AuthElement() {
 	const [authTokenCalled, setAuthTokenCalled] = useState(false);
@@ -22,7 +23,10 @@ export default function AuthElement() {
 						sessionStorage.setItem('jwt', res.data.jwt);
 						
 						if (sessionStorage.getItem('jwt'))
+						{
 							navigate('/home');
+							pongSocket.emit("register", { token: res.data.jwt });
+						}
 					}
 					else
 						onOpen()

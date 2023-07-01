@@ -8,7 +8,7 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([PongHistory]), UserModule],
+	imports: [TypeOrmModule.forFeature([PongHistory]), UserModule, AuthModule],
 	providers: [PongGateway, PongService, HistoryService],
 	exports: [TypeOrmModule, HistoryService]
 })

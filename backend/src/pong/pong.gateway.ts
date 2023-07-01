@@ -4,9 +4,6 @@ import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
 import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas, PongInitEntities } from './pong.service';
 import { User } from '../user/user.entity';
-import { initialize } from 'passport';
-import { DataSource } from 'typeorm';
-import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 
@@ -17,12 +14,20 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   server: Server
 
   constructor(
+    private readonly authService: AuthService,
     private readonly pongService: PongService) {
     pongService.RegisterGateway(this);
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
+    
+    if (socket.handshake.auth.token === null)
+      return;
+
+    let user: User = await this.authService.getUserByToken(socket.handshake.auth.token);
+		if (user)
+      this.pongService.RegisterUserInfos(user.id, socket);
   }
 
   handleDisconnect(socket: Socket) {
@@ -36,9 +41,17 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.LaunchUpdates();
   }
 
+  @SubscribeMessage('register')
+  async handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
+    let user: User = await this.authService.getUserByToken(datas.token)
+		if (user) {
+      this.pongService.RegisterUserInfos(user.id, socket);
+		} else
+      console.log("Pong User auth not found");
+  }
+
   @SubscribeMessage('queue')
-  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { userID: number, custom: boolean } ) {
-    this.pongService.RegisterUserInfos(datas.userID, socket);
+  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
     this.pongService.JoinQueue(socket, datas.custom);
   }
 
@@ -72,6 +85,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   EmitInit(roomID: number, initDatas: PongInitData & PongInitEntities) {
     this.EmitEvent('Init', roomID, initDatas);
+  }
+
+  EmitPlayerNums(sockets: SocketPair) {
+    sockets.socketP1.emit("SetNum", 2);
+    sockets.socketP2.emit("SetNum", 1);
   }
 
   EmitStartGame(roomID: number, delaySeconds: number) {

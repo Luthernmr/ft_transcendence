@@ -2,6 +2,7 @@ import { Image, Button, FormLabel, HStack, Modal, ModalBody, ModalCloseButton, M
 import axios from "axios";
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import { pongSocket } from "../../sockets/sockets";
 
 export default function TwoFA() {
 	const [pinCode, setPinCode] = useState("");
@@ -20,6 +21,7 @@ export default function TwoFA() {
 				navigate('/Home');
 				console.log('token,normal', resp2.data.jwt);
 				sessionStorage.setItem('jwt', resp2.data.jwt);
+				pongSocket.emit("register", { token: resp2.data.jwt });
 				toast({
 					title: `2fa Validate`,
 					status: 'success',

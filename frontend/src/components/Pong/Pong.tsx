@@ -25,18 +25,19 @@ interface Vector2 {
 interface GameLayout {
   width: number,
 	height: number,
-	ballWidth: number,
-  paddleWidth: number,
+	ballHeight: number,
+  paddleHeight: number,
 }
 
 interface PongInitData extends GameLayout, PongInitEntities {
 	ballPosition: Vector2,
 	paddlePos: number,
+  playerNum: number
 }
 
 interface PongInitEntities {
-  ballHeight: number,
-  paddleHeight: number
+  ballWidth: number,
+  paddleWidth: number
 }
 
 interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRuntimeData, PaddleRuntimeData, Score {
@@ -46,7 +47,7 @@ interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRuntimeData
 interface BallRuntimeData {
 	ballPosition: Vector2,
 	ballDelta: Vector2,
-  ballHeight: number
+  ballWidth: number
 }
 
 interface PaddleRuntimeData {
@@ -69,7 +70,7 @@ interface Shape {
 }
 
 interface Paddle {
-  height: number,
+  pos: number,
   delta: number,
 }
 
@@ -86,9 +87,11 @@ enum PongState {
   Watch
 }
 
-function Add(first: Vector2, second: Vector2): Vector2 {
-  return {x: first.x + second.x, y: first.y + second.y};
+enum PongDisplay {
+  Normal,
+  Reversed
 }
+
 
 function Pong() {
   const requestRef = useRef(0);
@@ -99,14 +102,14 @@ function Pong() {
   const Offset: Vector2 = {x: OFFSET_X, y: OFFSET_Y};
   const walls = useRef<Obstacle[]>([WALL_PLACEHOLDER, WALL_PLACEHOLDER, WALL_PLACEHOLDER, WALL_PLACEHOLDER]);
   
-  const [ball, setBall] = useState<Vector2>({x: Offset.x + 390, y: Offset.y + 290});
+  const [ball, setBall] = useState<Vector2>({x: 200, y: 300});
   const ballDelta = useRef<Vector2>({x: 0, y: 0});
   const ballShape = useRef<Shape>({width: 20, height: 20});
 
   const paddleDatas = useRef<Shape>({width: 0, height: 0});
 
-  const leftPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
-  const rightPaddle = useRef<Paddle>({ height: Offset.y + 200, delta: 0 });
+  const leftPaddle = useRef<Paddle>({ pos: 200, delta: 0 });
+  const rightPaddle = useRef<Paddle>({ pos: 200, delta: 0 });
   
   const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
 
@@ -116,26 +119,30 @@ function Pong() {
 
   const winner = useRef<number>(1);
 
+  const display = useRef<PongDisplay>(PongDisplay.Reversed);
+  const playerNum = useRef<number>(1);
+
+  const layout = useRef<Shape>( {width: 0, height: 0} );
+
   function WallBuilder(width: number, height: number) {
     walls.current = [{ // UP
-      x: Offset.x - WALL_WIDTH,
-      y: Offset.y - WALL_HEIGHT,
+      x: - WALL_WIDTH,
+      y: - WALL_HEIGHT,
       width: width + 2 * WALL_WIDTH,
       height: WALL_HEIGHT
     }, { // BOTTOM
-      x: Offset.x - WALL_WIDTH,
-      y: Offset.y + height,
+      x: - WALL_WIDTH,
+      y: height,
       width: width + 2 * WALL_WIDTH,
       height: WALL_HEIGHT
     }, { // RIGHT
-      x: Offset.x + width,
-      y: Offset.y - WALL_HEIGHT,
+      x: width,
+      y: - WALL_HEIGHT,
       width: WALL_WIDTH,
       height: height + 2 * WALL_HEIGHT
     }, { // LEFT
-      
-      x: Offset.x - WALL_WIDTH,
-      y: Offset.y - WALL_HEIGHT,
+      x: - WALL_WIDTH,
+      y: - WALL_HEIGHT,
       width: WALL_WIDTH,
       height: height + 2 * WALL_HEIGHT
     }
@@ -144,6 +151,7 @@ function Pong() {
 
   function SyncDatas(datas: GameLayout & PongInitEntities) {
     WallBuilder(datas.width, datas.height);
+    layout.current = { width: datas.width, height: datas.height };
     ballShape.current = { width: datas.ballWidth, height: datas.ballHeight };
     paddleDatas.current = {width: datas.paddleWidth, height: datas.paddleHeight};
   }
@@ -153,13 +161,23 @@ function Pong() {
       console.log("Initing Pong");
       SyncDatas(datas);
 
-      setBall(Add(Offset, datas.ballPosition));
+      setBall(datas.ballPosition);
       ballDelta.current = {x: 0, y: 0};
-      leftPaddle.current.height = Offset.y + datas.paddlePos;
-      rightPaddle.current.height = Offset.y + datas.paddlePos;
+      leftPaddle.current.pos = datas.paddlePos;
+      rightPaddle.current.pos = datas.paddlePos;
     }
 
     pongSocket.on('Init', Init);
+
+    function SetNum(num: number) {
+      playerNum.current = num;
+      if (num === 1)
+        display.current = PongDisplay.Normal;
+      else
+        display.current = PongDisplay.Reversed;
+    }
+
+    pongSocket.on('SetNum', SetNum);
 
     return () => {
       pongSocket.off('Init', Init);
@@ -175,8 +193,8 @@ function Pong() {
         y: ball.y + ballDelta.current.y * (deltaTime / 100),
       }));
 
-      leftPaddle.current.height += leftPaddle.current.delta * deltaTime / 100;
-      rightPaddle.current.height += rightPaddle.current.delta * deltaTime / 100;
+      leftPaddle.current.pos += leftPaddle.current.delta * deltaTime / 100;
+      rightPaddle.current.pos += rightPaddle.current.delta * deltaTime / 100;
     }
 
     previousTimeRef.current = time;
@@ -206,15 +224,15 @@ function Pong() {
 
     function BallDelta(values: BallRuntimeData) {
       ballDelta.current = values.ballDelta;
-      setBall(Add(Offset, values.ballPosition));
-      ballShape.current.height = values.ballHeight;
+      setBall(values.ballPosition);
+      ballShape.current.width = values.ballWidth;
     }
 
     pongSocket.on('BallDelta', BallDelta);
 
     function PaddleDelta(values: PaddleRuntimeData) {
-      leftPaddle.current = {height: Offset.y + values.paddle1Pos, delta: values.paddle1Delta };
-      rightPaddle.current = {height: Offset.y + values.paddle2Pos, delta: values.paddle2Delta };
+      leftPaddle.current = { pos: values.paddle1Pos, delta: values.paddle1Delta };
+      rightPaddle.current = { pos: values.paddle2Pos, delta: values.paddle2Delta };
     };
 
     pongSocket.on('PaddleDelta', PaddleDelta);
@@ -236,10 +254,10 @@ function Pong() {
       pongState.current = PongState.Watch;
       SyncDatas(datas);
 
-      setBall(Add(Offset, datas.ballPosition));
+      setBall(datas.ballPosition);
       ballDelta.current = datas.ballDelta;
-      leftPaddle.current.height = Offset.y + datas.paddle1Pos;
-      rightPaddle.current.height = Offset.y + datas.paddle2Pos;
+      leftPaddle.current.pos = datas.paddle1Pos;
+      rightPaddle.current.pos = datas.paddle2Pos;
       leftPaddle.current.delta = datas.paddle1Delta;
       rightPaddle.current.delta = datas.paddle2Delta;
 
@@ -269,8 +287,8 @@ function Pong() {
     
     let input = 0;
 
-    if (e.code == 'ArrowUp') input = -1;
-    else if (e.code == 'ArrowDown') input = 1;
+    if (e.code == 'ArrowLeft') input = playerNum.current === 1 ? -1 : 1;
+    else if (e.code == 'ArrowRight') input = playerNum.current === 1 ? 1 : -1;
     else return;
 
     pongSocket.emit('keydown', input);
@@ -282,8 +300,8 @@ function Pong() {
     
     let input = 0;
     
-    if (e.code == 'ArrowUp') input = -1;
-    else if (e.code == 'ArrowDown') input = 1;
+    if (e.code == 'ArrowLeft') input = playerNum.current === 1 ? -1 : 1;
+    else if (e.code == 'ArrowRight') input = playerNum.current === 1 ? 1 : -1;
     else return;
     
     pongSocket.emit('keyup', input);
@@ -303,11 +321,9 @@ function Pong() {
     if (userString === null)
       return;
 
-    const user = JSON.parse(userString);
-    console.log("userID :" + Number(user.id))
+    pongSocket.emit('queue', { custom: custom });
 
     pongState.current = PongState.Queue;
-    pongSocket.emit('queue', {userID: Number(user.id), custom: custom });
   }
 
   const RestartRequest = () => {
@@ -316,6 +332,13 @@ function Pong() {
 
   const WatchGame = () => {
     pongSocket.emit('watch');
+  }
+
+  function version(value: number, mirror: number) : number {
+    if (display.current === PongDisplay.Reversed) {
+      return mirror - value;
+    }
+    return value;
   }
 
   if (pongState.current === PongState.Out) {
@@ -342,16 +365,29 @@ function Pong() {
     return (
       <div>
         <Button onClick= { RestartRequest }> Start again ? </Button>
-        <Stage width={800} height={500}>
+        <Stage width={500} height={800}>
           <Layer>
             <Text fontSize={50} width={700} y={170} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
             <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
             <Text fontSize={30} width={700} y={170} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
-            <Rect x={walls.current[0].x} y={walls.current[0].y} width={walls.current[0].width} height={walls.current[0].height} fill='black'/>
-            <Rect x={walls.current[1].x} y={walls.current[1].y} width={walls.current[1].width} height={walls.current[1].height} fill='black'/>
-            <Rect x={ball.x} y={ball.y} width={ballShape.current.width} height={ballShape.current.height} fill='black' cornerRadius={ballShape.current.width / 2}/>
-            <Rect x={Offset.x} y={leftPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' cornerRadius={5} />
-            <Rect x={walls.current[2].x - paddleDatas.current.width} y={rightPaddle.current.height} width={paddleDatas.current.width} height={paddleDatas.current.height} fill='black' cornerRadius={5}/>
+            <Rect x={Offset.x + walls.current[2].x} y={Offset.y + walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill='black'/>
+            <Rect x={Offset.x + walls.current[3].x} y={Offset.y + walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill='black'/>
+            <Rect x={Offset.x + version(ball.x, layout.current.width - ballShape.current.width)}
+                  y={Offset.y + version(ball.y, layout.current.height - ballShape.current.height)}
+                  width={ballShape.current.width}
+                  height={ballShape.current.height}
+                  fill='black'
+                  cornerRadius={ballShape.current.height / 2}/>
+            <Rect x={Offset.x + version(leftPaddle.current.pos, layout.current.width - paddleDatas.current.width)}
+                  y={Offset.y + version(0, layout.current.height - paddleDatas.current.height)}
+                  width={paddleDatas.current.width}
+                  height={paddleDatas.current.height}
+                  fill='black' cornerRadius={10} />
+            <Rect x={Offset.x + version(rightPaddle.current.pos, layout.current.width - paddleDatas.current.width)}
+                  y={Offset.y + version(layout.current.height - paddleDatas.current.height, layout.current.height - paddleDatas.current.height) }
+                  width={paddleDatas.current.width}
+                  height={paddleDatas.current.height}
+                  fill='black' cornerRadius={10}/>
           </Layer>
         </Stage>
       </div>
