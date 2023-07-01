@@ -22,6 +22,12 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
+    if (socket.handshake.auth.token === null)
+      return;
+
+    let user: User = await this.authService.getUserByToken(socket.handshake.auth.token);
+		if (user)
+      this.pongService.RegisterUserInfos(user.id, socket);
   }
 
   handleDisconnect(socket: Socket) {
@@ -39,7 +45,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   async handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
     let user: User = await this.authService.getUserByToken(datas.token)
 		if (user) {
-			user = await this.userService.setSocket(user.id, socket.id);
       this.pongService.RegisterUserInfos(user.id, socket);
 		} else
       console.log("Pong User auth not found");
