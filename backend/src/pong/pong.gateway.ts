@@ -82,6 +82,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.EmitEvent('Init', roomID, initDatas);
   }
 
+  EmitPlayerNums(sockets: SocketPair) {
+    sockets.socketP1.emit("SetNum", 2);
+    sockets.socketP2.emit("SetNum", 1);
+  }
+
   EmitStartGame(roomID: number, delaySeconds: number) {
     this.EmitEvent('StartGame', roomID, delaySeconds);
   }

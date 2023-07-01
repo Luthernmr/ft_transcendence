@@ -311,7 +311,7 @@ export class PongService {
 
 		this.waitingState.push(false);
 
-		//const init_datas = custom ? {...CUSTOM_INIT_DATAS} : {...STANDARD_INIT_DATAS};
+		this.pongGateway.EmitPlayerNums(sockets);
 
 		this.pongGateway.EmitInit(roomIndex, custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS);
 
