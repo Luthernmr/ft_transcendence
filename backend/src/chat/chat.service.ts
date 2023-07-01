@@ -7,13 +7,14 @@ import {
 import { Server, Socket } from 'socket.io';
 import { RoomService } from 'src/room/room.service';
 import { Room } from 'src/room/entities/room.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
 export class ChatService {
   private logger: Logger;
 
-  constructor(private readonly roomService: RoomService) {
+  constructor(private readonly roomService: RoomService, private readonly userRepo: UserService) {
     this.logger = new Logger(ChatService.name);
   }
 
@@ -44,7 +45,8 @@ export class ChatService {
 
   @SubscribeMessage('getUserRooms')
   async getUserRooms(client: Socket, payload: { userId: number }) {
-    const rooms = await this.roomService.getAllRoomsForUser(payload.userId);
-    client.emit('roomList', rooms);
+    const rooms = await this.userRepo.getRoomsByUID(payload.userId);
+    // console.log("My rooms after typeorm:", rooms);
+    client.emit('roomList', rooms.rooms);
   }
 }

@@ -27,17 +27,18 @@ export class RoomService {
 
   async createRoom(client: Socket, data: Partial<Room>) {
     try {
+      console.log('Data of room is : ', data);
       const dto = plainToClass(CreateRoomDto, data);
+      console.log('DTO of room is : ', dto);
       await validateOrReject(dto).catch((errors: ValidationError[]) => {
         throw new BadRequestException(errors);
       });
-
       const room = await this.roomRepo.findOne({ where: { name: dto.name } });
       const user = await this.authService.getUserByToken(
         client.handshake.auth.token,
       );
       if (room) {
-        throw new BadRequestException('Room already exist');
+        throw new BadRequestException('Room already exists');
       }
       let hashedPassword = null;
       if (dto.password) {
@@ -49,19 +50,12 @@ export class RoomService {
         ownerId: user.id,
         isPrivate: dto.isPrivate,
         password: hashedPassword,
-        users: [user],
+        users: dto.users,
       };
       await this.roomRepo.save(payload);
     } catch (error) {
       this.logger.log(error);
       return error;
     }
-  }
-
-  async getAllRoomsForUser(userId: number): Promise<Room[]> {
-    return await this.roomRepo
-      .createQueryBuilder('room')
-      .innerJoin('room.users', 'user', 'user.id = :userId', { userId })
-      .getMany();
   }
 }

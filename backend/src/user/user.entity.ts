@@ -42,6 +42,7 @@ export class User {
   @JoinTable()
   pendingRequests: PendingRequest[];
 
+
   @OneToMany(() => BlockedUser, friend => friend.currentUser)
   @JoinTable()
   blockedUsers: BlockedUser[];

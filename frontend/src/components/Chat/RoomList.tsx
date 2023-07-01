@@ -37,9 +37,7 @@ const RoomList: React.FC<RoomListProps> = ({
   const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
 
   useEffect(() => {
-    chatSocket.on("roomList", () => {
-      chatSocket.emit("getUserRooms", { userId: currentUser.id });
-    });
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
 
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
@@ -77,10 +75,10 @@ const RoomList: React.FC<RoomListProps> = ({
         height="100%"
         overflowY="auto"
       >
-        {rooms.map((room, index) => (
+        {rooms?.map((room, index) => (
           <Box h={"40px"} key={index} onClick={() => setSelectedRoom(room)}>
             <AvatarGroup size={"md"} max={2}>
-              {room.users?.map(
+              {room?.users?.map(
                 (
                   user: User
                 ) => (
