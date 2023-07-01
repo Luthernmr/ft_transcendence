@@ -21,6 +21,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
+    
     if (socket.handshake.auth.token === null)
       return;
 
