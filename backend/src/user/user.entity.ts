@@ -66,4 +66,7 @@ export class User {
 
   @Column({default : 0})
   experience: number
+
+  @Column({ default: 0})
+  ratioToNextLevel: number
 }
