@@ -206,7 +206,9 @@ export class PongService {
 
 		const pendingCustomIndex: number = this.pendingPlayersCustom.findIndex(data => data.socket === socket);
 		if (pendingIndex >= 0)
-			this.pendingPlayersCustom.splice(pendingIndex, 1);
+			this.pendingPlayersCustom.splice(pendingCustomIndex, 1);
+
+		console.log("User unregistered from pong");
 	}
 
 	LaunchUpdates() {

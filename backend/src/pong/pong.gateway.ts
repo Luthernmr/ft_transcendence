@@ -4,9 +4,6 @@ import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
 import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas, PongInitEntities } from './pong.service';
 import { User } from '../user/user.entity';
-import { initialize } from 'passport';
-import { DataSource } from 'typeorm';
-import { IoAdapter } from '@nestjs/platform-socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
 
@@ -17,6 +14,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   server: Server
 
   constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
     private readonly pongService: PongService) {
     pongService.RegisterGateway(this);
   }
@@ -36,9 +35,20 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.LaunchUpdates();
   }
 
+  @SubscribeMessage('register')
+  async handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
+    console.log("Trying to register user of token: " + datas.token);
+    let user: User = await this.authService.getUserByToken(datas.token)
+		if (user) {
+			user = await this.userService.setSocket(user.id, socket.id);
+      this.pongService.RegisterUserInfos(user.id, socket);
+		} else
+      console.log("Pong User auth not found");
+  }
+
   @SubscribeMessage('queue')
   handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { userID: number, custom: boolean } ) {
-    this.pongService.RegisterUserInfos(datas.userID, socket);
+    //this.pongService.RegisterUserInfos(datas.userID, socket);
     this.pongService.JoinQueue(socket, datas.custom);
   }
 

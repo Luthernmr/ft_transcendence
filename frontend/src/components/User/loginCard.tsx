@@ -31,6 +31,7 @@ import { useState, ChangeEvent, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { io } from 'socket.io-client';
 import TwoFA from './TwoFA';
+import { pongSocket } from '../../sockets/sockets';
 interface FormValue {
 	email: string;
 	password: string;
@@ -65,6 +66,7 @@ export default function loginCard() {
 				navigate('/Home');
 				console.log('token,normal', response.data.token);
 				sessionStorage.setItem('jwt', response.data.token);
+				pongSocket.emit("register", { token: response.data.token });
 			}
 			if (!response.data) {
 				onOpen()
