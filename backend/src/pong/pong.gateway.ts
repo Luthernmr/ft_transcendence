@@ -37,7 +37,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('register')
   async handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
-    console.log("Trying to register user of token: " + datas.token);
     let user: User = await this.authService.getUserByToken(datas.token)
 		if (user) {
 			user = await this.userService.setSocket(user.id, socket.id);
