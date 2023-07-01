@@ -15,7 +15,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UserService,
     private readonly pongService: PongService) {
     pongService.RegisterGateway(this);
   }
