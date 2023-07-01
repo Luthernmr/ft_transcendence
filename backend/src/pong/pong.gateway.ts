@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas, PongInitEntities } from './pong.service';
 import { initialize } from 'passport';
 import { DataSource } from 'typeorm';
 import { IoAdapter } from '@nestjs/platform-socket.io';
@@ -32,9 +32,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('queue')
-  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() userID: number) {
-    this.pongService.JoinQueue(socket, userID);
-    console.log("Joined queue, userID: " + userID);
+  handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { userID: number, custom: boolean } ) {
+    this.pongService.JoinQueue(socket, datas.userID, datas.custom);
+    console.log("Joined queue, userID: " + datas.userID);
   }
 
   @SubscribeMessage('keydown')
@@ -65,7 +65,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.server.socketsLeave("room" + roomID);
   }
 
-  EmitInit(roomID: number, initDatas: PongInitData) {
+  EmitInit(roomID: number, initDatas: PongInitData & PongInitEntities) {
     this.EmitEvent('Init', roomID, initDatas);
   }
 
