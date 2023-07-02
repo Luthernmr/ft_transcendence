@@ -18,8 +18,8 @@ const BALL_WIDTH_CUSTOM: number = 50;
 const BALL_CUSTOM_GAIN: number = 8;
 const BALL_MAX_WIDTH: number = 200;
 
-const BALL_START_POS_X: number = 200;
-const BALL_START_POS_Y: number = 300;
+const BALL_START_POS_X: number = 200 - BALL_WIDTH / 2;
+const BALL_START_POS_Y: number = 300 - BALL_HEIGHT / 2;
 
 const BALL_SPEED: number = 6;
 

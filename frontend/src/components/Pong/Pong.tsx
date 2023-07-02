@@ -10,6 +10,8 @@ const OFFSET_Y: number = 40;
 const WALL_WIDTH: number = 10;
 const WALL_HEIGHT: number = 10;
 
+const RESP: number = 1;
+
 const WALL_PLACEHOLDER: Obstacle = {
   x: 0,
   y: 0,
@@ -367,9 +369,11 @@ function Pong() {
         <Button onClick= { RestartRequest }> Start again ? </Button>
         <Stage width={500} height={800}>
           <Layer>
-            <Text fontSize={50} width={700} y={170} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
-            <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
-            <Text fontSize={30} width={700} y={170} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
+            <Text fontSize={50} width={500} y={250} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
+            <Text fontSize={50} x={Offset.x + 5} y={Offset.y + 250} align='left' text={playerNum.current === 1 ? `${score.current.scoreP1}` : `${score.current.scoreP2}`} />
+            <Text fontSize={50} x={Offset.x + 5} y={layout.current.height - 250} align='left' text={playerNum.current === 1 ? `${score.current.scoreP2}` : `${score.current.scoreP1}`} />
+            <Text fontSize={30} width={500} y={250} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
+            <Line points={[Offset.x, Offset.y + layout.current.height / 2, Offset.x + layout.current.width, Offset.y + layout.current.height/2]} stroke='black' strokeWidth={1} dash={[10, 10]}/>
             <Rect x={Offset.x + walls.current[2].x} y={Offset.y + walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill='black'/>
             <Rect x={Offset.x + walls.current[3].x} y={Offset.y + walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill='black'/>
             <Rect x={Offset.x + version(ball.x, layout.current.width - ballShape.current.width)}
