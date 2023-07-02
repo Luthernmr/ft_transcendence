@@ -81,8 +81,16 @@ export class UserService {
 		return await this.pendingRequest.findOne({ where: { id: id } })
 	}
 
-	async deletePendingRequestById(id: number) {
-		await this.pendingRequest.delete(await this.getPendingRequestById(id))
+	async deletePendingRequestById(request: PendingRequest) {
+		try {
+			console.log('delete this:', request);
+			const result = await this.pendingRequest.delete(request);
+			console.log('deletion result:', result);
+			return result;
+		  } catch (error) {
+			console.error('An error occurred while deleting the pending request:', error);
+			throw error;
+		  }
 	}
 
 	async getAllPendingRequest(user: any): Promise<any> {

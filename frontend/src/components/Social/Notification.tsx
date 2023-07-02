@@ -68,6 +68,9 @@ const PendingRequest = () => {
 		userSocket.on('requestAcccepted', () => {
 			userSocket.emit('getPendingRequest')
 		})
+		userSocket.on('requestRejected', () => {
+			userSocket.emit('getPendingRequest')
+		})
 		userSocket.emit('getPendingRequest')
 
 		userSocket.on('sendSuccess', () => {
@@ -97,6 +100,10 @@ const PendingRequest = () => {
 		userSocket.emit('acceptFriendRequest', { requestId: id })
 	}
 
+	const handleReject = async (id: number) => {
+		userSocket.emit('rejectFriendRequest', { requestId: id })
+	}
+
 
 
 	return (
@@ -122,7 +129,7 @@ const PendingRequest = () => {
 								</Flex>
 								<Stack spacing={2} direction='row' align='center'>
 									<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id)} >Accepter</Button>
-									<Button colorScheme='gray' size='sm'>Rejeter</Button>
+									<Button colorScheme='gray' onClick={() => handleReject(friendRequest.id)} size='sm'>Rejeter</Button>
 								</Stack>
 							</Flex>
 						))}

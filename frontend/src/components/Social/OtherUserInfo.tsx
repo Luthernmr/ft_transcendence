@@ -18,7 +18,7 @@ export default function OtherProfilInfo(props: any) {
 				<Flex flexDirection={'column'} justifyContent={'space-between'} >
 					<Flex alignItems={'center'} flexDirection={'row'}>
 						<VStack>
-							<CircularProgress value={40} size={"3em"} color='green.400' thickness={'3px'}>
+							<CircularProgress value={props?.user?.ratioToNextLevel} size={"3em"} color='green.400' thickness={'3px'}>
 								<CircularProgressLabel><Avatar
 									name={props.user?.nickname}
 									size="xl"
@@ -28,8 +28,7 @@ export default function OtherProfilInfo(props: any) {
 							<Heading >{props.user?.nickname}</Heading>
 						</VStack>
 						<Flex flexDirection={'column'}>
-							<Heading>Level 5/100</Heading>
-							<Text>40/100 XP</Text>
+							<Heading> lvl {props?.user?.level}</Heading>
 						</Flex>
 					</Flex>
 					<HStack>

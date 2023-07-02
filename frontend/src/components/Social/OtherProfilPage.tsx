@@ -38,7 +38,6 @@ export default function OtherProfilPage() {
 				flex={"1"}
 				direction={"column"}
 				maxH={"100%"}
-				overflowY={"auto"}
 			>
 				<HStack>
 					<OtherProfilInfo user={user}/>
