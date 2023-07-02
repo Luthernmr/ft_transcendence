@@ -8,13 +8,16 @@ import { Server, Socket } from 'socket.io';
 import { RoomService } from 'src/room/room.service';
 import { Room } from 'src/room/entities/room.entity';
 import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/user.entity';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
 export class ChatService {
   private logger: Logger;
 
-  constructor(private readonly roomService: RoomService, private readonly userRepo: UserService) {
+  constructor(private readonly roomService: RoomService, private readonly userService: UserService,
+    private readonly authService: AuthService) {
     this.logger = new Logger(ChatService.name);
   }
 
@@ -25,13 +28,22 @@ export class ChatService {
     this.logger.log('Gateway initialized');
   }
 
-  handleConnection(socket: Socket) {
-    this.logger.log('id: ' + socket.id + ' connected');
-  }
-
-  handleDisconnect(socket: Socket) {
-    this.logger.log('id: ' + socket.id + ' disconnected');
-  }
+  // handleConnection(socket: Socket) {
+    // }
+    
+    handleDisconnect(socket: Socket) {
+      this.logger.log('id: ' + socket.id + ' disconnected');
+    }
+    
+    async handleConnection(client: Socket) {
+    this.logger.log('id: ' + client.id + ' connected');
+		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		if (user) {
+			user = await this.userService.setSocket(user.id, client.id);
+			await this.userService.setOnline(user);
+      console.log("************** user", user);
+		}
+	}
 
   @SubscribeMessage('createRoom')
   async createRoom(client: Socket, data: Partial<Room>) {
@@ -45,8 +57,8 @@ export class ChatService {
 
   @SubscribeMessage('getUserRooms')
   async getUserRooms(client: Socket, payload: { userId: number }) {
-    const rooms = await this.userRepo.getRoomsByUID(payload.userId);
-    // console.log("My rooms after typeorm:", rooms);
+    const rooms = await this.userService.getRoomsByUID(payload.userId);
+    console.log("My rooms after typeorm:", rooms.rooms);
     client.emit('roomList', rooms.rooms);
   }
 }

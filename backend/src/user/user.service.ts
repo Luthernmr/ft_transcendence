@@ -116,7 +116,7 @@ export class UserService {
 		return await (this.userRepository.findOne({
 			where: {id: userId},
 			relations: {
-				rooms: true
+				rooms: {users: true}
 			}
 		}))
 	}

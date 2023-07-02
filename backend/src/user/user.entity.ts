@@ -47,8 +47,7 @@ export class User {
   @JoinTable()
   blockedUsers: BlockedUser[];
 
-  @JoinTable()
-  @ManyToOne(() => Room, (room: Room) => room.users)
+  @ManyToMany(() => Room, (room: Room) => room.users)
   rooms: Room[];
 
   @JoinTable()

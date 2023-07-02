@@ -11,12 +11,7 @@ import {
 } from "@chakra-ui/react";
 import { AddIcon } from "@chakra-ui/icons";
 import { chatSocket } from "../../sockets/sockets";
-
-interface User {
-  id: number;
-  name: string;
-  src: string;
-}
+import { User } from "../Social/AllUserItem";
 
 interface Room {
   id: string;
@@ -37,11 +32,10 @@ const RoomList: React.FC<RoomListProps> = ({
   const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
 
   useEffect(() => {
-    chatSocket.emit("getUserRooms", { userId: currentUser.id });
-
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
     });
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
 
     return () => {
       chatSocket.off("roomList");
@@ -82,7 +76,7 @@ const RoomList: React.FC<RoomListProps> = ({
                 (
                   user: User
                 ) => (
-                  <Avatar name={user.name} src={user.src} key={user.id} />
+                  <Avatar name={user.nickname} src={user.imgPdp} key={user.id} />
                 )
               )}
             </AvatarGroup>
