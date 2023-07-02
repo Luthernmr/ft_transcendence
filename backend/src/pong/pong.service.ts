@@ -9,7 +9,7 @@ const COUNTDOWN: number = 3000;
 
 const FRAMERATE: number = 16 / 100;
 
-const PONG_WIDTH: number = 400;
+const PONG_WIDTH: number = 450;
 const PONG_HEIGHT: number = 600;
 
 const BALL_HEIGHT: number = 20;
@@ -18,10 +18,10 @@ const BALL_WIDTH_CUSTOM: number = 50;
 const BALL_CUSTOM_GAIN: number = 8;
 const BALL_MAX_WIDTH: number = 200;
 
-const BALL_START_POS_X: number = 200 - BALL_WIDTH / 2;
-const BALL_START_POS_Y: number = 300 - BALL_HEIGHT / 2;
+const BALL_START_POS_X: number = PONG_WIDTH / 2 - BALL_WIDTH / 2;
+const BALL_START_POS_Y: number = PONG_HEIGHT / 2 - BALL_HEIGHT / 2;
 
-const BALL_SPEED: number = 6;
+const BALL_SPEED: number = 10;
 
 const OUTER_ANGLE_DELTA: number = 5 * BALL_SPEED;
 const INNER_ANGLE_DELTA: number = 2.5 * BALL_SPEED;
@@ -36,7 +36,7 @@ const PADDLE_WIDTH_CUSTOM: number = PADDLE_HEIGHT;
 const PADDLE_SECTION: number = PADDLE_WIDTH / 5;
 const PADDLE_START_POS: number = 200;
 
-const PADDLE_SPEED: number = 20;
+const PADDLE_SPEED: number = 40;
 
 const WIN_SCORE: number = 3;
 
