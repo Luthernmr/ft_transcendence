@@ -10,7 +10,11 @@ const OFFSET_Y: number = 40;
 const WALL_WIDTH: number = 10;
 const WALL_HEIGHT: number = 10;
 
-const RESP: number = 1;
+const MAX_WIN_WIDTH: number = 800;
+const MAX_WIN_HEIGHT: number = 800;
+
+const MIN_WIN_WIDTH: number = 200;
+const MIN_WIN_HEIGHT: number = 200;
 
 const WALL_PLACEHOLDER: Obstacle = {
   x: 0,
@@ -125,6 +129,7 @@ function Pong() {
   const playerNum = useRef<number>(1);
 
   const layout = useRef<Shape>( {width: 0, height: 0} );
+  const [size, setSize] = useState(1);
 
   function WallBuilder(width: number, height: number) {
     walls.current = [{ // UP
@@ -309,12 +314,29 @@ function Pong() {
     pongSocket.emit('keyup', input);
   }
 
+  const updateDimensions = () => {
+    let rate = 1;
+
+    if (window.innerWidth >= MAX_WIN_WIDTH && window.innerHeight >= MAX_WIN_HEIGHT) {
+      rate = 1;
+    } else if (window.innerWidth <= MIN_WIN_WIDTH || window.innerHeight <= MIN_WIN_HEIGHT) {
+      rate = MIN_WIN_WIDTH / MAX_WIN_WIDTH;
+    } else {
+      rate = Math.min(window.innerWidth / MAX_WIN_WIDTH, window.innerHeight / MAX_WIN_HEIGHT);
+    }
+
+    setSize(rate);
+    console.log(rate);
+  }
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('resize', updateDimensions);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyDown);
+      window.removeEventListener('resize', updateDimensions);
     }
   }, []);
 
