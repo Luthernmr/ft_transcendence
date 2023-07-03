@@ -9,6 +9,7 @@ const COUNTDOWN: number = 3000;
 
 const FRAMERATE: number = 16 / 100;
 
+
 const PONG_WIDTH: number = 450;
 const PONG_HEIGHT: number = 600;
 
@@ -238,6 +239,7 @@ export class PongService {
 
 			this.CreateRoom(currentPlayer, opponent, custom);
 		} else {
+			console.log("not enough players in queue =", pendingPlayersArray.length)
 			pendingPlayersArray.push(currentPlayer);
 		}
 	}
@@ -311,12 +313,15 @@ export class PongService {
 
 		this.waitingState.push(false);
 
+		console.log("room created");
+
 		this.pongGateway.EmitPlayerNums(sockets);
 
 		this.pongGateway.EmitInit(roomIndex, custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS);
 
 		this.pongGateway.EmitStartGame(roomIndex, COUNTDOWN / 1000);
 
+		
 		this.StartGameAtCountdown(this.socketsRuntime.length - 1, COUNTDOWN);
 	}
 
