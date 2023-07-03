@@ -8,14 +8,25 @@ import {
   VStack,
   IconButton,
   StackDivider,
+  Text,
+  HStack,
+  Spacer,
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  LockIcon,
+  UnlockIcon,
+  ViewIcon,
+  ViewOffIcon,
+} from "@chakra-ui/icons";
 import { chatSocket } from "../../sockets/sockets";
 import { User } from "../Social/AllUserItem";
 
 interface Room {
   id: string;
   name: string;
+  password: string;
+  isPrivate: boolean;
   users: User[];
 }
 
@@ -71,15 +82,28 @@ const RoomList: React.FC<RoomListProps> = ({
       >
         {rooms?.map((room, index) => (
           <Box h={"40px"} key={index} onClick={() => setSelectedRoom(room)}>
-            <AvatarGroup size={"md"} max={2}>
-              {room?.users?.map(
-                (
-                  user: User
-                ) => (
-                  <Avatar name={user.nickname} src={user.imgPdp} key={user.id} />
-                )
+            <HStack>
+              <AvatarGroup size={"md"} max={3}>
+                {room?.users?.map((user: User) => (
+                  <Avatar
+                    name={user.nickname}
+                    src={user.imgPdp}
+                    key={user.id}
+                  />
+                ))}
+              </AvatarGroup>
+              <Spacer />
+              <Text mr={2}>{room.name}</Text>
+              {room.isPrivate && (
+                <ViewOffIcon boxSize={6} ml={2} color={"gray.500"} />
               )}
-            </AvatarGroup>
+              {room.password && (
+                <LockIcon boxSize={6} ml={2} color={"gray.500"} />
+              )}
+              {!room.isPrivate && !room.password && (
+                <ViewIcon boxSize={6} ml={2} color={"gray.500"} />
+              )}
+            </HStack>
           </Box>
         ))}
       </VStack>
