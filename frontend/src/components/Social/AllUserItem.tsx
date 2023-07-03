@@ -13,6 +13,9 @@ export interface User {
 	imgPdp: string;
 	isOnline: boolean;
 	isTwoFa: boolean;
+	level: number,
+	experience: number,
+	ratioToNextLevel: number
 }
 
 export default function AllUserItem() {

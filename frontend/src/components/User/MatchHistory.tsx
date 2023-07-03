@@ -57,6 +57,7 @@ export default function MatchHistory(props :any) {
 	{
 		return (
 		<>
+
 			<Stack spacing='1'>
 				{ matchHistorys.map((matchHistory) => (
 					<Card key={matchHistory?.id} size={'sm'} bg={handleBg(matchHistory?.winner)}>
@@ -84,7 +85,7 @@ export default function MatchHistory(props :any) {
 		return (
 			<Center>
 
-			<Heading color={'gray.500'} >History is empty</Heading>
+			<Heading color={'gray.500'}>This user has not yet played a game</Heading>
 			</Center>
 		)
 }

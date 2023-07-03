@@ -47,12 +47,10 @@ export default function UserProfile() {
 			borderRadius={"md"}
 			bg={"white"}
 			padding={"15px"}
-			minHeight={"100%"}
 			flex={"1"}
 			direction={"column"}
-			maxH={"100%"}
 		>
-			<Tabs variant="soft-rounded">
+			<Tabs variant="soft-rounded" >
 				<TabList mb="1em">
 					<Tab>Profile Settings</Tab>
 					<Tab>Match History</Tab>
@@ -63,9 +61,9 @@ export default function UserProfile() {
 						<Settings />
 					</TabPanel>
 					<TabPanel >
-					<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}>
-						<MatchHistory user={currentUser} />
-					</Box>
+						<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"scroll"} >
+							<MatchHistory user={currentUser} />
+						</Box>
 					</TabPanel>
 					<TabPanel>
 						<BlockedList />

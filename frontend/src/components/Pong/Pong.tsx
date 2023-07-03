@@ -2,13 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
-import { RiContrastDropLine } from 'react-icons/ri';
 
 const OFFSET_X: number = 40;
 const OFFSET_Y: number = 40;
 
 const WALL_WIDTH: number = 10;
 const WALL_HEIGHT: number = 10;
+
+const MAX_WIN_WIDTH: number = 800;
+const MAX_WIN_HEIGHT: number = 1000;
+
+const MIN_WIN_WIDTH: number = 200;
+const MIN_WIN_HEIGHT: number = 400;
 
 const WALL_PLACEHOLDER: Obstacle = {
   x: 0,
@@ -123,6 +128,7 @@ function Pong() {
   const playerNum = useRef<number>(1);
 
   const layout = useRef<Shape>( {width: 0, height: 0} );
+  const [size, setSize] = useState(1);
 
   function WallBuilder(width: number, height: number) {
     walls.current = [{ // UP
@@ -307,12 +313,30 @@ function Pong() {
     pongSocket.emit('keyup', input);
   }
 
+  const updateDimensions = () => {
+    let rate = 1;
+
+    if (window.innerWidth >= MAX_WIN_WIDTH && window.innerHeight >= MAX_WIN_HEIGHT) {
+      rate = 1;
+    } else if (window.innerWidth <= MIN_WIN_WIDTH || window.innerHeight <= MIN_WIN_HEIGHT) {
+      rate = MIN_WIN_WIDTH / MAX_WIN_WIDTH;
+    } else {
+      rate = Math.min(window.innerWidth / MAX_WIN_WIDTH, window.innerHeight / MAX_WIN_HEIGHT);
+    }
+
+    setSize(rate);
+
+    console.log(rate);
+  }
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('resize', updateDimensions);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyDown);
+      window.removeEventListener('resize', updateDimensions);
     }
   }, []);
 
@@ -365,26 +389,28 @@ function Pong() {
     return (
       <div>
         <Button onClick= { RestartRequest }> Start again ? </Button>
-        <Stage width={500} height={800}>
+        <Stage x={Offset.x} y = {Offset.y} width={500} height={700} scale={{x: size, y: size}}>
           <Layer>
-            <Text fontSize={50} width={700} y={170} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
-            <Text fontSize={50} width={700} y={80} align='center' text={`${score.current.scoreP1} | ${score.current.scoreP2}`} />
-            <Text fontSize={30} width={700} y={170} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
-            <Rect x={Offset.x + walls.current[2].x} y={Offset.y + walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill='black'/>
-            <Rect x={Offset.x + walls.current[3].x} y={Offset.y + walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill='black'/>
-            <Rect x={Offset.x + version(ball.x, layout.current.width - ballShape.current.width)}
-                  y={Offset.y + version(ball.y, layout.current.height - ballShape.current.height)}
+            <Text fontSize={50} width={500} y={250} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
+            <Text fontSize={50} x={5} y={version(225, layout.current.height - 50)} align='left' text={`${score.current.scoreP1}`} />
+            <Text fontSize={50} x={5} y={version(layout.current.height - 50 - 225, layout.current.height - 50)} align='left' text={`${score.current.scoreP2}`} />
+            <Text fontSize={30} width={400} y={200} align='center' text={`Player ${winner.current} won!`} visible={pongState.current === PongState.Finished}/>
+            <Line points={[0, layout.current.height / 2, layout.current.width, layout.current.height / 2]} stroke='black' strokeWidth={1} dash={[10, 10]}/>
+            <Rect x={walls.current[2].x} y={walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill='black'/>
+            <Rect x={walls.current[3].x} y={walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill='black'/>
+            <Rect x={version(ball.x, layout.current.width - ballShape.current.width)}
+                  y={version(ball.y, layout.current.height - ballShape.current.height)}
                   width={ballShape.current.width}
                   height={ballShape.current.height}
                   fill='black'
                   cornerRadius={ballShape.current.height / 2}/>
-            <Rect x={Offset.x + version(leftPaddle.current.pos, layout.current.width - paddleDatas.current.width)}
-                  y={Offset.y + version(0, layout.current.height - paddleDatas.current.height)}
+            <Rect x={version(leftPaddle.current.pos, layout.current.width - paddleDatas.current.width)}
+                  y={version(0, layout.current.height - paddleDatas.current.height)}
                   width={paddleDatas.current.width}
                   height={paddleDatas.current.height}
                   fill='black' cornerRadius={10} />
-            <Rect x={Offset.x + version(rightPaddle.current.pos, layout.current.width - paddleDatas.current.width)}
-                  y={Offset.y + version(layout.current.height - paddleDatas.current.height, layout.current.height - paddleDatas.current.height) }
+            <Rect x={version(rightPaddle.current.pos, layout.current.width - paddleDatas.current.width)}
+                  y={version(layout.current.height - paddleDatas.current.height, layout.current.height - paddleDatas.current.height) }
                   width={paddleDatas.current.width}
                   height={paddleDatas.current.height}
                   fill='black' cornerRadius={10}/>
