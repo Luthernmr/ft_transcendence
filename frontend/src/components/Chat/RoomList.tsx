@@ -20,14 +20,10 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton
+  ModalCloseButton,
+  useToast,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  LockIcon,
-  ViewIcon,
-  ViewOffIcon,
-} from "@chakra-ui/icons";
+import { AddIcon, LockIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import { chatSocket } from "../../sockets/sockets";
 import { User } from "../Social/AllUserItem";
 
@@ -58,13 +54,14 @@ const RoomList: React.FC<RoomListProps> = ({
     chatSocket.emit("getUserRooms", { userId: currentUser.id });
 
     return () => {
-      chatSocket.off("roomList");
+      // chatSocket.off("roomList");
     };
   }, [currentUser.id]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [roomPassword, setRoomPassword] = useState("");
   const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);
+  const toast = useToast();
 
   const handleRoomClick = (room: Room) => {
     if (room.password) {
@@ -73,13 +70,26 @@ const RoomList: React.FC<RoomListProps> = ({
     } else {
       setSelectedRoom(room);
     }
-  }
+  };
 
   const handlePasswordSubmit = () => {
-    // TODO: Verify the password with your own logic
-    setSelectedRoom(selectedRoom);
+    chatSocket.on("passCheck", (check: boolean) => {
+      if (check && selectedRoom) {
+        setSelectedRoom(selectedRoom);
+      }
+      else {
+        toast({
+          title: "Wrong password",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        return;
+      }
+    })
+    chatSocket.emit("checkRoomPassword", { room: selectedRoom, password: roomPassword, });
     onClose();
-  }
+  };
 
   return (
     <Flex
