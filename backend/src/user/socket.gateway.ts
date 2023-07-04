@@ -56,7 +56,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//console.log('socket id receiv :', otherId, 'socket id sender  :', userSender.socketId)
 		try {
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
-			if (alreadyExist)
+			console.log('relation', alreadyExist);
+			if (alreadyExist != null)
 				throw new BadRequestException('Request already exists for this person.');
 			if (userReceiv.id == userSender.id)
 				throw new BadRequestException('can t send request');
@@ -91,7 +92,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			})
 			client.to(otherId).emit('reload');
 			client.emit('requestAcccepted')
-			await this.userService.deletePendingRequestById(data.requestId);
+			await this.userService.deletePendingRequestById(request);
 		}
 		catch (error) {
 			//console.log(error)
@@ -105,8 +106,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		try {
 			//console.log('rejected', data.requestId)
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
-
 			await this.userService.deletePendingRequestById(request);
+			console.log('rejected', request);
 			client.emit('requestRejected')
 		}
 		catch (error) {
