@@ -3,6 +3,7 @@ import { Socket } from 'socket.io-client';
 
 
 export const userSocket : Socket = io(import.meta.env.VITE_BACKEND + '/user', {
+	timeout : 5000,
 	auth: {
 	  token: sessionStorage.getItem("jwt")
 	}

@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { JwtService } from '@nestjs/jwt';
 import { FriendService } from 'src/social/friend.service';
+import { Server, Socket } from "socket.io";
 
 @Injectable()
 export class UserService {
