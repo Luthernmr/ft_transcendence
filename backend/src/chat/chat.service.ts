@@ -31,17 +31,16 @@ export class ChatService {
   // handleConnection(socket: Socket) {
     // }
     
-    handleDisconnect(socket: Socket) {
+    async handleDisconnect(socket: Socket) {
       this.logger.log('id: ' + socket.id + ' disconnected');
     }
     
     async handleConnection(client: Socket) {
-    this.logger.log('id: ' + client.id + ' connected');
+    this.logger.log('id-: ' + client.id + ' connected');
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
-      console.log("************** user", user);
 		}
 	}
 
@@ -58,7 +57,6 @@ export class ChatService {
   @SubscribeMessage('getUserRooms')
   async getUserRooms(client: Socket, payload: { userId: number }) {
     const rooms = await this.userService.getRoomsByUID(payload.userId);
-    console.log("My rooms after typeorm:", rooms.rooms);
     client.emit('roomList', rooms.rooms);
   }
 }

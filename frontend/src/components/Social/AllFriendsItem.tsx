@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { userSocket } from "../../sockets/sockets";
 import { User } from "./AllUserItem";
 
-
 export interface Friend {
 	id: number;
 	nickname: string;
@@ -19,7 +18,6 @@ export default function AllfriendItem() {
 
 	useEffect(() => {
 		userSocket.on('friendsList', (data) => {
-			console.log('friendlist', data);
 			setFriends(data)
 		})
 		userSocket.on('requestAcccepted', () => {
@@ -35,7 +33,6 @@ export default function AllfriendItem() {
 	function deleteFriend(e: any, id: number) {
 		e.preventDefault()
 		userSocket.emit("deleteFriend", { friendId: id })
-		console.log('deleteFriend');
 	}
 
 

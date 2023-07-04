@@ -9,7 +9,6 @@ import AllUserItem from "./AllUserItem";
 import AllfriendItem from "./AllFriendsItem";
 
 export default function FriendList() {
-
   return (
     <>
       <Tabs variant="soft-rounded">

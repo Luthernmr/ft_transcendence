@@ -1,8 +1,4 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { User } from "./AllUserItem";
-import { IconButton, Box, Text, List, ListItem, Flex, Avatar, AvatarBadge, Badge, Button, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Icon, HStack, VStack, CircularProgress, CircularProgressLabel, Heading } from "@chakra-ui/react";
+import { Box, Flex, Avatar, HStack, VStack, CircularProgress, CircularProgressLabel, Heading } from "@chakra-ui/react";
 import AddFriendButton from "./AddFriendButton";
 import BlockUserButton from "./BlockUserButton";
 
@@ -10,8 +6,6 @@ import BlockUserButton from "./BlockUserButton";
 
 
 export default function OtherProfilInfo(props: any) {
-
-
 	return (
 		<>
 			<Box borderWidth='1px' borderRadius='lg' p={4} m={4}>

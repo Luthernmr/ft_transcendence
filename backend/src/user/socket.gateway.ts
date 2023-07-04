@@ -2,15 +2,11 @@
 https://docs.nestjs.com/websockets/gateways#gateways
 */
 
-import { MessageBody, SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
-import { use } from 'passport';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit } from '@nestjs/websockets';
 import { Server, Socket } from "socket.io";
 import { UserService } from './user.service';
 import { User } from './user.entity';
-import { validate } from 'class-validator';
-import { SocketAddress } from 'net';
 import { FriendService } from 'src/social/friend.service';
-import { PendingRequest } from 'src/social/pendingRequest.entity';
 import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
 import { BadRequestException } from '@nestjs/common';
@@ -30,6 +26,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		//console.log('use on connexion:', user)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
@@ -52,18 +49,17 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async Friend(client: Socket, data: {
 		userReceiveId: any,
 	}) {
-		console.log('test')
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		const userReceiv: any = await this.userService.getUserById(data.userReceiveId)
+		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
 
-		const otherId = userReceiv.socketId;
-
+		const otherId = userReceiv.socketId; 
+		console.log('socket id receiv :', otherId, 'socket id sender  :', userSender.socketId)
 		try {
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
 			if (alreadyExist)
-				throw new BadRequestException('Request already exists for this person.');	
-			if(userReceiv == userSender)
-				throw new BadRequestException('can t send request');	
+				throw new BadRequestException('Request already exists for this person.');
+			if (userReceiv.id == userSender.id)
+				throw new BadRequestException('can t send request');
 			await this.userService.createPendingRequest({
 				type: "Friend",
 				senderId: userSender.id,
@@ -109,7 +105,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		try {
 			console.log('rejected', data.requestId)
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
-		
+
 			await this.userService.deletePendingRequestById(request);
 			client.emit('requestRejected')
 		}
@@ -173,21 +169,21 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		const userBlocked: any = await this.userService.getUserById(data.userBlockedId)
 
 		try {
-				const alreadyBlock: any = await this.friendService.getBlockedRelation(userSender, userBlocked)
-				if (userSender.id == userBlocked.id || alreadyBlock)
-					throw new BadRequestException('block error');	
-				await this.friendService.blockUser({
-					currentUser: userSender,
-					otherUser: userBlocked
-				})
-				client.emit('userHasBlocked');
-			}
-			catch (error) {
-				console.log(error)
-				client.emit('alreadyBlocked');
-			}
+			const alreadyBlock: any = await this.friendService.getBlockedRelation(userSender, userBlocked)
+			if (userSender.id == userBlocked.id || alreadyBlock)
+				throw new BadRequestException('block error');
+			await this.friendService.blockUser({
+				currentUser: userSender,
+				otherUser: userBlocked
+			})
+			client.emit('userHasBlocked');
 		}
-		
+		catch (error) {
+			console.log(error)
+			client.emit('alreadyBlocked');
+		}
+	}
+
 	@SubscribeMessage('getBlockedList')
 	async getBlockList(client: Socket) {
 		try {

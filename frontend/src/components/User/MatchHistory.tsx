@@ -1,6 +1,6 @@
-import { Card, CardHeader, CardBody, CardFooter, Heading, Stack, Text, Box, Avatar, Flex, HStack, Center } from '@chakra-ui/react'
+import { Card, CardBody, Heading, Stack, Text, Avatar, Flex, HStack, Center } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { Link as RouteLink, useNavigate } from "react-router-dom";
+import { Link as RouteLink } from "react-router-dom";
 
 import { User } from '../Social/AllUserItem';
 import axios from 'axios';
@@ -19,7 +19,6 @@ export default function MatchHistory(props :any) {
 		try {
 			const getHistory = async () => {
 				try {
-					console.log('before getHIsto')
 					const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/history/' + props?.user?.id , {
 						withCredentials: true,
 					})
@@ -35,11 +34,6 @@ export default function MatchHistory(props :any) {
 			console.log(error)
 		}
 	}, [props?.user?.id])
-	
-	useEffect(() => {
-		console.log('id', props?.user?.id);
-		console.log('historyss winner id:', matchHistorys);
-	}, [matchHistorys]);
 	
 	function handleBg(issue: any) {
 		if (issue)
@@ -57,7 +51,6 @@ export default function MatchHistory(props :any) {
 	{
 		return (
 		<>
-
 			<Stack spacing='1'>
 				{ matchHistorys.map((matchHistory) => (
 					<Card key={matchHistory?.id} size={'sm'} bg={handleBg(matchHistory?.winner)}>

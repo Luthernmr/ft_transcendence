@@ -2,12 +2,9 @@ import {
 	Popover,
 	PopoverTrigger,
 	PopoverContent,
-	PopoverHeader,
 	PopoverBody,
-	PopoverFooter,
 	PopoverArrow,
 	PopoverCloseButton,
-	PopoverAnchor,
 	Button,
 	Portal,
 	Tab,
@@ -18,27 +15,16 @@ import {
 	IconButton,
 	Box,
 	Avatar,
-	Tag,
-	TagLabel,
 	Text,
 	Flex,
 	Stack,
-	AvatarBadge,
-	Badge,
-	css,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import {
-	FiSettings,
-	FiMenu,
 	FiBell,
-	FiChevronDown,
-	FiMessageSquare,
 } from 'react-icons/fi';
 import { userSocket } from '../../sockets/sockets';
-import axios from 'axios';
 import { useToast } from '@chakra-ui/react'
-import { count } from 'console';
 
 export interface FriendRequest {
 	id: number;
@@ -51,20 +37,15 @@ export interface FriendRequest {
 const PendingRequest = () => {
 
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
-
 	const toast = useToast()
 	useEffect(() => {
 		userSocket.on('notifyRequest', () => {
-			console.log('notify');
 			userSocket.emit('getPendingRequest')
 		})
 
 		userSocket.on('pendingRequestsList', (data) => {
-			console.log(data)
 			setFriendRequests(data);
 		})
-
-
 		userSocket.on('requestAcccepted', () => {
 			userSocket.emit('getPendingRequest')
 		})
@@ -90,11 +71,8 @@ const PendingRequest = () => {
 				isClosable: true,
 				position: 'top'
 			})
-			console.log('test');
-
 		})
 	}, []);
-
 
 	const handleAccept = async (id: number) => {
 		userSocket.emit('acceptFriendRequest', { requestId: id })
@@ -103,9 +81,6 @@ const PendingRequest = () => {
 	const handleReject = async (id: number) => {
 		userSocket.emit('rejectFriendRequest', { requestId: id })
 	}
-
-
-
 	return (
 		<Box>
 			<Tabs variant='soft-rounded' colorScheme='blue'>

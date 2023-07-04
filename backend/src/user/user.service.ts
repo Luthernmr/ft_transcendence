@@ -63,14 +63,12 @@ export class UserService {
 	}
 
 	async createPendingRequest(data: any): Promise<PendingRequest> {
-		console.log("data", data);
 		const existingRequest = await this.pendingRequest.findOne({
 			where: {
 				type: data.type,
 				senderId: data.senderId
 			}
 		});
-		console.log('exiting', existingRequest)
 		if (existingRequest) {
 			throw new BadRequestException('Request already exists for this person.');
 		}
@@ -83,9 +81,7 @@ export class UserService {
 
 	async deletePendingRequestById(request: PendingRequest) {
 		try {
-			console.log('delete this:', request);
 			const result = await this.pendingRequest.delete(request);
-			console.log('deletion result:', result);
 			return result;
 		  } catch (error) {
 			console.error('An error occurred while deleting the pending request:', error);
@@ -95,7 +91,6 @@ export class UserService {
 
 	async getAllPendingRequest(user: any): Promise<any> {
 		const userWithPendingRequests = await this.userRepository.findOne({ where: user, relations: ['pendingRequests'] });
-		console.log("pending list", userWithPendingRequests.pendingRequests);
 		return userWithPendingRequests.pendingRequests;
 	}
 

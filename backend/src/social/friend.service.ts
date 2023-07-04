@@ -29,7 +29,6 @@ export class FriendService {
 		return this.blockedUserRepository.save(data)
 	}
 	
-
 	async deleteFriend(currentUser : User , friendUser : User){
 		try {
 			const relation : any = await this.getRelation(currentUser, friendUser);
@@ -73,27 +72,16 @@ export class FriendService {
 		});
 		
 		const friendList = [];
-
-		
-		
 		for (let i = 0; i < theyRequested.length; i++) {
 			if (!iRequested.find(item => item.userA.id === theyRequested[i].userB.id)) {
 				friendList.push(theyRequested[i].userB);
-				console.log('yes');
 			}
-			console.log('no')
-
 		}
-		
 		for (let i = 0; i < iRequested.length; i++) {
 			if(!theyRequested.find(item => item.userB.id === iRequested[i].userA.id)){
 				friendList.push(iRequested[i].userA);
-				console.log('yes')
 			}
-			console.log('alreadyFriends')
 		}
-		
-		console.log("FriendList", friendList)
 		return friendList;
 	}
 

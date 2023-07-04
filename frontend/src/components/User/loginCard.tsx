@@ -12,33 +12,17 @@ import {
 	Text,
 	useColorModeValue,
 	useToast,
-	HStack,
 	Modal,
-	ModalBody,
-	ModalCloseButton,
-	ModalContent,
-	ModalFooter,
-	ModalHeader,
-	ModalOverlay,
-	PinInput,
-	PinInputField,
-	VStack,
 	useDisclosure,
 } from '@chakra-ui/react';
 import axios from 'axios';
-import { FormEventHandler } from 'react';
-import { useState, ChangeEvent, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { io } from 'socket.io-client';
+import { useState, ChangeEvent } from 'react';
+import { useNavigate } from 'react-router-dom';
 import TwoFA from './TwoFA';
-import { pongSocket } from '../../sockets/sockets';
+import { chatSocket, pongSocket, userSocket } from '../../sockets/sockets';
 interface FormValue {
 	email: string;
 	password: string;
-}
-
-interface OnlineResponse {
-	online: boolean;
 }
 
 export default function loginCard() {
@@ -61,12 +45,16 @@ export default function loginCard() {
 				"email": formValue.email,
 				"password": formValue.password
 			}, { withCredentials: true });
-			console.log('data', response.data)
 			if (response.data.token) {
-				navigate('/Home');
-				console.log('token,normal', response.data.token);
 				sessionStorage.setItem('jwt', response.data.token);
-				pongSocket.emit("register", { token: response.data.token });
+				if (sessionStorage.getItem("jwt")) {
+					userSocket.auth = {token : response.data.token}
+					chatSocket.auth = {token : response.data.token}
+					chatSocket.disconnect().connect();
+					userSocket.disconnect().connect();
+					navigate("/home");
+					pongSocket.emit("register", { token: response.data.jwt });
+				}
 			}
 			if (!response.data) {
 				onOpen()
@@ -92,7 +80,7 @@ export default function loginCard() {
 		}
 	};
 
-	const connectAPI = async (event: any) => {
+	const connectAPI = async () => {
 		window.location.href = import.meta.env.VITE_42AUTH;
 	}
 	const [pinCode, setPinCode] = useState("");

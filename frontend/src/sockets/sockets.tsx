@@ -1,11 +1,12 @@
 import { io } from "socket.io-client";
+import { Socket } from 'socket.io-client';
 
-export const userSocket = io(import.meta.env.VITE_BACKEND + '/user', {
-	//reconnectionDelayMax: 10000, 
+
+export const userSocket : Socket = io(import.meta.env.VITE_BACKEND + '/user', {
 	auth: {
-		token: sessionStorage.getItem("jwt")
+	  token: sessionStorage.getItem("jwt")
 	}
-});
+  });
 
 export const chatSocket = io(import.meta.env.VITE_BACKEND + '/chat', {
 	auth: {

@@ -63,9 +63,6 @@ export class AuthService {
 		await this.userService.setOffline(user)
 		response.clearCookie('jwt');
 		response.clearCookie('twofa');
-		console.log('prout', response.cookie['jwt']);
-		console.log('prout', response.cookie['twofa']);
-
 	}
 
 }

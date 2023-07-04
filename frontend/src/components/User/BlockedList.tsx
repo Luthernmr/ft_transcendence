@@ -1,5 +1,5 @@
-import { DeleteIcon, ChatIcon, ViewIcon } from "@chakra-ui/icons";
-import { Box, Text, List, Popover, ListItem, PopoverTrigger, Flex, Avatar, AvatarBadge, Badge, PopoverContent, PopoverArrow, PopoverHeader, PopoverCloseButton, PopoverBody, HStack, IconButton, useToast, Stack } from "@chakra-ui/react";
+import { DeleteIcon } from "@chakra-ui/icons";
+import { Box, Text, List, ListItem, Flex, Avatar, HStack, IconButton, useToast } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { userSocket } from "../../sockets/sockets";
 
@@ -16,7 +16,6 @@ export default function BlockedList() {
 
 	useEffect(() => {
 		userSocket.on('blockedList', (data) => {
-			console.log('blockedList', data);
 			setBlockedUsers(data)
 		})
 
@@ -33,7 +32,6 @@ export default function BlockedList() {
 				isClosable: true,
 				position: 'top'
 			})
-			console.log('test');
 
 		})
 	}, []);

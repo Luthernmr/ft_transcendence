@@ -25,6 +25,7 @@ export default function App() {
 
 	userSocket.on('connect', () => {
 		console.log('user socket connect')
+
 	})
 
 	pongSocket.on('connect', () => {

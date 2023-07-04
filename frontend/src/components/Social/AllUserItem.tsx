@@ -24,7 +24,6 @@ export default function AllUserItem() {
 
 	useEffect(() => {
 		userSocket.on('userList', (data) => {
-			console.log('userList', data);
 			setUsers(data)
 		})
 		userSocket.emit('getAllUsers')

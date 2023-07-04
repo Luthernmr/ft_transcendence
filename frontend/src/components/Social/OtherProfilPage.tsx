@@ -1,7 +1,5 @@
-import { Box, CircularProgress, Flex, HStack, Tab, TabList, TabPanel, TabPanels, Tabs, Text } from "@chakra-ui/react"
-import BlockedList from "../User/BlockedList"
+import { Box, Flex, HStack } from "@chakra-ui/react"
 import MatchHistory from "../User/MatchHistory"
-import Settings from "../User/Settings"
 import OtherProfilInfo from "./OtherUserInfo"
 import axios from "axios"
 import { useState, useEffect } from "react"
@@ -9,7 +7,6 @@ import { useParams } from "react-router-dom"
 import { User } from "./AllUserItem"
 
 export default function OtherProfilPage() {
-
 	const [user, setUser] = useState<User>();
 	const { id } = useParams();
 	useEffect(() => {
@@ -18,7 +15,6 @@ export default function OtherProfilPage() {
 				const resp : any  = await axios.get(import.meta.env.VITE_BACKEND + '/user/' + id, {
 					withCredentials: true,
 				})
-				console.log('je rep', resp);
 				setUser(resp.data.user)
 			}
 			getUser();
