@@ -11,11 +11,20 @@ import {
   Text,
   HStack,
   Spacer,
+  Input,
+  Button,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalFooter,
+  ModalBody,
+  ModalCloseButton
 } from "@chakra-ui/react";
 import {
   AddIcon,
   LockIcon,
-  UnlockIcon,
   ViewIcon,
   ViewOffIcon,
 } from "@chakra-ui/icons";
@@ -53,6 +62,25 @@ const RoomList: React.FC<RoomListProps> = ({
     };
   }, [currentUser.id]);
 
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [roomPassword, setRoomPassword] = useState("");
+  const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);
+
+  const handleRoomClick = (room: Room) => {
+    if (room.password) {
+      setSelectedRoomLocal(room);
+      onOpen();
+    } else {
+      setSelectedRoom(room);
+    }
+  }
+
+  const handlePasswordSubmit = () => {
+    // TODO: Verify the password with your own logic
+    setSelectedRoom(selectedRoom);
+    onClose();
+  }
+
   return (
     <Flex
       borderRadius={"md"}
@@ -81,7 +109,7 @@ const RoomList: React.FC<RoomListProps> = ({
         overflowY="auto"
       >
         {rooms?.map((room, index) => (
-          <Box h={"40px"} key={index} onClick={() => setSelectedRoom(room)}>
+          <Box h={"40px"} key={index} onClick={() => handleRoomClick(room)}>
             <HStack>
               <AvatarGroup size={"md"} max={3}>
                 {room?.users?.map((user: User) => (
@@ -107,6 +135,31 @@ const RoomList: React.FC<RoomListProps> = ({
           </Box>
         ))}
       </VStack>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>Password Required</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Input
+              type="password"
+              placeholder="Enter password"
+              value={roomPassword}
+              onChange={(e) => setRoomPassword(e.target.value)}
+            />
+          </ModalBody>
+
+          <ModalFooter>
+            <Button variant="ghost" mr={3} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button colorScheme="blue" onClick={handlePasswordSubmit}>
+              Submit
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </Flex>
   );
 };

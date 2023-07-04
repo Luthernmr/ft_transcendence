@@ -30,58 +30,59 @@ export class HistoryService {
 	}
 
 	async addEntry(ids: IDPair, score: Score) {
-		const user1 = await this.userService.getUserById(ids.idP1);
-		const user2 = await this.userService.getUserById(ids.idP2);
+    const user1 = await this.userService.getUserById(ids.idP1);
+    const user2 = await this.userService.getUserById(ids.idP2);
 
-		const winner = score.scoreP1 > score.scoreP2 ? 1 : 2;
-		
-		const winnerUser = winner === 1 ? user1 : user2;
-		const loserUser = winnerUser === user1 ? user2 : user1;
+    const winner = score.scoreP1 > score.scoreP2 ? 1 : 2;
 
-		const levelDiff = loserUser.level - winnerUser.level;
-		const xpGained = levelDiff > 0 ? XP_GAIN_WIN * (levelDiff + 1) : XP_GAIN_WIN;
+    const winnerUser = winner === 1 ? user1 : user2;
+    const loserUser = winnerUser === user1 ? user2 : user1;
 
-		await this.addXP(winnerUser, xpGained);
-		await this.addXP(loserUser, XP_GAIN_LOSS);
+    const levelDiff = loserUser.level - winnerUser.level;
+    const xpGained =
+      levelDiff > 0 ? XP_GAIN_WIN * (levelDiff + 1) : XP_GAIN_WIN;
 
-		//console.log("user1 lvl: ", user1.level, "xp: ", user1.experience);
-		//console.log("user2 lvl: ", user2.level, "xp: ", user2.experience);
+    await this.addXP(winnerUser, xpGained);
+    await this.addXP(loserUser, XP_GAIN_LOSS);
 
-		const history = {
-			user1: user1,
-			user2: user2,
-			winner: winner,
-			scoreUser1: score.scoreP1,
-			scoreUser2: score.scoreP2
-		};
+    ////console.log("user1 lvl: ", user1.level, "xp: ", user1.experience);
+    ////console.log("user2 lvl: ", user2.level, "xp: ", user2.experience);
 
-		await this.pongHistory.save(history);
-	}
+    const history = {
+      user1: user1,
+      user2: user2,
+      winner: winner,
+      scoreUser1: score.scoreP1,
+      scoreUser2: score.scoreP2,
+    };
+
+    await this.pongHistory.save(history);
+  }
 
 	async addXP(user: User, xp: number) {
-		const userXP = user.experience + xp;
-		
-		let userLevel = 1;
-		let ladder = 1;
+    const userXP = user.experience + xp;
 
-		while (userXP >= (ladder * 100)) {
-			userLevel++;
-			ladder += userLevel;
-		}
+    let userLevel = 1;
+    let ladder = 1;
 
-		const previousLadder = ladder - userLevel;
-		const currentLevelXP = userXP - (previousLadder * 100);
-		const percentageToNextLevel = currentLevelXP / (userLevel * 100);
-		const ratioToNextLevel = Math.trunc(percentageToNextLevel * 100);
+    while (userXP >= ladder * 100) {
+      userLevel++;
+      ladder += userLevel;
+    }
 
-		//console.log("XP user " + user.id, " : ", userLevel, userXP, ratioToNextLevel);
+    const previousLadder = ladder - userLevel;
+    const currentLevelXP = userXP - previousLadder * 100;
+    const percentageToNextLevel = currentLevelXP / (userLevel * 100);
+    const ratioToNextLevel = Math.trunc(percentageToNextLevel * 100);
 
-		await this.userRepository.update(user.id, {
-			level: userLevel,
-			experience: userXP,
-			ratioToNextLevel: ratioToNextLevel
-		});
-	}
+    ////console.log("XP user " + user.id, " : ", userLevel, userXP, ratioToNextLevel);
+
+    await this.userRepository.update(user.id, {
+      level: userLevel,
+      experience: userXP,
+      ratioToNextLevel: ratioToNextLevel,
+    });
+  }
 
 	async getAllHistories(): Promise<PongHistory[]> {
 		return await this.pongHistory.find();

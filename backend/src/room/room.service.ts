@@ -27,9 +27,9 @@ export class RoomService {
 
   async createRoom(client: Socket, data: Partial<Room>) {
     try {
-      // console.log('Data of room is : ', data);
+      // //console.log('Data of room is : ', data);
       const dto = plainToClass(CreateRoomDto, data);
-      // console.log('DTO of room is : ', dto);
+      // //console.log('DTO of room is : ', dto);
       await validateOrReject(dto).catch((errors: ValidationError[]) => {
         throw new BadRequestException(errors);
       });
@@ -53,7 +53,6 @@ export class RoomService {
         users: dto.users,
       };
       await this.roomRepo.save(payload);
-      
     } catch (error) {
       this.logger.log(error);
       return error;

@@ -30,10 +30,10 @@ export class UserController {
 	@Get(':id')
 	@UseGuards(JwtTwoFactorGuard)
 	async user(@Res() response: Response, @Param('id') id: number) {
-		console.log('here')
+		//console.log('here')
 		const user = await this.userService.getUserById(id)
 		delete user.password;
-		console.log('test', user)
+		//console.log('test', user)
 		response.send({ user: user });
 	}
 
@@ -41,15 +41,15 @@ export class UserController {
 	@UseGuards()
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-			console.log('usi id request hystory',id);
-			
-			const user : any = await this.userService.getUserById(id)
-			delete user.password;
-			const history : any = await this.historyService.getUserHistory(user);
-			console.log('history', history);
-			response.send({history : history});
-		} catch (error) {
-			console.log(error);
+      //console.log('usi id request hystory',id);
+
+      const user: any = await this.userService.getUserById(id);
+      delete user.password;
+      const history: any = await this.historyService.getUserHistory(user);
+      //console.log('history', history);
+      response.send({ history: history });
+    } catch (error) {
+			//console.log(error);
 		}
 	}
 

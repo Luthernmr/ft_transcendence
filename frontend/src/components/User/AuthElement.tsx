@@ -37,8 +37,8 @@ export default function AuthElement() {
 						pongSocket.emit("register", { token: res.data.jwt });
 					} else onOpen();
 				} catch (error) {
-					console.log("already", error);
-				}
+          //console.log("already", error);
+        }
 			};
 			getAuthToken();
 			setAuthTokenCalled(true); // Mettre à jour l'état pour indiquer que getAuthToken a été appelée
@@ -46,15 +46,15 @@ export default function AuthElement() {
 	}, [authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
 
 	async function handleclick() {
-		const response = await axios.get(
-			import.meta.env.VITE_BACKEND + "/api/logout",
-			{ withCredentials: true }
-		);
-		console.log(response.data);
-		sessionStorage.removeItem("jwt");
-		sessionStorage.removeItem("currentUser");
-		navigate("/login");
-	}
+    const response = await axios.get(
+      import.meta.env.VITE_BACKEND + "/api/logout",
+      { withCredentials: true }
+    );
+    //console.log(response.data);
+    sessionStorage.removeItem("jwt");
+    sessionStorage.removeItem("currentUser");
+    navigate("/login");
+  }
 	return (
 		<>
 			<Center h="100vh">

@@ -201,8 +201,8 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         withCredentials: true,
       });
       setUser(res.data.user);
-      sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
-      console.log(sessionStorage.getItem("currentUser"));
+      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+      //console.log(sessionStorage.getItem("currentUser"));
     };
     getUser();
   }, []);
@@ -213,12 +213,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         import.meta.env.VITE_BACKEND + "/api/logout",
         { withCredentials: true }
       );
-      console.log(response.data);
+      //console.log(response.data);
       sessionStorage.removeItem("jwt");
       sessionStorage.removeItem("currentUser");
-      console.log("jwwwr", sessionStorage.getItem("jwt"));
+      //console.log("jwwwr", sessionStorage.getItem("jwt"));
     } catch (error) {
-      console.log(error);
+      //console.log(error);
     }
   };
 

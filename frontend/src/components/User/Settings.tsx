@@ -36,8 +36,8 @@ export default function Settings() {
 
 			}, { withCredentials: true });
 		} catch (error) {
-			console.log(error);
-		}
+      //console.log(error);
+    }
 	}
 
 	const [isChecked, setIsChecked] = useState(false);
@@ -77,34 +77,39 @@ export default function Settings() {
 
 	async function sendCode() {
 		try {
-			const resp = await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-on' + location.search, {
-				"twoFACode": pinCode
-			}, { withCredentials: true });
-			console.log(resp.data.status);
-			if (resp.data.status == 401)
-				throw new Error('test');
-			setIsChecked(true);
-			toast({
-				title: `2FA is now activate please log in again`,
-				status: 'success',
-				isClosable: true,
-				position: 'top'
-			})
-			await axios.get(import.meta.env.VITE_BACKEND + "/api/logout",{ withCredentials: true });
-			sessionStorage.removeItem("jwt");
-			sessionStorage.removeItem("currentUser");
-			onClose()
-			navigate('/login');
-		}
+      const resp = await axios.post(
+        import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
+        {
+          twoFACode: pinCode,
+        },
+        { withCredentials: true }
+      );
+      //console.log(resp.data.status);
+      if (resp.data.status == 401) throw new Error("test");
+      setIsChecked(true);
+      toast({
+        title: `2FA is now activate please log in again`,
+        status: "success",
+        isClosable: true,
+        position: "top",
+      });
+      await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+        withCredentials: true,
+      });
+      sessionStorage.removeItem("jwt");
+      sessionStorage.removeItem("currentUser");
+      onClose();
+      navigate("/login");
+    }
 		catch (error) {
-			toast({
-				title: `invalid code`,
-				status: 'error',
-				isClosable: true,
-				position: 'top'
-			})
-			console.log(error)
-		}
+      toast({
+        title: `invalid code`,
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+      //console.log(error)
+    }
 	}
 
 	return (

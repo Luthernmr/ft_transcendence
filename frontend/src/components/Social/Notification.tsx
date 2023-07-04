@@ -55,15 +55,14 @@ const PendingRequest = () => {
 		userSocket.emit('getPendingRequest')
 
 		userSocket.on('sendSuccess', () => {
-			toast({
-				title: `A request has been sent`,
-				status: 'success',
-				isClosable: true,
-				position: 'top'
-			})
-			console.log('test');
-
-		})
+      toast({
+        title: `A request has been sent`,
+        status: "success",
+        isClosable: true,
+        position: "top",
+      });
+      //console.log('test');
+    })
 		userSocket.on('alreadyFriend', () => {
 			toast({
 				title: `You can't send more friend request`,
@@ -128,9 +127,9 @@ const BellButton = () => {
 
 	useEffect(() => {
 		userSocket.on('notifyRequest', () => {
-			console.log('notify');
-			setNotified(true);
-		})
+      //console.log('notify');
+      setNotified(true);
+    })
 	}, [notified])
 
 

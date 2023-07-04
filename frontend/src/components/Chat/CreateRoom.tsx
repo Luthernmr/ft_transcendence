@@ -117,7 +117,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
       chatSocket.on("error", handleError);
       chatSocket.on("roomCreated", handleRoomCreated);
 
-      console.log(members);
+      //console.log(members);
       chatSocket.emit("createRoom", {
         name: roomName,
         users: members,

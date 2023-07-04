@@ -25,14 +25,14 @@ export default function MatchHistory(props :any) {
 					setMatchHistorys(resp.data.history)
 				} catch(error)
 				{
-					console.log('error', error);
-				}
+          //console.log('error', error);
+        }
 			}
 			getHistory()
 		}
 		catch (error) {
-			console.log(error)
-		}
+      //console.log(error)
+    }
 	}, [props?.user?.id])
 	
 	function handleBg(issue: any) {

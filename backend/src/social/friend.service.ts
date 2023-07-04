@@ -36,7 +36,7 @@ export class FriendService {
 		}
 		catch(error)
 		{
-			console.log(error)
+			//console.log(error)
 		}
 	}
 	async getFriends(currentUser: User): Promise<any> {
@@ -122,7 +122,7 @@ export class FriendService {
 		
 		if (relation1.length)
 		{
-			console.log('relqtion bloc-k 1', relation1)
+			//console.log('relqtion bloc-k 1', relation1)
 			return relation1
 		}
 	}
@@ -145,25 +145,25 @@ export class FriendService {
 		});
 
 		let blockedList2 = []
-		console.log('blockedList',blockedList)
+		//console.log('blockedList',blockedList)
 		for (let i = 0; i < blockedList.length; i++) {
 			blockedList2.push(blockedList[i].otherUser);
 		}
 		
-		console.log("blockedList service", blockedList2)
+		//console.log("blockedList service", blockedList2)
 		return blockedList2;
 	}
 
 	async unblockUser (currentUser : User, otherUser : User ) {
 		try{
-			console.log('here', currentUser, otherUser)
-			let relation : any = await this.getBlockedRelation(currentUser, otherUser)
-			console.log('unblock',relation);
-			 await	this.blockedUserRepository.delete(relation)
-		}
+      //console.log('here', currentUser, otherUser)
+      let relation: any = await this.getBlockedRelation(currentUser, otherUser);
+      //console.log('unblock',relation);
+      await this.blockedUserRepository.delete(relation);
+    }
 		catch (error)
 		{
-			console.log(error);
+			//console.log(error);
 		}
 	}
 

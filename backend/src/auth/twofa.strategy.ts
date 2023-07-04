@@ -13,18 +13,20 @@ export class JwtTwoFactorStrategy extends PassportStrategy( Strategy,'jwt-two-fa
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {
-	console.log('test')
+    //console.log('test')
     super({
-      jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-		console.log(request.cookies);
-        return request?.cookies?.twofa;
-      }]),
-      secretOrKey: 'secret'
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (request: Request) => {
+          //console.log(request.cookies);
+          return request?.cookies?.twofa;
+        },
+      ]),
+      secretOrKey: 'secret',
     });
   }
  
   async validate(payload : any) {
-	console.log(payload)
+    //console.log(payload)
     const user = await this.userService.getUserById(payload.id);
     if (!user.isTwoFA) {
       return user;

@@ -11,7 +11,7 @@ import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
 import { BadRequestException } from '@nestjs/common';
 
-console.log("Websocket: " + process.env.FRONTEND);
+//console.log("Websocket: " + process.env.FRONTEND);
 
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -26,7 +26,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		//console.log('use on connexion:', user)
+		////console.log('use on connexion:', user)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
@@ -42,7 +42,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	}
 
 	afterInit(server: Socket) {
-		console.log('Socket is live')
+		//console.log('Socket is live')
 	}
 
 	@SubscribeMessage('friendRequest')
@@ -53,7 +53,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
 
 		const otherId = userReceiv.socketId; 
-		console.log('socket id receiv :', otherId, 'socket id sender  :', userSender.socketId)
+		//console.log('socket id receiv :', otherId, 'socket id sender  :', userSender.socketId)
 		try {
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
 			if (alreadyExist)
@@ -71,7 +71,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.to(otherId).emit('notifyRequest');
 		}
 		catch (error) {
-			console.log(error)
+			//console.log(error)
 			client.emit('alreadyFriend');
 		}
 	}
@@ -94,7 +94,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			await this.userService.deletePendingRequestById(data.requestId);
 		}
 		catch (error) {
-			console.log(error)
+			//console.log(error)
 		}
 	}
 
@@ -103,14 +103,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		requestId: any,
 	}) {
 		try {
-			console.log('rejected', data.requestId)
+			//console.log('rejected', data.requestId)
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
 
 			await this.userService.deletePendingRequestById(request);
 			client.emit('requestRejected')
 		}
 		catch (error) {
-			console.log(error)
+			//console.log(error)
 		}
 	}
 
@@ -122,7 +122,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('friendsList', friendList)
 		}
 		catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 
@@ -135,7 +135,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('reload');
 		}
 		catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 
@@ -153,7 +153,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('pendingRequestsList', pendingRequests)
 		}
 		catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 
@@ -179,7 +179,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('userHasBlocked');
 		}
 		catch (error) {
-			console.log(error)
+			//console.log(error)
 			client.emit('alreadyBlocked');
 		}
 	}
@@ -192,7 +192,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('blockedList', blockedList)
 		}
 		catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 
@@ -205,7 +205,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('userHasBlocked');
 		}
 		catch (error) {
-			console.log(error);
+			//console.log(error);
 		}
 	}
 }

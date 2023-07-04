@@ -20,7 +20,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log("New socket connected to pong backend: " + socket.id);
+    //console.log("New socket connected to pong backend: " + socket.id);
     
     if (socket.handshake.auth.token === null)
       return;
@@ -31,13 +31,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   handleDisconnect(socket: Socket) {
-    console.log("Socket disconnected from pong :" + socket.id);
+    //console.log("Socket disconnected from pong :" + socket.id);
     this.pongService.CloseRoom(socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }
 
   afterInit(socket: Socket) {
-    console.log("Pong Gateway successfully init");
+    //console.log("Pong Gateway successfully init");
     this.pongService.LaunchUpdates();
   }
 

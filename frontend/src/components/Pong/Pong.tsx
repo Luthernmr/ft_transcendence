@@ -164,11 +164,11 @@ function Pong() {
 
   useEffect(() => {
     function Init(datas: PongInitData) {
-      console.log("Initing Pong");
+      //console.log("Initing Pong");
       SyncDatas(datas);
 
       setBall(datas.ballPosition);
-      ballDelta.current = {x: 0, y: 0};
+      ballDelta.current = { x: 0, y: 0 };
       leftPaddle.current.pos = datas.paddlePos;
       rightPaddle.current.pos = datas.paddlePos;
     }
@@ -316,17 +316,26 @@ function Pong() {
   const updateDimensions = () => {
     let rate = 1;
 
-    if (window.innerWidth >= MAX_WIN_WIDTH && window.innerHeight >= MAX_WIN_HEIGHT) {
+    if (
+      window.innerWidth >= MAX_WIN_WIDTH &&
+      window.innerHeight >= MAX_WIN_HEIGHT
+    ) {
       rate = 1;
-    } else if (window.innerWidth <= MIN_WIN_WIDTH || window.innerHeight <= MIN_WIN_HEIGHT) {
+    } else if (
+      window.innerWidth <= MIN_WIN_WIDTH ||
+      window.innerHeight <= MIN_WIN_HEIGHT
+    ) {
       rate = MIN_WIN_WIDTH / MAX_WIN_WIDTH;
     } else {
-      rate = Math.min(window.innerWidth / MAX_WIN_WIDTH, window.innerHeight / MAX_WIN_HEIGHT);
+      rate = Math.min(
+        window.innerWidth / MAX_WIN_WIDTH,
+        window.innerHeight / MAX_WIN_HEIGHT
+      );
     }
 
     setSize(rate);
 
-    console.log(rate);
+    //console.log(rate);
   }
 
   useEffect(() => {

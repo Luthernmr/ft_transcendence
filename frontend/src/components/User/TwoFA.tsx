@@ -29,14 +29,14 @@ export default function TwoFA() {
 			onClose()
 		}
 		catch (error) {
-			toast({
-				title: `invalid code`,
-				status: 'error',
-				isClosable: true,
-				position: 'top'
-			})
-			console.log(error)
-		}
+      toast({
+        title: `invalid code`,
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+      //console.log(error)
+    }
 	}
 
 	return (
