@@ -10,8 +10,7 @@ export const userSocket = io(import.meta.env.VITE_BACKEND + '/user', {
 export const chatSocket = io(import.meta.env.VITE_BACKEND + '/chat', {
 	auth: {
 		token: sessionStorage.getItem("jwt")
-	},
-	reconnectionDelayMax: 10000, 
+	}
 });
 
 export const pongSocket = io(import.meta.env.VITE_BACKEND + '/pong', {

@@ -62,7 +62,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
 			if (alreadyExist)
 				throw new BadRequestException('Request already exists for this person.');	
-			if(userReceiv == userReceiv)
+			if(userReceiv == userSender)
 				throw new BadRequestException('can t send request');	
 			await this.userService.createPendingRequest({
 				type: "Friend",
