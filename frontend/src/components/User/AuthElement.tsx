@@ -31,8 +31,10 @@ export default function AuthElement() {
 						sessionStorage.setItem("jwt", res.data.jwt);
 						userSocket.auth = {token : res.data.jwt};
 						chatSocket.auth = {token : res.data.jwt};
+						pongSocket.auth = {token : res.data.jwt};
 						userSocket.disconnect().connect();
-						chatSocket.disconnect().connect();
+						userSocket.disconnect().connect();
+						pongSocket.disconnect().connect();
 						navigate("/home");
 						pongSocket.emit("register", { token: res.data.jwt });
 					} else onOpen();

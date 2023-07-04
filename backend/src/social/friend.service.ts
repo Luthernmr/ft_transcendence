@@ -102,9 +102,17 @@ export class FriendService {
 		})
 		
 		if (relation1.length)
+		{
+			console.log('relation1')
 			return relation1
+		}
 		else if (relation2.length)
+		{
+			console.log('relation2')
 			return relation2
+		}
+		else 
+			return (null);
 	}
 
 	/* -------------------------------------------------------------------------- */

@@ -66,11 +66,13 @@ export class UserService {
 		const existingRequest = await this.pendingRequest.findOne({
 			where: {
 				type: data.type,
-				senderId: data.senderId
+				senderId: data.senderId,
+				user : data.user
 			}
 		});
+		console.log (existingRequest)
 		if (existingRequest) {
-			throw new BadRequestException('Request already exists for this person.');
+			throw new BadRequestException('cannot create Request already exists for this person.');
 		}
 		return await this.pendingRequest.save(data);
 	}
@@ -81,7 +83,9 @@ export class UserService {
 
 	async deletePendingRequestById(request: PendingRequest) {
 		try {
-			const result = await this.pendingRequest.delete(request);
+			console.log('delet1', request);
+			const result = await this.pendingRequest.delete(request.id);
+			console.log('delet', result);
 			return result;
 		  } catch (error) {
 			console.error('An error occurred while deleting the pending request:', error);

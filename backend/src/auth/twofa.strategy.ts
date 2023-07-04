@@ -13,7 +13,6 @@ export class JwtTwoFactorStrategy extends PassportStrategy( Strategy,'jwt-two-fa
     private readonly userService: UserService,
     private readonly authService: AuthService,
   ) {
-	console.log('test')
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
 		console.log(request.cookies);
