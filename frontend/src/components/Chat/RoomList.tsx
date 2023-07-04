@@ -78,6 +78,7 @@ const RoomList: React.FC<RoomListProps> = ({
         setSelectedRoom(selectedRoom);
       }
       else {
+        setRoomPassword("")
         toast({
           title: "Wrong password",
           status: "error",
