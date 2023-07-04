@@ -12,7 +12,7 @@ import {
 @Entity('Room')
 export class Room {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
 
   @Column({ length: 20, nullable: true })
   name: string;
@@ -20,20 +20,20 @@ export class Room {
   @Column()
   ownerId: number;
 
-  @Column({default: false})
+  @Column({ default: false })
   isPrivate: boolean;
 
-  @Column({length: 80, nullable: true })
+  @Column({ length: 80, nullable: true })
   password: string;
 
-  @ManyToMany(() => User, (user: User) => user.room)
+  @ManyToMany(() => User,(user: User) => user.rooms)
   @JoinTable()
   users: User[];
 
   @ManyToMany(() => User, (user: User) => user.adminRooms)
   @JoinTable()
   admins: User[];
-  
+
   @ManyToMany(() => User, (user: User) => user.bannedRooms)
   @JoinTable()
   bannedUsers: User[];

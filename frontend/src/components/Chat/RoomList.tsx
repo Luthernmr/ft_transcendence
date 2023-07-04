@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -8,26 +8,51 @@ import {
   VStack,
   IconButton,
   StackDivider,
+  Text,
+  HStack,
+  Spacer,
 } from "@chakra-ui/react";
-import { AddIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  LockIcon,
+  UnlockIcon,
+  ViewIcon,
+  ViewOffIcon,
+} from "@chakra-ui/icons";
+import { chatSocket } from "../../sockets/sockets";
+import { User } from "../Social/AllUserItem";
 
-interface User {
-  id: number;
+interface Room {
+  id: string;
   name: string;
-  src: string;
+  password: string;
+  isPrivate: boolean;
+  users: User[];
 }
 
 interface RoomListProps {
-  rooms: any[];
-  setSelectedRoom: (room: any) => void;
+  setSelectedRoom: (room: Room) => void;
   setShowCreateRoom: (show: boolean) => void;
 }
 
 const RoomList: React.FC<RoomListProps> = ({
-  rooms,
   setSelectedRoom,
   setShowCreateRoom,
 }) => {
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
+
+  useEffect(() => {
+    chatSocket.on("roomList", (rooms: Room[]) => {
+      setRooms(rooms);
+    });
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
+
+    return () => {
+      chatSocket.off("roomList");
+    };
+  }, [currentUser.id]);
+
   return (
     <Flex
       borderRadius={"md"}
@@ -55,13 +80,30 @@ const RoomList: React.FC<RoomListProps> = ({
         height="100%"
         overflowY="auto"
       >
-        {rooms.map((room, index) => (
+        {rooms?.map((room, index) => (
           <Box h={"40px"} key={index} onClick={() => setSelectedRoom(room)}>
-            <AvatarGroup size={"md"} max={2}>
-              {room.users.map((user: User) => (
-                <Avatar name={user.name} src={user.src} key={user.id} />
-              ))}
-            </AvatarGroup>
+            <HStack>
+              <AvatarGroup size={"md"} max={3}>
+                {room?.users?.map((user: User) => (
+                  <Avatar
+                    name={user.nickname}
+                    src={user.imgPdp}
+                    key={user.id}
+                  />
+                ))}
+              </AvatarGroup>
+              <Spacer />
+              <Text mr={2}>{room.name}</Text>
+              {room.isPrivate && (
+                <ViewOffIcon boxSize={6} ml={2} color={"gray.500"} />
+              )}
+              {room.password && (
+                <LockIcon boxSize={6} ml={2} color={"gray.500"} />
+              )}
+              {!room.isPrivate && !room.password && (
+                <ViewIcon boxSize={6} ml={2} color={"gray.500"} />
+              )}
+            </HStack>
           </Box>
         ))}
       </VStack>

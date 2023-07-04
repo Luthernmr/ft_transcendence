@@ -119,4 +119,13 @@ export class UserService {
 			isTwoFA: false
 		});
 	}
+
+	async getRoomsByUID( userId: number) {
+		return await (this.userRepository.findOne({
+			where: {id: userId},
+			relations: {
+				rooms: {users: true}
+			}
+		}))
+	}
 }

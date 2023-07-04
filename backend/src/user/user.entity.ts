@@ -42,13 +42,13 @@ export class User {
   @JoinTable()
   pendingRequests: PendingRequest[];
 
+
   @OneToMany(() => BlockedUser, friend => friend.currentUser)
   @JoinTable()
   blockedUsers: BlockedUser[];
 
-  @JoinTable()
-  @ManyToOne(() => Room, (room: Room) => room.users)
-  room: Room;
+  @ManyToMany(() => Room, (room: Room) => room.users)
+  rooms: Room[];
 
   @JoinTable()
   @ManyToMany(() => Room, (room: Room) => room.bannedUsers, { eager: true })

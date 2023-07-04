@@ -1,4 +1,5 @@
 import { IsBoolean, IsOptional, IsString, IsArray } from 'class-validator';
+import { User } from 'src/user/user.entity';
 
 export class CreateRoomDto {
   @IsString()
@@ -12,13 +13,13 @@ export class CreateRoomDto {
   readonly password?: string;
   
   @IsArray()
-  readonly users: string[];
+  readonly users: User[];
   
   @IsOptional()
   @IsArray()
-  readonly admins: string[];
+  readonly admins: User[];
   
   @IsOptional()
   @IsArray()
-  readonly bannedUsers: string[];
+  readonly bannedUsers: User[];
 }

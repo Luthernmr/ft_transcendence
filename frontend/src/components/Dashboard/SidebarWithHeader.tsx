@@ -166,9 +166,9 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
           <Icon
             mr="4"
             fontSize="16"
-            _roomHover={{
-              color: "white",
-            }}
+            // _roomHover={{
+            //   color: "white",
+            // }}
             as={icon}
           />
         )}
