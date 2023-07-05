@@ -1,7 +1,3 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import {
 	Controller, Get, Res, Req, Post, Delete, Put, Body, BadRequestException,
 	UseGuards, UsePipes, ValidationPipe, UploadedFile, UseInterceptors, UnauthorizedException
