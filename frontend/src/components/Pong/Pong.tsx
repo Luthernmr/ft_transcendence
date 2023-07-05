@@ -3,16 +3,14 @@ import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData, WatcherInitDatas,
-          PongDisplay, PongState, QueueState }
+          PongDisplay, PongState, GameState }
           from './PongSettings';
 import HomeScreen from './HomeScreen';
 import GameScreen from './GameScreen';
 import QueueScreen from './QueueScreen';
-import { Socket } from 'socket.io-client';
 
 function Pong() {
   const [pongState, setPongState] = useState<PongState>(PongState.Home);
-  const [queueState, setQueueState] = useState<QueueState>(QueueState.Joined);
   const [size, setSize] = useState(1);
 
   const watching = useRef<boolean>(false);
@@ -30,10 +28,11 @@ function Pong() {
     paddle1Delta: 0,
     paddle2Pos: 0,
     paddle2Delta: 0,
-    countdown: 0,
     scoreP1: 0,
     scoreP2: 0,
-    playerNumber: 1
+    playerNumber: 1,
+    gameState: GameState.Playing,
+    winner: 0
   });
   
   useEffect(() => {
@@ -50,9 +49,11 @@ function Pong() {
       setPongState(PongState.Play);
 		}
 
-    function Watcher(datas: WatcherInitDatas) {
+    function Watcher(datas: PongInitData) {
+      setInitDatas({
+        ...datas
+      })
       watching.current = true;
-
       setPongState(PongState.Watch);
     }
 
@@ -64,27 +65,14 @@ function Pong() {
       }
     }
 
-    function Queue(datas: QueueState) {
-      setPongState(PongState.Queue);
-      setQueueState(datas);
-    }
-
-    function StartSecondary() {
-      setPongState(PongState.AlreadyConnected);
-    }
-
     pongSocket.on('Init', Init);
     pongSocket.on('Watcher', Watcher);
     pongSocket.on('gamestate', GameState);
-    pongSocket.on('Queue', Queue);
-    pongSocket.on('StartSecondary', StartSecondary);
 
     return () => {
       pongSocket.off('Init', Init);
       pongSocket.off('Watcher', Watcher);
       pongSocket.off('gamestate', GameState);
-      pongSocket.off('Queue', Queue);
-      pongSocket.off('StartSecondary', StartSecondary);
     }
   }, []);
 
@@ -111,6 +99,7 @@ function Pong() {
 
   const JoinQueue = (custom: boolean) => {
     pongSocket.emit('queue', { custom: custom });
+    setPongState(PongState.Queue);
   }
 
   const WatchGame = () => {
@@ -123,16 +112,12 @@ function Pong() {
     )
   } else if (pongState === PongState.Queue) {
     return (
-      <QueueScreen state={ queueState } />
+      <QueueScreen leaveQueue={() => setPongState(PongState.Home)}/>
     )
   } else if (pongState === PongState.Play || pongState === PongState.Watch) {
     return (
-      <GameScreen size={size} watcher={watching.current} initDatas={initDatas}/>
+      <GameScreen size={size} watcher={watching.current} initDatas={initDatas} leaveGame={() => setPongState(PongState.Home)}/>
       )
-  } else if (pongState === PongState.AlreadyConnected) {
-    return (
-      <h1>Currently Playing !</h1>
-    )
   }
 }
 

@@ -4,7 +4,7 @@ import { Button, ButtonGroup, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import GameArea from './GameArea';
 import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
-	Shape, Paddle, Score, OFFSET_X, OFFSET_Y }
+	Shape, Paddle, Score, OFFSET_X, OFFSET_Y, GameState }
 	from './PongSettings';
 import UserArea from './UsersArea';
 
@@ -12,11 +12,7 @@ interface GameScreenProps {
 	size: number,
 	watcher: boolean
 	initDatas: PongInitData;
-}
-
-enum GameState {
-	Playing,
-	Finished
+	leaveGame: Function
 }
 
 function GameScreen(props : GameScreenProps) {
@@ -36,6 +32,7 @@ function GameScreen(props : GameScreenProps) {
 	const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
 	const winner = useRef<number>(0);
 	const countdown = useRef<number>(0);
+	const [opponentAlive, setOpponentAlive] = useState<boolean>(true);
 
 	//Time
 	const requestRef = useRef(0);
@@ -47,8 +44,8 @@ function GameScreen(props : GameScreenProps) {
 			ballShape.current = { width: datas.ballWidth, height: datas.ballHeight };
 			paddleShape.current = {width: datas.paddleWidth, height: datas.paddleHeight};
 			ballDelta.current = datas.ballDelta;
-			countdown.current = datas.countdown;
-			score.current = { scoreP1: datas.scoreP1, scoreP2: datas.scoreP2 }
+			score.current = { scoreP1: datas.scoreP1, scoreP2: datas.scoreP2 };
+			winner.current = datas.winner;
 			setPaddleP1({
 				pos: datas.paddle1Pos,
 				delta: datas.paddle1Delta
@@ -58,11 +55,12 @@ function GameScreen(props : GameScreenProps) {
 				delta: datas.paddle2Delta
 			})
 			setBall(datas.ballPosition);
+			setGameState(datas.gameState);
 		}
 
 		InitDatas(props.initDatas);
 
-		pongSocket.emit('ready');
+		pongSocket.emit('clientReady');
 	}, []);
 
 	const Update = () => {
@@ -129,11 +127,26 @@ function GameScreen(props : GameScreenProps) {
 			winner.current = winnerNumber;
 		}
 
+		function OpponentDisconnected() {
+			setOpponentAlive(false);
+		}
+
+		function OpponentReconnected() {
+			setOpponentAlive(true);
+		}
+
+		function OpponentQuit() {
+			props.leaveGame();
+		}
+
 		pongSocket.on('StartGame', Start);
 		pongSocket.on('BallDelta', BallDelta);
 		pongSocket.on('PaddleDelta', PaddleDelta);
 		pongSocket.on('UpdateScore', UpdateScore);
 		pongSocket.on('End', EndGame);
+		pongSocket.on('OpponentDisconnected', OpponentDisconnected);
+		pongSocket.on('OpponentReconnected', OpponentReconnected);
+		pongSocket.on('OpponentQuit', OpponentQuit);
 
 		return () => {
 			pongSocket.off('StartGame', Start);
@@ -141,13 +154,13 @@ function GameScreen(props : GameScreenProps) {
 			pongSocket.off('PaddleDelta', PaddleDelta);
 			pongSocket.off('UpdateScore', UpdateScore);
 			pongSocket.off('End', EndGame);
+			pongSocket.off('OpponentDisconnected', OpponentDisconnected);
+			pongSocket.off('OpponentReconnected', OpponentReconnected);
+			pongSocket.off('OpponentQuit', OpponentQuit);
 		}
 	}, [])
 
 	const handleKeyDown = (e: KeyboardEvent) => {
-		if (props.watcher)
-		  return;
-	
 		if (e.repeat)
 		  return;
 		
@@ -161,9 +174,6 @@ function GameScreen(props : GameScreenProps) {
 	}
 
 	const handleKeyUp = (e: KeyboardEvent) => {
-		if (props.watcher)
-		  return;
-		
 		let input = 0;
 		
 		if (e.code == 'ArrowLeft') input = playerNumber.current === 1 ? -1 : 1;
@@ -174,6 +184,9 @@ function GameScreen(props : GameScreenProps) {
 	}
 
 	useEffect(() => {
+		if (props.watcher)
+			return;
+
 		window.addEventListener('keydown', handleKeyDown);
 		window.addEventListener('keyup', handleKeyUp);
 		return () => {
@@ -183,11 +196,13 @@ function GameScreen(props : GameScreenProps) {
 	}, []);
 
 	function requestRestart() {
-		pongSocket.emit('ready');
+		pongSocket.emit('requestRestart');
 	}
 
 	function quit() {
-		pongSocket.emit('quit');
+		if (!props.watcher)
+			pongSocket.emit('quit');
+		props.leaveGame();
 	}
 
 	return(
@@ -205,8 +220,9 @@ function GameScreen(props : GameScreenProps) {
 					<Layer>
 						<Text text={countdown.current.toString()} fontSize={50} width={450} y={400} align='center' visible={countdown.current > 0} />
 						<Text text={`Player ${winner.current} won!`} fontSize={30} width={450} y={180} align='center' visible={winner.current != 0}/>
-						<Text text="Restart" fontSize={25} onClick={requestRestart} width={450} y={400} align='center' visible={gameState === GameState.Finished}/>
+						<Text text="Restart" fontSize={25} onClick={requestRestart} width={450} y={400} align='center' visible={gameState === GameState.Finished && props.watcher == false}/>
 						<Text text="Quit" fontSize={25} onClick={quit} width={450} y={450} align='center' visible={gameState === GameState.Finished}/>
+						<Text text="Opponent Disconnected !" fontSize={30} width={450} y={110} align='center' color='red' visible={opponentAlive === false && props.watcher == false}/>
 						<GameArea 	width={props.initDatas.width}
 									height={props.initDatas.height}
 									size={props.size}

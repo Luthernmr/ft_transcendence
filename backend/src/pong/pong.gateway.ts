@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, QueueState } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -28,6 +28,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.RegisterUserToPong(socket, socket.handshake.auth.token);
   }
 
+  @SubscribeMessage('register')
+  handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
+    this.RegisterUserToPong(socket, datas.token);
+  }
+
   async RegisterUserToPong(socket: Socket, token: string) {
     let user: User = await this.authService.getUserByToken(token);
 		if (user) {
@@ -49,13 +54,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('requestGameState')
   handleGameStateRequest(@ConnectedSocket() socket: Socket) {
     const gameState = this.pongService.GetGameState(socket);
-    console.log("Emitting gamesate " + gameState.pongState);
+    console.log("Emitting gamestate " + gameState.pongState);
     socket.emit('gamestate', gameState);
-  }
-
-  @SubscribeMessage('register')
-  handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
-    this.RegisterUserToPong(socket, datas.token);
   }
 
   @SubscribeMessage('queue')
@@ -63,22 +63,29 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.JoinQueue(socket, datas.custom);
   }
 
-  EmitQueueState(socket: Socket, datas: { queueState: QueueState }) {
-    socket.emit('Queue', datas.queueState);
+  @SubscribeMessage('leaveQueue')
+  handleLeaveQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
+    this.pongService.LeaveQueue(socket);
   }
 
   EmitStartGameSecondary(socket: Socket) {
     socket.emit('StartSecondary');
   }
 
-  @SubscribeMessage('ready')
+  @SubscribeMessage('clientReady')
   handleReady(@ConnectedSocket() socket: Socket) {
-    this.pongService.ClientsIsReady(socket);
+    this.pongService.ClientIsReady(socket);
+  }
+
+  @SubscribeMessage('requestRestart')
+  handleResquestRestart(@ConnectedSocket() socket: Socket) {
+    this.pongService.RequestRestart(socket);
   }
 
   @SubscribeMessage('quit')
   handleQuit(@ConnectedSocket() socket: Socket) {
-    this.pongService.UserQuit(socket);
+    const opponentSocket = this.pongService.UserQuit(socket);
+    opponentSocket.emit('OpponentQuit');
   }
 
   @SubscribeMessage('keydown')
@@ -130,5 +137,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   EmitWatcher(socket: Socket, datas: WatcherInitDatas) {
     socket.emit('Watcher', datas);
+  }
+
+  EmitOpponentDisconnect(socket: Socket) {
+    socket.emit('OpponentDisconnected')
+  }
+
+  EmitOpponentReconnected(socket: Socket) {
+    socket.emit('OpponentReconnected')
   }
 }

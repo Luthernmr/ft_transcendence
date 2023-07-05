@@ -17,15 +17,15 @@ function UserArea({width, height, size, mirror, scoreP1, scoreP2}: UserAreaProps
 	if (mirror) {
 		return (
 			<>
-				<Text fontSize={50} x={5} y={200} align='left' text={`${scoreP1}`} />
-				<Text fontSize={50} x={5} y={height - 250} align='left' text={`${scoreP2}`} />
+				<Text fontSize={50} x={5} y={200} align='left' text={`${scoreP2}`} />
+				<Text fontSize={50} x={5} y={height - 250} align='left' text={`${scoreP1}`} />
 			</>
 		)
 	} else {
 		return (
 			<>
-				<Text fontSize={50} x={5} y={height - 250} align='left' text={`${scoreP1}`} />
-				<Text fontSize={50} x={5} y={200} align='left' text={`${scoreP2}`} />
+				<Text fontSize={50} x={5} y={height - 250} align='left' text={`${scoreP2}`} />
+				<Text fontSize={50} x={5} y={200} align='left' text={`${scoreP1}`} />
 			</>
 		)
 	}

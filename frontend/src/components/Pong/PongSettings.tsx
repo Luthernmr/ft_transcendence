@@ -30,8 +30,14 @@ export interface GameLayout {
 }
 
 export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntimeData, Score {
-	countdown: number,
-	playerNumber: number
+	playerNumber: number,
+  gameState: GameState,
+  winner: number
+}
+
+export enum GameState {
+	Playing,
+	Finished
 }
 
 export interface PongInitEntities {
@@ -88,17 +94,7 @@ export enum PongState {
   AlreadyConnected
 }
 
-export enum GameState {
-	Player,
-	Watcher
-}
-
 export enum PongDisplay {
   Normal,
   Reversed
-}
-
-export enum QueueState {
-  Joined,
-  AlreadyIn
 }
