@@ -26,7 +26,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		////console.log('use on connexion:', user)
+		console.log('use on connexion:', user)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
@@ -36,6 +36,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async handleDisconnect(client: Socket) {
 
 		const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		console.log('use on deconnexion:', user)
 		if (user) {
 			await this.userService.setOffline(user);
 		}
@@ -69,13 +70,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				user: userReceiv
 			})
 			client.emit('sendSuccess');
-			client.to(otherId).emit('notifyRequest');
+			console.log('servers socket', this.server.sockets)
+			
 		}
 		catch (error) {
-			//console.log(error)
 			client.emit('alreadyFriend');
 		}
 	}
+	
 
 	@SubscribeMessage('acceptFriendRequest')
 	async acceptFriendRequest(client: Socket, data: {
@@ -86,6 +88,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
 			const friendUser = await this.userService.getUserById(request.senderId)
 			const otherId = friendUser.socketId;
+			const alreadyExist = await this.friendService.getRelation(friendUser, currentUser)
+			console.log('relation', alreadyExist);
+			if (alreadyExist != null)
+				throw new BadRequestException('Already friend');
 			await this.friendService.addFriend({
 				userA: currentUser,
 				userB: friendUser

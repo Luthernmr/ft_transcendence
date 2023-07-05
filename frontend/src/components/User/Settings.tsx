@@ -22,22 +22,31 @@ export default function Settings() {
 		setProfile({ ...profile, nickname: event.target.value });
 	};
 
-	const handleAvatarChange = (event: any) => {
-		setProfile({ ...profile, imgPdp: event.target.files[0] })
-		setPreview(URL.createObjectURL(event.target.files[0]))
+
+	const handleAvatarChange = async (event: any) => {
+
+		var formData = new FormData();
+		formData.append("file", event.currentTarget.files[0]);
+		console.log('file to send', event.target.files[0])
+		const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', formData, {
+			headers: {
+				'Content-Type': 'multipart/form-data'
+			},
+			withCredentials: true
+		})
+		console.log('resposner', response);
 	}
 
 	const SendModif = async (event: any) => {
 		event.preventDefault();
 		try {
-			const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/settings', {
-				"img": profile.imgPdp,
-				"nickname": profile.nickname
+			const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', {
+				"file": profile.imgPdp,
 
 			}, { withCredentials: true });
 		} catch (error) {
-      //console.log(error);
-    }
+			//console.log(error);
+		}
 	}
 
 	const [isChecked, setIsChecked] = useState(false);
@@ -77,39 +86,39 @@ export default function Settings() {
 
 	async function sendCode() {
 		try {
-      const resp = await axios.post(
-        import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
-        {
-          twoFACode: pinCode,
-        },
-        { withCredentials: true }
-      );
-      //console.log(resp.data.status);
-      if (resp.data.status == 401) throw new Error("test");
-      setIsChecked(true);
-      toast({
-        title: `2FA is now activate please log in again`,
-        status: "success",
-        isClosable: true,
-        position: "top",
-      });
-      await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
-        withCredentials: true,
-      });
-      sessionStorage.removeItem("jwt");
-      sessionStorage.removeItem("currentUser");
-      onClose();
-      navigate("/login");
-    }
+			const resp = await axios.post(
+				import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
+				{
+					twoFACode: pinCode,
+				},
+				{ withCredentials: true }
+			);
+			//console.log(resp.data.status);
+			if (resp.data.status == 401) throw new Error("test");
+			setIsChecked(true);
+			toast({
+				title: `2FA is now activate please log in again`,
+				status: "success",
+				isClosable: true,
+				position: "top",
+			});
+			await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+				withCredentials: true,
+			});
+			sessionStorage.removeItem("jwt");
+			sessionStorage.removeItem("currentUser");
+			onClose();
+			navigate("/login");
+		}
 		catch (error) {
-      toast({
-        title: `invalid code`,
-        status: "error",
-        isClosable: true,
-        position: "top",
-      });
-      //console.log(error)
-    }
+			toast({
+				title: `invalid code`,
+				status: "error",
+				isClosable: true,
+				position: "top",
+			});
+			//console.log(error)
+		}
 	}
 
 	return (
@@ -128,7 +137,7 @@ export default function Settings() {
 						id="avatar"
 						name="avatar"
 						accept="image/*"
-						onChange={handleAvatarChange}
+						onChange={(event) => handleAvatarChange(event)}
 					/>
 				</HStack>
 			</FormControl>
