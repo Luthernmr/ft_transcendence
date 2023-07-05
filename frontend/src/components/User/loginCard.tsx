@@ -61,7 +61,7 @@ export default function loginCard() {
 			if (!response.data) {
 				onOpen()
 			}
-			console.log(response.data.status)
+			// console.log(response.data.status)
 			if (response.data.status == 401 || response.data.status == 400) {
 				toast({
 					title: `invalid login , do you have an account ?`,
@@ -78,7 +78,7 @@ export default function loginCard() {
 				isClosable: true,
 				position: 'top'
 			})
-			console.log(error);
+			// console.log(error);
 		}
 	};
 

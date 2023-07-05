@@ -11,7 +11,6 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
-import passport from 'passport';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -55,6 +54,9 @@ export class ChatService {
       client.emit('error', { message: error.message });
     } else {
       client.emit('roomCreated');
+      data.users.forEach((element) => {
+        client.to(element.socketId).emit('roomCreated');
+      });
     }
   }
 
@@ -65,8 +67,14 @@ export class ChatService {
   }
 
   @SubscribeMessage('checkRoomPassword')
-  async checkRoomPass(client: Socket, payload: { room: Room, password: string }) {
-    const answer = await bcrypt.compare(payload.password, payload.room.password);
+  async checkRoomPass(
+    client: Socket,
+    payload: { room: Room; password: string },
+  ) {
+    const answer = await bcrypt.compare(
+      payload.password,
+      payload.room.password,
+    );
     client.emit('passCheck', answer);
   }
 }
