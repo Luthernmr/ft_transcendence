@@ -35,7 +35,7 @@ export default function TwoFA() {
         isClosable: true,
         position: "top",
       });
-      //console.log(error)
+      //console.log(error);
     }
 	}
 

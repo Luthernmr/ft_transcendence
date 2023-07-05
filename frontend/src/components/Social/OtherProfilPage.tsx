@@ -20,7 +20,7 @@ export default function OtherProfilPage() {
 			getUser();
 		}
 		catch (error) {
-      //console.log(error)
+      //console.log(error);
     }
 	}, [id])
 	

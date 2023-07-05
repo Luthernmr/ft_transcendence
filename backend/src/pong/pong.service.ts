@@ -190,7 +190,7 @@ export class PongService {
 		else {
 			
 			this.playerInfos.push({userId: userID, socket: socket});
-			//console.log("Added new user to pong playerInfos (id: " + userID + ")");
+			//console.log('Added new user to pong playerInfos (id: ' + userID + ')');
 		}
 	}
 
@@ -208,7 +208,7 @@ export class PongService {
 		if (pendingIndex >= 0)
 			this.pendingPlayersCustom.splice(pendingCustomIndex, 1);
 
-		//console.log("User unregistered from pong");
+		//console.log('User unregistered from pong');
 	}
 
 	LaunchUpdates() {
@@ -223,14 +223,14 @@ export class PongService {
 		const currentPlayerIndex = this.playerInfos.findIndex(infos => (infos.socket === socket));
 
 		if (currentPlayerIndex < 0) {
-			//console.log("user not registered to pong");
+			//console.log('user not registered to pong');
 			return;
 		}
 
 		const currentPlayer = this.playerInfos[currentPlayerIndex];
 		const pendingPlayersArray = custom ? this.pendingPlayersCustom : this.pendingPlayers;
 
-		//console.log("Joined queue, userID: " + currentPlayer.userId);
+		//console.log('Joined queue, userID: ' + currentPlayer.userId);
 
 		if (pendingPlayersArray.length >= 1) {
 			const opponent = pendingPlayersArray[0];
@@ -247,7 +247,16 @@ export class PongService {
 		const user2Index = this.playerInfos.findIndex(infos => (infos.userId === user2ID));
 		
 		if (user1Index < 0 || user2Index < 0) {
-			//console.log("Error for users ", user1ID, " & ", user2ID, ", indexes = ", user1Index, " & ", user2Index);
+			//console.log(
+    //     'Error for users ',
+    //     user1ID,
+    //     ' & ',
+    //     user2ID,
+    //     ', indexes = ',
+    //     user1Index,
+    //     ' & ',
+    //     user2Index,
+    //   );
 			return;
 		}
 
@@ -333,9 +342,9 @@ export class PongService {
 				...this.paddleRuntime[index],
 				...this.scoreData[index]
 			});
-			//console.log("Joined room Id: " + this.roomID[0]);
-		} else
-			console.log("No room is currently running!");
+			//console.log('Joined room Id: ' + this.roomID[0]);
+		} //else
+			//console.log("No room is currently running!");
 	}
 
 	RemoveWatcher(index: number, socket: Socket) {
@@ -359,10 +368,10 @@ export class PongService {
 	}
 
 	CloseRoom(socketID: string) {
-		//console.log("Closing pong room");
+		//console.log('Closing pong room');
 
 		const index: number = this.FindIndexBySocketId(socketID);
-		//console.log("Found index: " + index);
+		//console.log('Found index: ' + index);
 		
 		if (index >= 0) {
 			this.CleanDatas(index);

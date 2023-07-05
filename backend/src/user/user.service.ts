@@ -71,7 +71,7 @@ export class UserService {
 				user : data.user
 			}
 		});
-		console.log (existingRequest)
+		//console.log (existingRequest)
 		if (existingRequest) {
 			throw new BadRequestException('cannot create Request already exists for this person.');
 		}
@@ -84,14 +84,17 @@ export class UserService {
 
 	async deletePendingRequestById(request: PendingRequest) {
 		try {
-			console.log('delet1', request);
-			const result = await this.pendingRequest.delete(request.id);
-			console.log('delet', result);
-			return result;
-		  } catch (error) {
-			console.error('An error occurred while deleting the pending request:', error);
-			throw error;
-		  }
+      //console.log('delet1', request);
+      const result = await this.pendingRequest.delete(request.id);
+      //console.log('delet', result);
+      return result;
+    } catch (error) {
+      console.error(
+        'An error occurred while deleting the pending request:',
+        error,
+      );
+      throw error;
+    }
 	}
 
 	async getAllPendingRequest(user: any): Promise<any> {

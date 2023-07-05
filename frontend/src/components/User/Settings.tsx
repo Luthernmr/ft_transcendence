@@ -24,102 +24,113 @@ export default function Settings() {
 
 
 	const handleAvatarChange = async (event: any) => {
-
-		var formData = new FormData();
-		formData.append("file", event.currentTarget.files[0]);
-		console.log('file to send', event.target.files[0])
-		const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', formData, {
-			headers: {
-				'Content-Type': 'multipart/form-data'
-			},
-			withCredentials: true
-		})
-		console.log('resposner', response);
-	}
+    var formData = new FormData();
+    formData.append("file", event.currentTarget.files[0]);
+    //console.log('file to send', event.target.files[0])
+    const response = await axios.post(
+      import.meta.env.VITE_BACKEND + "/user/avatar",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+    //console.log('resposner', response);
+  }
 
 	const SendModif = async (event: any) => {
-		event.preventDefault();
-		try {
-			const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', {
-				"file": profile.imgPdp,
+    event.preventDefault();
+    try {
+      const response = await axios.post(
+        import.meta.env.VITE_BACKEND + "/user/avatar",
+        {
+          file: profile.imgPdp,
+        },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      //console.log(error);
+    }
+  };
 
-			}, { withCredentials: true });
-		} catch (error) {
-			//console.log(error);
-		}
-	}
+  const [isChecked, setIsChecked] = useState(false);
+  const [qrCode, setQrcode] = useState("");
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [pinCode, setPinCode] = useState("");
 
-	const [isChecked, setIsChecked] = useState(false);
-	const [qrCode, setQrcode] = useState("");
-	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [pinCode, setPinCode] = useState("");
+  const navigate = useNavigate();
 
-	const navigate = useNavigate();
+  useEffect(() => {
+    const getUser = async () => {
+      const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
+        withCredentials: true,
+      });
+      setProfile(res.data.user);
+      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+    };
+    getUser();
+    if (profile.isTwoFA) setIsChecked(true);
+  }, [profile.isTwoFA, isChecked]);
+  async function handleCheck2FA() {
+    if (profile.isTwoFA) {
+      const resp = await axios.post(
+        import.meta.env.VITE_BACKEND + "/api/turn-off" + location.search,
+        {
+          twoFACode: pinCode,
+        },
+        { withCredentials: true }
+      );
+      setIsChecked(false);
+    } else {
+      const resp: any = await axios.get(
+        import.meta.env.VITE_BACKEND + "/api/generate" + location.search,
+        { withCredentials: true, responseType: "blob" }
+      );
+      const qrUrl = URL.createObjectURL(resp.data);
+      setQrcode(qrUrl);
+      onOpen();
+    }
+  }
 
-	useEffect(() => {
-		const getUser = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
-			setProfile(res.data.user);
-			sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
-		}
-		getUser();
-		if (profile.isTwoFA)
-			setIsChecked(true);
+  const toast = useToast();
 
-	}, [profile.isTwoFA, isChecked]);
-	async function handleCheck2FA() {
-		if (profile.isTwoFA) {
-			const resp = await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-off' + location.search, {
-				"twoFACode": pinCode
-			}, { withCredentials: true });
-			setIsChecked(false);
-		}
-		else {
-			const resp: any = await axios.get(import.meta.env.VITE_BACKEND + '/api/generate' + location.search, { withCredentials: true, responseType: "blob" });
-			const qrUrl = URL.createObjectURL(resp.data);
-			setQrcode(qrUrl);
-			onOpen();
-		}
-	}
-
-	const toast = useToast()
-
-	async function sendCode() {
-		try {
-			const resp = await axios.post(
-				import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
-				{
-					twoFACode: pinCode,
-				},
-				{ withCredentials: true }
-			);
-			//console.log(resp.data.status);
-			if (resp.data.status == 401) throw new Error("test");
-			setIsChecked(true);
-			toast({
-				title: `2FA is now activate please log in again`,
-				status: "success",
-				isClosable: true,
-				position: "top",
-			});
-			await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
-				withCredentials: true,
-			});
-			sessionStorage.removeItem("jwt");
-			sessionStorage.removeItem("currentUser");
-			onClose();
-			navigate("/login");
-		}
-		catch (error) {
-			toast({
-				title: `invalid code`,
-				status: "error",
-				isClosable: true,
-				position: "top",
-			});
-			//console.log(error)
-		}
-	}
+  async function sendCode() {
+    try {
+      const resp = await axios.post(
+        import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
+        {
+          twoFACode: pinCode,
+        },
+        { withCredentials: true }
+      );
+      //console.log(resp.data.status);
+      if (resp.data.status == 401) throw new Error("test");
+      setIsChecked(true);
+      toast({
+        title: `2FA is now activate please log in again`,
+        status: "success",
+        isClosable: true,
+        position: "top",
+      });
+      await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+        withCredentials: true,
+      });
+      sessionStorage.removeItem("jwt");
+      sessionStorage.removeItem("currentUser");
+      onClose();
+      navigate("/login");
+    } catch (error) {
+      toast({
+        title: `invalid code`,
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+      //console.log(error);
+    }
+  }
 
 	return (
 		<VStack spacing={4} align="stretch">

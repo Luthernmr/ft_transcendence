@@ -17,21 +17,22 @@ export default function MatchHistory(props :any) {
 	const [matchHistorys, setMatchHistorys] = useState<MatchHistory[]>([])
 	useEffect(() => {
 		try {
-			const getHistory = async () => {
-				try {
-					const resp = await axios.get(import.meta.env.VITE_BACKEND + '/user/history/' + props?.user?.id , {
-						withCredentials: true,
-					})
-					setMatchHistorys(resp.data.history)
-				} catch(error)
-				{
-          //console.log('error', error);
+      const getHistory = async () => {
+        try {
+          const resp = await axios.get(
+            import.meta.env.VITE_BACKEND + "/user/history/" + props?.user?.id,
+            {
+              withCredentials: true,
+            }
+          );
+          setMatchHistorys(resp.data.history);
+        } catch (error) {
+          //console.log("error", error);
         }
-			}
-			getHistory()
-		}
-		catch (error) {
-      //console.log(error)
+      };
+      getHistory();
+    } catch (error) {
+      //console.log(error);
     }
 	}, [props?.user?.id])
 	

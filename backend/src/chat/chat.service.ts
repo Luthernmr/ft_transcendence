@@ -51,31 +51,30 @@ export class ChatService {
   async createRoom(client: Socket, data: Partial<Room>) {
     const error = await this.roomService.createRoom(client, data);
     if (error) {
-      client.emit('error', { message: error.message });
+      this.server.emit('error', { message: error.message });
     } else {
-      client.emit('roomCreated');
+      this.server.emit('roomCreated');
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
-        client.to(element.socketId).emit('roomList', rooms.rooms);
+        this.server.to(element.socketId).emit('roomList', rooms.rooms);
       });
     }
   }
 
   @SubscribeMessage('getUserRooms')
-  async getUserRooms(client: Socket, payload: { userId: number }) {
+  async getUserRooms(payload: { userId: number }) {
     const rooms = await this.userService.getRoomsByUID(payload.userId);
-    client.emit('roomList', rooms.rooms);
+    this.server.emit('roomList', rooms.rooms);
   }
 
   @SubscribeMessage('checkRoomPassword')
   async checkRoomPass(
-    client: Socket,
     payload: { room: Room; password: string },
   ) {
     const answer = await bcrypt.compare(
       payload.password,
       payload.room.password,
     );
-    client.emit('passCheck', answer);
+    this.server.emit('passCheck', answer);
   }
 }

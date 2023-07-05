@@ -173,39 +173,37 @@ function Pong() {
       rightPaddle.current.pos = datas.paddlePos;
     }
 
-    pongSocket.on('Init', Init);
+    pongSocket.on("Init", Init);
 
     function SetNum(num: number) {
       playerNum.current = num;
-      if (num === 1)
-        display.current = PongDisplay.Normal;
-      else
-        display.current = PongDisplay.Reversed;
+      if (num === 1) display.current = PongDisplay.Normal;
+      else display.current = PongDisplay.Reversed;
     }
 
-    pongSocket.on('SetNum', SetNum);
+    pongSocket.on("SetNum", SetNum);
 
     return () => {
-      pongSocket.off('Init', Init);
-    }
+      pongSocket.off("Init", Init);
+    };
   }, []);
 
   const update = () => {
     const time = Date.now();
     if (previousTimeRef.current != undefined) {
       const deltaTime = time - previousTimeRef.current;
-      setBall(ball => ({
+      setBall((ball) => ({
         x: ball.x + ballDelta.current.x * (deltaTime / 100),
         y: ball.y + ballDelta.current.y * (deltaTime / 100),
       }));
 
-      leftPaddle.current.pos += leftPaddle.current.delta * deltaTime / 100;
-      rightPaddle.current.pos += rightPaddle.current.delta * deltaTime / 100;
+      leftPaddle.current.pos += (leftPaddle.current.delta * deltaTime) / 100;
+      rightPaddle.current.pos += (rightPaddle.current.delta * deltaTime) / 100;
     }
 
     previousTimeRef.current = time;
     requestRef.current = requestAnimationFrame(update);
-  }
+  };
 
   useEffect(() => {
     requestRef.current = requestAnimationFrame(update);
@@ -220,13 +218,13 @@ function Pong() {
 
       async function MakeCountdown() {
         while (countdown.current > 0) {
-          await new Promise(r => setTimeout(r, 1000));
+          await new Promise((r) => setTimeout(r, 1000));
           countdown.current -= 1;
         }
       }
     }
 
-    pongSocket.on('StartGame', Start);
+    pongSocket.on("StartGame", Start);
 
     function BallDelta(values: BallRuntimeData) {
       ballDelta.current = values.ballDelta;
@@ -234,27 +232,33 @@ function Pong() {
       ballShape.current.width = values.ballWidth;
     }
 
-    pongSocket.on('BallDelta', BallDelta);
+    pongSocket.on("BallDelta", BallDelta);
 
     function PaddleDelta(values: PaddleRuntimeData) {
-      leftPaddle.current = { pos: values.paddle1Pos, delta: values.paddle1Delta };
-      rightPaddle.current = { pos: values.paddle2Pos, delta: values.paddle2Delta };
-    };
+      leftPaddle.current = {
+        pos: values.paddle1Pos,
+        delta: values.paddle1Delta,
+      };
+      rightPaddle.current = {
+        pos: values.paddle2Pos,
+        delta: values.paddle2Delta,
+      };
+    }
 
-    pongSocket.on('PaddleDelta', PaddleDelta);
+    pongSocket.on("PaddleDelta", PaddleDelta);
 
     function UpdateScore(values: Score) {
       score.current = values;
     }
 
-    pongSocket.on('UpdateScore', UpdateScore);
+    pongSocket.on("UpdateScore", UpdateScore);
 
     function EndGame(winnerNumber: number) {
       winner.current = winnerNumber;
       pongState.current = PongState.Finished;
     }
 
-    pongSocket.on('End', EndGame);
+    pongSocket.on("End", EndGame);
 
     function Watcher(datas: WatcherInitDatas) {
       pongState.current = PongState.Watch;
@@ -272,46 +276,51 @@ function Pong() {
       pongState.current = PongState.Watch;
     }
 
-    pongSocket.on('Watcher', Watcher);
+    pongSocket.on("Watcher", Watcher);
 
     return () => {
-      pongSocket.off('StartGame', Start);
-      pongSocket.off('BallDelta', BallDelta);
-      pongSocket.off('PaddleDelta', PaddleDelta);
-      pongSocket.off('UpdateScore', UpdateScore);
-      pongSocket.off('End', EndGame);
-      pongSocket.off('Watcher', Watcher);
-    }
+      pongSocket.off("StartGame", Start);
+      pongSocket.off("BallDelta", BallDelta);
+      pongSocket.off("PaddleDelta", PaddleDelta);
+      pongSocket.off("UpdateScore", UpdateScore);
+      pongSocket.off("End", EndGame);
+      pongSocket.off("Watcher", Watcher);
+    };
   }, []);
 
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (pongState.current != PongState.Play && pongState.current != PongState.Finished)
+    if (
+      pongState.current != PongState.Play &&
+      pongState.current != PongState.Finished
+    )
       return;
 
-    if (e.repeat)
-      return;
-    
+    if (e.repeat) return;
+
     let input = 0;
 
-    if (e.code == 'ArrowLeft') input = playerNum.current === 1 ? -1 : 1;
-    else if (e.code == 'ArrowRight') input = playerNum.current === 1 ? 1 : -1;
+    if (e.code == "ArrowLeft") input = playerNum.current === 1 ? -1 : 1;
+    else if (e.code == "ArrowRight") input = playerNum.current === 1 ? 1 : -1;
     else return;
 
-    pongSocket.emit('keydown', input);
-  }
+    pongSocket.emit("keydown", input);
+  };
 
   const handleKeyUp = (e: KeyboardEvent) => {
-    if (pongState.current != PongState.Play && pongState.current != PongState.Finished)
+    if (
+      pongState.current != PongState.Play &&
+      pongState.current != PongState.Finished
+    )
       return;
-    
+
     let input = 0;
-    
-    if (e.code == 'ArrowLeft') input = playerNum.current === 1 ? -1 : 1;
-    else if (e.code == 'ArrowRight') input = playerNum.current === 1 ? 1 : -1;
+
+    if (e.code == "ArrowLeft") input = playerNum.current === 1 ? -1 : 1;
+    else if (e.code == "ArrowRight") input = playerNum.current === 1 ? 1 : -1;
     else return;
-    
-    pongSocket.emit('keyup', input);
-  }
+
+    pongSocket.emit("keyup", input);
+  };
 
   const updateDimensions = () => {
     let rate = 1;
@@ -336,7 +345,7 @@ function Pong() {
     setSize(rate);
 
     //console.log(rate);
-  }
+  };
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);

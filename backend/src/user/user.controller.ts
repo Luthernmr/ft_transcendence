@@ -41,12 +41,12 @@ export class UserController {
 	@UseGuards()
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-			//console.log('usi id request hystory',id);
+			//console.log('usi id request hystory', id);
 
-			const user: any = await this.userService.getUserById(id);
-			delete user.password;
-			const history: any = await this.historyService.getUserHistory(user);
-			//console.log('history', history);
+      const user: any = await this.userService.getUserById(id);
+      delete user.password;
+      const history: any = await this.historyService.getUserHistory(user);
+      //console.log('history', history);
 			response.send({ history: history });
 		} catch (error) {
 			//console.log(error);
@@ -88,7 +88,7 @@ export class UserController {
 		}
 	}))
 	async addAvatar(@Req() request: Request, @UploadedFile() file: Express.Multer.File) {
-		console.log(file);
+		//console.log(file);
 		try {
 			if (!file)
 				throw new BadRequestException('File is not an image');

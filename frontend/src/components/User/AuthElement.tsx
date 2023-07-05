@@ -39,8 +39,8 @@ export default function AuthElement() {
 						pongSocket.emit("register", { token: res.data.jwt });
 					} else onOpen();
 				} catch (error) {
-					console.log( error);
-				}
+          //console.log( error);
+        }
 			};
 			getAuthToken();
 			setAuthTokenCalled(true); // Mettre à jour l'état pour indiquer que getAuthToken a été appelée

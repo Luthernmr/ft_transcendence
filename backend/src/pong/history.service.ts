@@ -45,8 +45,8 @@ export class HistoryService {
     await this.addXP(winnerUser, xpGained);
     await this.addXP(loserUser, XP_GAIN_LOSS);
 
-    ////console.log("user1 lvl: ", user1.level, "xp: ", user1.experience);
-    ////console.log("user2 lvl: ", user2.level, "xp: ", user2.experience);
+    //console.log('user1 lvl: ', user1.level, 'xp: ', user1.experience);
+    //console.log('user2 lvl: ', user2.level, 'xp: ', user2.experience);
 
     const history = {
       user1: user1,
@@ -75,7 +75,13 @@ export class HistoryService {
     const percentageToNextLevel = currentLevelXP / (userLevel * 100);
     const ratioToNextLevel = Math.trunc(percentageToNextLevel * 100);
 
-    ////console.log("XP user " + user.id, " : ", userLevel, userXP, ratioToNextLevel);
+    //console.log(
+    //   'XP user ' + user.id,
+    //   ' : ',
+    //   userLevel,
+    //   userXP,
+    //   ratioToNextLevel,
+    // );
 
     await this.userRepository.update(user.id, {
       level: userLevel,
