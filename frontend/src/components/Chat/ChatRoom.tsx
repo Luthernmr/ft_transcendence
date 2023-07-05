@@ -12,13 +12,22 @@ import {
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { FiSend } from "react-icons/fi";
+import { User } from '../Social/AllUserItem';
 
-interface ChatRoomProps {
-  messages: any[];
-  setSelectedRoom: (room: any) => void;
+interface Room {
+  id: string;
+  name: string;
+  password: string;
+  isPrivate: boolean;
+  users: User[];
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedRoom }) => {
+interface ChatRoomProps {
+  setSelectedRoom: (room: any) => void;
+  selectedRoom: Room;
+}
+
+const ChatRoom: React.FC<ChatRoomProps> = ({setSelectedRoom, selectedRoom }) => {
   return (
     <Flex
       borderRadius={"md"}
@@ -35,11 +44,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedRoom }) => {
           onClick={() => setSelectedRoom(null)}
         />
         <Heading size={"md"} textAlign={"center"} flex={"1"}>
-          Room
+          {selectedRoom.name}
         </Heading>
       </Flex>
       <VStack flex="1" spacing={4} align={"stretch"} overflowY={"auto"}>
-        {messages.map((message) => (
+        {/* {messages.map((message) => (
           <Box
             key={message.id}
             bg={message.userId === 1 ? "teal.500" : "gray.200"}
@@ -52,7 +61,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({ messages, setSelectedRoom }) => {
           >
             <Text>{message.content}</Text>
           </Box>
-        ))}
+        ))} */}
       </VStack>
       <InputGroup size="md">
         <Input placeholder="Type your message..." borderRadius="md" />
