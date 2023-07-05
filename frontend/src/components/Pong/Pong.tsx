@@ -3,19 +3,19 @@ import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData, WatcherInitDatas,
-          PongDisplay, PongState }
+          PongDisplay, PongState, QueueState }
           from './PongSettings';
 import HomeScreen from './HomeScreen';
 import GameScreen from './GameScreen';
 import QueueScreen from './QueueScreen';
+import { Socket } from 'socket.io-client';
 
 function Pong() {
   const [pongState, setPongState] = useState<PongState>(PongState.Home);
+  const [queueState, setQueueState] = useState<QueueState>(QueueState.Joined);
   const [size, setSize] = useState(1);
 
   const watching = useRef<boolean>(false);
-
-  //const playerNumber = useRef<1 | 2>(1);
 
   const [initDatas, setInitDatas] = useState<PongInitData>({
     width: 0,
@@ -38,13 +38,10 @@ function Pong() {
   
   useEffect(() => {
     updateDimensions();
-    pongSocket.emit('onPongConnection');
+    pongSocket.emit('requestGameState');
   }, [])
 
   useEffect(() => {
-    // function SetNum(num: 1 | 2) {
-    //   playerNumber.current = num;
-    // }
 
     function Init(datas: PongInitData) {
       setInitDatas({
@@ -55,16 +52,6 @@ function Pong() {
 
     function Watcher(datas: WatcherInitDatas) {
       watching.current = true;
-      // SyncDatas(datas);
-
-      // setBall(datas.ballPosition);
-      // ballDelta.current = datas.ballDelta;
-      // leftPaddle.current.pos = datas.paddle1Pos;
-      // rightPaddle.current.pos = datas.paddle2Pos;
-      // leftPaddle.current.delta = datas.paddle1Delta;
-      // rightPaddle.current.delta = datas.paddle2Delta;
-
-      // score.current = { scoreP1: datas.scoreP1, scoreP2: datas.scoreP2 };
 
       setPongState(PongState.Watch);
     }
@@ -77,15 +64,21 @@ function Pong() {
       }
     }
 
-    //pongSocket.on('SetNum', SetNum);
+    function Queue(datas: QueueState) {
+      setPongState(PongState.Queue);
+      setQueueState(datas);
+    }
+
     pongSocket.on('Init', Init);
     pongSocket.on('Watcher', Watcher);
     pongSocket.on('gamestate', GameState);
+    pongSocket.on('Queue', Queue);
 
     return () => {
       pongSocket.off('Init', Init);
       pongSocket.off('Watcher', Watcher);
       pongSocket.off('gamestate', GameState);
+      pongSocket.off('Queue', Queue);
     }
   }, []);
 
@@ -112,9 +105,6 @@ function Pong() {
 
   const JoinQueue = (custom: boolean) => {
     pongSocket.emit('queue', { custom: custom });
-
-    setPongState(PongState.Queue);
-    watching.current = false;
   }
 
   const WatchGame = () => {
@@ -127,7 +117,7 @@ function Pong() {
     )
   } else if (pongState === PongState.Queue) {
     return (
-      <QueueScreen />
+      <QueueScreen state={ queueState } />
     )
   } else if (pongState === PongState.Play || pongState === PongState.Watch) {
     return (

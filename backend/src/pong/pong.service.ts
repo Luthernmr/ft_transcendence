@@ -5,6 +5,8 @@ import { HistoryService } from './history.service';
 import { log } from 'console';
 import { User } from 'src/user/user.entity';
 import { IndexDescription } from 'typeorm';
+import { cp } from 'fs';
+import { queue } from 'rxjs';
 
 const COUNTDOWN: number = 3000;
 
@@ -150,13 +152,18 @@ export enum PongState {
 	AlreadyConnected
 }
 
+export enum QueueState {
+	Joined,
+	AlreadyIn
+}
+
 type PlayerInfosIndex = number;
 
 @Injectable()
 export class PongService {
 	playerInfos: PlayerInfos[];
-	clientReady: Array<boolean>; // playerInfos INdex
 
+	clientReady: Array<boolean>; // playerInfos Index
 	pendingPlayers: Array<number>; // playerInfos Index
 	pendingPlayersCustom: Array<number>; // playerInfos Index
 
@@ -215,35 +222,63 @@ export class PongService {
 	}
 
 	RegisterUserInfos(userID: number, socket: Socket) : boolean {
-		const playerInfosIndex = this.playerInfos.findIndex(infos => (infos.userId === userID));
+		//const playerInfosIndex = this.playerInfos.findIndex(infos => (infos.userId === userID));
 
-		if (playerInfosIndex >= 0) {
-			if (this.playerInfos[playerInfosIndex].socket === null) {
-				this.playerInfos[playerInfosIndex].socket = socket;
-				const instanceIndex = this.usersRuntime.findIndex(user => user.user1 === playerInfosIndex || user.user2 === playerInfosIndex);
-				if (instanceIndex >= 0)
-					socket.join('room' + this.roomID[instanceIndex]);
-			} else {
-				console.log("user", userID, "already connected to a pong instance");
-				return false;
-			}
-			
-			console.log("Replaced pong socket (id: " + userID + ")");
+		// if (playerInfosIndex >= 0) {
+		// 	if (this.playerInfos[playerInfosIndex].socket === null) {
+		// 		this.playerInfos[playerInfosIndex].socket = socket;
+		// 		const instanceIndex = this.usersRuntime.findIndex(user => user.user1 === playerInfosIndex || user.user2 === playerInfosIndex);
+		// 		if (instanceIndex >= 0)
+		// 			socket.join('room' + this.roomID[instanceIndex]);
+		// 	} else {
+		// 		console.log("user", userID, "already connected to a pong instance");
+		// 		return false;
+		// 	}
+
+		// 	console.log("Replaced pong socket (id: " + userID + ")");
+		// } else {
+		const newInfos: PlayerInfos = {userId: userID, socket: socket, pongState: PongState.Home};
+
+		const cleanIndex = this.playerInfos.findIndex(info => (info.userId === undefined));
+		if (cleanIndex >= 0) {
+			this.playerInfos[cleanIndex] = newInfos;
+			this.clientReady[cleanIndex] = false;
+			console.log("RegisterUserInfos: found clean index at " + cleanIndex);
 		} else {
 			this.playerInfos.push({userId: userID, socket: socket, pongState: PongState.Home});
 			this.clientReady.push(false);
-			console.log("Added new user to pong playerInfos (id: " + userID + ")");
 		}
+		console.log("Added new user to pong playerInfos (id: " + userID + ")");
+		//}
 
 		return true;
+	}
+
+	GetOtherUserInfoIndex(excludeSocket: Socket, userID: number) {
+		return this.playerInfos.findIndex(info => (info.userId === userID && info.socket != excludeSocket));
 	}
 
 	UnregisterUserInfos(socket: Socket) {
 		const index = this.playerInfos.findIndex(infos => (infos.socket === socket));
 
-		if (index >= 0) {			
-			this.playerInfos[index].socket = null;
-			console.log("User socket set to null");
+		if (index >= 0) {
+			const otherIndex = this.GetOtherUserInfoIndex(socket, this.playerInfos[index].userId);
+			if (otherIndex >= 0)
+			{
+				this.playerInfos[index].socket = this.playerInfos[otherIndex].socket;
+				this.playerInfos[index].pongState = this.playerInfos[otherIndex].pongState;
+				this.playerInfos[otherIndex].userId = undefined;
+			} else {
+				const queueInfo = this.UserInQueue(this.playerInfos[index].userId);
+				if (queueInfo.index >= 0) {
+					const pendingPlayersArray = queueInfo.custom ? this.pendingPlayersCustom : this.pendingPlayers;
+					pendingPlayersArray.splice(queueInfo.index, 1);
+				}
+
+				this.playerInfos[index].userId = undefined;
+			}
+			//this.playerInfos[index].socket = null;
+			//console.log("User socket set to null");
 		}
 		// } else if (index >= 0) {
 		// 	const pendingIndex: number = this.pendingPlayers.findIndex(data => this.playerInfos[data].socket === socket);
@@ -272,6 +307,18 @@ export class PongService {
 		return this.usersRuntime.findIndex(user => (this.GetSocket(user.user1).id === socketID || this.GetSocket(user.user2).id === socketID));
 	}
 
+	UserInQueue(userID: number) : { index: number, custom: boolean } {
+		const classicIndex = this.pendingPlayers.findIndex(pend => (this.playerInfos[pend].userId === userID));
+		if (classicIndex >= 0)
+			return({index: classicIndex, custom: false});
+
+		const customIndex = this.pendingPlayersCustom.findIndex(pend => (this.playerInfos[pend].userId === userID));
+		if (customIndex >= 0)
+			return({index: customIndex, custom: true});
+
+		return({index: -1, custom: false});
+	}
+
 	JoinQueue(socket: Socket, custom: boolean = false) {
 		const currentPlayerInfoIndex = this.playerInfos.findIndex(infos => (infos.socket === socket));
 
@@ -280,19 +327,45 @@ export class PongService {
 			return;
 		}
 
+		const queueInfos = this.UserInQueue(this.playerInfos[currentPlayerInfoIndex].userId);
+		if (queueInfos.index >= 0) {
+			console.log("user already in queue");
+			if (this.playerInfos[queueInfos.index].socket != socket) {
+				this.pongGateway.EmitQueueState(socket, { queueState: QueueState.AlreadyIn });
+			} else
+				this.pongGateway.EmitQueueState(socket, { queueState: QueueState.Joined });
+			return;
+		}
+
 		const pendingPlayersArray = custom ? this.pendingPlayersCustom : this.pendingPlayers;
 
 		console.log("Joined queue, userID: " + this.playerInfos[currentPlayerInfoIndex].userId);
 
-		if (pendingPlayersArray.length >= 1 && this.playerInfos[pendingPlayersArray[0]].socket != null) {
+		if (pendingPlayersArray.length >= 1 && this.playerInfos[pendingPlayersArray[0]].userId != null) {
 			const opponentInfoIndex = pendingPlayersArray[0];
 			pendingPlayersArray.splice(0, 1);
-
 			this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom);
 		} else {
 			console.log("not enough players in queue =", pendingPlayersArray.length)
 			pendingPlayersArray.push(currentPlayerInfoIndex);
 			this.playerInfos[currentPlayerInfoIndex].pongState = PongState.Queue;
+			this.pongGateway.EmitQueueState(socket, { queueState: QueueState.Joined });
+		}
+	}
+
+	CheckForMatch() {
+		if (this.pendingPlayers.length >= 2) {
+			const user1InfoIndex = this.pendingPlayers[0];
+			const user2InfoIndex = this.pendingPlayers[1];
+			this.pendingPlayers.splice(0, 2);
+			this.CreateRoom(user1InfoIndex, user2InfoIndex, false);
+		}
+
+		if (this.pendingPlayersCustom.length >= 2) {
+			const user1InfoIndex = this.pendingPlayersCustom[0];
+			const user2InfoIndex = this.pendingPlayersCustom[1];
+			this.pendingPlayers.splice(0, 2);
+			this.CreateRoom(user1InfoIndex, user2InfoIndex, true);
 		}
 	}
 

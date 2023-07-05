@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, PongInitEntities, PongState } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, QueueState } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -19,23 +19,20 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     pongService.RegisterGateway(this);
   }
 
-  async handleConnection(@ConnectedSocket() socket: Socket) {
+  handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
     
     if (socket.handshake.auth.token === null)
       return;
 
-    let user: User = await this.authService.getUserByToken(socket.handshake.auth.token);
+    this.RegisterUserToPong(socket, socket.handshake.auth.token);
+  }
+
+  async RegisterUserToPong(socket: Socket, token: string) {
+    let user: User = await this.authService.getUserByToken(token);
 		if (user) {
-      let gameState = null;
-        if (this.pongService.RegisterUserInfos(user.id, socket)) {
-          gameState = this.pongService.GetGameState(socket);
-        } else {
-          gameState = { pongState: PongState.AlreadyConnected, payload: null }
-        }
-        console.log("Sending" + gameState.pongState);
-        socket.emit('gamestate', gameState);
-      }
+      this.pongService.RegisterUserInfos(user.id, socket);
+    }
   }
 
   handleDisconnect(socket: Socket) {
@@ -49,18 +46,26 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.LaunchUpdates();
   }
 
+  @SubscribeMessage('requestGameState')
+  handleGameStateRequest(@ConnectedSocket() socket: Socket) {
+    const gameState = this.pongService.GetGameState(socket);
+    console.log("Emitting gamesate " + gameState.pongState);
+    socket.emit('gamestate', gameState);
+  }
+
   @SubscribeMessage('register')
-  async handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
-    let user: User = await this.authService.getUserByToken(datas.token)
-		if (user) {
-      this.pongService.RegisterUserInfos(user.id, socket);
-		} else
-      console.log("Pong User auth not found");
+  handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
+    this.RegisterUserToPong(socket, datas.token);
   }
 
   @SubscribeMessage('queue')
   handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
     this.pongService.JoinQueue(socket, datas.custom);
+  }
+
+  EmitQueueState(socket: Socket, datas: { queueState: QueueState }) {
+    console.log('Emitting queue state: ' + datas.queueState);
+    socket.emit('Queue', datas.queueState);
   }
 
   @SubscribeMessage('ready')

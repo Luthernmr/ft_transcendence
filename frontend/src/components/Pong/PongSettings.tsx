@@ -97,3 +97,8 @@ export enum PongDisplay {
   Normal,
   Reversed
 }
+
+export enum QueueState {
+  Joined,
+  AlreadyIn
+}
