@@ -66,7 +66,7 @@ export class AuthService {
 			if (!token)
 			  return null;
 			const user :any = await this.getUserByToken(token)
-			console.log("user verified", user);
+			// console.log("user verified", user);
 			if(userId == user.id)
 			  otherSocket= socket[1];
 		}
