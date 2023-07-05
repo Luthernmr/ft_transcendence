@@ -69,16 +69,22 @@ function Pong() {
       setQueueState(datas);
     }
 
+    function StartSecondary() {
+      setPongState(PongState.AlreadyConnected);
+    }
+
     pongSocket.on('Init', Init);
     pongSocket.on('Watcher', Watcher);
     pongSocket.on('gamestate', GameState);
     pongSocket.on('Queue', Queue);
+    pongSocket.on('StartSecondary', StartSecondary);
 
     return () => {
       pongSocket.off('Init', Init);
       pongSocket.off('Watcher', Watcher);
       pongSocket.off('gamestate', GameState);
       pongSocket.off('Queue', Queue);
+      pongSocket.off('StartSecondary', StartSecondary);
     }
   }, []);
 
@@ -125,7 +131,7 @@ function Pong() {
       )
   } else if (pongState === PongState.AlreadyConnected) {
     return (
-      <h1>You are already connected to a Pong Instance !</h1>
+      <h1>Currently Playing !</h1>
     )
   }
 }

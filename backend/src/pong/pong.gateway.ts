@@ -64,8 +64,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   EmitQueueState(socket: Socket, datas: { queueState: QueueState }) {
-    console.log('Emitting queue state: ' + datas.queueState);
     socket.emit('Queue', datas.queueState);
+  }
+
+  EmitStartGameSecondary(socket: Socket) {
+    socket.emit('StartSecondary');
   }
 
   @SubscribeMessage('ready')
@@ -77,12 +80,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   handleQuit(@ConnectedSocket() socket: Socket) {
     this.pongService.UserQuit(socket);
   }
-
-  // @SubscribeMessage('onPongConnection')
-  // handleGetState(@ConnectedSocket() socket: Socket) {
-  //   const gameState = this.pongService.GetGameState(socket);
-  //   socket.emit('gamestate', gameState);
-  // }
 
   @SubscribeMessage('keydown')
   handlePaddleKeydown(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
