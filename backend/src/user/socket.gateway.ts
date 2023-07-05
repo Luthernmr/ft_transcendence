@@ -36,7 +36,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async handleDisconnect(client: Socket) {
 
 		const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		console.log('use on deconnexion:', user)
+		// console.log('use on deconnexion:', user)
 		if (user) {
 			await this.userService.setOffline(user);
 		}

@@ -48,14 +48,10 @@ const RoomList: React.FC<RoomListProps> = ({
   const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
 
   useEffect(() => {
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
     });
-    chatSocket.emit("getUserRooms", { userId: currentUser.id });
-
-    // return () => {
-    //   chatSocket.off("roomList");
-    // };
   }, [currentUser.id]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -121,32 +117,36 @@ const RoomList: React.FC<RoomListProps> = ({
         height="100%"
         overflowY="auto"
       >
-        {rooms?.map((room, index) => (
-          <Box h={"40px"} key={index} onClick={() => handleRoomClick(room)}>
-            <HStack>
-              <AvatarGroup size={"md"} max={3}>
-                {room?.users?.map((user: User) => (
-                  <Avatar
-                    name={user.nickname}
-                    src={user.imgPdp}
-                    key={user.id}
-                  />
-                ))}
-              </AvatarGroup>
-              <Spacer />
-              <Text mr={2}>{room.name}</Text>
-              {room.isPrivate && (
-                <ViewOffIcon boxSize={6} ml={2} color={"gray.500"} />
-              )}
-              {room.password && (
-                <LockIcon boxSize={6} ml={2} color={"gray.500"} />
-              )}
-              {!room.isPrivate && !room.password && (
-                <ViewIcon boxSize={6} ml={2} color={"gray.500"} />
-              )}
-            </HStack>
-          </Box>
-        ))}
+        {rooms?.length > 0 ? (
+          rooms.map((room, index) => (
+            <Box h={"40px"} key={index} onClick={() => handleRoomClick(room)}>
+              <HStack>
+                <AvatarGroup size={"md"} max={3}>
+                  {room?.users?.map((user: User) => (
+                    <Avatar
+                      name={user.nickname}
+                      src={user.imgPdp}
+                      key={user.id}
+                    />
+                  ))}
+                </AvatarGroup>
+                <Spacer />
+                <Text mr={2}>{room.name}</Text>
+                {room.isPrivate && (
+                  <ViewOffIcon boxSize={6} ml={2} color={"gray.500"} />
+                )}
+                {room.password && (
+                  <LockIcon boxSize={6} ml={2} color={"gray.500"} />
+                )}
+                {!room.isPrivate && !room.password && (
+                  <ViewIcon boxSize={6} ml={2} color={"gray.500"} />
+                )}
+              </HStack>
+            </Box>
+          ))
+        ) : (
+          <Text textAlign={"center"} width="100%">No rooms available. Please create a new one.</Text>
+        )}
       </VStack>
 
       <Modal isOpen={isOpen} onClose={onClose}>

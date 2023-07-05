@@ -53,9 +53,10 @@ export class ChatService {
     if (error) {
       client.emit('error', { message: error.message });
     } else {
-      client.emit('roomCreated');``
-      data.users.forEach((element) => {
-        client.to(element.socketId).emit('roomCreated');
+      client.emit('roomCreated');
+      data.users.forEach(async (element) => {
+        const rooms = await this.userService.getRoomsByUID(element.id);
+        client.to(element.socketId).emit('roomList', rooms.rooms);
       });
     }
   }
