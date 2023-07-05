@@ -30,6 +30,7 @@ import Settings from "./Settings";
 import MatchHistory from "./MatchHistory";
 import { BlockList } from "net";
 import BlockedList from "./BlockedList";
+import ProfilInfo from "../Social/OtherUserInfo";
 
 interface User {
 	id: number,

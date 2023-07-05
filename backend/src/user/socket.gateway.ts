@@ -53,8 +53,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
 
-		const otherId = userReceiv.socketId; 
-		//console.log('socket id receiv :', otherId, 'socket id sender  :', userSender.socketId)
+		const otherId = userReceiv.socketId;
 		try {
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
 			console.log('relation', alreadyExist);
@@ -69,11 +68,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				senderPdp: userSender.imgPdp,
 				user: userReceiv
 			})
-			this.server.to(otherId).emit('notifyRequest');
+
+			const socketMap = this.server.sockets;
+			console.log('here', socketMap);
+			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
+			console.log('her2');
+			//for (const socket of sockets) {
+			//	const socketToken = socket?.handshake?.auth?.token;
+			//	console.log(socketToken)
+			//}
+
+
+			otherSocket.emit('notifyRequest');
 			client.emit('sendSuccess');
-			console.log('servers socket', this.server.sockets)
 		}
 		catch (error) {
+			console.log(error)
 			client.emit('alreadyFriend');
 		}
 	}

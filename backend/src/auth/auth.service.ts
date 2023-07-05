@@ -2,13 +2,15 @@
 https://docs.nestjs.com/providers#services
 */
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { UserService } from '../user/user.service';
 import { authenticator } from 'otplib';
+import { Server, Socket } from "socket.io";
+
 
 @Injectable()
 export class AuthService {
@@ -54,8 +56,25 @@ export class AuthService {
 
 			return user;
 		}
-
 	}
+
+	async getUserSocket(server: any, userId: number) {
+		let sockets = Array.from(await server.sockets);
+		let otherSocket = null;
+		for(const socket of sockets) {
+			let token = (socket as any)[1].handshake.auth.token;
+			if (!token)
+			  return null;
+			const user :any = await this.getUserByToken(token)
+			console.log("user verified", user);
+			if(userId == user.id)
+			  otherSocket= socket[1];
+		}
+		if (otherSocket)
+			return (otherSocket)
+		else
+			throw new BadRequestException("no user found") 
+	  }
 
 	async logout(request: Request, response: Response) {
 		const user = await this.getUserCookie(request);

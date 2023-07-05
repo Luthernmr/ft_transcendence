@@ -10,7 +10,7 @@ export interface Profile {
 }
 
 export default function Settings(props: any) {
-	
+
 	var formData = new FormData();
 	const [profile, setProfile] = useState<Profile>({
 		imgPdp: props.user.imgPdp,
@@ -27,6 +27,8 @@ export default function Settings(props: any) {
 
 	const handleAvatarChange = async (event: any) => {
 		formData.append("file", event.currentTarget.files[0]);
+		setPreview(URL.createObjectURL(event.currentTarget.files[0]));
+
 	}
 
 	const SendModif = async (event: any) => {
@@ -47,9 +49,9 @@ export default function Settings(props: any) {
 				"nickname": profile.nickname,
 
 			}, { withCredentials: true });
-			
+
 		} catch (error) {
-			
+
 		}
 	}
 
@@ -62,9 +64,11 @@ export default function Settings(props: any) {
 
 	useEffect(() => {
 		const getUser = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
-			setProfile(res.data.user);
-			sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
+			setProfile({
+				imgPdp: props.user.imgPdp,
+				nickname: props.user.nickname,
+				isTwoFA: props.user.isTwoFa
+			});
 		}
 		getUser();
 		if (profile.isTwoFA)
@@ -144,7 +148,7 @@ export default function Settings(props: any) {
 						accept="image/*"
 						placeholder="test"
 						onChange={(event) => handleAvatarChange(event)}
-						/>
+					/>
 				</HStack>
 			</FormControl>
 			<FormControl>

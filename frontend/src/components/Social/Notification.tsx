@@ -35,7 +35,7 @@ export interface FriendRequest {
 
 
 const PendingRequest = () => {
-
+	
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 	const toast = useToast()
 	useEffect(() => {
@@ -43,7 +43,7 @@ const PendingRequest = () => {
 			console.log('notified')
 			userSocket.emit('getPendingRequest')
 		})
-
+		
 		userSocket.on('pendingRequestsList', (data) => {
 			setFriendRequests(data);
 		})
@@ -56,14 +56,14 @@ const PendingRequest = () => {
 		userSocket.emit('getPendingRequest')
 
 		userSocket.on('sendSuccess', () => {
-      toast({
+			toast({
         title: `A request has been sent`,
         status: "success",
         isClosable: true,
         position: "top",
-      });
-      //console.log('test');
-    })
+	});
+	//console.log('test');
+})
 		userSocket.on('alreadyFriend', () => {
 			toast({
 				title: `You can't send more friend request`,
@@ -77,7 +77,7 @@ const PendingRequest = () => {
 	const handleAccept = async (id: number) => {
 		userSocket.emit('acceptFriendRequest', { requestId: id })
 	}
-
+	
 	const handleReject = async (id: number) => {
 		userSocket.emit('rejectFriendRequest', { requestId: id })
 	}
@@ -99,7 +99,7 @@ const PendingRequest = () => {
 										name={friendRequest.senderNickname}
 										ml={-1}
 										mr={2}
-									/>
+										/>
 									<Text><Text as='b'>{friendRequest.senderNickname}</Text> send you a {friendRequest.type} Request </Text>
 								</Flex>
 								<Stack spacing={2} direction='row' align='center'>
@@ -125,15 +125,15 @@ const BellButton = () => {
 	const handleNotify = async () => {
 		setNotified(false);
 	}
-
+	
 	useEffect(() => {
 		userSocket.on('notifyRequest', () => {
-      //console.log('notify');
-      setNotified(true);
-    })
+			//console.log('notify');
+			setNotified(true);
+		})
 	}, [notified])
-
-
+	
+	
 	if (notified)
 		return (
 			<PopoverTrigger>
