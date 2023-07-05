@@ -29,18 +29,18 @@ export default function AuthElement() {
 					);
 					if (res.data.jwt) {
 						sessionStorage.setItem("jwt", res.data.jwt);
-						userSocket.auth = {token : res.data.jwt};
-						chatSocket.auth = {token : res.data.jwt};
-						pongSocket.auth = {token : res.data.jwt};
+						userSocket.auth = { token: res.data.jwt };
+						chatSocket.auth = { token: res.data.jwt };
+						pongSocket.auth = { token: res.data.jwt };
 						userSocket.disconnect().connect();
-						userSocket.disconnect().connect();
+						chatSocket.disconnect().connect();
 						pongSocket.disconnect().connect();
 						navigate("/home");
 						pongSocket.emit("register", { token: res.data.jwt });
 					} else onOpen();
 				} catch (error) {
-          //console.log("already", error);
-        }
+					console.log( error);
+				}
 			};
 			getAuthToken();
 			setAuthTokenCalled(true); // Mettre à jour l'état pour indiquer que getAuthToken a été appelée
@@ -48,15 +48,11 @@ export default function AuthElement() {
 	}, [authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
 
 	async function handleclick() {
-    const response = await axios.get(
-      import.meta.env.VITE_BACKEND + "/api/logout",
-      { withCredentials: true }
-    );
-    //console.log(response.data);
-    sessionStorage.removeItem("jwt");
-    sessionStorage.removeItem("currentUser");
-    navigate("/login");
-  }
+		//console.log(response.data);
+		sessionStorage.removeItem("jwt");
+		sessionStorage.removeItem("currentUser");
+		navigate("/login");
+	}
 	return (
 		<>
 			<Center h="100vh">

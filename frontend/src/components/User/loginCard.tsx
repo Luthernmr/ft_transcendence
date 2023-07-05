@@ -49,7 +49,7 @@ export default function loginCard() {
 				sessionStorage.setItem('jwt', response.data.token);
 				if (sessionStorage.getItem("jwt")) {
 					userSocket.auth = {token : response.data.token}
-					userSocket.auth = {token : response.data.token}
+					chatSocket.auth = {token : response.data.token}
 					pongSocket.auth = {token : response.data.token}
 					chatSocket.disconnect().connect();
 					userSocket.disconnect().connect();
