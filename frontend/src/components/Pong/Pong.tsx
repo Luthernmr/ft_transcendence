@@ -97,10 +97,6 @@ function Pong() {
     watching.current = false;
   }
 
-  const RestartRequest = () => {
-    pongSocket.emit('restart');
-  }
-
   const WatchGame = () => {
     pongSocket.emit('watch');
   }

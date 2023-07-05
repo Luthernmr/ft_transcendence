@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Button, Center } from '@chakra-ui/react';
+import { Button, ButtonGroup, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import GameArea from './GameArea';
 import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
@@ -15,6 +15,11 @@ interface GameScreenProps {
 	initDatas: PongInitData;
 }
 
+enum GameState {
+	Playing,
+	Finished
+}
+
 function GameScreen(props : GameScreenProps) {
 	//Ball
 	const [ball, setBall] = useState<Vector2>({x: 200, y: 300});
@@ -27,6 +32,7 @@ function GameScreen(props : GameScreenProps) {
 	const paddleShape = useRef<Shape>({width: 0, height: 0});
 
 	//Game
+	const [gameState, setGameState] = useState<GameState>(GameState.Playing);
 	const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
 	const winner = useRef<number>(0);
 	const countdown = useRef<number>(0);
@@ -87,6 +93,8 @@ function GameScreen(props : GameScreenProps) {
 
 	useEffect(() => {
 		function Start(delay: number) {
+			setGameState(GameState.Playing);
+			winner.current = 0;
 			countdown.current = delay;
 			MakeCountdown();
 
@@ -114,6 +122,7 @@ function GameScreen(props : GameScreenProps) {
 		}
 
 		function EndGame(winnerNumber: number) {
+			setGameState(GameState.Finished);
 			winner.current = winnerNumber;
 		}
 
@@ -170,6 +179,14 @@ function GameScreen(props : GameScreenProps) {
 		}
 	}, []);
 
+	function requestRestart() {
+		pongSocket.emit('ready');
+	}
+
+	function quit() {
+		pongSocket.emit('quit');
+	}
+
 	return(
 		<div style={{
 			display: "flex",
@@ -183,8 +200,10 @@ function GameScreen(props : GameScreenProps) {
 						}}>
 				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
 					<Layer>
-						<Text fontSize={50} width={450} y={400} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
-						<Text fontSize={30} width={450} y={180} align='center' text={`Player ${winner.current} won!`} visible={winner.current != 0}/>
+						<Text text={countdown.current.toString()} fontSize={50} width={450} y={400} align='center' visible={countdown.current > 0} />
+						<Text text={`Player ${winner.current} won!`} fontSize={30} width={450} y={180} align='center' visible={winner.current != 0}/>
+						<Text text="Restart" fontSize={25} onClick={requestRestart} width={450} y={400} align='center' visible={gameState === GameState.Finished}/>
+						<Text text="Quit" fontSize={25} onClick={quit} width={450} y={450} align='center' visible={gameState === GameState.Finished}/>
 						<GameArea 	width={props.initDatas.width}
 									height={props.initDatas.height}
 									size={props.size}

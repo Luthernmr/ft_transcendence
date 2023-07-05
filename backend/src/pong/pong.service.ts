@@ -349,6 +349,14 @@ export class PongService {
 		{
 			this.waitingState[player1Index] = false;
 			this.waitingState[player2Index] = false;
+			const score: Score = {
+				scoreP1: 0,
+				scoreP2: 0
+			}
+	
+			this.scoreData[instanceIndex] = score;
+			this.pongGateway.EmitScore(this.roomID[instanceIndex], score);
+
 			this.StartGameAtCountdown(instanceIndex, COUNTDOWN);
 		}
 	}
@@ -375,7 +383,7 @@ export class PongService {
 		socket.leave("room" + this.roomID[index]);
 	}
 
-	async StartGameAtCountdown(index: number, countdown: number) {
+	async StartGameAtCountdown(index: number, countdown: number) {				
 		this.pongGateway.EmitStartGame(this.roomID[index], COUNTDOWN / 1000);
 
 		await new Promise(r => setTimeout(r, countdown));
