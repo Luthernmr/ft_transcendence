@@ -56,7 +56,6 @@ export class UserController {
 	@Post('settings')
 	@UseGuards(JwtTwoFactorGuard)
 	async settings(
-		@Body('img') img: string,
 		@Body('nickname') nickname: string,
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: Request
@@ -64,9 +63,8 @@ export class UserController {
 		const user: any = request.user;
 		if (!user)
 			return ("no user");
-		this.userService.changeImg(user, img);
 		this.userService.changeNickname(user, nickname);
-		return response.send({ img, user });
+		return response.send({ user });
 	}
 
 	@Post('avatar')
