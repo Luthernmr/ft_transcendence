@@ -145,6 +145,8 @@ export class PongService {
 
 	waitingState: Array<boolean>;
 
+	clientReady: Array<boolean>;
+
 	roomID: Array<number>;
 	maxRoomID: number;
 
@@ -154,6 +156,7 @@ export class PongService {
 	
 	constructor(private readonly historyService: HistoryService) {
 		this.playerInfos = [];
+		this.clientReady = []; // share same index as playerInfos
 		
 		this.pendingPlayers = [];
 		this.pendingPlayersCustom = [];
@@ -189,8 +192,8 @@ export class PongService {
 		if (index > 0)
 			this.playerInfos[index].socket = socket;
 		else {
-			
 			this.playerInfos.push({userId: userID, socket: socket});
+			this.clientReady.push(false);
 			console.log("Added new user to pong playerInfos (id: " + userID + ")");
 		}
 	}
@@ -198,8 +201,10 @@ export class PongService {
 	UnregisterUserInfos(socket: Socket) {
 		const index = this.playerInfos.findIndex(infos => (infos.socket === socket));
 
-		if (index >= 0)
+		if (index >= 0) {
 			this.playerInfos.splice(index, 1);
+			this.clientReady.splice(index, 1);
+		}
 
 		const pendingIndex: number = this.pendingPlayers.findIndex(data => data.socket === socket);
 		if (pendingIndex >= 0)
@@ -318,11 +323,34 @@ export class PongService {
 		this.pongGateway.EmitPlayerNums(sockets);
 
 		this.pongGateway.EmitInit(roomIndex, custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS);
-
-		this.pongGateway.EmitStartGame(roomIndex, COUNTDOWN / 1000);
-
 		
 		this.StartGameAtCountdown(this.socketsRuntime.length - 1, COUNTDOWN);
+	}
+
+	ClientsIsReady(socket: Socket) {
+		const instanceIndex = this.FindIndexBySocketId(socket.id);
+		
+		if (instanceIndex < 0) {
+			console.log("ClientIsReady: client not found");
+			return;
+		}
+
+		const socketPair = this.socketsRuntime[instanceIndex];
+
+		const player1Index = this.playerInfos.findIndex(info => (info.socket === socketPair.socketP1));
+		const player2Index = this.playerInfos.findIndex(info => (info.socket === socketPair.socketP2));
+
+		if (this.playerInfos[player1Index].socket === socket)
+			this.waitingState[player1Index] = true;
+		else
+			this.waitingState[player2Index] = true;
+
+		if (this.waitingState[player1Index] && this.waitingState[player2Index])
+		{
+			this.waitingState[player1Index] = false;
+			this.waitingState[player2Index] = false;
+			this.StartGameAtCountdown(instanceIndex, COUNTDOWN);
+		}
 	}
 
 	AddWatcher(index: number, socket: Socket) {
@@ -348,6 +376,8 @@ export class PongService {
 	}
 
 	async StartGameAtCountdown(index: number, countdown: number) {
+		this.pongGateway.EmitStartGame(this.roomID[index], COUNTDOWN / 1000);
+
 		await new Promise(r => setTimeout(r, countdown));
 		this.ballRuntime[index].ballDelta = {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y};
 		this.pongGateway.EmitBallDelta(this.roomID[index], this.ballRuntime[index]);
@@ -358,7 +388,6 @@ export class PongService {
 		this.ballRuntime[index].ballDelta = {x: 0, y: 0};
 
 		this.pongGateway.EmitBallDelta(this.roomID[index], this.ballRuntime[index]);
-		this.pongGateway.EmitStartGame(this.roomID[index], COUNTDOWN / 1000);
 		
 		this.StartGameAtCountdown(this.socketsRuntime.length - 1, COUNTDOWN);
 	}

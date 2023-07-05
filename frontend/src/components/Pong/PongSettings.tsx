@@ -4,11 +4,11 @@ export const OFFSET_Y: number = 40;
 export const WALL_WIDTH: number = 10;
 export const WALL_HEIGHT: number = 10;
 
-export const MAX_WIN_WIDTH: number = 800;
-export const MAX_WIN_HEIGHT: number = 1000;
+export const MAX_WIN_WIDTH: number = 1900;
+export const MAX_WIN_HEIGHT: number = 850;
 
-export const MIN_WIN_WIDTH: number = 200;
-export const MIN_WIN_HEIGHT: number = 400;
+export const MIN_WIN_WIDTH: number = 500;
+export const MIN_WIN_HEIGHT: number = 450;
 
 export const WALL_PLACEHOLDER: Obstacle = {
   x: 0,

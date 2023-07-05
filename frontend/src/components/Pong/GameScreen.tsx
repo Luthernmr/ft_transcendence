@@ -3,11 +3,10 @@ import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { Button, Center } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import GameArea from './GameArea';
-import {  OFFSET_X, OFFSET_Y, WALL_WIDTH, WALL_HEIGHT, MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, WALL_PLACEHOLDER,
-	Vector2, GameLayout, PongInitData, PongInitEntities, WatcherInitDatas,
-	BallRuntimeData, PaddleRuntimeData, Obstacle,
-	Shape, Paddle, Score, PongState, GameState }
+import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
+	Shape, Paddle, Score, OFFSET_X, OFFSET_Y }
 	from './PongSettings';
+import UserArea from './UsersArea';
 
 interface GameScreenProps {
 	size: number,
@@ -29,7 +28,7 @@ function GameScreen(props : GameScreenProps) {
 
 	//Game
 	const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
-	const winner = useRef<number>(1);
+	const winner = useRef<number>(0);
 	const countdown = useRef<number>(0);
 
 	//Time
@@ -53,7 +52,8 @@ function GameScreen(props : GameScreenProps) {
 		}
 
 		InitDatas(props.initDatas);
-		console.log(props.initDatas);
+
+		pongSocket.emit('ready');
 	}, []);
 
 	const Update = () => {
@@ -171,17 +171,49 @@ function GameScreen(props : GameScreenProps) {
 	}, []);
 
 	return(
-		<>
-			<GameArea 	width={props.initDatas.width}
-						height={props.initDatas.height}
-						size={props.size}
-						mirror={props.playerNumber === 1 ? false : true}
-						ball={Object.assign({}, ball, ballShape.current)}
-						paddleP1={paddleP1.pos}
-						paddleP2={paddleP2.pos}
-						paddleShape={paddleShape.current}
-			/>
-		</>
+		<div style={{
+			display: "flex",
+			flexDirection: "row",
+			width: 1060 * props.size,
+			height: 700 * props.size
+		}} >
+			<div style={{
+						width: '50%',
+						backgroundColor: 'lightgray'
+						}}>
+				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
+					<Layer>
+						<Text fontSize={50} width={450} y={400} align='center' text={countdown.current.toString()} visible={countdown.current > 0} />
+						<Text fontSize={30} width={450} y={180} align='center' text={`Player ${winner.current} won!`} visible={winner.current != 0}/>
+						<GameArea 	width={props.initDatas.width}
+									height={props.initDatas.height}
+									size={props.size}
+									mirror={props.playerNumber === 1 ? false : true}
+									ball={Object.assign({}, ball, ballShape.current)}
+									paddleP1={paddleP1.pos}
+									paddleP2={paddleP2.pos}
+									paddleShape={paddleShape.current}
+									/>
+					</Layer>
+				</Stage>
+			</div>
+			<div style={{
+						width: '50%',
+						backgroundColor: 'lightyellow'
+						}}>
+				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
+					<Layer>
+						<UserArea 	width={props.initDatas.width}
+									height={props.initDatas.height}	
+									size={props.size}
+									mirror={props.playerNumber === 1 ? false : true}
+									scoreP1={score.current.scoreP1}
+									scoreP2={score.current.scoreP2}
+									/>
+					</Layer>
+				</Stage>
+			</div>
+		</div>
 	)
 }
 

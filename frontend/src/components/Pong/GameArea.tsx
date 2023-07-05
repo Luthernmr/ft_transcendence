@@ -22,30 +22,30 @@ interface GameAreaProps {
 function GameArea({width, height, size, mirror, ball, paddleP1, paddleP2, paddleShape}: GameAreaProps) {	
 	if (mirror) {
 		return (
-		<><Stage x={OFFSET_X} y={OFFSET_Y} width={500} height={700} scale={{x: size, y: size}}>
-			<Layer>
-				<GameFrame width={width} height={height}/>
-				<Ball	x={width - ball.x - ball.width}
-						y={height - ball.y - ball.height}
-						width={ball.width} height={ball.height} />
-				<Paddle x={width - paddleP1 - paddleShape.width}
-						y={height - paddleShape.height}
-						width={paddleShape.width} height={paddleShape.height}/>
-				<Paddle x={width - paddleP2 - paddleShape.width}
-						y={0}
-						width={paddleShape.width} height={paddleShape.height}/>
-			</Layer >
-		</Stage >
+		<>
+			<GameFrame width={width} height={height}/>
+			<Ball	x={width - ball.x - ball.width}
+					y={height - ball.y - ball.height}
+					width={ball.width} height={ball.height} />
+			<Paddle x={width - paddleP1 - paddleShape.width}
+					y={height - paddleShape.height}
+					width={paddleShape.width} height={paddleShape.height}/>
+			<Paddle x={width - paddleP2 - paddleShape.width}
+					y={0}
+					width={paddleShape.width} height={paddleShape.height}/>
 	</>)
 	} else return (
-		<> <Stage x={OFFSET_X} y={OFFSET_Y} width={500} height={700}>
-				<Layer>
-					<GameFrame width={width} height={height}/>
-					<Ball x={ball.x} y={ball.y} width={ball.width} height={ball.height} />
-					<Paddle x={paddleP1} y={0} width={paddleShape.width} height={paddleShape.height}/>
-					<Paddle x={paddleP2} y={height - paddleShape.height} width={paddleShape.width} height={paddleShape.height}/>
-				</Layer >
-			</Stage >
+		<>
+			<GameFrame width={width} height={height}/>
+			<Ball 	x={ball.x}
+					y={ball.y}
+					width={ball.width} height={ball.height} />
+			<Paddle x={paddleP1}
+					y={0}
+					width={paddleShape.width} height={paddleShape.height}/>
+			<Paddle x={paddleP2}
+					y={height - paddleShape.height}
+					width={paddleShape.width} height={paddleShape.height}/>
 		</>
 	)
 }

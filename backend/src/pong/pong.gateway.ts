@@ -55,6 +55,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.JoinQueue(socket, datas.custom);
   }
 
+  @SubscribeMessage('ready')
+  handleReady(@ConnectedSocket() socket: Socket) {
+    this.pongService.ClientsIsReady(socket);
+  }
+
   @SubscribeMessage('keydown')
   handlePaddleKeydown(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyDown(socket.id, input);
