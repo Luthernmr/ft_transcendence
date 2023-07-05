@@ -2,7 +2,7 @@ import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, M
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { message, Upload } from 'antd';
+
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
@@ -55,39 +55,12 @@ export default function Settings(props: any) {
 		}
 	}
 
-  const navigate = useNavigate();
+	const [isChecked, setIsChecked] = useState(false);
+	const [qrCode, setQrcode] = useState("");
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [pinCode, setPinCode] = useState("");
 
-  useEffect(() => {
-    const getUser = async () => {
-      const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-        withCredentials: true,
-      });
-      setProfile(res.data.user);
-      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-    };
-    getUser();
-    if (profile.isTwoFA) setIsChecked(true);
-  }, [profile.isTwoFA, isChecked]);
-  async function handleCheck2FA() {
-    if (profile.isTwoFA) {
-      const resp = await axios.post(
-        import.meta.env.VITE_BACKEND + "/api/turn-off" + location.search,
-        {
-          twoFACode: pinCode,
-        },
-        { withCredentials: true }
-      );
-      setIsChecked(false);
-    } else {
-      const resp: any = await axios.get(
-        import.meta.env.VITE_BACKEND + "/api/generate" + location.search,
-        { withCredentials: true, responseType: "blob" }
-      );
-      const qrUrl = URL.createObjectURL(resp.data);
-      setQrcode(qrUrl);
-      onOpen();
-    }
-  }
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		const getUser = async () => {
@@ -101,41 +74,60 @@ export default function Settings(props: any) {
 		if (profile.isTwoFA)
 			setIsChecked(true);
 
-  async function sendCode() {
-    try {
-      const resp = await axios.post(
-        import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
-        {
-          twoFACode: pinCode,
-        },
-        { withCredentials: true }
-      );
-      //console.log(resp.data.status);
-      if (resp.data.status == 401) throw new Error("test");
-      setIsChecked(true);
-      toast({
-        title: `2FA is now activate please log in again`,
-        status: "success",
-        isClosable: true,
-        position: "top",
-      });
-      await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
-        withCredentials: true,
-      });
-      sessionStorage.removeItem("jwt");
-      sessionStorage.removeItem("currentUser");
-      onClose();
-      navigate("/login");
-    } catch (error) {
-      toast({
-        title: `invalid code`,
-        status: "error",
-        isClosable: true,
-        position: "top",
-      });
-      //console.log(error);
-    }
-  }
+	}, [profile.isTwoFA, isChecked]);
+	async function handleCheck2FA() {
+		if (profile.isTwoFA) {
+			const resp = await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-off' + location.search, {
+				"twoFACode": pinCode
+			}, { withCredentials: true });
+			setIsChecked(false);
+		}
+		else {
+			const resp: any = await axios.get(import.meta.env.VITE_BACKEND + '/api/generate' + location.search, { withCredentials: true, responseType: "blob" });
+			const qrUrl = URL.createObjectURL(resp.data);
+			setQrcode(qrUrl);
+			onOpen();
+		}
+	}
+
+	const toast = useToast()
+
+	async function sendCode() {
+		try {
+			const resp = await axios.post(
+				import.meta.env.VITE_BACKEND + "/api/turn-on" + location.search,
+				{
+					twoFACode: pinCode,
+				},
+				{ withCredentials: true }
+			);
+			//console.log(resp.data.status);
+			if (resp.data.status == 401) throw new Error("test");
+			setIsChecked(true);
+			toast({
+				title: `2FA is now activate please log in again`,
+				status: "success",
+				isClosable: true,
+				position: "top",
+			});
+			await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+				withCredentials: true,
+			});
+			sessionStorage.removeItem("jwt");
+			sessionStorage.removeItem("currentUser");
+			onClose();
+			navigate("/login");
+		}
+		catch (error) {
+			toast({
+				title: `invalid code`,
+				status: "error",
+				isClosable: true,
+				position: "top",
+			});
+			//console.log(error)
+		}
+	}
 
 	return (
 		<VStack spacing={4} align="stretch">
