@@ -69,12 +69,13 @@ export class ChatService {
 
   @SubscribeMessage('checkRoomPassword')
   async checkRoomPass(
+    client: Socket,
     payload: { room: Room; password: string },
   ) {
     const answer = await bcrypt.compare(
       payload.password,
       payload.room.password,
     );
-    this.server.emit('passCheck', answer);
+    client.emit('passCheck', answer);
   }
 }
