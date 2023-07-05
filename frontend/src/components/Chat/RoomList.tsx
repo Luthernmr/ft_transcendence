@@ -53,9 +53,9 @@ const RoomList: React.FC<RoomListProps> = ({
     });
     chatSocket.emit("getUserRooms", { userId: currentUser.id });
 
-    return () => {
-      // chatSocket.off("roomList");
-    };
+    // return () => {
+    //   chatSocket.off("roomList");
+    // };
   }, [currentUser.id]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -76,9 +76,8 @@ const RoomList: React.FC<RoomListProps> = ({
     chatSocket.on("passCheck", (check: boolean) => {
       if (check && selectedRoom) {
         setSelectedRoom(selectedRoom);
-      }
-      else {
-        setRoomPassword("")
+      } else {
+        setRoomPassword("");
         toast({
           title: "Wrong password",
           status: "error",
@@ -87,8 +86,11 @@ const RoomList: React.FC<RoomListProps> = ({
         });
         return;
       }
-    })
-    chatSocket.emit("checkRoomPassword", { room: selectedRoom, password: roomPassword, });
+    });
+    chatSocket.emit("checkRoomPassword", {
+      room: selectedRoom,
+      password: roomPassword,
+    });
     onClose();
   };
 
