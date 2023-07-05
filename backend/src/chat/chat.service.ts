@@ -53,7 +53,7 @@ export class ChatService {
     if (error) {
       client.emit('error', { message: error.message });
     } else {
-      client.emit('roomCreated');
+      client.emit('roomCreated');``
       data.users.forEach((element) => {
         client.to(element.socketId).emit('roomCreated');
       });
