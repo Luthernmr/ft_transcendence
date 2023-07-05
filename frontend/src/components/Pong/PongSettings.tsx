@@ -24,14 +24,14 @@ export interface Vector2 {
 
 export interface GameLayout {
  	 width: number,
-	height: number,
-	ballHeight: number,
+	 height: number,
+	 ballHeight: number,
  	 paddleHeight: number,
 }
 
-export interface PongInitData extends GameLayout, PongInitEntities {
-	ballPosition: Vector2,
-	paddlePos: number
+export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntimeData, Score {
+	countdown: number,
+	playerNumber: number
 }
 
 export interface PongInitEntities {
@@ -50,6 +50,7 @@ export interface BallRuntimeData {
 }
 
 export interface PaddleRuntimeData {
+  paddleWidth: number,
 	paddle1Pos: number,
 	paddle1Delta: number,
 	paddle2Pos: number,

@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas, PongInitEntities } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, PongInitEntities, PongState } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -32,7 +32,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   handleDisconnect(socket: Socket) {
     console.log("Socket disconnected from pong :" + socket.id);
-    this.pongService.CloseRoom(socket.id);
+    //this.pongService.CloseRoom(socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }
 
@@ -60,6 +60,17 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.ClientsIsReady(socket);
   }
 
+  @SubscribeMessage('quit')
+  handleQuit(@ConnectedSocket() socket: Socket) {
+    this.pongService.UserQuit(socket);
+  }
+
+  @SubscribeMessage('onPongConnection')
+  handleGetState(@ConnectedSocket() socket: Socket) {
+    const gameState = this.pongService.GetGameState(socket);
+    socket.emit('gamestate', gameState);
+  }
+
   @SubscribeMessage('keydown')
   handlePaddleKeydown(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyDown(socket.id, input);
@@ -68,11 +79,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('keyup')
   handlePaddleKeyup(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyUp(socket.id, input);
-  }
-
-  @SubscribeMessage('restart')
-  handleRestart(@ConnectedSocket() socket: Socket) {
-    this.pongService.RestartNewGame(socket);
   }
 
   @SubscribeMessage('watch')
@@ -88,13 +94,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.server.socketsLeave("room" + roomID);
   }
 
-  EmitInit(roomID: number, initDatas: PongInitData & PongInitEntities) {
-    this.EmitEvent('Init', roomID, initDatas);
-  }
-
-  EmitPlayerNums(sockets: SocketPair) {
-    sockets.socketP1.emit("SetNum", 2);
-    sockets.socketP2.emit("SetNum", 1);
+  EmitInit(socket: Socket, initDatas: PongInitData) {
+    socket.emit('Init', initDatas);
   }
 
   EmitStartGame(roomID: number, delaySeconds: number) {

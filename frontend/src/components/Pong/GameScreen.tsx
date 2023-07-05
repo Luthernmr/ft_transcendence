@@ -11,7 +11,6 @@ import UserArea from './UsersArea';
 interface GameScreenProps {
 	size: number,
 	watcher: boolean
-	playerNumber: 1 | 2;
 	initDatas: PongInitData;
 }
 
@@ -27,6 +26,7 @@ function GameScreen(props : GameScreenProps) {
 	const ballShape = useRef<Shape>({width: 20, height: 20});
 	
 	//Paddles
+	const playerNumber = useRef<number>(1);
 	const [paddleP1, setPaddleP1] = useState<Paddle>({ pos: 200, delta: 0 });
 	const [paddleP2, setPaddleP2] = useState<Paddle>({ pos: 200, delta: 0 });
 	const paddleShape = useRef<Shape>({width: 0, height: 0});
@@ -41,18 +41,21 @@ function GameScreen(props : GameScreenProps) {
 	const requestRef = useRef(0);
  	const previousTimeRef = useRef(Date.now());
 
-	 useEffect(() => {
+	useEffect(() => {
 		function InitDatas(datas: PongInitData) {
+			playerNumber.current = datas.playerNumber;
 			ballShape.current = { width: datas.ballWidth, height: datas.ballHeight };
 			paddleShape.current = {width: datas.paddleWidth, height: datas.paddleHeight};
-			ballDelta.current = {x: 0, y: 0};
+			ballDelta.current = datas.ballDelta;
+			countdown.current = datas.countdown;
+			score.current = { scoreP1: datas.scoreP1, scoreP2: datas.scoreP2 }
 			setPaddleP1({
-				pos: datas.paddlePos,
-				delta: 0
+				pos: datas.paddle1Pos,
+				delta: datas.paddle1Delta
 			})
 			setPaddleP2({
-				pos: datas.paddlePos,
-				delta: 0
+				pos: datas.paddle2Pos,
+				delta: datas.paddle2Delta
 			})
 			setBall(datas.ballPosition);
 		}
@@ -150,8 +153,8 @@ function GameScreen(props : GameScreenProps) {
 		
 		let input = 0;
 	
-		if (e.code == 'ArrowLeft') input = props.playerNumber === 1 ? -1 : 1;
-		else if (e.code == 'ArrowRight') input = props.playerNumber === 1 ? 1 : -1;
+		if (e.code == 'ArrowLeft') input = playerNumber.current === 1 ? -1 : 1;
+		else if (e.code == 'ArrowRight') input = playerNumber.current === 1 ? 1 : -1;
 		else return;
 	
 		pongSocket.emit('keydown', input);
@@ -163,8 +166,8 @@ function GameScreen(props : GameScreenProps) {
 		
 		let input = 0;
 		
-		if (e.code == 'ArrowLeft') input = props.playerNumber === 1 ? -1 : 1;
-		else if (e.code == 'ArrowRight') input = props.playerNumber === 1 ? 1 : -1;
+		if (e.code == 'ArrowLeft') input = playerNumber.current === 1 ? -1 : 1;
+		else if (e.code == 'ArrowRight') input = playerNumber.current === 1 ? 1 : -1;
 		else return;
 		
 		pongSocket.emit('keyup', input);
@@ -207,7 +210,7 @@ function GameScreen(props : GameScreenProps) {
 						<GameArea 	width={props.initDatas.width}
 									height={props.initDatas.height}
 									size={props.size}
-									mirror={props.playerNumber === 1 ? false : true}
+									mirror={playerNumber.current === 1 ? false : true}
 									ball={Object.assign({}, ball, ballShape.current)}
 									paddleP1={paddleP1.pos}
 									paddleP2={paddleP2.pos}
@@ -225,7 +228,7 @@ function GameScreen(props : GameScreenProps) {
 						<UserArea 	width={props.initDatas.width}
 									height={props.initDatas.height}	
 									size={props.size}
-									mirror={props.playerNumber === 1 ? false : true}
+									mirror={playerNumber.current === 1 ? false : true}
 									scoreP1={score.current.scoreP1}
 									scoreP2={score.current.scoreP2}
 									/>

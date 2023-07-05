@@ -15,27 +15,36 @@ function Pong() {
 
   const watching = useRef<boolean>(false);
 
-  const playerNumber = useRef<1 | 2>(1);
+  //const playerNumber = useRef<1 | 2>(1);
 
   const [initDatas, setInitDatas] = useState<PongInitData>({
     width: 0,
     height: 0,
     ballHeight: 0,
-    paddleHeight: 0,
-    ballPosition:{x: 0, y: 0},
-    paddlePos: 0,
     ballWidth: 0,
-    paddleWidth: 0
+    paddleHeight: 0,
+    paddleWidth: 0,
+    ballPosition:{x: 0, y: 0},
+    ballDelta: {x: 0, y: 0},
+    paddle1Pos: 0,
+    paddle1Delta: 0,
+    paddle2Pos: 0,
+    paddle2Delta: 0,
+    countdown: 0,
+    scoreP1: 0,
+    scoreP2: 0,
+    playerNumber: 1
   });
   
   useEffect(() => {
     updateDimensions();
+    pongSocket.emit('onPongConnection');
   }, [])
 
   useEffect(() => {
-    function SetNum(num: 1 | 2) {
-      playerNumber.current = num;
-    }
+    // function SetNum(num: 1 | 2) {
+    //   playerNumber.current = num;
+    // }
 
     function Init(datas: PongInitData) {
       setInitDatas({
@@ -60,12 +69,23 @@ function Pong() {
       setPongState(PongState.Watch);
     }
 
-    pongSocket.on('SetNum', SetNum);
+    function GameState(datas: any) {
+      setPongState(datas.pongState);
+
+      if (datas.pongState === PongState.Play) {
+        setInitDatas(datas.payload);
+      }
+    }
+
+    //pongSocket.on('SetNum', SetNum);
     pongSocket.on('Init', Init);
     pongSocket.on('Watcher', Watcher);
+    pongSocket.on('gamestate', GameState);
 
     return () => {
+      pongSocket.off('Init', Init);
       pongSocket.off('Watcher', Watcher);
+      pongSocket.off('gamestate', GameState);
     }
   }, []);
 
@@ -109,9 +129,9 @@ function Pong() {
     return (
       <QueueScreen />
     )
-  } else if (pongState === PongState.Play || pongState === PongState.Finished || pongState === PongState.Watch) {
+  } else if (pongState === PongState.Play || pongState === PongState.Watch) {
     return (
-      <GameScreen size={size} watcher={watching.current} playerNumber={playerNumber.current} initDatas={initDatas}/>
+      <GameScreen size={size} watcher={watching.current} initDatas={initDatas}/>
       )
   }
 }
