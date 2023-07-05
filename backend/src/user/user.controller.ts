@@ -60,11 +60,15 @@ export class UserController {
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: Request
 	) {
-		const user: any = request.user;
-		if (!user)
-			return ("no user");
-		this.userService.changeNickname(user, nickname);
-		return response.send({ user });
+		try {
+			const user: any = request.user;
+			if (!user)
+				return ("no user");
+			this.userService.changeNickname(user, nickname);
+			return response.send({ user });
+		} catch (error) {
+			console.log(error)
+		} 
 	}
 
 	@Post('avatar')

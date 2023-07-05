@@ -217,7 +217,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       pongSocket.disconnect();
       //console.log("jwwwr", sessionStorage.getItem("jwt"));
     } catch (error) {
-      //console.log(error);
     }
   };
   ``;

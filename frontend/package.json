@@ -15,6 +15,7 @@
 		"@emotion/styled": "^11.10.6",
 		"@types/node": "^20.2.5",
 		"@types/socket.io-client": "^3.0.0",
+		"antd": "^5.6.4",
 		"axios": "^1.4.0",
 		"framer-motion": "^10.12.4",
 		"konva": "^9.0.1",

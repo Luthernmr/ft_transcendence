@@ -131,25 +131,40 @@ export class SocketGateway
     }
   }
 
-  @SubscribeMessage('rejectFriendRequest')
-  async rejectFriendRequest(
-    client: Socket,
-    data: {
-      requestId: any;
-    },
-  ) {
-    try {
-      //console.log('rejected', data.requestId);
-      const request: any = await this.userService.getPendingRequestById(
-        data.requestId,
-      );
-      await this.userService.deletePendingRequestById(request);
-      //console.log('rejected', request);
-      client.emit('requestRejected');
-    } catch (error) {
-      //console.log(error);
-    }
-  }
+		const otherId = userReceiv.socketId;
+		try {
+			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
+			console.log('relation', alreadyExist);
+			if (alreadyExist != null)
+				throw new BadRequestException('Request already exists for this person.');
+			if (userReceiv.id == userSender.id)
+				throw new BadRequestException('can t send request');
+			await this.userService.createPendingRequest({
+				type: "Friend",
+				senderId: userSender.id,
+				senderNickname: userSender.nickname,
+				senderPdp: userSender.imgPdp,
+				user: userReceiv
+			})
+
+			const socketMap = this.server.sockets;
+			console.log('here', socketMap);
+			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
+			console.log('her2');
+			//for (const socket of sockets) {
+			//	const socketToken = socket?.handshake?.auth?.token;
+			//	console.log(socketToken)
+			//}
+
+
+			otherSocket.emit('notifyRequest');
+			client.emit('sendSuccess');
+		}
+		catch (error) {
+			console.log(error)
+			client.emit('alreadyFriend');
+		}
+	}
 
   @SubscribeMessage('getFriends')
   async getFriendsList(client: Socket) {
