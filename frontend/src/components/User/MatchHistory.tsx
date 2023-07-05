@@ -53,7 +53,8 @@ export default function MatchHistory(props :any) {
 		<>
 			<Stack spacing='1'>
 				{ matchHistorys.map((matchHistory) => (
-					<Card key={matchHistory?.id} size={'sm'} bg={handleBg(matchHistory?.winner)}>
+					<Card key={matchHistory.id} size={'sm'} bg={handleBg(matchHistory?.winner)}>
+						<Text>{matchHistory.id}</Text>
 						<CardBody >
 							<Flex justifyContent={'space-around'} alignItems={'center'}>
 								<HStack spacing={'2'} >

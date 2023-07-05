@@ -59,9 +59,14 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 	async changeNickname(user: User, nickname: string) {
-		user.nickname = nickname;
-		await this.userRepository.save(user);
+			user.nickname = nickname;
+			await this.userRepository.save(user);
 	}
+
+	async isNicknameAlreadyUsed(nickname: string): Promise<boolean> {
+		const count = await this.userRepository.count({where : { nickname : nickname} });
+		return count > 0;
+	  }
 
 	async createPendingRequest(data: any): Promise<PendingRequest> {
 		const existingRequest = await this.pendingRequest.findOne({

@@ -2,21 +2,23 @@ import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, M
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { message, Upload } from 'antd';
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
 	isTwoFA: boolean;
 }
 
-export default function Settings() {
-
+export default function Settings(props: any) {
+	
+	var formData = new FormData();
 	const [profile, setProfile] = useState<Profile>({
-		imgPdp: '',
+		imgPdp: props.user.imgPdp,
 		nickname: '',
 		isTwoFA: false
 	});
 
-	const [profilePreview, setPreview] = useState('');
+	const [profilePreview, setPreview] = useState(props.user.imgPdp);
 
 	const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setProfile({ ...profile, nickname: event.target.value });
@@ -24,28 +26,30 @@ export default function Settings() {
 
 
 	const handleAvatarChange = async (event: any) => {
-
-		var formData = new FormData();
 		formData.append("file", event.currentTarget.files[0]);
-		console.log('file to send', event.target.files[0])
-		const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', formData, {
-			headers: {
-				'Content-Type': 'multipart/form-data'
-			},
-			withCredentials: true
-		})
-		console.log('resposner', response);
 	}
 
 	const SendModif = async (event: any) => {
 		event.preventDefault();
 		try {
-			const response = await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', {
-				"file": profile.imgPdp,
-
-			}, { withCredentials: true });
+			await axios.post(import.meta.env.VITE_BACKEND + '/user/avatar', formData, {
+				headers: {
+					'Content-Type': 'multipart/form-data'
+				},
+				withCredentials: true
+			})
 		} catch (error) {
 			//console.log(error);
+		}
+
+		try {
+			await axios.post(import.meta.env.VITE_BACKEND + '/user/settings', {
+				"nickname": profile.nickname,
+
+			}, { withCredentials: true });
+			
+		} catch (error) {
+			
 		}
 	}
 
@@ -132,13 +136,15 @@ export default function Settings() {
 						src={profilePreview}
 						alt="User avatar"
 					/>
-					<Input
+
+					<input
 						type="file"
 						id="avatar"
 						name="avatar"
 						accept="image/*"
+						placeholder="test"
 						onChange={(event) => handleAvatarChange(event)}
-					/>
+						/>
 				</HStack>
 			</FormControl>
 			<FormControl>

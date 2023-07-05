@@ -69,15 +69,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				senderPdp: userSender.imgPdp,
 				user: userReceiv
 			})
+			this.server.to(otherId).emit('notifyRequest');
 			client.emit('sendSuccess');
 			console.log('servers socket', this.server.sockets)
-			
 		}
 		catch (error) {
 			client.emit('alreadyFriend');
 		}
 	}
-	
 
 	@SubscribeMessage('acceptFriendRequest')
 	async acceptFriendRequest(client: Socket, data: {

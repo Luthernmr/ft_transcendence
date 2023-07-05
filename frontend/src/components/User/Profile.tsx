@@ -58,7 +58,7 @@ export default function UserProfile() {
 				</TabList>
 				<TabPanels >
 					<TabPanel>
-						<Settings />
+						<Settings user={currentUser}/>
 					</TabPanel>
 					<TabPanel >
 						<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"scroll"} >

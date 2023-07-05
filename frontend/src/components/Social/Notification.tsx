@@ -40,6 +40,7 @@ const PendingRequest = () => {
 	const toast = useToast()
 	useEffect(() => {
 		userSocket.on('notifyRequest', () => {
+			console.log('notified')
 			userSocket.emit('getPendingRequest')
 		})
 
