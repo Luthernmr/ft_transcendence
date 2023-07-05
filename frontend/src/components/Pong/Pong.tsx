@@ -133,6 +133,10 @@ function Pong() {
     return (
       <GameScreen size={size} watcher={watching.current} initDatas={initDatas}/>
       )
+  } else if (pongState === PongState.AlreadyConnected) {
+    return (
+      <h1>You are already connected to a Pong Instance !</h1>
+    )
   }
 }
 

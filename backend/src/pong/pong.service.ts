@@ -130,7 +130,8 @@ export interface Score {
 
 export interface PlayerInfos {
 	socket: Socket,
-	userId: number
+	userId: number,
+	pongState: PongState
 }
 
 export interface IDPair {
@@ -145,7 +146,8 @@ export enum PongState {
 	Queue,
 	Play,
 	Finished,
-	Watch
+	Watch,
+	AlreadyConnected
 }
 
 type PlayerInfosIndex = number;
@@ -212,23 +214,28 @@ export class PongService {
 		this.pongGateway = pongGateway;
 	}
 
-	RegisterUserInfos(userID: number, socket: Socket) {
+	RegisterUserInfos(userID: number, socket: Socket) : boolean {
 		const playerInfosIndex = this.playerInfos.findIndex(infos => (infos.userId === userID));
-		console.log("user trying to register");
 
-		if (playerInfosIndex >= 0 && this.playerInfos[playerInfosIndex].socket === null) {
-			this.playerInfos[playerInfosIndex].socket = socket;
-			const instanceIndex = this.usersRuntime.findIndex(user => user.user1 === playerInfosIndex || user.user2 === playerInfosIndex);
-			console.log("Registration: found instance " + instanceIndex);
-			if (instanceIndex >= 0)
-				socket.join('room' + this.roomID[instanceIndex]);
+		if (playerInfosIndex >= 0) {
+			if (this.playerInfos[playerInfosIndex].socket === null) {
+				this.playerInfos[playerInfosIndex].socket = socket;
+				const instanceIndex = this.usersRuntime.findIndex(user => user.user1 === playerInfosIndex || user.user2 === playerInfosIndex);
+				if (instanceIndex >= 0)
+					socket.join('room' + this.roomID[instanceIndex]);
+			} else {
+				console.log("user", userID, "already connected to a pong instance");
+				return false;
+			}
 			
 			console.log("Replaced pong socket (id: " + userID + ")");
-		} else if (playerInfosIndex < 0) {
-			this.playerInfos.push({userId: userID, socket: socket});
+		} else {
+			this.playerInfos.push({userId: userID, socket: socket, pongState: PongState.Home});
 			this.clientReady.push(false);
 			console.log("Added new user to pong playerInfos (id: " + userID + ")");
 		}
+
+		return true;
 	}
 
 	UnregisterUserInfos(socket: Socket) {
@@ -285,6 +292,7 @@ export class PongService {
 		} else {
 			console.log("not enough players in queue =", pendingPlayersArray.length)
 			pendingPlayersArray.push(currentPlayerInfoIndex);
+			this.playerInfos[currentPlayerInfoIndex].pongState = PongState.Queue;
 		}
 	}
 
@@ -407,6 +415,9 @@ export class PongService {
 		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2 });
 		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1 });
 
+		playerInfo1.pongState = PongState.Play;
+		playerInfo2.pongState = PongState.Play;
+
 		this.StartGameAtCountdown(this.usersRuntime.length - 1, COUNTDOWN);
 	}
 
@@ -502,6 +513,9 @@ export class PongService {
 	}
 
 	CleanDatas(index: number) {
+		this.playerInfos[this.usersRuntime[index].user1].pongState = PongState.Home;
+		this.playerInfos[this.usersRuntime[index].user2].pongState = PongState.Home;
+
 		const ballRuntimeMode = this.customMode[index] ? this.ballRuntimeCustom : this.ballRuntimeStandard;
 		const modeIndex = ballRuntimeMode.indexOf(this.ballRuntime[index]);
 		ballRuntimeMode.splice(modeIndex, 1);

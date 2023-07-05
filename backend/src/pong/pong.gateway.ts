@@ -26,8 +26,16 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
       return;
 
     let user: User = await this.authService.getUserByToken(socket.handshake.auth.token);
-		if (user)
-      this.pongService.RegisterUserInfos(user.id, socket);
+		if (user) {
+      let gameState = null;
+        if (this.pongService.RegisterUserInfos(user.id, socket)) {
+          gameState = this.pongService.GetGameState(socket);
+        } else {
+          gameState = { pongState: PongState.AlreadyConnected, payload: null }
+        }
+        console.log("Sending" + gameState.pongState);
+        socket.emit('gamestate', gameState);
+      }
   }
 
   handleDisconnect(socket: Socket) {
@@ -65,11 +73,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.UserQuit(socket);
   }
 
-  @SubscribeMessage('onPongConnection')
-  handleGetState(@ConnectedSocket() socket: Socket) {
-    const gameState = this.pongService.GetGameState(socket);
-    socket.emit('gamestate', gameState);
-  }
+  // @SubscribeMessage('onPongConnection')
+  // handleGetState(@ConnectedSocket() socket: Socket) {
+  //   const gameState = this.pongService.GetGameState(socket);
+  //   socket.emit('gamestate', gameState);
+  // }
 
   @SubscribeMessage('keydown')
   handlePaddleKeydown(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {

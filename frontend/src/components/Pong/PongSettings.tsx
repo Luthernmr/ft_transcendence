@@ -84,7 +84,8 @@ export enum PongState {
   Queue,
   Play,
   Finished,
-  Watch
+  Watch,
+  AlreadyConnected
 }
 
 export enum GameState {
