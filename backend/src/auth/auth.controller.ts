@@ -53,7 +53,7 @@ export class AuthController {
 	) {
 		try {
 			const user = await this.userService.getUser(loginDto.email);
-			console.log('user login', user);
+			// console.log('user login', user);
 			if (!user) {
 				throw new BadRequestException('invalid credentials or not register');
 			}
