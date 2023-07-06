@@ -6,10 +6,11 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { debug } from 'console';
 
 const COUNTDOWN: number = 3000;
 
-const FRAMERATE: number = 16 / 100;
+const FRAMERATE: number = 16;
 
 const PONG_WIDTH: number = 450;
 const PONG_HEIGHT: number = 600;
@@ -188,6 +189,8 @@ export class PongService {
 
 	customMode: Array<boolean>;
 	gameState: Array<GameState>;
+
+	time: number;
 	
 	constructor(private readonly historyService: HistoryService,
 				private readonly userService: UserService,
@@ -220,6 +223,8 @@ export class PongService {
 
 		this.customMode = [];
 		this.gameState = [];
+
+		this.time = Date.now();
 	}
 
 	RegisterGateway(pongGateway : PongGateway) {
@@ -283,7 +288,7 @@ export class PongService {
 	}
 
 	LaunchUpdates() {
-		setInterval(this.GlobalUpdate.bind(this), 16);
+		setInterval(this.GlobalUpdate.bind(this), FRAMERATE);
 	}
 
 	GetSocket(userInfosIndex: number) : Socket {
@@ -729,13 +734,18 @@ export class PongService {
 	}
 
 	GlobalUpdate() {
+		const currentTime = Date.now();
+		const deltaTime = currentTime - this.time;
+		this.time = currentTime;
+		const framerate = deltaTime / 100;
+
 		// PADDLE CALCULATIONS
 		this.paddleRuntime.forEach(function (data, index) {
 			const oldPaddle1Delta = data.paddle1Delta;
 			const oldPaddle2Delta = data.paddle2Delta;
 
-			data.paddle1Pos += data.paddle1Delta * FRAMERATE;
-			data.paddle2Pos += data.paddle2Delta * FRAMERATE;
+			data.paddle1Pos += data.paddle1Delta * framerate;
+			data.paddle2Pos += data.paddle2Delta * framerate;
 
 			if (data.paddle1Pos < 0) {
 				data.paddle1Delta = 0;
@@ -770,9 +780,8 @@ export class PongService {
 
 		// BALL CALCULATIONS
 		this.ballRuntime.forEach(function (data, index) {
-
-			data.ballPosition.x += data.ballDelta.x * FRAMERATE;
-			data.ballPosition.y += data.ballDelta.y * FRAMERATE;
+			data.ballPosition.x += data.ballDelta.x * framerate;
+			data.ballPosition.y += data.ballDelta.y * framerate;
 
 			if (data.ballPosition.x <= 0) {
 				data.ballDelta.x = -data.ballDelta.x;

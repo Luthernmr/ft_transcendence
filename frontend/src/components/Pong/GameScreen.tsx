@@ -67,6 +67,7 @@ function GameScreen(props : GameScreenProps) {
 		const time = Date.now();
 		if (previousTimeRef.current != undefined) {
 		  const deltaTime = time - previousTimeRef.current;
+		  
 		  setBall(ball => ({
 			x: ball.x + ballDelta.current.x * (deltaTime / 100),
 			y: ball.y + ballDelta.current.y * (deltaTime / 100),
@@ -88,8 +89,8 @@ function GameScreen(props : GameScreenProps) {
 	}
 
 	useEffect(() => {
-	requestRef.current = requestAnimationFrame(Update);
-	return () => cancelAnimationFrame(requestRef.current);
+		requestRef.current = requestAnimationFrame(Update);
+		return () => cancelAnimationFrame(requestRef.current);
 	}, []);
 
 	useEffect(() => {
