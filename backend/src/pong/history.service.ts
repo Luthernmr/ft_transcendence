@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { Score, IDPair } from './pong.service';
 import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
-import { cp } from 'fs';
 
 const XP_GAIN_WIN = 15;
 const XP_GAIN_LOSS = 5;

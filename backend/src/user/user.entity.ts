@@ -25,6 +25,9 @@ export class User {
   @Column({default: false })
   isOnline: boolean;
 
+  @Column({default: false})
+  isPlaying: boolean;
+
   @Column({nullable: true})
   socketId: string;
 
