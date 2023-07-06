@@ -59,13 +59,11 @@ export default function loginCard() {
 					userSocket.disconnect().connect();
 					pongSocket.disconnect().connect();
 					navigate("/home");
-					pongSocket.emit("register", { token: response.data.jwt });
 				}
 			}
 			if (!response.data) {
 				onOpen();
 			}
-			//console.log(response.data.status);
 			if (response.data.status == 401 || response.data.status == 400) {
 				toast({
 					title: response.data.message,
@@ -81,18 +79,13 @@ export default function loginCard() {
 				isClosable: true,
 				position: "top",
 			});
-			//console.log(error);
 		}
 	};
 
 	const connectAPI = async () => {
 		window.location.href = import.meta.env.VITE_42AUTH;
 	}
-	const [pinCode, setPinCode] = useState("");
-
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
-
 
 	return (
 		<form onSubmit={handleSubmit}>
