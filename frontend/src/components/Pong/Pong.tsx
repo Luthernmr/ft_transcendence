@@ -8,9 +8,10 @@ import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInit
 import HomeScreen from './HomeScreen';
 import GameScreen from './GameScreen';
 import QueueScreen from './QueueScreen';
+import LoadScreen from './LoadScreen';
 
 function Pong() {
-  const [pongState, setPongState] = useState<PongState>(PongState.Home);
+  const [pongState, setPongState] = useState<PongState>(PongState.Load);
   const [size, setSize] = useState(1);
 
   const watching = useRef<boolean>(false);
@@ -37,6 +38,7 @@ function Pong() {
   
   useEffect(() => {
     updateDimensions();
+    console.log("requestGameState");
     pongSocket.emit('requestGameState');
   }, [])
 
@@ -115,7 +117,11 @@ function Pong() {
     pongSocket.emit('watch');
   }
 
-  if (pongState === PongState.Home) {
+  if (pongState === PongState.Load) {
+    return (
+      <LoadScreen />
+    )
+  } else if (pongState === PongState.Home) {
     return (
       <HomeScreen JoinPong={() => JoinQueue(false)} JoinGnop={() => JoinQueue(true)} WatchGame={WatchGame} />
     )
