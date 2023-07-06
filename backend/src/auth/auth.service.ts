@@ -62,14 +62,12 @@ export class AuthService {
 		let sockets = Array.from(await server.sockets);
 		let otherSocket = null;
 		for(const socket of sockets) {
-			let token = (socket as any)[1].handshake.auth.token;
-			if (!token)
-			  return null;
-			const user :any = await this.getUserByToken(token)
-			// console.log("user verified", user);
-			if(userId == user.id)
-			  otherSocket= socket[1];
-		}
+      let token = (socket as any)[1].handshake.auth.token;
+      if (!token) return null;
+      const user: any = await this.getUserByToken(token);
+      //console.log("user verified", user);
+      if (userId == user.id) otherSocket = socket[1];
+    }
 		if (otherSocket)
 			return (otherSocket)
 		else

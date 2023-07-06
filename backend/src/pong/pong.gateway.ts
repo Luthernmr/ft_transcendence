@@ -45,7 +45,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   handleDisconnect(socket: Socket) {
-    console.log("Socket disconnected from pong :" + socket.id);
+    //console.log("Socket disconnected from pong :" + socket.id);
     //this.pongService.CloseRoom(socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }

@@ -39,31 +39,31 @@ const PendingRequest = () => {
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 	const toast = useToast()
 	useEffect(() => {
-		userSocket.on('notifyRequest', () => {
-			// console.log('notified')
-			userSocket.emit('getPendingRequest')
-		})
-		
-		userSocket.on('pendingRequestsList', (data) => {
-			setFriendRequests(data);
-		})
-		userSocket.on('requestAcccepted', () => {
-			userSocket.emit('getPendingRequest')
-		})
-		userSocket.on('requestRejected', () => {
-			userSocket.emit('getPendingRequest')
-		})
-		userSocket.emit('getPendingRequest')
+		userSocket.on("notifyRequest", () => {
+      //console.log('notified')
+      userSocket.emit("getPendingRequest");
+    });
 
-		userSocket.on('sendSuccess', () => {
-			toast({
+    userSocket.on("pendingRequestsList", (data) => {
+      setFriendRequests(data);
+    });
+    userSocket.on("requestAcccepted", () => {
+      userSocket.emit("getPendingRequest");
+    });
+    userSocket.on("requestRejected", () => {
+      userSocket.emit("getPendingRequest");
+    });
+    userSocket.emit("getPendingRequest");
+
+    userSocket.on("sendSuccess", () => {
+      toast({
         title: `A request has been sent`,
         status: "success",
         isClosable: true,
         position: "top",
-	});
-	//console.log('test');
-})
+      });
+      //console.log('test');
+    });
 		userSocket.on('alreadyFriend', () => {
 			toast({
 				title: `You can't send more friend request`,
@@ -127,10 +127,10 @@ const BellButton = () => {
 	}
 	
 	useEffect(() => {
-		userSocket.on('notifyRequest', () => {
-			//console.log('notify');
-			setNotified(true);
-		})
+		userSocket.on("notifyRequest", () => {
+      //console.log('notify');
+      setNotified(true);
+    });
 	}, [notified])
 	
 	

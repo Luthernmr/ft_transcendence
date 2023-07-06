@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, FormEvent } from "react";
 import {
   Flex,
   Box,
@@ -9,10 +9,13 @@ import {
   InputGroup,
   Input,
   InputRightElement,
+  useToast,
+  Button,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { FiSend } from "react-icons/fi";
-import { User } from '../Social/AllUserItem';
+import { User } from "../Social/AllUserItem";
+import { chatSocket } from "../../sockets/sockets";
 
 interface Room {
   id: string;
@@ -27,7 +30,47 @@ interface ChatRoomProps {
   selectedRoom: Room;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({setSelectedRoom, selectedRoom }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({
+  setSelectedRoom,
+  selectedRoom,
+}) => {
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
+  const [messageContent, setMessageContent] = useState<string>("");
+  const toast = useToast();
+
+  const handleSendMessage = (e: FormEvent) => {
+    e.preventDefault();
+    if (messageContent.trim() === "") {
+      toast({
+        title: "Type a message",
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+    chatSocket.emit("sendMessage", {
+      text: messageContent,
+      room: selectedRoom.id,
+      user: currentUser.id,
+    });
+
+    setMessageContent("");
+  };
+
+  const handleError = (error: { message: any }) => {
+    console.log("Here", error)
+    toast({
+      title: error.message,
+      status: "error",
+      isClosable: true,
+      position: "top",
+    });
+    chatSocket.off("error1", handleError);
+  };
+
+  chatSocket.on("error1", handleError);
+
   return (
     <Flex
       borderRadius={"md"}
@@ -63,19 +106,27 @@ const ChatRoom: React.FC<ChatRoomProps> = ({setSelectedRoom, selectedRoom }) => 
           </Box>
         ))} */}
       </VStack>
-      <InputGroup size="md">
-        <Input placeholder="Type your message..." borderRadius="md" />
-        <InputRightElement mr={"1.5"}>
-          <IconButton
-            colorScheme="teal"
-            h="1.75rem"
-            size="sm"
-            aria-label="Send message"
-            icon={<FiSend />}
-            type="submit"
+      <form onSubmit={handleSendMessage}>
+        <InputGroup size="md">
+          <Input
+            placeholder="Type your message..."
+            borderRadius="md"
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
           />
-        </InputRightElement>
-      </InputGroup>
+          <InputRightElement mr={"1.5"}>
+            <Button
+              colorScheme="teal"
+              h="1.75rem"
+              size="sm"
+              aria-label="Send message"
+              type="submit"
+            >
+              <FiSend />
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </form>
     </Flex>
   );
 };

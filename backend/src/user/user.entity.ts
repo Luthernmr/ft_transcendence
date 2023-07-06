@@ -1,28 +1,36 @@
-import { Message } from 'src/room/entities/message.entity';
+import { Message } from 'src/message/entities/message.entity';
 import { Room } from 'src/room/entities/room.entity';
 import { BlockedUser } from 'src/social/blockedUser.entity';
 import { Friend } from 'src/social/friend.entity';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, ManyToMany, JoinTable, OneToMany } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+  OneToMany,
+} from 'typeorm';
 
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({unique : true})
+  @Column({ unique: true })
   nickname: string;
 
-  @Column({unique : true})
+  @Column({ unique: true })
   email: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   password: string;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   imgPdp: string;
 
-  @Column({default: false })
+  @Column({ default: false })
   isOnline: boolean;
 
   @Column({default: false})
@@ -31,22 +39,21 @@ export class User {
   @Column({nullable: true})
   socketId: string;
 
-  @Column({nullable: true})
-  twoFASecret : string
+  @Column({ nullable: true })
+  twoFASecret: string;
 
   @Column({ nullable: true, default: false })
   isTwoFA: boolean;
 
-  @OneToMany(() => Friend, friend => friend.userA)
+  @OneToMany(() => Friend, (friend) => friend.userA)
   @JoinTable()
   friends: Friend[];
 
-  @OneToMany(() => PendingRequest, pendingRequest => pendingRequest.user)
+  @OneToMany(() => PendingRequest, (pendingRequest) => pendingRequest.user)
   @JoinTable()
   pendingRequests: PendingRequest[];
 
-
-  @OneToMany(() => BlockedUser, friend => friend.currentUser)
+  @OneToMany(() => BlockedUser, (friend) => friend.currentUser)
   @JoinTable()
   blockedUsers: BlockedUser[];
 
@@ -64,12 +71,12 @@ export class User {
   @OneToMany(() => Message, (message: Message) => message.user)
   messages: Array<Message>;
 
-  @Column({default : 1})
-  level: number
+  @Column({ default: 1 })
+  level: number;
 
-  @Column({default : 0})
-  experience: number
+  @Column({ default: 0 })
+  experience: number;
 
-  @Column({ default: 0})
-  ratioToNextLevel: number
+  @Column({ default: 0 })
+  ratioToNextLevel: number;
 }

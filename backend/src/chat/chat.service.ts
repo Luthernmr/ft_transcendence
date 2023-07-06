@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -8,9 +8,11 @@ import { Server, Socket } from 'socket.io';
 import { RoomService } from 'src/room/room.service';
 import { Room } from 'src/room/entities/room.entity';
 import { UserService } from 'src/user/user.service';
+import { MessageService } from 'src/message/message.service';
 import { User } from 'src/user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
+import { Message } from 'src/message/entities/message.entity';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -21,6 +23,7 @@ export class ChatService {
     private readonly roomService: RoomService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly messageService: MessageService,
   ) {
     this.logger = new Logger(ChatService.name);
   }
@@ -49,15 +52,15 @@ export class ChatService {
 
   @SubscribeMessage('createRoom')
   async createRoom(client: Socket, data: Partial<Room>) {
-    const error = await this.roomService.createRoom(client, data);
-    if (error) {
-      this.server.emit('error', { message: error.message });
-    } else {
-      this.server.emit('roomCreated');
+    try {
+      await this.roomService.createRoom(client, data);
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
         this.server.to(element.socketId).emit('roomList', rooms.rooms);
       });
+      this.server.emit('roomCreated');
+    } catch (error) {
+      this.server.emit('error', { message: error.message });
     }
   }
 
@@ -77,5 +80,18 @@ export class ChatService {
       payload.room.password,
     );
     client.emit('passCheck', answer);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async sendMessage(client: Socket, data: Message) {
+    try {
+      await this.messageService.createMessage(data);
+      // data.room.users.forEach(async (element) => {
+      //   this.server.to(element.socketId).emit('newMessage', message);
+      // });
+    } catch (error) {
+      this.logger.log(error);
+      this.server.emit('error1', { message: error.message });
+    }
   }
 }
