@@ -86,12 +86,11 @@ export interface Score {
 }
 
 export enum PongState {
+  Load,
   Home,
   Queue,
   Play,
-  Finished,
   Watch,
-  AlreadyConnected
 }
 
 export enum PongDisplay {

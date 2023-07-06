@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -52,8 +52,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   @SubscribeMessage('requestGameState')
-  handleGameStateRequest(@ConnectedSocket() socket: Socket) {
-    const gameState = this.pongService.GetGameState(socket);
+  async handleGameStateRequest(@ConnectedSocket() socket: Socket) {
+    const gameState = await this.pongService.GetGameState(socket);
     console.log("Emitting gamestate " + gameState.pongState);
     socket.emit('gamestate', gameState);
   }
@@ -101,6 +101,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   private EmitEvent(event: string, roomID: number, datas: any) {
     this.server.to("room" + roomID).emit(event, datas);
+  }
+
+  EmitGameState(socket: Socket, gameState: GameDatas) {
+    console.log("Emitting gamestate " + gameState.pongState);
+    socket.emit('gamestate', gameState);
   }
 
   CloseRoom(roomID: number) {

@@ -45,6 +45,12 @@ const PADDLE_SPEED: number = 40;
 
 const WIN_SCORE: number = 3;
 
+export interface GameDatas 
+{
+	pongState: PongState,
+	payload: any
+}
+
 export interface Vector2 {
 	x: number,
 	y: number
@@ -146,10 +152,10 @@ export interface IDPair {
 export interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRuntimeData, PaddleRuntimeData, Score {}
 
 export enum PongState {
+	Load,
 	Home,
 	Queue,
 	Play,
-	Finished,
 	Watch,
 }
 
@@ -189,6 +195,7 @@ export class PongService {
 
 	customMode: Array<boolean>;
 	gameState: Array<GameState>;
+	awaitGameState: Array<Socket>;
 
 	time: number;
 	
@@ -223,6 +230,7 @@ export class PongService {
 
 		this.customMode = [];
 		this.gameState = [];
+		this.awaitGameState = [];
 
 		this.time = Date.now();
 	}
@@ -250,13 +258,19 @@ export class PongService {
 				else
 					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser1].socket);
 			}
-
 		} else {
 			this.userInfos.push({userId: userID, socket: socket});
 			this.clientReady.push(false);
 		}
 
 		console.log("Added new user to pong userInfos (id: " + userID + ")");
+
+		const awaitGSIndex = this.awaitGameState.findIndex(s => s === socket);
+		if (awaitGSIndex >= 0)
+		{
+			this.awaitGameState.splice(awaitGSIndex, 1);
+			this.SendGameState(socket);
+		}
 
 		return;
 	}
@@ -390,7 +404,21 @@ export class PongService {
 		return true;
 	}
 
-	GetGameState(socket: Socket) : { pongState: PongState, payload: any } {
+	RequestGameState(socket: Socket) {
+		const userIndex = this.userInfos.findIndex(user => user.socket === socket);
+
+		if (userIndex < 0) {
+			this.awaitGameState.push(socket);
+		} else
+			this.SendGameState(socket);
+	}
+
+	SendGameState(socket) {
+		const gameState = this.GetGameState(socket);
+		this.pongGateway.EmitGameState(socket, gameState);
+	}
+
+	GetGameState(socket: Socket) : GameDatas {
 		const userInNormalQueue = this.queueClassic.findIndex(data => this.userInfos[data].socket === socket);
 		const userInCustomQueue = this.queueCustom.findIndex(data => this.userInfos[data].socket === socket);
 
