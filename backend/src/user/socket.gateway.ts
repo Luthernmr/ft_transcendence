@@ -60,7 +60,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
 			// console.log('relation', alreadyExist);
 			if (alreadyExist != null)
-				throw new BadRequestException('Request already exists for this person.');
+				throw new BadRequestException('Alreedy friend.');
 			if (userReceiv.id == userSender.id)
 				throw new BadRequestException('can t send request');
 			await this.userService.createPendingRequest({
@@ -87,10 +87,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
 		try {
-			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
-			// console.log('relation', alreadyExist);
-			if (alreadyExist != null)
-				throw new BadRequestException('Request already exists for this person.');
 			if (userReceiv.id == userSender.id)
 				throw new BadRequestException('can t send request');
 			await this.userService.createPendingRequest({

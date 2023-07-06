@@ -144,7 +144,7 @@ export default function Settings(props: any) {
 												p="5px"
 												opacity={"80%"}
 												borderRadius={"100%"}
-												boxSize={"100%"}
+												boxSize={'100%'}
 												_hover={{ opacity: '50%', cursor: 'pointer' }}
 												color="gray.100" position={"absolute"}>
 					
