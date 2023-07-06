@@ -5,11 +5,11 @@ export class CreateMessageDto {
   @IsNotEmpty()
   text: string;
 
-  @IsUUID()
+  // @IsUUID()
   @IsNotEmpty()
-  roomId: string;
+  room: string;
 
-  @IsUUID()
+  // @IsUUID()
   @IsNotEmpty()
-  userId: string;
+  user: string;
 }

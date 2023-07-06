@@ -462,8 +462,6 @@ export class PongService {
 		
 		const roomName = "room" + roomIndex;
 
-    const roomName = 'room' + roomIndex;
-
     const playerInfo1 = this.userInfos[player1];
     const playerInfo2 = this.userInfos[player2];
 

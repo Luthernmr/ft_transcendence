@@ -51,9 +51,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     }
     console.log("Here ", messageContent);
     chatSocket.emit("sendMessage", {
-      content: messageContent,
-      roomId: selectedRoom.id,
-      userId: currentUser.id,
+      text: messageContent,
+      room: selectedRoom.id,
+      user: currentUser.id,
     });
 
     setMessageContent("");

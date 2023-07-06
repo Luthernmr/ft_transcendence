@@ -21,7 +21,6 @@ export class MessageService {
   }
   
   async createMessage(data: Message) {
-    this.logger.log(data)
     try {
       const dto = plainToClass(CreateMessageDto, data);
       await validateOrReject(dto).catch((errors: ValidationError[]) => {
