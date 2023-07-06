@@ -30,7 +30,7 @@ import Settings from "./Settings";
 import MatchHistory from "./MatchHistory";
 import { BlockList } from "net";
 import BlockedList from "./BlockedList";
-import ProfilInfo from "../Social/OtherUserInfo";
+import ProfilInfo from "./ProfileInfo";
 
 interface User {
 	id: number,
@@ -59,6 +59,7 @@ export default function UserProfile() {
 				</TabList>
 				<TabPanels >
 					<TabPanel>
+					<ProfilInfo user={currentUser}/>
 						<Settings user={currentUser}/>
 					</TabPanel>
 					<TabPanel >

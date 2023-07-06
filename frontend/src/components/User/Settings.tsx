@@ -1,8 +1,7 @@
-import { VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, PinInput, PinInputField, useToast } from "@chakra-ui/react";
+import { Avatar, VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, PinInput, PinInputField, useToast, CircularProgress, CircularProgressLabel, Flex, Heading } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { message, Upload } from 'antd';
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
@@ -27,8 +26,6 @@ export default function Settings(props: any) {
 
 	const handleAvatarChange = async (event: any) => {
 		formData.append("file", event.currentTarget.files[0]);
-		setPreview(URL.createObjectURL(event.currentTarget.files[0]));
-
 	}
 
 	const SendModif = async (event: any) => {
@@ -53,6 +50,7 @@ export default function Settings(props: any) {
 		} catch (error) {
 
 		}
+		window.location.reload();
 	}
 
 	const [isChecked, setIsChecked] = useState(false);
@@ -64,11 +62,9 @@ export default function Settings(props: any) {
 
 	useEffect(() => {
 		const getUser = async () => {
-			setProfile({
-				imgPdp: props.user.imgPdp,
-				nickname: props.user.nickname,
-				isTwoFA: props.user.isTwoFa
-			});
+			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
+			setProfile(res.data.user);
+			sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
 		}
 		getUser();
 		if (profile.isTwoFA)
@@ -134,12 +130,21 @@ export default function Settings(props: any) {
 			<FormControl>
 				<FormLabel>Avatar</FormLabel>
 				<HStack spacing={4}>
-					<Image
-						borderRadius="full"
-						boxSize="50px"
-						src={profilePreview}
-						alt="User avatar"
-					/>
+				<Flex alignItems={'center'} flexDirection={'row'}>
+					<VStack>
+						<CircularProgress value={props?.user?.ratioToNextLevel} size={"3em"} color='green.400' thickness={'3px'}>
+							<CircularProgressLabel><Avatar
+								name={props.user?.nickname}
+								size="xl"
+								src={profilePreview}>
+							</Avatar></CircularProgressLabel>
+						</CircularProgress>
+					</VStack>
+					<Flex flexDirection={'column'}>
+						<Heading> lvl {props?.user?.level}</Heading>
+					</Flex>
+				</Flex>
+					
 
 					<input
 						type="file"

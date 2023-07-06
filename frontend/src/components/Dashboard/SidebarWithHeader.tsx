@@ -166,9 +166,6 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
           <Icon
             mr="4"
             fontSize="16"
-            // _roomHover={{
-            //   color: "white",
-            // }}
             as={icon}
           />
         )}
@@ -202,7 +199,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       });
       setUser(res.data.user);
       sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-      //console.log(sessionStorage.getItem("currentUser"));
     };
     getUser();
   }, []);
@@ -278,7 +274,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue("white", "gray.900")}
               borderColor={useColorModeValue("gray.200", "gray.700")}
             >
-              <MenuItem as={RouteLink} to="/Settings">
+              <MenuItem as={RouteLink} to="/Profile">
                 Settings
               </MenuItem>
               <MenuDivider />

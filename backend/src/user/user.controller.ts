@@ -11,6 +11,8 @@ import { User } from './user.entity';
 import { diskStorage } from 'multer';
 import { HistoryService } from 'src/pong/history.service';
 import { request } from 'http';
+import * as fs from 'fs';
+
 
 @Controller('user')
 export class UserController {
@@ -64,8 +66,8 @@ export class UserController {
 			const user: any = request.user;
 			if (!user)
 				return ("no user");
-			this.userService.changeNickname(user, nickname);
-			return response.send({ user });
+			await this.userService.changeNickname(user, nickname);
+			response.send({ user });
 		} catch (error) {
 			console.log(error)
 		} 
@@ -102,7 +104,21 @@ export class UserController {
 					filePath : `http://212.227.209.204:5000/user/avatars/${file.filename}`
 				};
 				const user: any = request.user;
-				this.userService.changeImg(user, response.filePath)
+				console.log("oldpath", user.imgPdp)
+				if (user.imgPdp)
+				{
+					const oldFilePath = user.imgPdp
+					let split = oldFilePath.split('/')
+					console.log(split);
+					try {
+					  if (oldFilePath) {
+						fs.unlinkSync(`./uploadedFiles/${split[5]}`);
+					  }
+					} catch (error) {
+					  console.error('Erreur lors de la suppression de l\'ancienne image :', error);
+					}
+				}
+				await this.userService.changeImg(user, response.filePath)
 				return response
 			}
 		} catch (error) {
