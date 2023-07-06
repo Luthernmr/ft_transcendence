@@ -254,7 +254,7 @@ export class PongService {
 			return;
 
 		// Queue
-		this.LeaveQueue(socket);
+		this.LeaveQueue(index);
 
 		// Running Game
 		const roomIndex = this.FindIndexBySocketId(socket.id);
@@ -325,41 +325,32 @@ export class PongService {
 		}
 	}
 
-	LeaveQueue(socket: Socket) {
-		const index = this.userInfos.findIndex(infos => (infos.socket === socket));
+	LeaveQueue(userIndex: UserInfosIndex) {
+		// Queue
+		const queueInfos = this.UserInQueue(this.userInfos[userIndex].userId);
 
-		if (index < 0)
+		if (queueInfos.index < 0)
 			return;
 
-		// Queue
-		const queueInfos = this.UserInQueue(this.userInfos[index].userId);
-
-		if (queueInfos.index >= 0) {
-			const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
-			queueArray.splice(queueInfos.index, 1);
-			console.log("User removed from the queue");
-		}
+		const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
+		queueArray.splice(queueInfos.index, 1);
+		console.log("User removed from the queue");
 	}
 
-	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) {
+	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) : boolean {
 		const user1Index = this.userInfos.findIndex(infos => (infos.userId === user1ID));
 		const user2Index = this.userInfos.findIndex(infos => (infos.userId === user2ID));
+
+		// Check runtime
 		
-		if (user1Index < 0 || user2Index < 0) {
-			//console.log(
-    //     'Error for users ',
-    //     user1ID,
-    //     ' & ',
-    //     user2ID,
-    //     ', indexes = ',
-    //     user1Index,
-    //     ' & ',
-    //     user2Index,
-    //   );
-			return;
-		}
+
+		// if not, LeaveQueue
+		this.LeaveQueue(user1Index);
+		this.LeaveQueue(user2Index);
 
 		this.CreateRoom(user1Index, user2Index, custom);
+
+		return true;
 	}
 
 	GetGameState(socket: Socket) : { pongState: PongState, payload: any } {
