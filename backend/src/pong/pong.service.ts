@@ -264,7 +264,7 @@ export class PongService {
 			this.clientReady.push(false);
 		}
 
-		console.log("Added new user to pong userInfos (id: " + userID + ")");
+		//console.log("Added new user to pong userInfos (id: " + userID + ")");
 
 		const awaitGSIndex = this.awaitGameState.findIndex(s => s === socket);
 		if (awaitGSIndex >= 0)
@@ -342,13 +342,13 @@ export class PongService {
     }
 
 		if (this.UserLocked(currentPlayerInfoIndex)) {
-			console.log("user currently in game");
+			//console.log("user currently in game");
 			return;
 		}
 
 		const queueInfos = this.UserInQueue(this.userInfos[currentPlayerInfoIndex].userId);
 		if (queueInfos.index >= 0) {
-			console.log("user already in queue");
+			//console.log("user already in queue");
 			return;
 		}
 
@@ -363,7 +363,7 @@ export class PongService {
 			pendingPlayersArray.splice(0, 1);
 			this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom);
 		} else {
-			console.log("Not enough players in queue");
+			//console.log("Not enough players in queue");
 			pendingPlayersArray.push(currentPlayerInfoIndex);
 		}
 	}
@@ -383,7 +383,7 @@ export class PongService {
 
 		const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
 		queueArray.splice(queueInfos.index, 1);
-		console.log("User removed from the queue");
+		//console.log("User removed from the queue");
 	}
 
 	GetRuntimeIndex(userIndex: UserInfosIndex) : number {

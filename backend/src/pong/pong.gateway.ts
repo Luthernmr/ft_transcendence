@@ -20,7 +20,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   handleConnection(@ConnectedSocket() socket: Socket) {
-    console.log("New socket connected to pong backend: " + socket.id);
+    //console.log("New socket connected to pong backend: " + socket.id);
     
     if (socket.handshake.auth.token === null || socket.handshake.auth.token === undefined) {
       return;
@@ -106,7 +106,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   EmitGameState(socket: Socket, gameState: GameDatas) {
-    console.log("Emitting gamestate " + gameState.pongState);
+    //console.log("Emitting gamestate " + gameState.pongState);
     socket.emit('gamestate', gameState);
   }
 

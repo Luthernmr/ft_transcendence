@@ -36,14 +36,12 @@ export class MessageService {
   
       const message = new Message();
       message.text = dto.text;
-      message.user = data.user;//replace after user check
+      message.user = data.user; //replace after user check
       message.room = data.room;
   
       await this.messageRepo.save(message);
     } catch (error) {
-      this.logger.log(error);
       throw error;
-    }
+    }    
   }
-  
 }

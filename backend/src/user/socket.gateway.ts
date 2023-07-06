@@ -83,7 +83,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
       //console.log('her2');
       //for (const socket of sockets) {
       //	const socketToken = socket?.handshake?.auth?.token;
-      //	//console.log(socketToken)
+      	//console.log(socketToken)
       //}
 
       otherSocket.emit('notifyRequest');
