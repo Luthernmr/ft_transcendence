@@ -28,7 +28,7 @@ export class HistoryService {
 	) {
 	}
 
-	async addEntry(ids: IDPair, score: Score) {
+	async addEntry(ids: IDPair, score: Score, custom: boolean = false) {
     const user1 = await this.userService.getUserById(ids.idP1);
     const user2 = await this.userService.getUserById(ids.idP2);
 
@@ -53,6 +53,7 @@ export class HistoryService {
       winner: winner,
       scoreUser1: score.scoreP1,
       scoreUser2: score.scoreP2,
+	  customMode: custom
     };
 
     await this.pongHistory.save(history);
