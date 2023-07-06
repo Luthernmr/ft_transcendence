@@ -8,6 +8,7 @@ import {
 	Modal,
 	VStack,
 	useDisclosure,
+	useToast,
 } from "@chakra-ui/react";
 import TwoFA from "./TwoFA";
 import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
@@ -16,6 +17,7 @@ import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
 export default function AuthElement() {
 	const [authTokenCalled, setAuthTokenCalled] = useState(false);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const toast = useToast()
 
 	const navigate = useNavigate();
 
@@ -39,7 +41,12 @@ export default function AuthElement() {
 						pongSocket.emit("register", { token: res.data.jwt });
 					} else onOpen();
 				} catch (error) {
-          //console.log( error);
+					toast({
+						title: `Failde to connect with api`,
+						status: "error",
+						isClosable: true,
+						position: "top",
+					});
         }
 			};
 			getAuthToken();

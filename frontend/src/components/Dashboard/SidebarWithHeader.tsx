@@ -103,7 +103,7 @@ interface SidebarProps extends BoxProps {
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Box
-      transition="3s ease"
+      transition="3s ease-in-out"
       bg={useColorModeValue("white", "gray.900")}
       borderRight="1px"
       borderRightColor={useColorModeValue("gray.200", "gray.700")}
@@ -127,6 +127,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           icon={link.icon}
           routeName={link.routeName}
           onClose={onClose}
+          onClick={onClose}
         >
           {link.name}
         </NavItem>
@@ -176,7 +177,7 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
   );
 };
 
-interface MobileProps extends FlexProps {
+export interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 

@@ -28,17 +28,20 @@ export class AuthController {
 	async register(
 		@Body() registerDto: RegisterDto
 	) {
-		const salt = await bcrypt.genSalt();
-		const hashedPassword = await bcrypt.hash(registerDto.password, salt);
-
-		const user = await this.userService.create({
-			nickname: registerDto.nickname,
-			email: registerDto.email,
-			password: hashedPassword,
-			pendingRequests: []
-		});
-		delete user.password
-		return user;
+		try {
+			const salt = await bcrypt.genSalt();
+			const hashedPassword = await bcrypt.hash(registerDto.password, salt);
+			const user = await this.userService.create({
+				nickname: registerDto.nickname,
+				email: registerDto.email,
+				password: hashedPassword,
+				pendingRequests: []
+			});
+			delete user.password
+			return user;
+		} catch (error) {
+			
+		}
 	}
 
 	@Post('login')
@@ -51,10 +54,10 @@ export class AuthController {
 			const user = await this.userService.getUser(loginDto.email);
 			// console.log('user login', user);
 			if (!user) {
-				throw new BadRequestException('invalid credentials or not register');
+				throw new BadRequestException('user not exist');
 			}
 			if (!await bcrypt.compare(loginDto.password, user.password)) {
-				throw new BadRequestException('bad password');
+				throw new BadRequestException('wrong password');
 			}
 			const token = await this.authService.login(user, response);
 			 await this.authService.loginTwoFa(user, response, false)
