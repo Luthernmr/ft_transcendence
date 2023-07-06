@@ -6,6 +6,7 @@ import { userSocket } from "../../sockets/sockets";
 import { User } from "./AllUserItem";
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import DeleteFriendButton from "./DeleteFriendButton";
+import UserCard from "./UserCard";
 
 
 export interface Friend {
@@ -43,36 +44,9 @@ export default function AllfriendItem() {
 					<Box >
 						<ListItem  >
 							<PopoverTrigger>
-								<Flex alignItems={'center'} _hover={{ bg: 'gray.200' }} padding={'2'} w={'100%'} borderRadius={'8'}>
-									<Avatar
-										name={friend.nickname}
-										size="sm"
-										src={friend.imgPdp}>
-										{friend.isOnline &&
-											<AvatarBadge boxSize='1em' bg='green.500' />
-										}
-										{!friend.isOnline &&
-											<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
-										}
-									</Avatar>
-									<Box ml='2'>
-										<Text fontSize='sm' fontWeight='bold'>
-											{friend.nickname}
-											{friend.isOnline &&
-												<Badge ml='1' colorScheme='purple'>
-													inGame
-												</Badge>
-											}
-											{!friend.isOnline &&
-												<Badge ml='1' colorScheme='red'>
-													offline
-												</Badge>
-											}
-										</Text>
-										<Text fontSize='xs'>Student</Text>
-									</Box>
-								</Flex>
-
+								<Box >
+									<UserCard as={'Button'} user={friend} />
+								</Box>
 							</PopoverTrigger>
 						</ListItem>
 					</Box>
@@ -89,7 +63,7 @@ export default function AllfriendItem() {
 						<PopoverCloseButton />
 						<PopoverBody >
 							<Flex justifyContent={'space-between'}>
-								< DeleteFriendButton />
+								<DeleteFriendButton friend={friend} />
 							</Flex>
 						</PopoverBody>
 					</PopoverContent>

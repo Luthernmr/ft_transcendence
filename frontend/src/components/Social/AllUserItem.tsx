@@ -7,6 +7,7 @@ import { Link as RouteLink, useNavigate } from "react-router-dom";
 import BlockUserButton from "./BlockUserButton";
 import AddFriendButton from "./AddFriendButton";
 import PongInviteButton from "./PongInviteButton";
+import UserCard from "./UserCard";
 
 export interface User {
 	id: number;
@@ -43,36 +44,9 @@ export default function AllUserItem() {
 						<Box >
 							<ListItem  >
 								<PopoverTrigger>
-									<Flex alignItems={'center'} _hover={{ bg: 'gray.200', cursor: 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
-										<Avatar
-											name={user.nickname}
-											size="sm"
-											src={user.imgPdp}>
-											{user.isOnline &&
-												<AvatarBadge boxSize='1em' bg='green.500' />
-											}
-											{!user.isOnline &&
-												<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
-											}
-										</Avatar>
-										<Box ml='2'>
-											<Text fontSize='sm' fontWeight='bold'>
-												{user.nickname}
-												{user.isOnline &&
-													<Badge ml='1' colorScheme='purple'>
-														inGame
-													</Badge>
-												}
-												{!user.isOnline &&
-													<Badge ml='1' colorScheme='red'>
-														offline
-													</Badge>
-												}
-											</Text>
-											<Text fontSize='xs'>Student</Text>
-										</Box>
-									</Flex>
-
+									<Box>
+										<UserCard user={user} />
+									</Box>
 								</PopoverTrigger>
 							</ListItem>
 						</Box>

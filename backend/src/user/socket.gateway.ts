@@ -10,6 +10,7 @@ import { FriendService } from 'src/social/friend.service';
 import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
 import { BadRequestException } from '@nestjs/common';
+import { PongService } from 'src/pong/pong.service';
 
 //console.log("Websocket: " + process.env.FRONTEND);
 
@@ -21,6 +22,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
 		private readonly friendService: FriendService,
+		private readonly pongService: PongService,
 
 	) { }
 
@@ -103,8 +105,28 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('sendSuccess');
 		}
 		catch (error) {
-			// console.log(error)
+			 console.log(error)
 			client.emit('alreadyFriend');
+		}
+	}
+
+	@SubscribeMessage('acceptPongRequest')
+	async acceptPongRequest(client: Socket, data: {
+		requestId: any,
+	}) {
+		try {
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
+			const request: any = await this.userService.getPendingRequestById(data.requestId);
+			this.pongService.AcceptInvitation(currentUser?.id, request?.senderId);
+			const otherSocket = await this.authService.getUserSocket(this.server, request.senderId)
+
+			client.emit('duelAcccepted')
+			otherSocket.emit('duelAcccepted')
+			await this.userService.deletePendingRequestById(request);
+
+		}
+		catch (error) {
+			console.log(error)
 		}
 	}
 
@@ -134,8 +156,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		}
 	}
 
-	@SubscribeMessage('rejectFriendRequest')
-	async rejectFriendRequest(client: Socket, data: {
+	@SubscribeMessage('rejectRequest')
+	async rejectRequest(client: Socket, data: {
 		requestId: any,
 	}) {
 		try {

@@ -20,11 +20,10 @@ import {
 	Stack,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import {
-	FiBell,
-} from 'react-icons/fi';
+import { FiBell } from 'react-icons/fi';
 import { userSocket } from '../../sockets/sockets';
 import { useToast } from '@chakra-ui/react'
+import {useNavigate } from "react-router-dom"; 
 
 export interface FriendRequest {
 	id: number;
@@ -35,7 +34,7 @@ export interface FriendRequest {
 
 
 const PendingRequest = () => {
-	
+	const navigate = useNavigate()
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 	const toast = useToast()
 	useEffect(() => {
@@ -49,6 +48,11 @@ const PendingRequest = () => {
 		})
 		userSocket.on('requestAcccepted', () => {
 			userSocket.emit('getPendingRequest')
+		})
+
+		userSocket.on('duelAcccepted', () => {
+			userSocket.emit('getPendingRequest')
+			navigate('/play')
 		})
 		userSocket.on('requestRejected', () => {
 			userSocket.emit('getPendingRequest')
@@ -77,12 +81,12 @@ const PendingRequest = () => {
 	const handleAccept = async (id: number, type: string) => {
 		if (type == "Friend")
 			userSocket.emit('acceptFriendRequest', { requestId: id })
-		if (type == "Prong")
+		if (type == "Pong")
 			userSocket.emit('acceptPongRequest', { requestId: id })
 	}
 	
 	const handleReject = async (id: number) => {
-		userSocket.emit('rejectFriendRequest', { requestId: id })
+		userSocket.emit('rejectRequest', { requestId: id })
 	}
 	return (
 		<Box>

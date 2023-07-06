@@ -9,7 +9,7 @@ export default function PongInviteButton(props : any) {
 	}
 	
 	return (
-		<Button colorScheme="purple" onClick={(e) => sendPongRequest(e, props.user.id)}>
+		<Button colorScheme="purple" onClick={(e) => sendPongRequest(e, props?.user?.id)}>
 			Duel
 		</Button>
 	)
