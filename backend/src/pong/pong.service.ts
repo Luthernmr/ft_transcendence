@@ -188,6 +188,7 @@ export class PongService {
 				private readonly userService: UserService,
 				@InjectRepository(User)
 				private userRepository: Repository<User>) {
+					
 		this.userInfos = [];
 		this.lockedUsers = [];
 
