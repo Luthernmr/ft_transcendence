@@ -11,7 +11,6 @@ import { UserService } from 'src/user/user.service';
 import { User } from 'src/user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
-import passport from 'passport';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -52,21 +51,31 @@ export class ChatService {
   async createRoom(client: Socket, data: Partial<Room>) {
     const error = await this.roomService.createRoom(client, data);
     if (error) {
-      client.emit('error', { message: error.message });
+      this.server.emit('error', { message: error.message });
     } else {
-      client.emit('roomCreated');
+      this.server.emit('roomCreated');
+      data.users.forEach(async (element) => {
+        const rooms = await this.userService.getRoomsByUID(element.id);
+        this.server.to(element.socketId).emit('roomList', rooms.rooms);
+      });
     }
   }
 
   @SubscribeMessage('getUserRooms')
-  async getUserRooms(client: Socket, payload: { userId: number }) {
+  async getUserRooms(payload: { userId: number }) {
     const rooms = await this.userService.getRoomsByUID(payload.userId);
-    client.emit('roomList', rooms.rooms);
+    this.server.emit('roomList', rooms.rooms);
   }
 
   @SubscribeMessage('checkRoomPassword')
-  async checkRoomPass(client: Socket, payload: { room: Room, password: string }) {
-    const answer = await bcrypt.compare(payload.password, payload.room.password);
+  async checkRoomPass(
+    client: Socket,
+    payload: { room: Room; password: string },
+  ) {
+    const answer = await bcrypt.compare(
+      payload.password,
+      payload.room.password,
+    );
     client.emit('passCheck', answer);
   }
 }

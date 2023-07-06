@@ -38,7 +38,7 @@ export default function BlockedList() {
 
 	function unblockUser(e : any , id: number) {
     e.preventDefault();
-    //console.log('id', id)
+    //console.log("id", id);
     userSocket.emit("unblockUser", { blockedId: id });
   }
 	return (

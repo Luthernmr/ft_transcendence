@@ -40,7 +40,7 @@ const PendingRequest = () => {
 	const toast = useToast()
 	useEffect(() => {
 		userSocket.on('notifyRequest', () => {
-			console.log('notified')
+			// console.log('notified')
 			userSocket.emit('getPendingRequest')
 		})
 		
@@ -120,7 +120,7 @@ const PendingRequest = () => {
 }
 
 const BellButton = () => {
-	const [notified, setNotified] = useState(false);
+  const [notified, setNotified] = useState(false);
 
 	const handleNotify = async () => {
 		setNotified(false);

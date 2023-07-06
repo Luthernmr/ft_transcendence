@@ -1,7 +1,3 @@
-/*
-https://docs.nestjs.com/controllers#controllers
-*/
-
 import {
 	Controller, Get, Res, Req, Post, Delete, Put, Body, BadRequestException,
 	UseGuards, UsePipes, ValidationPipe, UploadedFile, UseInterceptors, UnauthorizedException
@@ -53,7 +49,7 @@ export class AuthController {
 	) {
 		try {
 			const user = await this.userService.getUser(loginDto.email);
-			console.log('user login', user);
+			// console.log('user login', user);
 			if (!user) {
 				throw new BadRequestException('invalid credentials or not register');
 			}

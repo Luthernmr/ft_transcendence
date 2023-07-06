@@ -35,6 +35,7 @@ import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Notification from "../Social/Notification";
 import FriendList from "../Social/FriendList";
+import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
 
 interface LinkItemProps {
   name: string;
@@ -202,18 +203,19 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
     };
     getUser();
   }, []);
-  const navigate = useNavigate();
-  const signOut = async (event: any) => {
+  const signOut = async () => {
     try {
-      const response = await axios.get(
-        import.meta.env.VITE_BACKEND + "/api/logout",
-        { withCredentials: true }
-      );
+      //console.log(response.data);
       sessionStorage.removeItem("jwt");
       sessionStorage.removeItem("currentUser");
+      chatSocket.disconnect();
+      userSocket.disconnect();
+      pongSocket.disconnect();
+      //console.log("jwwwr", sessionStorage.getItem("jwt"));
     } catch (error) {
     }
   };
+  ``;
 
   return (
     <Flex

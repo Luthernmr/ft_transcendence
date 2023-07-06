@@ -103,12 +103,12 @@ export class FriendService {
 		
 		if (relation1.length)
 		{
-			console.log('relation1')
+			//console.log('relation1')
 			return relation1
 		}
 		else if (relation2.length)
 		{
-			console.log('relation2')
+			//console.log('relation2')
 			return relation2
 		}
 		else 
@@ -164,9 +164,9 @@ export class FriendService {
 
 	async unblockUser (currentUser : User, otherUser : User ) {
 		try{
-      //console.log('here', currentUser, otherUser)
+      //console.log('here', currentUser, otherUser);
       let relation: any = await this.getBlockedRelation(currentUser, otherUser);
-      //console.log('unblock',relation);
+      //console.log('unblock', relation);
       await this.blockedUserRepository.delete(relation);
     }
 		catch (error)

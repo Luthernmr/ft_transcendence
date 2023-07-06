@@ -27,9 +27,7 @@ export class RoomService {
 
   async createRoom(client: Socket, data: Partial<Room>) {
     try {
-      // //console.log('Data of room is : ', data);
       const dto = plainToClass(CreateRoomDto, data);
-      // //console.log('DTO of room is : ', dto);
       await validateOrReject(dto).catch((errors: ValidationError[]) => {
         throw new BadRequestException(errors);
       });

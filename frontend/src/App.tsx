@@ -23,18 +23,18 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 
 export default function App() {
 
-	userSocket.on('ping', () => {
-		console.log('pinged')
-		userSocket.emit('pong');
-  })
+	userSocket.on("ping", () => {
+    //console.log("pinged");
+    userSocket.emit("pong");
+  });
 
-	pongSocket.on('connect', () => {
+  pongSocket.on("connect", () => {
     //console.log("pong socket connecting");
-  })
+  });
 
-	chatSocket.on('connect', () => {
-    //console.log('chat socket connect')
-  })
+  chatSocket.on("connect", () => {
+    //console.log("chat socket connect");
+  });
 
 
 

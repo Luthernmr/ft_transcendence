@@ -46,7 +46,7 @@ export default function registerCard() {
 			navigate('/login');
 		}
 		catch (error) {
-      //console.log('error', error)
+      //console.log("error", error);
     }
 
 	};

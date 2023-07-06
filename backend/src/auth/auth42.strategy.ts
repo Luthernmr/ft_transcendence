@@ -6,7 +6,14 @@ import 'dotenv/config'
 @Injectable()
 export class auth42Strategy extends PassportStrategy(Strategy, '42') {
 	constructor() {
-    //console.log("test,", process.env.AUTHORIZATION_URL, process.env.TOKEN_URL, process.env.CLIENT_ID, process.env.CLIENT_SECRET ,process.env.CALLBACK_URL)
+    //console.log(
+    //   'test,',
+    //   process.env.AUTHORIZATION_URL,
+    //   process.env.TOKEN_URL,
+    //   process.env.CLIENT_ID,
+    //   process.env.CLIENT_SECRET,
+    //   process.env.CALLBACK_URL,
+    // );
     super({
       authorizationURL: process.env.AUTHORIZATION_URL,
       tokenURL: process.env.TOKEN_URL,
