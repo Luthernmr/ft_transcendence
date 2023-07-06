@@ -21,6 +21,7 @@ const BALL_CUSTOM_GAIN: number = 8;
 const BALL_MAX_WIDTH: number = 200;
 
 const BALL_START_POS_X: number = PONG_WIDTH / 2 - BALL_WIDTH / 2;
+const BALL_START_POS_X_CUSTOM: number = PONG_WIDTH / 2 - BALL_WIDTH_CUSTOM / 2;
 const BALL_START_POS_Y: number = PONG_HEIGHT / 2 - BALL_HEIGHT / 2;
 
 const BALL_SPEED: number = 10;
@@ -36,7 +37,8 @@ const PADDLE_WIDTH: number = 100;
 const PADDLE_WIDTH_CUSTOM: number = PADDLE_HEIGHT;
 
 const PADDLE_SECTION: number = PADDLE_WIDTH / 5;
-const PADDLE_START_POS: number = 200;
+const PADDLE_START_POS: number = PONG_WIDTH / 2 - PADDLE_WIDTH / 2;
+const PADDLE_START_POS_CUSTOM : number = PONG_WIDTH / 2 - PADDLE_WIDTH_CUSTOM / 2;
 
 const PADDLE_SPEED: number = 40;
 
@@ -59,7 +61,7 @@ enum FrontGameState {
 	Finished
 }
 
-export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntimeData, Score {
+export interface PongInitData extends GameLayout, Score {
 	playerNumber: number,
 	gameState: FrontGameState,
 	winner: number,
@@ -69,15 +71,7 @@ const BASE_INIT_DATAS: PongInitData = {
 	width: PONG_WIDTH,
 	height: PONG_HEIGHT,
 	ballHeight: BALL_HEIGHT,
-	ballWidth: BALL_WIDTH,
 	paddleHeight: PADDLE_HEIGHT,
-	paddleWidth: PADDLE_WIDTH,
-	ballPosition: {x: BALL_START_POS_X, y: BALL_START_POS_Y},
-	ballDelta: {x: 0, y: 0},
-	paddle1Pos: PADDLE_START_POS,
-	paddle1Delta: 0,
-	paddle2Pos: PADDLE_START_POS,
-	paddle2Delta: 0,
 	scoreP1: 0,
 	scoreP2: 0,
 	playerNumber: 1,
@@ -85,19 +79,30 @@ const BASE_INIT_DATAS: PongInitData = {
 	winner: 0
 }
 
-export interface PongInitEntities {
-	ballWidth: number,
-	paddleWidth: number,
+export interface PongInitEntities extends BallRuntimeData, PaddleRuntimeData {
+
 }
 
 const STANDARD_ENTITIES: PongInitEntities = {
 	ballWidth: BALL_WIDTH,
-	paddleWidth: PADDLE_WIDTH
+	ballPosition: {x: BALL_START_POS_X, y: BALL_START_POS_Y},
+	ballDelta: {x: 0, y: 0},
+	paddleWidth: PADDLE_WIDTH,
+	paddle1Delta: 0,
+	paddle1Pos: PADDLE_START_POS,
+	paddle2Delta: 0,
+	paddle2Pos: PADDLE_START_POS
 }
 
 const CUSTOM_ENTITIES: PongInitEntities = {
 	ballWidth: BALL_WIDTH_CUSTOM,
-	paddleWidth: PADDLE_WIDTH_CUSTOM
+	ballPosition: {x: BALL_START_POS_X_CUSTOM, y: BALL_START_POS_Y},
+	ballDelta: {x: 0, y: 0},
+	paddleWidth: PADDLE_WIDTH_CUSTOM,
+	paddle1Delta: 0,
+	paddle1Pos: PADDLE_START_POS_CUSTOM,
+	paddle2Delta: 0,
+	paddle2Pos: PADDLE_START_POS_CUSTOM
 }
 
 const STANDARD_INIT_DATAS = { ...BASE_INIT_DATAS, ...STANDARD_ENTITIES };
@@ -329,8 +334,8 @@ export class PongService {
 		console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
 
 		if (pendingPlayersArray.length >= 1) {
-			this.lockedUsers.push(currentPlayerInfoIndex);
 			const opponentInfoIndex = pendingPlayersArray[0];
+			this.lockedUsers.push(currentPlayerInfoIndex);
 			this.lockedUsers.push(opponentInfoIndex);
 			pendingPlayersArray.splice(0, 1);
 			this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom);
@@ -468,10 +473,12 @@ export class PongService {
 
 		this.idPairs.push(ids);
 
+		const initDatas = custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS;
+
 		const ball: BallRuntimeData = {
-			ballPosition: { ...BASE_INIT_DATAS.ballPosition },
-			ballDelta: {x: 0, y: 0},
-			ballWidth: custom ? CUSTOM_ENTITIES.ballWidth : STANDARD_ENTITIES.ballWidth,
+			ballPosition: { ...initDatas.ballPosition },
+			ballWidth: initDatas.ballWidth,
+			ballDelta: { ...initDatas.ballDelta },
 		};
 
 		this.ballRuntime.push(ball);
@@ -479,10 +486,10 @@ export class PongService {
 		custom ? this.ballRuntimeCustom.push(ball) : this.ballRuntimeStandard.push(ball);
 
 		const paddles: PaddleRuntimeData = {
-			paddleWidth: custom ? CUSTOM_ENTITIES.paddleWidth : STANDARD_ENTITIES.paddleWidth,
-			paddle1Pos: PADDLE_START_POS,
+			paddleWidth: initDatas.paddleWidth,
+			paddle1Pos: initDatas.paddle1Pos,
 			paddle1Delta: 0,
-			paddle2Pos: PADDLE_START_POS,
+			paddle2Pos: initDatas.paddle2Pos,
 			paddle2Delta: 0
 		}
 
@@ -497,8 +504,6 @@ export class PongService {
 		this.gameState.push(GameState.Connecting);
 
 		console.log("room created");
-
-		const initDatas = custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS
 
 		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2 });
 		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1 });
@@ -600,7 +605,10 @@ export class PongService {
 	}
 
 	RestartGame(index: number) {
-		this.ballRuntime[index].ballPosition = { ...BASE_INIT_DATAS.ballPosition };
+		this.ballRuntime[index].ballPosition = { 
+			x: PONG_WIDTH / 2 - this.ballRuntime[index].ballWidth / 2,
+			y: BALL_START_POS_Y
+		};
 		this.ballRuntime[index].ballDelta = {x: 0, y: 0};
 		this.gameState[index] = GameState.Running;
 
@@ -635,8 +643,11 @@ export class PongService {
 		if (index >= 0) {
 			this.CleanDatas(index);
 			this.SetPlayingState(player1Index, player2Index, false);
-			this.lockedUsers.splice(player1Index, 1);
-			this.lockedUsers.splice(player2Index, 1);
+
+			const lockedIndex1 = this.lockedUsers.findIndex(index => index === player1Index);
+			this.lockedUsers.splice(lockedIndex1, 1);
+			const lockedIndex2 = this.lockedUsers.findIndex(index => index === player2Index);
+			this.lockedUsers.splice(lockedIndex2, 1);
 			return;
 		}
 	}
@@ -702,15 +713,18 @@ export class PongService {
 
 	EndGame(index: number) {
 		const winner: number = (this.scoreData[index].scoreP1 > this.scoreData[index].scoreP2) ? 1 : 2;
+		const custom = this.customMode[index];
 
-		this.ballRuntime[index].ballPosition = { ...BASE_INIT_DATAS.ballPosition };
-		this.ballRuntime[index].ballDelta = {x: 0, y: 0};
+		this.ballRuntime[index].ballPosition = { 	x: custom ? BALL_START_POS_X_CUSTOM : BALL_START_POS_X,
+													y: BALL_START_POS_Y };
+		this.ballRuntime[index].ballWidth = custom ? BALL_WIDTH_CUSTOM : BALL_WIDTH,
+		this.ballRuntime[index].ballDelta = {x: 0, y: 0}
+
 		this.gameState[index] = GameState.WaitingForRestart;
 
 		this.pongGateway.EmitBallDelta(this.roomID[index], this.ballRuntime[index]);
 		this.pongGateway.EmitEnd(this.roomID[index], winner);
 
-		const custom = this.customMode[index];
 		this.historyService.addEntry(this.idPairs[index], this.scoreData[index], custom);
 	}
 

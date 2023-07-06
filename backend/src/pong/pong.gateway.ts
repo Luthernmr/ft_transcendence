@@ -68,10 +68,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.LeaveQueueSocket(socket);
   }
 
-  EmitStartGameSecondary(socket: Socket) {
-    socket.emit('StartSecondary');
-  }
-
   @SubscribeMessage('clientReady')
   handleReady(@ConnectedSocket() socket: Socket) {
     this.pongService.ClientIsReady(socket);
@@ -140,7 +136,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   EmitOpponentDisconnect(socket: Socket) {
-    socket.emit('OpponentDisconnected')
+    socket?.emit('OpponentDisconnected')
   }
 
   EmitOpponentReconnected(socket: Socket) {

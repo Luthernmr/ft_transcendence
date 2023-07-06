@@ -37,6 +37,7 @@ function Pong() {
   
   useEffect(() => {
     updateDimensions();
+    console.log("requestGameState");
     pongSocket.emit('requestGameState');
   }, [])
 
