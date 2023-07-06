@@ -710,7 +710,8 @@ export class PongService {
 		this.pongGateway.EmitBallDelta(this.roomID[index], this.ballRuntime[index]);
 		this.pongGateway.EmitEnd(this.roomID[index], winner);
 
-		this.historyService.addEntry(this.idPairs[index], this.scoreData[index]);
+		const custom = this.customMode[index];
+		this.historyService.addEntry(this.idPairs[index], this.scoreData[index], custom);
 	}
 
 	GlobalUpdate() {
