@@ -53,7 +53,7 @@ export class RoomService {
       await this.roomRepo.save(payload);
     } catch (error) {
       this.logger.log(error);
-      return error;
+      throw error;
     }
   }
 }

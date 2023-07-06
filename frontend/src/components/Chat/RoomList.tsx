@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -68,7 +68,8 @@ const RoomList: React.FC<RoomListProps> = ({
     }
   };
 
-  const handlePasswordSubmit = () => {
+  const handlePasswordSubmit = (e: FormEvent) => {
+    e.preventDefault();
     chatSocket.on("passCheck", (check: boolean) => {
       if (check && selectedRoom) {
         setSelectedRoom(selectedRoom);
@@ -145,7 +146,9 @@ const RoomList: React.FC<RoomListProps> = ({
             </Box>
           ))
         ) : (
-          <Text textAlign={"center"} width="100%">No rooms available. Please create a new one.</Text>
+          <Text textAlign={"center"} width="100%">
+            No rooms available. Please create a new one.
+          </Text>
         )}
       </VStack>
 
@@ -155,12 +158,14 @@ const RoomList: React.FC<RoomListProps> = ({
           <ModalHeader>Password Required</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Input
-              type="password"
-              placeholder="Enter password"
-              value={roomPassword}
-              onChange={(e) => setRoomPassword(e.target.value)}
-            />
+            <form onSubmit={handlePasswordSubmit}>
+              <Input
+                type="password"
+                placeholder="Enter password"
+                value={roomPassword}
+                onChange={(e) => setRoomPassword(e.target.value)}
+              />
+            </form>
           </ModalBody>
 
           <ModalFooter>

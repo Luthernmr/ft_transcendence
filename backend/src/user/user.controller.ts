@@ -43,7 +43,7 @@ export class UserController {
 	@UseGuards()
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-			//console.log('usi id request hystory', id);
+      //console.log('usi id request hystory', id);
 
       const user: any = await this.userService.getUserById(id);
       delete user.password;
@@ -69,7 +69,7 @@ export class UserController {
 			await this.userService.changeNickname(user, nickname);
 			response.send({ user });
 		} catch (error) {
-			console.log(error)
+			//console.log(error)
 		} 
 	}
 
