@@ -340,6 +340,13 @@ export class PongService {
 		}
 	}
 
+	LeaveQueueSocket(socket: Socket) {
+		const userIndex = this.userInfos.findIndex(user => user.socket === socket);
+
+		if (userIndex >= 0)
+			this.LeaveQueue(userIndex);
+	}
+
 	LeaveQueue(userIndex: UserInfosIndex) {
 		const queueInfos = this.UserInQueue(this.userInfos[userIndex].userId);
 
