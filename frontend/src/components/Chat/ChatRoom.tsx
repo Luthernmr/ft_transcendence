@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import {
   Flex,
   Box,
@@ -10,6 +10,7 @@ import {
   Input,
   InputRightElement,
   useToast,
+  Button,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { FiSend } from "react-icons/fi";
@@ -36,7 +37,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [messageContent, setMessageContent] = useState<string>("");
   const toast = useToast();
 
-  const handleSendMessage = () => {
+  const handleSendMessage = (e: FormEvent) => {
+    e.preventDefault();
     if (messageContent.trim() === "") {
       toast({
         title: "Type a message",
@@ -46,10 +48,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
       });
       return;
     }
+    console.log("Here ", messageContent);
     chatSocket.emit("sendMessage", {
-      content: messageContent,
-      roomId: selectedRoom.id,
-      userId: selectedRoom.users[0].id, // replace this with the id of the current user
+      // content: messageContent,
+      // roomId: selectedRoom.id,
+      // userId: currentUser.id,
     });
 
     setMessageContent("");
@@ -90,25 +93,27 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
           </Box>
         ))} */}
       </VStack>
-      <InputGroup size="md">
-        <Input
-          placeholder="Type your message..."
-          borderRadius="md"
-          value={messageContent}
-          onChange={(e) => setMessageContent(e.target.value)}
-        />
-        <InputRightElement mr={"1.5"}>
-          <IconButton
-            colorScheme="teal"
-            h="1.75rem"
-            size="sm"
-            aria-label="Send message"
-            icon={<FiSend />}
-            type="submit"
-            onClick={() => handleSendMessage()}
-         />
-        </InputRightElement>
-      </InputGroup>
+      <form onSubmit={handleSendMessage}>
+        <InputGroup size="md">
+          <Input
+            placeholder="Type your message..."
+            borderRadius="md"
+            value={messageContent}
+            onChange={(e) => setMessageContent(e.target.value)}
+          />
+          <InputRightElement mr={"1.5"}>
+            <Button
+              colorScheme="teal"
+              h="1.75rem"
+              size="sm"
+              aria-label="Send message"
+              type="submit"
+            >
+              <FiSend />
+            </Button>
+          </InputRightElement>
+        </InputGroup>
+      </form>
     </Flex>
   );
 };
