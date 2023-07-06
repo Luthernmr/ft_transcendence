@@ -12,6 +12,7 @@ import { MessageService } from 'src/message/message.service';
 import { User } from 'src/user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
+import { Message } from 'src/message/entities/message.entity';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -84,9 +85,15 @@ export class ChatService {
   @SubscribeMessage('sendMessage')
   async sendMessage(
     client: Socket,
-    payload: { content: string; roomId: number; userId: number },
+    data: Message,
   ) {
-    const message = await this.messageService.createMessage(payload);
-    this.server.to(payload.roomId.toString()).emit('newMessage', message);
+    try {
+      const message = await this.messageService.createMessage(data);
+      data.room.users.forEach(async (element) => {
+        this.server.to(element.socketId).emit('newMessage', message);
+      });
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
   }
 }

@@ -87,9 +87,9 @@ export default function SidebarWithHeader({
           justifyContent={"space-between"}
         >
           {children}
-          {/* <Box ml={5}>
+          <Box ml={5}>
             <FriendList />
-          </Box> */}
+          </Box>
         </Flex>
       </Flex>
     </>
