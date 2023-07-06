@@ -1,4 +1,5 @@
-import { Avatar, VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, PinInput, PinInputField, useToast, CircularProgress, CircularProgressLabel, Flex, Heading } from "@chakra-ui/react";
+import { EditIcon, DownloadIcon , SmallAddIcon } from "@chakra-ui/icons";
+import { Text, Avatar, VStack, FormControl, FormLabel, HStack, Input, Switch, Button, Image, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, useDisclosure, PinInput, PinInputField, useToast, CircularProgress, CircularProgressLabel, Flex, Box } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,7 +10,6 @@ export interface Profile {
 }
 
 export default function Settings(props: any) {
-
 	var formData = new FormData();
 	const [profile, setProfile] = useState<Profile>({
 		imgPdp: props.user.imgPdp,
@@ -17,16 +17,24 @@ export default function Settings(props: any) {
 		isTwoFA: false
 	});
 
-	const [profilePreview, setPreview] = useState(props.user.imgPdp);
-
+	const [profilePreview, setPreview] = useState("");
+	const [selectedFile, setSelectedFile] = useState()
 	const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setProfile({ ...profile, nickname: event.target.value });
 	};
 
-
 	const handleAvatarChange = async (event: any) => {
-		formData.append("file", event.currentTarget.files[0]);
+		const file = event.currentTarget.files[0];
+		setSelectedFile(event.currentTarget.files[0]);
+		setPreview(URL.createObjectURL(file));
 	}
+
+	useEffect(() => {
+		if (profilePreview) {
+			if (selectedFile)
+				formData.append("file", selectedFile);
+		}
+	}, [profilePreview]);
 
 	const SendModif = async (event: any) => {
 		event.preventDefault();
@@ -38,9 +46,7 @@ export default function Settings(props: any) {
 				withCredentials: true
 			})
 		} catch (error) {
-			//console.log(error);
 		}
-
 		try {
 			await axios.post(import.meta.env.VITE_BACKEND + '/user/settings', {
 				"nickname": profile.nickname,
@@ -48,7 +54,6 @@ export default function Settings(props: any) {
 			}, { withCredentials: true });
 
 		} catch (error) {
-
 		}
 		window.location.reload();
 	}
@@ -57,23 +62,23 @@ export default function Settings(props: any) {
 	const [qrCode, setQrcode] = useState("");
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [pinCode, setPinCode] = useState("");
-
 	const navigate = useNavigate();
 
 	useEffect(() => {
 		const getUser = async () => {
 			const res = await axios.get(import.meta.env.VITE_BACKEND + '/api/user', { withCredentials: true });
 			setProfile(res.data.user);
+			setPreview(res?.data?.user?.imgPdp)
 			sessionStorage.setItem('currentUser', JSON.stringify(res.data.user))
 		}
 		getUser();
 		if (profile.isTwoFA)
 			setIsChecked(true);
-
 	}, [profile.isTwoFA, isChecked]);
+
 	async function handleCheck2FA() {
 		if (profile.isTwoFA) {
-			const resp = await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-off' + location.search, {
+			await axios.post(import.meta.env.VITE_BACKEND + '/api/turn-off' + location.search, {
 				"twoFACode": pinCode
 			}, { withCredentials: true });
 			setIsChecked(false);
@@ -87,7 +92,6 @@ export default function Settings(props: any) {
 	}
 
 	const toast = useToast()
-
 	async function sendCode() {
 		try {
 			const resp = await axios.post(
@@ -97,7 +101,6 @@ export default function Settings(props: any) {
 				},
 				{ withCredentials: true }
 			);
-			//console.log(resp.data.status);
 			if (resp.data.status == 401) throw new Error("test");
 			setIsChecked(true);
 			toast({
@@ -121,32 +124,44 @@ export default function Settings(props: any) {
 				isClosable: true,
 				position: "top",
 			});
-			//console.log(error)
 		}
 	}
 
 	return (
-		<VStack spacing={4} align="stretch">
+		<VStack spacing={4} align="stretch" >
 			<FormControl>
-				<FormLabel>Avatar</FormLabel>
-				<HStack spacing={4}>
-				<Flex alignItems={'center'} flexDirection={'row'}>
-					<VStack>
-						<CircularProgress value={props?.user?.ratioToNextLevel} size={"3em"} color='green.400' thickness={'3px'}>
-							<CircularProgressLabel><Avatar
-								name={props.user?.nickname}
-								size="xl"
-								src={profilePreview}>
-							</Avatar></CircularProgressLabel>
-						</CircularProgress>
-					</VStack>
-					<Flex flexDirection={'column'}>
-						<Heading> lvl {props?.user?.level}</Heading>
-					</Flex>
-				</Flex>
+				<HStack spacing={4} >
+					<Flex alignItems={'center'} flexDirection={'row'} >
+						<VStack>
+							<CircularProgress transform={"rotate(180deg)"} value={props?.user?.ratioToNextLevel} size={"3em"} color='teal.500' thickness={'15%'}>
+								<CircularProgressLabel transform={"rotate(0.5turn) translateX(50%) translatey(50%)"}>
+									<label htmlFor="avatar">
+										<Avatar
+											name={props.user?.nickname}
+											size={'2xl'}
+											src={profilePreview}>
+											<SmallAddIcon
+												p="5px"
+												opacity={"80%"}
+												borderRadius={"100%"}
+												boxSize={"100%"}
+												_hover={{ opacity: '50%', cursor: 'pointer' }}
+												color="gray.100" position={"absolute"}>
 					
+											</SmallAddIcon>
+										</Avatar>
+									</label>
+									<Box as={'span'} position={'absolute'} left={"calc(50% - 15px)"} bottom={'-15px'} h={"20px"} w={"30px"}
+										bg={"black"} border={"2px"} borderColor={"teal.500"} borderRadius={'8px'} zIndex={9999} p={'1px'} alignSelf={"center"}>
+										<Text m="-1" fontSize={"1.5em"} color={"white"}>{props?.user?.level}</Text>
+									</Box>
+								</CircularProgressLabel>
+							</CircularProgress>
+						</VStack>
 
+					</Flex>
 					<input
+						hidden
 						type="file"
 						id="avatar"
 						name="avatar"

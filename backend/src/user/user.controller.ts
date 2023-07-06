@@ -48,7 +48,7 @@ export class UserController {
       const user: any = await this.userService.getUserById(id);
       delete user.password;
       const history: any = await this.historyService.getUserHistory(user);
-      //console.log('history', history);
+      console.log('history', history);
 			response.send({ history: history });
 		} catch (error) {
 			//console.log(error);
@@ -97,7 +97,10 @@ export class UserController {
 		//console.log(file);
 		try {
 			if (!file)
+			{
+				console.log(file)
 				throw new BadRequestException('File is not an image');
+			}
 			else
 			{
 				const response = {
@@ -118,7 +121,7 @@ export class UserController {
 					  console.error('Erreur lors de la suppression de l\'ancienne image :', error);
 					}
 				}
-				await this.userService.changeImg(user, response.filePath)
+				await this.userService.changeImg(user, response.filePath);
 				return response
 			}
 		} catch (error) {

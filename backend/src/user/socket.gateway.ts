@@ -30,6 +30,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
+			this.server.emit('reloadLists')
 		}
 	}
 
@@ -39,6 +40,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		// console.log('use on deconnexion:', user)
 		if (user) {
 			await this.userService.setOffline(user);
+			this.server.emit('reloadLists')
 		}
 	}
 
@@ -52,8 +54,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	}) {
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
-
-		const otherId = userReceiv.socketId;
 		try {
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
 			// console.log('relation', alreadyExist);
@@ -68,17 +68,37 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				senderPdp: userSender.imgPdp,
 				user: userReceiv
 			})
-
-			const socketMap = this.server.sockets;
-			// console.log('here', socketMap);
 			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
-			// console.log('her2');
-			//for (const socket of sockets) {
-			//	const socketToken = socket?.handshake?.auth?.token;
-			//	console.log(socketToken)
-			//}
+			otherSocket.emit('notifyRequest');
+			client.emit('sendSuccess');
+		}
+		catch (error) {
+			// console.log(error)
+			client.emit('alreadyFriend');
+		}
+	}
 
-
+	@SubscribeMessage('PongRequest')
+	async PongRequest(client: Socket, data: {
+		userReceiveId: any,
+	}) {
+		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
+		try {
+			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
+			// console.log('relation', alreadyExist);
+			if (alreadyExist != null)
+				throw new BadRequestException('Request already exists for this person.');
+			if (userReceiv.id == userSender.id)
+				throw new BadRequestException('can t send request');
+			await this.userService.createPendingRequest({
+				type: "Pong",
+				senderId: userSender.id,
+				senderNickname: userSender.nickname,
+				senderPdp: userSender.imgPdp,
+				user: userReceiv
+			})
+			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
 			otherSocket.emit('notifyRequest');
 			client.emit('sendSuccess');
 		}

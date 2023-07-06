@@ -38,7 +38,18 @@ export default function OtherProfilPage() {
 				<HStack>
 					<OtherProfilInfo user={user}/>
 				</HStack>
-				<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}>
+				<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}
+								sx={{
+									'&::-webkit-scrollbar': {
+										width: '5px',
+										borderRadius: '8px',
+										backgroundColor: `rgba(0, 0, 0, 0.05)`,
+									},
+									'&::-webkit-scrollbar-thumb': {
+										backgroundColor: `teal`,
+										borderRadius: '8px',
+									},
+								}}>
 					<MatchHistory user={user} />
 				</Box>
 			</Flex>

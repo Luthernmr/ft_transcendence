@@ -74,8 +74,11 @@ const PendingRequest = () => {
 		})
 	}, []);
 
-	const handleAccept = async (id: number) => {
-		userSocket.emit('acceptFriendRequest', { requestId: id })
+	const handleAccept = async (id: number, type: string) => {
+		if (type == "Friend")
+			userSocket.emit('acceptFriendRequest', { requestId: id })
+		if (type == "Prong")
+			userSocket.emit('acceptPongRequest', { requestId: id })
 	}
 	
 	const handleReject = async (id: number) => {
@@ -103,7 +106,7 @@ const PendingRequest = () => {
 									<Text><Text as='b'>{friendRequest.senderNickname}</Text> send you a {friendRequest.type} Request </Text>
 								</Flex>
 								<Stack spacing={2} direction='row' align='center'>
-									<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id)} >Accepter</Button>
+									<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id, friendRequest.type)} >Accepter</Button>
 									<Button colorScheme='gray' onClick={() => handleReject(friendRequest.id)} size='sm'>Rejeter</Button>
 								</Stack>
 							</Flex>
