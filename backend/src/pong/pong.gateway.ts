@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, SocketPair, Score, WatcherInitDatas, PongInitEntities } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -19,20 +19,30 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     pongService.RegisterGateway(this);
   }
 
-  async handleConnection(@ConnectedSocket() socket: Socket) {
-    //console.log('New socket connected to pong backend: ' + socket.id);
+  handleConnection(@ConnectedSocket() socket: Socket) {
+    console.log("New socket connected to pong backend: " + socket.id);
     
     if (socket.handshake.auth.token === null)
       return;
 
-    let user: User = await this.authService.getUserByToken(socket.handshake.auth.token);
-		if (user)
+    this.RegisterUserToPong(socket, socket.handshake.auth.token);
+  }
+
+  @SubscribeMessage('register')
+  handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
+    this.RegisterUserToPong(socket, datas.token);
+  }
+
+  async RegisterUserToPong(socket: Socket, token: string) {
+    let user: User = await this.authService.getUserByToken(token);
+		if (user) {
       this.pongService.RegisterUserInfos(user.id, socket);
+    }
   }
 
   handleDisconnect(socket: Socket) {
-    //console.log('Socket disconnected from pong :' + socket.id);
-    this.pongService.CloseRoom(socket.id);
+    console.log("Socket disconnected from pong :" + socket.id);
+    //this.pongService.CloseRoom(socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }
 
@@ -41,18 +51,41 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.LaunchUpdates();
   }
 
-  @SubscribeMessage('register')
-  async handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {
-    let user: User = await this.authService.getUserByToken(datas.token)
-		if (user) {
-      this.pongService.RegisterUserInfos(user.id, socket);
-		} //else
-      //console.log("Pong User auth not found");
+  @SubscribeMessage('requestGameState')
+  handleGameStateRequest(@ConnectedSocket() socket: Socket) {
+    const gameState = this.pongService.GetGameState(socket);
+    console.log("Emitting gamestate " + gameState.pongState);
+    socket.emit('gamestate', gameState);
   }
 
   @SubscribeMessage('queue')
   handleQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
     this.pongService.JoinQueue(socket, datas.custom);
+  }
+
+  @SubscribeMessage('leaveQueue')
+  handleLeaveQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
+    this.pongService.LeaveQueue(socket);
+  }
+
+  EmitStartGameSecondary(socket: Socket) {
+    socket.emit('StartSecondary');
+  }
+
+  @SubscribeMessage('clientReady')
+  handleReady(@ConnectedSocket() socket: Socket) {
+    this.pongService.ClientIsReady(socket);
+  }
+
+  @SubscribeMessage('requestRestart')
+  handleResquestRestart(@ConnectedSocket() socket: Socket) {
+    this.pongService.RequestRestart(socket);
+  }
+
+  @SubscribeMessage('quit')
+  handleQuit(@ConnectedSocket() socket: Socket) {
+    const opponentSocket = this.pongService.UserQuit(socket);
+    opponentSocket.emit('OpponentQuit');
   }
 
   @SubscribeMessage('keydown')
@@ -63,11 +96,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('keyup')
   handlePaddleKeyup(@ConnectedSocket() socket: Socket, @MessageBody() input: number) {
     this.pongService.PaddleKeyUp(socket.id, input);
-  }
-
-  @SubscribeMessage('restart')
-  handleRestart(@ConnectedSocket() socket: Socket) {
-    this.pongService.RestartNewGame(socket);
   }
 
   @SubscribeMessage('watch')
@@ -83,13 +111,8 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.server.socketsLeave("room" + roomID);
   }
 
-  EmitInit(roomID: number, initDatas: PongInitData & PongInitEntities) {
-    this.EmitEvent('Init', roomID, initDatas);
-  }
-
-  EmitPlayerNums(sockets: SocketPair) {
-    sockets.socketP1.emit("SetNum", 2);
-    sockets.socketP2.emit("SetNum", 1);
+  EmitInit(socket: Socket, initDatas: PongInitData) {
+    socket.emit('Init', initDatas);
   }
 
   EmitStartGame(roomID: number, delaySeconds: number) {
@@ -114,5 +137,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   EmitWatcher(socket: Socket, datas: WatcherInitDatas) {
     socket.emit('Watcher', datas);
+  }
+
+  EmitOpponentDisconnect(socket: Socket) {
+    socket.emit('OpponentDisconnected')
+  }
+
+  EmitOpponentReconnected(socket: Socket) {
+    socket.emit('OpponentReconnected')
   }
 }
