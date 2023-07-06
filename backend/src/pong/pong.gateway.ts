@@ -65,7 +65,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('leaveQueue')
   handleLeaveQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
-    this.pongService.LeaveQueue(socket);
+    this.pongService.LeaveQueueSocket(socket);
   }
 
   EmitStartGameSecondary(socket: Socket) {

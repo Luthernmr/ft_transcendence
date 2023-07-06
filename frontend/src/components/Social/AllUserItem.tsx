@@ -6,6 +6,7 @@ import { userSocket } from "../../sockets/sockets";
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import BlockUserButton from "./BlockUserButton";
 import AddFriendButton from "./AddFriendButton";
+import PongInviteButton from "./PongInviteButton";
 
 export interface User {
 	id: number;
@@ -91,6 +92,7 @@ export default function AllUserItem() {
 									<Flex justifyContent={'space-between'}>
 										<AddFriendButton user={user} />
 										<BlockUserButton user={user} />
+										<PongInviteButton user={user} />
 									</Flex>
 								</PopoverBody>
 							</PopoverContent>

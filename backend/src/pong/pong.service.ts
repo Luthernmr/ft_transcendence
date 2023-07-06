@@ -160,6 +160,7 @@ export class PongService {
 	pongGateway : PongGateway;
 
 	userInfos: UserInfos[];
+	lockedUsers: Array<UserInfosIndex>;
 
 	clientReady: Array<boolean>; // userInfos Index
 	requestRestart: Array<boolean>; // userInfos Index
@@ -187,7 +188,10 @@ export class PongService {
 				private readonly userService: UserService,
 				@InjectRepository(User)
 				private userRepository: Repository<User>) {
+					
 		this.userInfos = [];
+		this.lockedUsers = [];
+
 		this.clientReady = []; // share same index as userInfos
 		this.requestRestart = [];
 		
@@ -254,7 +258,7 @@ export class PongService {
 			return;
 
 		// Queue
-		this.LeaveQueue(socket);
+		this.LeaveQueue(index);
 
 		// Running Game
 		const roomIndex = this.FindIndexBySocketId(socket.id);
@@ -297,11 +301,20 @@ export class PongService {
 		return({index: -1, custom: false});
 	}
 
+	UserLocked(userIndex: UserInfosIndex) : boolean {
+		return this.lockedUsers.findIndex(user => user === userIndex) >= 0;
+	}
+
 	JoinQueue(socket: Socket, custom: boolean = false) {
 		const currentPlayerInfoIndex = this.userInfos.findIndex(infos => (infos.socket === socket));
 
 		if (currentPlayerInfoIndex < 0) {
 			console.log("User not registered to pong");
+			return;
+		}
+
+		if (this.UserLocked(currentPlayerInfoIndex)) {
+			console.log("user currently in game");
 			return;
 		}
 
@@ -316,7 +329,9 @@ export class PongService {
 		console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
 
 		if (pendingPlayersArray.length >= 1) {
+			this.lockedUsers.push(currentPlayerInfoIndex);
 			const opponentInfoIndex = pendingPlayersArray[0];
+			this.lockedUsers.push(opponentInfoIndex);
 			pendingPlayersArray.splice(0, 1);
 			this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom);
 		} else {
@@ -325,41 +340,44 @@ export class PongService {
 		}
 	}
 
-	LeaveQueue(socket: Socket) {
-		const index = this.userInfos.findIndex(infos => (infos.socket === socket));
+	LeaveQueueSocket(socket: Socket) {
+		const userIndex = this.userInfos.findIndex(user => user.socket === socket);
 
-		if (index < 0)
-			return;
-
-		// Queue
-		const queueInfos = this.UserInQueue(this.userInfos[index].userId);
-
-		if (queueInfos.index >= 0) {
-			const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
-			queueArray.splice(queueInfos.index, 1);
-			console.log("User removed from the queue");
-		}
+		if (userIndex >= 0)
+			this.LeaveQueue(userIndex);
 	}
 
-	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) {
+	LeaveQueue(userIndex: UserInfosIndex) {
+		const queueInfos = this.UserInQueue(this.userInfos[userIndex].userId);
+
+		if (queueInfos.index < 0)
+			return;
+
+		const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
+		queueArray.splice(queueInfos.index, 1);
+		console.log("User removed from the queue");
+	}
+
+	GetRuntimeIndex(userIndex: UserInfosIndex) : number {
+		return this.usersRuntime.findIndex(users => (users.indexUser1 === userIndex || users.indexUser2 === userIndex));
+	}
+
+	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) : boolean {
 		const user1Index = this.userInfos.findIndex(infos => (infos.userId === user1ID));
 		const user2Index = this.userInfos.findIndex(infos => (infos.userId === user2ID));
-		
-		if (user1Index < 0 || user2Index < 0) {
-			//console.log(
-    //     'Error for users ',
-    //     user1ID,
-    //     ' & ',
-    //     user2ID,
-    //     ', indexes = ',
-    //     user1Index,
-    //     ' & ',
-    //     user2Index,
-    //   );
-			return;
-		}
+
+		if (this.UserLocked(user1Index) || this.UserLocked(user2Index))
+			return false;
+
+		this.lockedUsers.push(user1Index);
+		this.lockedUsers.push(user2Index);
+
+		this.LeaveQueue(user1Index);
+		this.LeaveQueue(user2Index);
 
 		this.CreateRoom(user1Index, user2Index, custom);
+
+		return true;
 	}
 
 	GetGameState(socket: Socket) : { pongState: PongState, payload: any } {
@@ -421,6 +439,13 @@ export class PongService {
 
 		await this.SetPlayingState(player1, player2, true);
 
+		const users: UserPair = {
+			indexUser1: player1,
+			indexUser2: player2,
+		}
+		
+		this.usersRuntime.push(users);
+		
 		this.maxRoomID++;
 		const roomIndex = this.maxRoomID;
 
@@ -428,13 +453,6 @@ export class PongService {
 		
 		this.customMode.push(custom);
 		
-		const users: UserPair = {
-			indexUser1: player1,
-			indexUser2: player2,
-		}
-
-		this.usersRuntime.push(users);
-
 		const roomName = "room" + roomIndex;
 
 		const playerInfo1 = this.userInfos[player1];
@@ -617,6 +635,8 @@ export class PongService {
 		if (index >= 0) {
 			this.CleanDatas(index);
 			this.SetPlayingState(player1Index, player2Index, false);
+			this.lockedUsers.splice(player1Index, 1);
+			this.lockedUsers.splice(player2Index, 1);
 			return;
 		}
 	}
