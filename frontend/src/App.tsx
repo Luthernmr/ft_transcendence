@@ -11,6 +11,7 @@ import { ReactNode, useEffect, useState } from "react";
 import UserProfile from "./components/User/Profile";
 import TwoFA from "./components/User/TwoFA";
 import OtherProfilPage from "./components/Social/OtherProfilPage";
+import {useNavigate } from "react-router-dom"; 
 
 
 function PrivateRoute({ children }: { children: ReactNode }) {
@@ -22,6 +23,8 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
+
+	const navigate = useNavigate();
 
 	userSocket.on("ping", () => {
     //console.log("pinged");
@@ -35,8 +38,6 @@ export default function App() {
   chatSocket.on("connect", () => {
     //console.log("chat socket connect");
   });
-
-
 
 	return (
 		<Routes>
