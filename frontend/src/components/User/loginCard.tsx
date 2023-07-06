@@ -59,7 +59,7 @@ export default function loginCard() {
           userSocket.disconnect().connect();
           pongSocket.disconnect().connect();
           navigate("/home");
-          pongSocket.emit("register", { token: response.data.jwt });
+          //pongSocket.emit("register", { token: response.data.token });
         }
       }
       if (!response.data) {

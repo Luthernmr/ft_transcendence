@@ -22,8 +22,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   handleConnection(@ConnectedSocket() socket: Socket) {
     console.log("New socket connected to pong backend: " + socket.id);
     
-    if (socket.handshake.auth.token === null)
+    if (socket.handshake.auth.token === null || socket.handshake.auth.token === undefined) {
       return;
+    }
 
     this.RegisterUserToPong(socket, socket.handshake.auth.token);
   }
@@ -33,10 +34,13 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.RegisterUserToPong(socket, datas.token);
   }
 
+
   async RegisterUserToPong(socket: Socket, token: string) {
     let user: User = await this.authService.getUserByToken(token);
 		if (user) {
       this.pongService.RegisterUserInfos(user.id, socket);
+    } else {
+      console.log("User not found, token = " + token);
     }
   }
 
@@ -53,9 +57,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('requestGameState')
   async handleGameStateRequest(@ConnectedSocket() socket: Socket) {
-    const gameState = await this.pongService.GetGameState(socket);
-    console.log("Emitting gamestate " + gameState.pongState);
-    socket.emit('gamestate', gameState);
+    this.pongService.RequestGameState(socket);
   }
 
   @SubscribeMessage('queue')

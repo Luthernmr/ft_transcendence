@@ -253,9 +253,9 @@ export class PongService {
 			if (roomIndex >= 0) {
 				socket.join("room" + this.roomID[roomIndex]);
 				const users = this.usersRuntime[roomIndex];
-				if (socket.id === this.userInfos[users.indexUser1].socket.id)
+				if (socket.id === this.GetSocket(users.indexUser1)?.id && this.GetSocket(users.indexUser2))
 					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser2].socket);
-				else
+				else if (this.GetSocket(users.indexUser1))
 					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser1].socket);
 			}
 		} else {
@@ -276,10 +276,12 @@ export class PongService {
 	}
 
 	UnregisterUserInfos(socket: Socket) {
-		const index = this.userInfos.findIndex(infos => (infos.socket === socket));
+		const index = this.userInfos.findIndex(infos => (infos.socket?.id === socket.id));
 
-		if (index < 0)
+		if (index < 0) {
+			//console.log("Cannot find index for socket", socket.id);
 			return;
+		}
 
 		// Queue
 		this.LeaveQueue(index);
@@ -289,13 +291,14 @@ export class PongService {
 
 		if (roomIndex >= 0) {
 			const users = this.usersRuntime[roomIndex];
-			if (socket.id === this.userInfos[users.indexUser1].socket.id)
-				this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser2].socket);
-			else
-				this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser1].socket);
+			if (socket.id === this.GetSocket(users.indexUser1)?.id && this.GetSocket(users.indexUser2))
+			this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser2].socket);
+				else if (this.GetSocket(users.indexUser1))
+			this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser1].socket);
 		}
 
 		// Socket
+		//console.log("Setting userInfo socket to null (user", this.userInfos[index].userId, ")");
 		this.userInfos[index].socket = null;
 
 		//console.log('User unregistered from pong');
@@ -409,8 +412,10 @@ export class PongService {
 
 		if (userIndex < 0) {
 			this.awaitGameState.push(socket);
-		} else
+		} else {
+			//console.log("Found user", this.userInfos[userIndex].userId, ", sending it to socket", socket.id);
 			this.SendGameState(socket);
+		}
 	}
 
 	SendGameState(socket) {

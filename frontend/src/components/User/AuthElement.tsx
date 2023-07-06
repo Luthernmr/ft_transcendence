@@ -36,7 +36,7 @@ export default function AuthElement() {
 						chatSocket.disconnect().connect();
 						pongSocket.disconnect().connect();
 						navigate("/home");
-						pongSocket.emit("register", { token: res.data.jwt });
+						//pongSocket.emit("register", { token: res.data.jwt });
 					} else onOpen();
 				} catch (error) {
           //console.log( error);
