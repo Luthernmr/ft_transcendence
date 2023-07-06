@@ -2,6 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { PongGateway } from './pong.gateway'
 import { Socket } from 'socket.io';
 import { HistoryService } from './history.service';
+import { UserService } from 'src/user/user.service';
+import { User } from 'src/user/user.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const COUNTDOWN: number = 3000;
 
@@ -179,7 +183,10 @@ export class PongService {
 	customMode: Array<boolean>;
 	gameState: Array<GameState>;
 	
-	constructor(private readonly historyService: HistoryService) {
+	constructor(private readonly historyService: HistoryService,
+				private readonly userService: UserService,
+				@InjectRepository(User)
+				private userRepository: Repository<User>) {
 		this.userInfos = [];
 		this.clientReady = []; // share same index as userInfos
 		this.requestRestart = [];
@@ -397,7 +404,22 @@ export class PongService {
 		return state;
 	}
 
-	CreateRoom(player1: UserInfosIndex, player2: UserInfosIndex, custom: boolean = false) {
+	async SetPlayingState(player1: UserInfosIndex, player2: UserInfosIndex, state: boolean) {
+		const user1 = await this.userService.getUserById(this.userInfos[player1].userId);
+		const user2 = await this.userService.getUserById(this.userInfos[player2].userId);
+
+		await this.userRepository.update(user1.id, {
+			isPlaying: state
+		});
+
+		await this.userRepository.update(user2.id, {
+			isPlaying: state
+		});
+	}
+
+	async CreateRoom(player1: UserInfosIndex, player2: UserInfosIndex, custom: boolean = false) {
+
+		await this.SetPlayingState(player1, player2, true);
 
 		this.maxRoomID++;
 		const roomIndex = this.maxRoomID;
@@ -588,9 +610,13 @@ export class PongService {
 
 		const index: number = this.FindIndexBySocketId(socketID);
 		//console.log('Found index: ' + index);
-		
+
+		const player1Index = this.usersRuntime[index].indexUser1;
+		const player2Index = this.usersRuntime[index].indexUser2;
+
 		if (index >= 0) {
 			this.CleanDatas(index);
+			this.SetPlayingState(player1Index, player2Index, false);
 			return;
 		}
 	}
