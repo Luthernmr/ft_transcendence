@@ -39,19 +39,6 @@ export default function App() {
     //console.log("chat socket connect");
   });
 
-  useEffect(() => {
-	function navigateToPong() {
-		navigate('/Play');
-	}
-
-	pongSocket.on('navigate', navigateToPong);
-
-	return () => {
-		pongSocket.off('navigate', navigateToPong)
-	}
-  }, [])
-
-
 	return (
 		<Routes>
 			<Route path="/Register" element={<RegisterCard />} />

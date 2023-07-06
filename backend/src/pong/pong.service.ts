@@ -337,14 +337,17 @@ export class PongService {
 		console.log("User removed from the queue");
 	}
 
+	GetRuntimeIndex(userIndex: UserInfosIndex) : number {
+		return this.usersRuntime.findIndex(users => (users.indexUser1 === userIndex || users.indexUser2 === userIndex));
+	}
+
 	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) : boolean {
 		const user1Index = this.userInfos.findIndex(infos => (infos.userId === user1ID));
 		const user2Index = this.userInfos.findIndex(infos => (infos.userId === user2ID));
 
-		// Check runtime
-		
+		if (this.GetRuntimeIndex(user1Index) >= 0 || this.GetRuntimeIndex(user2Index) >= 0)
+			return false;
 
-		// if not, LeaveQueue
 		this.LeaveQueue(user1Index);
 		this.LeaveQueue(user2Index);
 
@@ -412,6 +415,13 @@ export class PongService {
 
 		await this.SetPlayingState(player1, player2, true);
 
+		const users: UserPair = {
+			indexUser1: player1,
+			indexUser2: player2,
+		}
+		
+		this.usersRuntime.push(users);
+		
 		this.maxRoomID++;
 		const roomIndex = this.maxRoomID;
 
@@ -419,13 +429,6 @@ export class PongService {
 		
 		this.customMode.push(custom);
 		
-		const users: UserPair = {
-			indexUser1: player1,
-			indexUser2: player2,
-		}
-
-		this.usersRuntime.push(users);
-
 		const roomName = "room" + roomIndex;
 
 		const playerInfo1 = this.userInfos[player1];
