@@ -26,7 +26,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		// console.log('use on connexion:', user)
+		//console.log('use on connexion:', user)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
@@ -36,7 +36,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async handleDisconnect(client: Socket) {
 
 		const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		// console.log('use on deconnexion:', user)
+		//console.log('use on deconnexion:', user)
 		if (user) {
 			await this.userService.setOffline(user);
 		}
@@ -55,37 +55,43 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 		const otherId = userReceiv.socketId;
 		try {
-			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
-			// console.log('relation', alreadyExist);
-			if (alreadyExist != null)
-				throw new BadRequestException('Request already exists for this person.');
-			if (userReceiv.id == userSender.id)
-				throw new BadRequestException('can t send request');
-			await this.userService.createPendingRequest({
-				type: "Friend",
-				senderId: userSender.id,
-				senderNickname: userSender.nickname,
-				senderPdp: userSender.imgPdp,
-				user: userReceiv
-			})
+      const alreadyExist = await this.friendService.getRelation(
+        userSender,
+        userReceiv,
+      );
+      //console.log('relation', alreadyExist);
+      if (alreadyExist != null)
+        throw new BadRequestException(
+          'Request already exists for this person.',
+        );
+      if (userReceiv.id == userSender.id)
+        throw new BadRequestException('can t send request');
+      await this.userService.createPendingRequest({
+        type: 'Friend',
+        senderId: userSender.id,
+        senderNickname: userSender.nickname,
+        senderPdp: userSender.imgPdp,
+        user: userReceiv,
+      });
 
-			const socketMap = this.server.sockets;
-			// console.log('here', socketMap);
-			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
-			// console.log('her2');
-			//for (const socket of sockets) {
-			//	const socketToken = socket?.handshake?.auth?.token;
-			//	console.log(socketToken)
-			//}
+      const socketMap = this.server.sockets;
+      //console.log('here', socketMap);
+      const otherSocket = await this.authService.getUserSocket(
+        this.server,
+        userReceiv.id,
+      );
+      //console.log('her2');
+      //for (const socket of sockets) {
+      //	const socketToken = socket?.handshake?.auth?.token;
+      //	//console.log(socketToken)
+      //}
 
-
-			otherSocket.emit('notifyRequest');
-			client.emit('sendSuccess');
-		}
-		catch (error) {
-			// console.log(error)
-			client.emit('alreadyFriend');
-		}
+      otherSocket.emit('notifyRequest');
+      client.emit('sendSuccess');
+    } catch (error) {
+      //console.log(error)
+      client.emit('alreadyFriend');
+    }
 	}
 
 	@SubscribeMessage('acceptFriendRequest')
@@ -98,7 +104,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const friendUser = await this.userService.getUserById(request.senderId)
 			const otherId = friendUser.socketId;
 			const alreadyExist = await this.friendService.getRelation(friendUser, currentUser)
-			// console.log('relation', alreadyExist);
+			//console.log('relation', alreadyExist);
 			if (alreadyExist != null)
 				throw new BadRequestException('Already friend');
 			await this.friendService.addFriend({
@@ -122,7 +128,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			//console.log('rejected', data.requestId)
 			const request: any = await this.userService.getPendingRequestById(data.requestId);
 			await this.userService.deletePendingRequestById(request);
-			// console.log('rejected', request);
+			//console.log('rejected', request);
 			client.emit('requestRejected')
 		}
 		catch (error) {

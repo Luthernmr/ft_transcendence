@@ -48,11 +48,11 @@ export default function AuthElement() {
 	}, [authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
 
 	async function handleclick() {
-		//console.log(response.data);
-		sessionStorage.removeItem("jwt");
-		sessionStorage.removeItem("currentUser");
-		navigate("/login");
-	}
+    //console.log(response.data);
+    sessionStorage.removeItem("jwt");
+    sessionStorage.removeItem("currentUser");
+    navigate("/login");
+  }
 	return (
 		<>
 			<Center h="100vh">

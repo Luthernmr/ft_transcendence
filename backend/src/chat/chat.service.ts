@@ -8,6 +8,7 @@ import { Server, Socket } from 'socket.io';
 import { RoomService } from 'src/room/room.service';
 import { Room } from 'src/room/entities/room.entity';
 import { UserService } from 'src/user/user.service';
+import { MessageService } from 'src/message/message.service';
 import { User } from 'src/user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
@@ -21,6 +22,7 @@ export class ChatService {
     private readonly roomService: RoomService,
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly messageService: MessageService,
   ) {
     this.logger = new Logger(ChatService.name);
   }
@@ -77,5 +79,14 @@ export class ChatService {
       payload.room.password,
     );
     client.emit('passCheck', answer);
+  }
+
+  @SubscribeMessage('sendMessage')
+  async sendMessage(
+    client: Socket,
+    payload: { content: string; roomId: number; userId: number },
+  ) {
+    const message = await this.messageService.createMessage(payload);
+    this.server.to(payload.roomId.toString()).emit('newMessage', message);
   }
 }

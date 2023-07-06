@@ -9,7 +9,7 @@ import { Friend } from 'src/social/friend.entity';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { BlockedUser } from 'src/social/blockedUser.entity';
 import { Room } from 'src/room/entities/room.entity';
-import { Message } from 'src/room/entities/message.entity';
+import { Message } from 'src/message/entities/message.entity';
 import { PongHistory } from 'src/pong/pongHistory.entity';
 
 @Module({

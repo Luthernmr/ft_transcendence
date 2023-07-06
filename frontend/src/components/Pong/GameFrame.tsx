@@ -15,30 +15,38 @@ function GameFrame({ width, height } : GameFrameProps) {
 	const walls = useRef<Obstacle[]>([WALL_PLACEHOLDER, WALL_PLACEHOLDER, WALL_PLACEHOLDER, WALL_PLACEHOLDER]);
 	
 	useEffect(() => {
-		console.log("Updating walls");
-		walls.current = [{ // UP
-			x: - WALL_WIDTH,
-			y: - WALL_HEIGHT,
-			width: width + 2 * WALL_WIDTH,
-			height: WALL_HEIGHT
-		}, { // BOTTOM
-			x: - WALL_WIDTH,
-			y: height,
-			width: width + 2 * WALL_WIDTH,
-			height: WALL_HEIGHT
-		}, { // RIGHT
-			x: width,
-			y: - WALL_HEIGHT,
-			width: WALL_WIDTH,
-			height: height + 2 * WALL_HEIGHT
-		}, { // LEFT
-			x: - WALL_WIDTH,
-			y: - WALL_HEIGHT,
-			width: WALL_WIDTH,
-			height: height + 2 * WALL_HEIGHT
-		}
-	];
-	}, [width])
+    //console.log("Updating walls");
+    walls.current = [
+      {
+        // UP
+        x: -WALL_WIDTH,
+        y: -WALL_HEIGHT,
+        width: width + 2 * WALL_WIDTH,
+        height: WALL_HEIGHT,
+      },
+      {
+        // BOTTOM
+        x: -WALL_WIDTH,
+        y: height,
+        width: width + 2 * WALL_WIDTH,
+        height: WALL_HEIGHT,
+      },
+      {
+        // RIGHT
+        x: width,
+        y: -WALL_HEIGHT,
+        width: WALL_WIDTH,
+        height: height + 2 * WALL_HEIGHT,
+      },
+      {
+        // LEFT
+        x: -WALL_WIDTH,
+        y: -WALL_HEIGHT,
+        width: WALL_WIDTH,
+        height: height + 2 * WALL_HEIGHT,
+      },
+    ];
+  }, [width])
 
 	return (
 		<>

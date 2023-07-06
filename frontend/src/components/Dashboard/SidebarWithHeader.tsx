@@ -87,9 +87,9 @@ export default function SidebarWithHeader({
           justifyContent={"space-between"}
         >
           {children}
-          <Box ml={5}>
+          {/* <Box ml={5}>
             <FriendList />
-          </Box>
+          </Box> */}
         </Flex>
       </Flex>
     </>
@@ -216,8 +216,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       userSocket.disconnect();
       pongSocket.disconnect();
       //console.log("jwwwr", sessionStorage.getItem("jwt"));
-    } catch (error) {
-    }
+    } catch (error) {}
   };
   ``;
 

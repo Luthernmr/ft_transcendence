@@ -4,11 +4,10 @@ import {
   CreateDateColumn,
   Entity,
   JoinTable,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Room } from './room.entity';
+import { Room } from '../../room/entities/room.entity';
 
 @Entity()
 export class Message {
@@ -22,7 +21,7 @@ export class Message {
   created_at: Date;
 
   @JoinTable()
-  @ManyToMany(() => Room, (room: Room) => room.messages)
+  @ManyToOne(() => Room, (room: Room) => room.messages)
   room: Room;
 
   @JoinTable()

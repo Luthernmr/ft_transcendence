@@ -34,6 +34,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   setSelectedRoom,
   selectedRoom,
 }) => {
+  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
   const [messageContent, setMessageContent] = useState<string>("");
   const toast = useToast();
 
@@ -50,9 +51,9 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     }
     console.log("Here ", messageContent);
     chatSocket.emit("sendMessage", {
-      // content: messageContent,
-      // roomId: selectedRoom.id,
-      // userId: currentUser.id,
+      content: messageContent,
+      roomId: selectedRoom.id,
+      userId: currentUser.id,
     });
 
     setMessageContent("");

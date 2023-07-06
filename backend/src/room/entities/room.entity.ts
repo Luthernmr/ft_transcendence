@@ -1,4 +1,4 @@
-import { Message } from './message.entity';
+import { Message } from '../../message/entities/message.entity';
 import { User } from 'src/user/user.entity';
 import {
   Entity,
@@ -26,7 +26,7 @@ export class Room {
   @Column({ length: 80, nullable: true })
   password: string;
 
-  @ManyToMany(() => User,(user: User) => user.rooms)
+  @ManyToMany(() => User, (user: User) => user.rooms)
   @JoinTable()
   users: User[];
 

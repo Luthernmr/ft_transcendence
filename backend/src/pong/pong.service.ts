@@ -211,60 +211,67 @@ export class PongService {
 	}
 
 	RegisterUserInfos(userID: number, socket: Socket) {
-		const userIndex = this.userInfos.findIndex(info => (info.userId === userID));
+    const userIndex = this.userInfos.findIndex(
+      (info) => info.userId === userID,
+    );
 
-		if (userIndex >= 0 && this.userInfos[userIndex].socket == null)
-		{
-			this.userInfos[userIndex].socket = socket;
+    if (userIndex >= 0 && this.userInfos[userIndex].socket == null) {
+      this.userInfos[userIndex].socket = socket;
 
-			// Game
+      // Game
 
-			const roomIndex = this.FindIndexBySocketId(socket.id);
+      const roomIndex = this.FindIndexBySocketId(socket.id);
 
-			if (roomIndex >= 0) {
-				socket.join("room" + this.roomID[roomIndex]);
-				const users = this.usersRuntime[roomIndex];
-				if (socket.id === this.userInfos[users.indexUser1].socket.id)
-					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser2].socket);
-				else
-					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser1].socket);
-			}
+      if (roomIndex >= 0) {
+        socket.join('room' + this.roomID[roomIndex]);
+        const users = this.usersRuntime[roomIndex];
+        if (socket.id === this.userInfos[users.indexUser1].socket.id)
+          this.pongGateway.EmitOpponentReconnected(
+            this.userInfos[users.indexUser2].socket,
+          );
+        else
+          this.pongGateway.EmitOpponentReconnected(
+            this.userInfos[users.indexUser1].socket,
+          );
+      }
+    } else {
+      this.userInfos.push({ userId: userID, socket: socket });
+      this.clientReady.push(false);
+    }
 
-		} else {
-			this.userInfos.push({userId: userID, socket: socket});
-			this.clientReady.push(false);
-		}
+    //console.log("Added new user to pong userInfos (id: " + userID + ")");
 
-		console.log("Added new user to pong userInfos (id: " + userID + ")");
-
-		return;
-	}
+    return;
+  }
 
 	UnregisterUserInfos(socket: Socket) {
-		const index = this.userInfos.findIndex(infos => (infos.socket === socket));
+    const index = this.userInfos.findIndex((infos) => infos.socket === socket);
 
-		if (index < 0)
-			return;
+    if (index < 0) return;
 
-		// Queue
-		this.LeaveQueue(socket);
+    // Queue
+    this.LeaveQueue(socket);
 
-		// Running Game
-		const roomIndex = this.FindIndexBySocketId(socket.id);
+    // Running Game
+    const roomIndex = this.FindIndexBySocketId(socket.id);
 
-		if (roomIndex >= 0) {
-			const users = this.usersRuntime[roomIndex];
-			if (socket.id === this.userInfos[users.indexUser1].socket.id)
-				this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser2].socket);
-			else
-				this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser1].socket);
-		}
+    if (roomIndex >= 0) {
+      const users = this.usersRuntime[roomIndex];
+      if (socket.id === this.userInfos[users.indexUser1].socket.id)
+        this.pongGateway.EmitOpponentDisconnect(
+          this.userInfos[users.indexUser2].socket,
+        );
+      else
+        this.pongGateway.EmitOpponentDisconnect(
+          this.userInfos[users.indexUser1].socket,
+        );
+    }
 
-		// Socket
-		this.userInfos[index].socket = null;
+    // Socket
+    this.userInfos[index].socket = null;
 
-		//console.log('User unregistered from pong');
-	}
+    //console.log('User unregistered from pong');
+  }
 
 	LaunchUpdates() {
 		setInterval(this.GlobalUpdate.bind(this), 16);
@@ -294,28 +301,30 @@ export class PongService {
 		const currentPlayerInfoIndex = this.userInfos.findIndex(infos => (infos.socket === socket));
 
 		if (currentPlayerInfoIndex < 0) {
-			console.log("User not registered to pong");
-			return;
-		}
+      //console.log("User not registered to pong");
+      return;
+    }
 
-		const queueInfos = this.UserInQueue(this.userInfos[currentPlayerInfoIndex].userId);
-		if (queueInfos.index >= 0) {
-			console.log("user already in queue");
-			return;
-		}
+    const queueInfos = this.UserInQueue(
+      this.userInfos[currentPlayerInfoIndex].userId,
+    );
+    if (queueInfos.index >= 0) {
+      //console.log("user already in queue");
+      return;
+    }
 
-		const pendingPlayersArray = custom ? this.queueClassic : this.queueCustom;
+    const pendingPlayersArray = custom ? this.queueClassic : this.queueCustom;
 
-		console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
+    //console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
 
-		if (pendingPlayersArray.length >= 1) {
-			const opponentInfoIndex = pendingPlayersArray[0];
-			pendingPlayersArray.splice(0, 1);
-			this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom);
-		} else {
-			console.log("Not enough players in queue");
-			pendingPlayersArray.push(currentPlayerInfoIndex);
-		}
+    if (pendingPlayersArray.length >= 1) {
+      const opponentInfoIndex = pendingPlayersArray[0];
+      pendingPlayersArray.splice(0, 1);
+      this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom);
+    } else {
+      //console.log("Not enough players in queue");
+      pendingPlayersArray.push(currentPlayerInfoIndex);
+    }
 	}
 
 	LeaveQueue(socket: Socket) {
@@ -328,10 +337,12 @@ export class PongService {
 		const queueInfos = this.UserInQueue(this.userInfos[index].userId);
 
 		if (queueInfos.index >= 0) {
-			const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
-			queueArray.splice(queueInfos.index, 1);
-			console.log("User removed from the queue");
-		}
+      const queueArray = queueInfos.custom
+        ? this.queueCustom
+        : this.queueClassic;
+      queueArray.splice(queueInfos.index, 1);
+      //console.log("User removed from the queue");
+    }
 	}
 
 	AcceptInvitation(user1ID: number, user2ID: number, custom: boolean = false) {
@@ -339,18 +350,18 @@ export class PongService {
 		const user2Index = this.userInfos.findIndex(infos => (infos.userId === user2ID));
 		
 		if (user1Index < 0 || user2Index < 0) {
-			//console.log(
-    //     'Error for users ',
-    //     user1ID,
-    //     ' & ',
-    //     user2ID,
-    //     ', indexes = ',
-    //     user1Index,
-    //     ' & ',
-    //     user2Index,
-    //   );
-			return;
-		}
+      //console.log(
+      //     'Error for users ',
+      //     user1ID,
+      //     ' & ',
+      //     user2ID,
+      //     ', indexes = ',
+      //     user1Index,
+      //     ' & ',
+      //     user2Index,
+      //   );
+      return;
+    }
 
 		this.CreateRoom(user1Index, user2Index, custom);
 	}
@@ -398,81 +409,92 @@ export class PongService {
 	}
 
 	CreateRoom(player1: UserInfosIndex, player2: UserInfosIndex, custom: boolean = false) {
+    this.maxRoomID++;
+    const roomIndex = this.maxRoomID;
 
-		this.maxRoomID++;
-		const roomIndex = this.maxRoomID;
+    this.roomID.push(roomIndex);
 
-		this.roomID.push(roomIndex);
-		
-		this.customMode.push(custom);
-		
-		const users: UserPair = {
-			indexUser1: player1,
-			indexUser2: player2,
-		}
+    this.customMode.push(custom);
 
-		this.usersRuntime.push(users);
+    const users: UserPair = {
+      indexUser1: player1,
+      indexUser2: player2,
+    };
 
-		const roomName = "room" + roomIndex;
+    this.usersRuntime.push(users);
 
-		const playerInfo1 = this.userInfos[player1];
-		const playerInfo2 = this.userInfos[player2];
+    const roomName = 'room' + roomIndex;
 
-		this.userInfos[player1].socket.join(roomName);
-		this.userInfos[player2].socket.join(roomName);
+    const playerInfo1 = this.userInfos[player1];
+    const playerInfo2 = this.userInfos[player2];
 
-		const ids: IDPair = {
-			idP1: playerInfo1.userId,
-			idP2: playerInfo2.userId
-		}
+    this.userInfos[player1].socket.join(roomName);
+    this.userInfos[player2].socket.join(roomName);
 
-		this.idPairs.push(ids);
+    const ids: IDPair = {
+      idP1: playerInfo1.userId,
+      idP2: playerInfo2.userId,
+    };
 
-		const ball: BallRuntimeData = {
-			ballPosition: { ...BASE_INIT_DATAS.ballPosition },
-			ballDelta: {x: 0, y: 0},
-			ballWidth: custom ? CUSTOM_ENTITIES.ballWidth : STANDARD_ENTITIES.ballWidth,
-		};
+    this.idPairs.push(ids);
 
-		this.ballRuntime.push(ball);
+    const ball: BallRuntimeData = {
+      ballPosition: { ...BASE_INIT_DATAS.ballPosition },
+      ballDelta: { x: 0, y: 0 },
+      ballWidth: custom
+        ? CUSTOM_ENTITIES.ballWidth
+        : STANDARD_ENTITIES.ballWidth,
+    };
 
-		custom ? this.ballRuntimeCustom.push(ball) : this.ballRuntimeStandard.push(ball);
+    this.ballRuntime.push(ball);
 
-		const paddles: PaddleRuntimeData = {
-			paddleWidth: custom ? CUSTOM_ENTITIES.paddleWidth : STANDARD_ENTITIES.paddleWidth,
-			paddle1Pos: PADDLE_START_POS,
-			paddle1Delta: 0,
-			paddle2Pos: PADDLE_START_POS,
-			paddle2Delta: 0
-		}
+    custom
+      ? this.ballRuntimeCustom.push(ball)
+      : this.ballRuntimeStandard.push(ball);
 
-		this.paddleRuntime.push(paddles);
+    const paddles: PaddleRuntimeData = {
+      paddleWidth: custom
+        ? CUSTOM_ENTITIES.paddleWidth
+        : STANDARD_ENTITIES.paddleWidth,
+      paddle1Pos: PADDLE_START_POS,
+      paddle1Delta: 0,
+      paddle2Pos: PADDLE_START_POS,
+      paddle2Delta: 0,
+    };
 
-		const score: Score = {
-			scoreP1: 0,
-			scoreP2: 0
-		}
+    this.paddleRuntime.push(paddles);
 
-		this.scoreData.push(score);
-		this.gameState.push(GameState.Connecting);
+    const score: Score = {
+      scoreP1: 0,
+      scoreP2: 0,
+    };
 
-		console.log("room created");
+    this.scoreData.push(score);
+    this.gameState.push(GameState.Connecting);
 
-		const initDatas = custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS
+    //console.log("room created");
 
-		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2 });
-		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1 });
+    const initDatas = custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS;
 
-		this.StartGameAtCountdown(this.usersRuntime.length - 1, COUNTDOWN);
-	}
+    this.pongGateway.EmitInit(playerInfo1.socket, {
+      ...initDatas,
+      playerNumber: 2,
+    });
+    this.pongGateway.EmitInit(playerInfo2.socket, {
+      ...initDatas,
+      playerNumber: 1,
+    });
+
+    this.StartGameAtCountdown(this.usersRuntime.length - 1, COUNTDOWN);
+  }
 
 	RequestRestart(socket: Socket) {
 		const instanceIndex = this.FindIndexBySocketId(socket.id);
 		
 		if (instanceIndex < 0) {
-			console.log("ClientIsReady: client not found");
-			return;
-		}
+      //console.log("ClientIsReady: client not found");
+      return;
+    }
 
 		if (this.gameState[instanceIndex] != GameState.WaitingForRestart)
 			return;
@@ -506,9 +528,9 @@ export class PongService {
 		const instanceIndex = this.FindIndexBySocketId(socket.id);
 		
 		if (instanceIndex < 0) {
-			console.log("ClientIsReady: client not found");
-			return;
-		}
+      //console.log("ClientIsReady: client not found");
+      return;
+    }
 
 		if (this.gameState[instanceIndex] != GameState.Connecting)
 			return;
@@ -530,22 +552,24 @@ export class PongService {
 	}
 
 	AddWatcher(index: number, socket: Socket) {
-		if (this.roomID.length > 0) {
-			index = 0;
-			socket.join("room" + this.roomID[index]);
-			
-			const initDatas = this.customMode[index] ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS;
+    if (this.roomID.length > 0) {
+      index = 0;
+      socket.join('room' + this.roomID[index]);
 
-			this.pongGateway.EmitWatcher(socket, {
-				...initDatas,
-				...this.ballRuntime[index],
-				...this.paddleRuntime[index],
-				...this.scoreData[index]
-			});
-			//console.log('Joined room Id: ' + this.roomID[0]);
-		} //else
-			//console.log("No room is currently running!");
-	}
+      const initDatas = this.customMode[index]
+        ? CUSTOM_INIT_DATAS
+        : STANDARD_INIT_DATAS;
+
+      this.pongGateway.EmitWatcher(socket, {
+        ...initDatas,
+        ...this.ballRuntime[index],
+        ...this.paddleRuntime[index],
+        ...this.scoreData[index],
+      });
+      //console.log('Joined room Id: ' + this.roomID[0]);
+    } //else
+    //console.log("No room is currently running!");
+  }
 
 	RemoveWatcher(index: number, socket: Socket) {
 		socket.leave("room" + this.roomID[index]);
@@ -570,30 +594,30 @@ export class PongService {
 	}
 
 	UserQuit(socket: Socket) : Socket {
-		const usersIndex = this.FindIndexBySocketId(socket.id);
+    const usersIndex = this.FindIndexBySocketId(socket.id);
 
-		let opponentSocket = null;
-		if (this.GetSocket(this.usersRuntime[usersIndex].indexUser1) === socket)
-			opponentSocket = this.GetSocket(this.usersRuntime[usersIndex].indexUser2);
-		else
-		opponentSocket = this.GetSocket(this.usersRuntime[usersIndex].indexUser1);
+    let opponentSocket = null;
+    if (this.GetSocket(this.usersRuntime[usersIndex].indexUser1) === socket)
+      opponentSocket = this.GetSocket(this.usersRuntime[usersIndex].indexUser2);
+    else
+      opponentSocket = this.GetSocket(this.usersRuntime[usersIndex].indexUser1);
 
-		this.CloseRoom(socket.id);
-		console.log('user requested quit');
-		return opponentSocket;
-	}
+    this.CloseRoom(socket.id);
+    //console.log('user requested quit');
+    return opponentSocket;
+  }
 
 	CloseRoom(socketID: string) {
-		//console.log('Closing pong room');
+    //console.log('Closing pong room');
 
-		const index: number = this.FindIndexBySocketId(socketID);
-		//console.log('Found index: ' + index);
-		
-		if (index >= 0) {
-			this.CleanDatas(index);
-			return;
-		}
-	}
+    const index: number = this.FindIndexBySocketId(socketID);
+    //console.log('Found index: ' + index);
+
+    if (index >= 0) {
+      this.CleanDatas(index);
+      return;
+    }
+  }
 
 	CleanDatas(index: number) {
 		const ballRuntimeMode = this.customMode[index] ? this.ballRuntimeCustom : this.ballRuntimeStandard;
