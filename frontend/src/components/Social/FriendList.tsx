@@ -8,7 +8,7 @@ import {
 import AllUserItem from "./AllUserItem";
 import AllfriendItem from "./AllFriendsItem";
 
-export default function FriendList() {
+export default function FriendList(MobileProps) {
   return (
     <>
       <Tabs variant="soft-rounded">
