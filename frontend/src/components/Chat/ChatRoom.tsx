@@ -49,7 +49,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
       });
       return;
     }
-    console.log("Here ", messageContent);
     chatSocket.emit("sendMessage", {
       text: messageContent,
       room: selectedRoom.id,
@@ -58,6 +57,19 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
     setMessageContent("");
   };
+
+  const handleError = (error: { message: any }) => {
+    console.log("Here", error)
+    toast({
+      title: error.message,
+      status: "error",
+      isClosable: true,
+      position: "top",
+    });
+    chatSocket.off("error1", handleError);
+  };
+
+  chatSocket.on("error1", handleError);
 
   return (
     <Flex

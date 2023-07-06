@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
@@ -52,15 +52,15 @@ export class ChatService {
 
   @SubscribeMessage('createRoom')
   async createRoom(client: Socket, data: Partial<Room>) {
-    const error = await this.roomService.createRoom(client, data);
-    if (error) {
-      this.server.emit('error', { message: error.message });
-    } else {
-      this.server.emit('roomCreated');
+    try {
+      await this.roomService.createRoom(client, data);
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
         this.server.to(element.socketId).emit('roomList', rooms.rooms);
       });
+      this.server.emit('roomCreated');
+    } catch (error) {
+      this.server.emit('error', { message: error.message });
     }
   }
 
@@ -83,17 +83,15 @@ export class ChatService {
   }
 
   @SubscribeMessage('sendMessage')
-  async sendMessage(
-    client: Socket,
-    data: Message,
-  ) {
+  async sendMessage(client: Socket, data: Message) {
     try {
-      const message = await this.messageService.createMessage(data);
-      data.room.users.forEach(async (element) => {
-        this.server.to(element.socketId).emit('newMessage', message);
-      });
+      await this.messageService.createMessage(data);
+      // data.room.users.forEach(async (element) => {
+      //   this.server.to(element.socketId).emit('newMessage', message);
+      // });
     } catch (error) {
-      client.emit('error', { message: error.message });
+      this.logger.log(error);
+      this.server.emit('error1', { message: error.message });
     }
   }
 }

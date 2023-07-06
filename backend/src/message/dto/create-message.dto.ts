@@ -1,15 +1,13 @@
-import { IsString, IsNotEmpty, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsUUID, MaxLength } from 'class-validator';
 
 export class CreateMessageDto {
   @IsString()
   @IsNotEmpty()
   text: string;
-
-  // @IsUUID()
+  
   @IsNotEmpty()
   room: string;
-
-  // @IsUUID()
+  
   @IsNotEmpty()
   user: string;
 }

@@ -24,7 +24,6 @@ export class MessageService {
     try {
       const dto = plainToClass(CreateMessageDto, data);
       await validateOrReject(dto).catch((errors: ValidationError[]) => {
-        this.logger.log(errors);
         throw new BadRequestException(errors);
       });      
   
@@ -40,11 +39,10 @@ export class MessageService {
       message.user = data.user;//replace after user check
       message.room = data.room;
   
-      const savedMessage = await this.messageRepo.save(message);
-      return savedMessage;
+      await this.messageRepo.save(message);
     } catch (error) {
       this.logger.log(error);
-      return error;
+      throw error;
     }
   }
   
