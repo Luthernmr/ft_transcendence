@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from "react";
 import {
   Flex,
   Box,
@@ -9,10 +9,12 @@ import {
   InputGroup,
   Input,
   InputRightElement,
+  useToast,
 } from "@chakra-ui/react";
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import { FiSend } from "react-icons/fi";
-import { User } from '../Social/AllUserItem';
+import { User } from "../Social/AllUserItem";
+import { chatSocket } from "../../sockets/sockets";
 
 interface Room {
   id: string;
@@ -27,7 +29,32 @@ interface ChatRoomProps {
   selectedRoom: Room;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({setSelectedRoom, selectedRoom }) => {
+const ChatRoom: React.FC<ChatRoomProps> = ({
+  setSelectedRoom,
+  selectedRoom,
+}) => {
+  const [messageContent, setMessageContent] = useState<string>("");
+  const toast = useToast();
+
+  const handleSendMessage = () => {
+    if (messageContent.trim() === "") {
+      toast({
+        title: "Type a message",
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
+    chatSocket.emit("sendMessage", {
+      content: messageContent,
+      roomId: selectedRoom.id,
+      userId: selectedRoom.users[0].id, // replace this with the id of the current user
+    });
+
+    setMessageContent("");
+  };
+
   return (
     <Flex
       borderRadius={"md"}
@@ -64,7 +91,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({setSelectedRoom, selectedRoom }) => 
         ))} */}
       </VStack>
       <InputGroup size="md">
-        <Input placeholder="Type your message..." borderRadius="md" />
+        <Input
+          placeholder="Type your message..."
+          borderRadius="md"
+          value={messageContent}
+          onChange={(e) => setMessageContent(e.target.value)}
+        />
         <InputRightElement mr={"1.5"}>
           <IconButton
             colorScheme="teal"
@@ -73,7 +105,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({setSelectedRoom, selectedRoom }) => 
             aria-label="Send message"
             icon={<FiSend />}
             type="submit"
-          />
+            onClick={() => handleSendMessage()}
+         />
         </InputRightElement>
       </InputGroup>
     </Flex>
