@@ -1,38 +1,15 @@
-import React, { useEffect, useState } from "react";
 import {
 	Box,
-	VStack,
-	FormControl,
-	FormLabel,
-	Input,
-	Switch,
-	Button,
-	Image,
-	HStack,
-	Card,
-	CardBody,
-	CardHeader,
-	Heading,
-	Stack,
-	Text,
 	Flex,
-	SimpleGrid,
 	Tab,
 	TabList,
 	TabPanel,
 	TabPanels,
 	Tabs,
 } from "@chakra-ui/react";
-import axios from "axios";
-import { BsJustify } from "react-icons/bs";
-import AllfriendItem from "../Social/AllFriendsItem";
 import Settings from "./Settings";
 import MatchHistory from "./MatchHistory";
-import { BlockList } from "net";
 import BlockedList from "./BlockedList";
-import ProfilInfo from "./ProfileInfo";
-import UserStat from "./Stats";
-import UserStats from "./Stats";
 
 interface User {
 	id: number,

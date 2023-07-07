@@ -33,35 +33,28 @@ export class UserController {
 	@Get(':id')
 	@UseGuards(JwtTwoFactorGuard)
 	async user(@Res() response: Response, @Param('id') id: number) {
-		//console.log('here')
 		const user = await this.userService.getUserById(id)
 		delete user.password;
-		//console.log('test', user)
 		response.send({ user: user });
 	}
 
 	@Get('history/:id')
-	@UseGuards()
+	@UseGuards(JwtTwoFactorGuard)
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-			//console.log('usi id request hystory', id);
-
 			const user: any = await this.userService.getUserById(id);
 			delete user.password;
 			const history: any = await this.historyService.getUserHistory(user);
 			console.log('history', history);
 			response.send({ history: history });
 		} catch (error) {
-			//console.log(error);
 		}
 	}
 
 	@Get('stats/:id')
-	@UseGuards()
+	@UseGuards(JwtTwoFactorGuard)
 	async stats(@Res() response: Response, @Param('id') id: number) {
 		try {
-			//console.log('usi id request hystory', id);
-
 			const user: any = await this.userService.getUserById(id);
 			delete user.password;
 			const historys = await this.historyService.getUserHistory(user);
@@ -92,8 +85,6 @@ export class UserController {
 				oponentTab: oponentTab,
 				winrate : winrate
 			})
-			console.log('history', historys);
-
 			response.send({ stats: stats });
 		} catch (error) {
 			//console.log(error);
@@ -140,10 +131,8 @@ export class UserController {
 		}
 	}))
 	async addAvatar(@Req() request: Request, @UploadedFile() file: Express.Multer.File) {
-		//console.log(file);
 		try {
 			if (!file) {
-				console.log(file)
 				throw new BadRequestException('File is not an image');
 			}
 			else {
@@ -151,11 +140,9 @@ export class UserController {
 					filePath: `http://212.227.209.204:5000/user/avatars/${file.filename}`
 				};
 				const user: any = request.user;
-				console.log("oldpath", user.imgPdp)
 				if (user.imgPdp) {
 					const oldFilePath = user.imgPdp
 					let split = oldFilePath.split('/')
-					console.log(split);
 					try {
 						if (oldFilePath) {
 							fs.unlinkSync(`./uploadedFiles/${split[5]}`);
@@ -173,6 +160,7 @@ export class UserController {
 	}
 
 	@Get('avatars/:filename')
+	@UseGuards(JwtTwoFactorGuard)
 	async getPicture(@Param('filename') filename: any, @Res() res: Response) {
 		res.sendFile(filename, { root: './uploadedFiles' })
 	}

@@ -19,7 +19,7 @@ export class AuthService {
 		private jwtService: JwtService,
 
 	) { }
-	async login(user: User, response: Response): Promise<any> {
+	async login(user: User, response: Response): Promise<{token : string}> {
 		await this.userService.setOnline(user);
 		const payload = { id: user.id, nickname: user.nickname, email: user.email, isOnline: user.isOnline, isTwoFa: user.isTwoFA };
 		const jwt = await this.jwtService.signAsync(payload);
@@ -48,7 +48,7 @@ export class AuthService {
 		return await this.userService.getUser(data.email);
 	}
 
-	async getUserByToken(token: any): Promise<User> {
+	async getUserByToken(token: string): Promise<User> {
 		if (token) {
 			const data = await this.jwtService.verifyAsync(token);
 			const user: User = await this.userService.getUser(data.email);
@@ -58,13 +58,13 @@ export class AuthService {
 		}
 	}
 
-	async getUserSocket(server: any, userId: number) {
+	async getUserSocket(server: any, userId: number): Promise<Socket> {
 		let sockets = Array.from(await server.sockets);
-		let otherSocket = null;
+		let otherSocket : Socket = null;
 		for(const socket of sockets) {
       let token = (socket as any)[1].handshake.auth.token;
       if (!token) return null;
-      const user: any = await this.getUserByToken(token);
+      const user: User = await this.getUserByToken(token);
       //console.log("user verified", user);
       if (userId == user.id) otherSocket = socket[1];
     }

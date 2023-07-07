@@ -1,5 +1,5 @@
 import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, JoinTable, ManyToOne } from 'typeorm';
 
 @Entity('blockedUser')
 export class BlockedUser {

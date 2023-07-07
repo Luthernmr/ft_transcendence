@@ -11,8 +11,7 @@ import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
 import { BadRequestException } from '@nestjs/common';
 import { PongService } from 'src/pong/pong.service';
-
-//console.log("Websocket: " + process.env.FRONTEND);
+import { PendingRequest } from 'src/social/pendingRequest.entity';
 
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
@@ -28,7 +27,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		//console.log('use on connexion:', user)
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
@@ -39,7 +37,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	async handleDisconnect(client: Socket) {
 
 		const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
-		//console.log('use on deconnexion:', user)
 		if (user) {
 			await this.userService.setOffline(user);
 			this.server.emit('reloadLists')
@@ -47,18 +44,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	}
 
 	afterInit(server: Socket) {
-		//console.log('Socket is live')
 	}
 
 	@SubscribeMessage('friendRequest')
 	async Friend(client: Socket, data: {
-		userReceiveId: any,
+		userReceiveId: number,
 	}) {
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
 		try {
 			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
-			// console.log('relation', alreadyExist);
 			if (alreadyExist != null)
 				throw new BadRequestException('Alreedy friend.');
 			if (userReceiv.id == userSender.id)
@@ -75,14 +70,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('sendSuccess');
 		}
 		catch (error) {
-			// console.log(error)
 			client.emit('alreadyFriend');
 		}
 	}
 
 	@SubscribeMessage('PongRequest')
 	async PongRequest(client: Socket, data: {
-		userReceiveId: any,
+		userReceiveId: number,
 	}) {
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
@@ -101,25 +95,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			client.emit('sendSuccess');
 		}
 		catch (error) {
-			 console.log(error)
 			client.emit('alreadyFriend');
 		}
 	}
 
 	@SubscribeMessage('acceptPongRequest')
 	async acceptPongRequest(client: Socket, data: {
-		requestId: any,
+		requestId: number,
 	}) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
-			const request: any = await this.userService.getPendingRequestById(data.requestId);
+			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token);
+			const request: PendingRequest = await this.userService.getPendingRequestById(data.requestId);
 			this.pongService.AcceptInvitation(currentUser?.id, request?.senderId);
 			const otherSocket = await this.authService.getUserSocket(this.server, request.senderId)
-
 			client.emit('duelAcccepted')
 			otherSocket.emit('duelAcccepted')
 			await this.userService.deletePendingRequestById(request);
-
 		}
 		catch (error) {
 			console.log(error)
@@ -128,15 +119,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 
 	@SubscribeMessage('acceptFriendRequest')
 	async acceptFriendRequest(client: Socket, data: {
-		requestId: any,
+		requestId: number,
 	}) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
-			const request: any = await this.userService.getPendingRequestById(data.requestId);
-			const friendUser = await this.userService.getUserById(request.senderId)
+			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token);
+			const request: PendingRequest = await this.userService.getPendingRequestById(data.requestId);
+			const friendUser: User = await this.userService.getUserById(request.senderId)
 			const otherId = friendUser.socketId;
 			const alreadyExist = await this.friendService.getRelation(friendUser, currentUser)
-			//console.log('relation', alreadyExist);
 			if (alreadyExist != null)
 				throw new BadRequestException('Already friend');
 			await this.friendService.addFriend({
@@ -148,66 +138,59 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			await this.userService.deletePendingRequestById(request);
 		}
 		catch (error) {
-			//console.log(error)
 		}
 	}
 
 	@SubscribeMessage('rejectRequest')
 	async rejectRequest(client: Socket, data: {
-		requestId: any,
+		requestId: number,
 	}) {
 		try {
-			//console.log('rejected', data.requestId)
-			const request: any = await this.userService.getPendingRequestById(data.requestId);
+			const request: PendingRequest = await this.userService.getPendingRequestById(data.requestId);
 			await this.userService.deletePendingRequestById(request);
-			//console.log('rejected', request);
 			client.emit('requestRejected')
 		}
 		catch (error) {
-			//console.log(error)
 		}
 	}
 
 	@SubscribeMessage('getFriends')
 	async getFriendsList(client: Socket) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
+			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token)
 			const friendList = await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList)
 		}
 		catch (error) {
-			//console.log(error);
 		}
 	}
 
 	@SubscribeMessage('deleteFriend')
 	async deleteFriend(client: Socket, data: { friendId: number }) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
-			const friendUser: any = await this.userService.getUserById(data.friendId);
+			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token);
+			const friendUser: User = await this.userService.getUserById(data.friendId);
 			await this.friendService.deleteFriend(currentUser, friendUser);
 			client.emit('reload');
 		}
 		catch (error) {
-			//console.log(error);
 		}
 	}
 
 	@SubscribeMessage('getAllUsers')
 	async getAllUsers(client: Socket) {
-		const users = await this.userService.getAllUser();
+		const users: User[] = await this.userService.getAllUser();
 		client.emit('userList', users);
 	}
 
 	@SubscribeMessage('getPendingRequest')
 	async getPendingRequest(client: Socket) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token)
+			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token)
 			const pendingRequests = await this.userService.getAllPendingRequest(currentUser)
 			client.emit('pendingRequestsList', pendingRequests)
 		}
 		catch (error) {
-			//console.log(error);
 		}
 	}
 
@@ -251,10 +234,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	}
 
 	@SubscribeMessage('unblockUser')
-	async unBlockUser(client: Socket, data: { blockedId: any }) {
+	async unBlockUser(client: Socket, data: { blockedId: number }) {
 		try {
-			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
-			const otherUser: any = await this.userService.getUserById(data.blockedId);
+			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token);
+			const otherUser: User = await this.userService.getUserById(data.blockedId);
 			await this.friendService.unblockUser(currentUser, otherUser)
 			client.emit('userHasBlocked');
 		}

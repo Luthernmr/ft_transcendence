@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { Response, Request, request, response } from 'express';
 import { JwtService } from '@nestjs/jwt'
 import { UserService } from 'src/user/user.service';
-import { LoginDto, RegisterDto } from 'src/user/user.dto';
+import { LoginDto, RegisterDto, twoFaCodeDto } from 'src/user/user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { auth42Guard } from './auth42.guard';
@@ -15,6 +15,7 @@ import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { TwoFAService } from './twofa.service';
 import JwtTwoFactorGuard from './twofa.guard';
 import { LocalAuthGuard } from './auth.guard';
+import { User } from 'src/user/user.entity';
 
 
 @Controller('api')
@@ -119,7 +120,7 @@ export class AuthController {
 	@Get('generate')
 	@UseGuards(LocalAuthGuard)
 	async qrcode(@Req() request: Request, @Res() response: Response) {
-		const user = await this.authService.getUserCookie(request);
+		const user : Partial<User> = await this.authService.getUserCookie(request);
 		const { otpauthUrl } = await this.twoFAService.generateTwoFASecret(user);
 
 		response.setHeader('Content-Type', 'image/png');
@@ -131,11 +132,11 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	async turnOnTwoFA(
 		@Req() request: Request,
-		@Body('twoFACode') twoFACode: string
+		@Body() twoFaCodeDto: twoFaCodeDto
 	) {
 		const user = await this.authService.getUserCookie(request);
 		const isCodeValid = await this.twoFAService.isTwoFACodeValid(
-			twoFACode, user
+			twoFaCodeDto.twoFaCode, user
 		);
 		try {
 			if (!isCodeValid) {
@@ -164,13 +165,13 @@ export class AuthController {
 	async authenticate(
 		@Res() response: Response,
 		@Req() request: Request,
-		@Body('twoFACode') twoFACode: string
+		@Body() twoFaCodeDto: twoFaCodeDto
 	) {
 		try {
 			const user = await this.authService.getUserCookie(request)
 			if (!user)
 				throw new UnauthorizedException('user not here');
-			const isCodeValid = await this.twoFAService.isTwoFACodeValid(twoFACode, user);
+			const isCodeValid = await this.twoFAService.isTwoFACodeValid(twoFaCodeDto.twoFaCode, user);
 			if (!isCodeValid) {
 				throw new UnauthorizedException('Wrong authentication code');
 			}

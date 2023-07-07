@@ -6,7 +6,6 @@ import { Controller, Get, Res, Req, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
-import axios from "axios";
 import { AuthService } from './auth.service';
 
 

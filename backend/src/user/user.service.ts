@@ -27,7 +27,7 @@ export class UserService {
 		return await this.userRepository.findOne({ where: { email: email } });
 	}
 
-	async getAllUser(): Promise<any> {
+	async getAllUser(): Promise<User[]> {
 		const users = await this.userRepository.find();
 		return users;
 	}
@@ -59,21 +59,21 @@ export class UserService {
 		await this.userRepository.save(user);
 	}
 	async changeNickname(user: User, nickname: string) {
-			user.nickname = nickname;
-			await this.userRepository.save(user);
+		user.nickname = nickname;
+		await this.userRepository.save(user);
 	}
 
 	async isNicknameAlreadyUsed(nickname: string): Promise<boolean> {
-		const count = await this.userRepository.count({where : { nickname : nickname} });
+		const count = await this.userRepository.count({ where: { nickname: nickname } });
 		return count > 0;
-	  }
+	}
 
 	async createPendingRequest(data: any): Promise<PendingRequest> {
 		const existingRequest = await this.pendingRequest.findOne({
 			where: {
 				type: data.type,
 				senderId: data.senderId,
-				user : data.user
+				user: data.user
 			}
 		});
 		//console.log (existingRequest)
@@ -89,20 +89,20 @@ export class UserService {
 
 	async deletePendingRequestById(request: PendingRequest) {
 		try {
-      //console.log('delet1', request);
-      const result = await this.pendingRequest.delete(request.id);
-      //console.log('delet', result);
-      return result;
-    } catch (error) {
-      console.error(
-        'An error occurred while deleting the pending request:',
-        error,
-      );
-      throw error;
-    }
+			//console.log('delet1', request);
+			const result = await this.pendingRequest.delete(request.id);
+			//console.log('delet', result);
+			return result;
+		} catch (error) {
+			console.error(
+				'An error occurred while deleting the pending request:',
+				error,
+			);
+			throw error;
+		}
 	}
 
-	async getAllPendingRequest(user: any): Promise<any> {
+	async getAllPendingRequest(user: User): Promise<PendingRequest[]> {
 		const userWithPendingRequests = await this.userRepository.findOne({ where: user, relations: ['pendingRequests'] });
 		return userWithPendingRequests.pendingRequests;
 	}
@@ -128,11 +128,11 @@ export class UserService {
 		});
 	}
 
-	async getRoomsByUID( userId: number) {
+	async getRoomsByUID(userId: number) {
 		return await (this.userRepository.findOne({
-			where: {id: userId},
+			where: { id: userId },
 			relations: {
-				rooms: {users: true}
+				rooms: { users: true }
 			}
 		}))
 	}
