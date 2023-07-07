@@ -12,7 +12,7 @@ import { Room } from '../../room/entities/room.entity';
 @Entity()
 export class Message {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  id: number;
 
   @Column({ length: 250 })
   text: string;

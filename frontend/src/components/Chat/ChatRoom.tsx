@@ -18,7 +18,7 @@ import { User } from "../Social/AllUserItem";
 import { chatSocket } from "../../sockets/sockets";
 
 interface Room {
-  id: string;
+  id: number;
   name: string;
   password: string;
   isPrivate: boolean;
@@ -26,10 +26,9 @@ interface Room {
 }
 
 interface Message {
-  id: string;
+  id: number;
   text: string;
   created_at: Date;
-  room: Room;
   user: User;
 }
 
@@ -81,13 +80,23 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
   const handleReceiveMessage = (receivedMessage: Message) => {
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-    console.log("Here :", messages)
+    console.log("Here :", messages);
   };
 
   React.useEffect(() => {
+    chatSocket.emit("getRoomMessages", selectedRoom);
+
+    const handleRoomMessages = (roomMessages: Message[]) => {
+      console.log(roomMessages);
+      setMessages(roomMessages);
+    };
+
+    chatSocket.on("roomMessages", handleRoomMessages);
     chatSocket.on("error", handleError);
     chatSocket.on("receiveMessage", handleReceiveMessage);
+
     return () => {
+      chatSocket.off("roomMessages", handleRoomMessages);
       chatSocket.off("error", handleError);
       chatSocket.off("receiveMessage", handleReceiveMessage);
     };
@@ -116,10 +125,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
         {messages.map((message) => (
           <Box
             key={message.id}
-            bg={message.user.id === currentUser.id ? "teal.500" : "gray.200"}
-            color={message.user.id === currentUser.id ? "white" : "black"}
+            bg={
+              message.user && message.user.id === currentUser.id
+                ? "teal.500"
+                : "gray.200"
+            }
+            color={
+              message.user && message.user.id === currentUser.id
+                ? "white"
+                : "black"
+            }
             alignSelf={
-              message.user.id === currentUser.id ? "flex-end" : "flex-start"
+              message.user && message.user.id === currentUser.id
+                ? "flex-end"
+                : "flex-start"
             }
             borderRadius="lg"
             p={2}

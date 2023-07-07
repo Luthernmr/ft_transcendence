@@ -5,7 +5,7 @@ import CreateRoom from "./CreateRoom";
 import { User } from "../Social/AllUserItem";
 
 interface Room {
-  id: string;
+  id: number;
   name: string;
   password: string;
   isPrivate: boolean;

@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable, Logger, ValidationError } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  ValidationError,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Message } from './entities/message.entity';
@@ -18,34 +23,50 @@ export class MessageService {
     private readonly roomService: RoomService,
     private readonly userService: UserService,
     @InjectRepository(Message) private messageRepo: Repository<Message>,
-    @InjectRepository(Message) private userRepo: Repository<User>,
-    @InjectRepository(Message) private roomRepo: Repository<Room>,
+    @InjectRepository(User) private userRepo: Repository<User>,
+    @InjectRepository(Room) private roomRepo: Repository<Room>,
   ) {
     this.logger = new Logger(MessageService.name);
   }
-  
+
   async createMessage(data: Message) {
     try {
       const dto = plainToClass(CreateMessageDto, data);
       await validateOrReject(dto).catch((errors: ValidationError[]) => {
         throw new BadRequestException(errors);
-      });      
-  
+      });
+
       // const user = await this.userRepo.findOne(dto.user);
       // const room = await this.roomRepo.findOne(dto.room);
-  
+
       // if (!user || !room) {
       //   throw new BadRequestException('User or Room does not exist');
       // }
-  
+
       const message = new Message();
       message.text = dto.text;
       message.user = data.user; //replace after user check
       message.room = data.room;
-  
+
       return await this.messageRepo.save(message);
     } catch (error) {
       throw error;
-    }    
+    }
+  }
+
+  async getMessagesByRoom(roomName: string): Promise<Message[]> {
+    try {
+      const room = await this.roomRepo.findOne({
+        where: { name: roomName },
+        relations: ['messages'],
+      });
+      if (!room) {
+        throw new Error('Room not found');
+      }
+      return room.messages;
+    } catch (error) {
+      this.logger.log(error);
+      throw error;
+    }
   }
 }
