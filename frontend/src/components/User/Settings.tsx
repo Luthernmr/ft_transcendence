@@ -3,6 +3,7 @@ import { Text, Avatar, VStack, FormControl, FormLabel, HStack, Input, Switch, Bu
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import UserStats from "./Stats";
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
@@ -132,7 +133,7 @@ export default function Settings(props: any) {
 			<FormControl>
 				<HStack spacing={4} >
 					<Flex alignItems={'center'} flexDirection={'row'} >
-						<VStack>
+						<HStack>
 							<CircularProgress transform={"rotate(180deg)"} value={props?.user?.ratioToNextLevel} size={"3em"} color='teal.500' thickness={'15%'}>
 								<CircularProgressLabel transform={"rotate(0.5turn) translateX(50%) translatey(50%)"}>
 									<label htmlFor="avatar">
@@ -157,7 +158,8 @@ export default function Settings(props: any) {
 									</Box>
 								</CircularProgressLabel>
 							</CircularProgress>
-						</VStack>
+							<UserStats user={props.user} />
+						</HStack>
 
 					</Flex>
 					<input

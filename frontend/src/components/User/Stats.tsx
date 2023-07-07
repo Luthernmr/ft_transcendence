@@ -1,9 +1,28 @@
 import axios from "axios"
 import { useState, useEffect } from "react"
 import { Box, CircularProgress, CircularProgressLabel, Text, VStack } from "@chakra-ui/react";
-import { Chart, Line } from 'react-chartjs-2';
+import React from 'react';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
 import { ChartOptions } from 'chart.js';
-
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 interface Stats {
 	nbOfWin: number,
@@ -15,7 +34,7 @@ interface Stats {
 	winrate: number,
 
 }
-export default function UserStat(props: any) {
+export default function UserStats(props: any) {
 
 	const [stats, setStats] = useState<Stats>({
 		nbOfWin: 0,
@@ -72,18 +91,22 @@ export default function UserStat(props: any) {
 
 	const options: Partial<ChartOptions<'line'>> = {
 		scales: {
-			y: {
-				type: 'linear',
-				beginAtZero: true,
-			},
+		  y: {
+			type: 'linear',
+			beginAtZero: true,
+		  },
 		},
-	};
+	  };
+
+	  const LineChart = () => (
+		<div>
+		  <Line data={data} options={options} />
+		</div>
+	  );
 
 	return (
 		<Box borderWidth='1px' borderRadius='lg' p={4} m={4}>
-			<div>
-				<Line data={data} options={options} />
-			</div>
+			<LineChart/>
 			<VStack>
 				<Text>winrate</Text>
 				<CircularProgress value={40} color='green.400'>

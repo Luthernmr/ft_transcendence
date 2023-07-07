@@ -31,6 +31,8 @@ import MatchHistory from "./MatchHistory";
 import { BlockList } from "net";
 import BlockedList from "./BlockedList";
 import ProfilInfo from "./ProfileInfo";
+import UserStat from "./Stats";
+import UserStats from "./Stats";
 
 interface User {
 	id: number,
@@ -52,6 +54,8 @@ export default function UserProfile() {
 			flex={"1"}
 			direction={"column"}
 			maxH={"100%"}
+			overflowY="auto"
+
 		>
 			<Tabs variant="soft-rounded" >
 				<TabList mb="1em">
@@ -61,8 +65,7 @@ export default function UserProfile() {
 				</TabList>
 				<TabPanels >
 					<TabPanel>
-						<ProfilInfo user={currentUser} />
-						<Settings user={currentUser} />
+							<Settings user={currentUser} />
 					</TabPanel>
 					<TabPanel >
 						<Box borderWidth='1px' borderRadius='lg' p={4} m={4}
