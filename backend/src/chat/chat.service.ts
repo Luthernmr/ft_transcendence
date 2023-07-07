@@ -85,10 +85,10 @@ export class ChatService {
   @SubscribeMessage('sendMessage')
   async sendMessage(client: Socket, data: Message) {
     try {
-      await this.messageService.createMessage(data);
-      // data.room.users.forEach(async (element) => {
-      //   this.server.to(element.socketId).emit('newMessage', message);
-      // });
+      const message = await this.messageService.createMessage(data);
+      data.room.users.forEach(async (element) => {
+        this.server.to(element.socketId).emit('receiveMessage', message);
+      });
     } catch (error) {
       client.emit('error', { message: error.message });
     }

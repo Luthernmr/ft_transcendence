@@ -16,6 +16,9 @@ import { CreateRoomDto } from './dto/create-room.dto';
 
 @Injectable()
 export class RoomService {
+  findOne(roomId: any) {
+    throw new Error('Method not implemented.');
+  }
   private logger: Logger;
 
   constructor(
