@@ -10,32 +10,19 @@ export interface MatchHistory {
 	opponent: User,
 	winner: boolean,
 	myScore: number,
-	opponentScore: number
+	opponentScore: number,
+	customMode : boolean
 }
 
 export default function MatchHistory(props: any) {
-	const [matchHistorys, setMatchHistorys] = useState<MatchHistory[]>([])
-	useEffect(() => {
-		try {
-			const getHistory = async () => {
-				try {
-					const resp = await axios.get(
-						import.meta.env.VITE_BACKEND + "/user/history/" + props?.user?.id,
-						{
-							withCredentials: true,
-						}
-					);
-					setMatchHistorys(resp.data.history);
-				} catch (error) {
-					//console.log("error", error);
-				}
-			};
-			getHistory();
-		} catch (error) {
-			//console.log(error);
-		}
-	}, [props?.user?.id])
+	const [winCount, setWinCount] = useState(0)
+	const [looseCount, setLooseCount] = useState(0)
+	const [matchCount, setMatchCount] = useState(0)
 
+
+	useEffect (() => {
+		setMatchCount(matchHistorys.length)
+	})
 	function handleBg(issue: any) {
 		if (issue)
 			return ('#68b7a1')
@@ -44,7 +31,11 @@ export default function MatchHistory(props: any) {
 
 	function handleIssue(issue: any) {
 		if (issue)
+		{
+			setWinCount(winCount + 1)
 			return ('WIN')
+		}
+		setLooseCount(looseCount + 1)
 		return ('LOOSE')
 	}
 
@@ -65,7 +56,12 @@ export default function MatchHistory(props: any) {
 										<Text fontWeight={'thin'} fontSize={'2xl'} color={'yellow.300'}>{handleIssue(matchHistory?.winner)}</Text>
 										<Text fontSize={'4xl'} color={'white'}>{matchHistory?.myScore} - {matchHistory?.opponentScore} </Text>
 									</Flex>
-									<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>+15 XP</Text>
+									{matchHistory?.customMode &&
+									<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>GNOP GAME</Text>
+									}
+									{!matchHistory?.customMode &&
+									<Text fontWeight={'hairline'} fontSize={'2xl'} color={'white'}>NORMAL GAME</Text>
+									}
 								</Flex>
 							</CardBody>
 						</Card>

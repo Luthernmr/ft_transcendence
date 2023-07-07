@@ -5,6 +5,7 @@ import axios from "axios"
 import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
 import { User } from "./AllUserItem"
+import UserStat from "../User/Stats"
 
 export default function OtherProfilPage() {
 	const [user, setUser] = useState<User>();
@@ -37,6 +38,7 @@ export default function OtherProfilPage() {
 			>
 				<HStack>
 					<OtherProfilInfo user={user}/>
+					
 				</HStack>
 				<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}
 								sx={{

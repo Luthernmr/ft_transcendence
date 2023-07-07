@@ -14,7 +14,8 @@ interface History {
 	winner: boolean,
 	opponent: User,
 	myScore: number,
-	opponentScore: number
+	opponentScore: number,
+	customMode: boolean
 }
 
 @Injectable()
@@ -109,7 +110,7 @@ export class HistoryService {
 					id: true,
 					nickname: true,
 					imgPdp: true,
-					isOnline: true
+					isOnline: true,
 				}
 			}
 		});
@@ -120,7 +121,8 @@ export class HistoryService {
 				winner: historyA[i].winner === 1 ? true : false,
 				opponent: historyA[i].user2,
 				myScore: historyA[i].scoreUser1,
-				opponentScore: historyA[i].scoreUser2
+				opponentScore: historyA[i].scoreUser2,
+				customMode :  historyA[i].customMode
 			})
 		}
 
@@ -147,7 +149,9 @@ export class HistoryService {
 				winner: historyB[i].winner === 2 ? true : false,
 				opponent: historyB[i].user1,
 				myScore: historyB[i].scoreUser2,
-				opponentScore: historyB[i].scoreUser1
+				opponentScore: historyB[i].scoreUser1,
+				customMode :  historyB[i].customMode
+
 			})
 		}
 
