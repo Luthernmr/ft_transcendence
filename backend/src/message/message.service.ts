@@ -7,6 +7,8 @@ import { validateOrReject } from 'class-validator';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UserService } from 'src/user/user.service';
 import { RoomService } from 'src/room/room.service';
+import { User } from 'src/user/user.entity';
+import { Room } from 'src/room/entities/room.entity';
 
 @Injectable()
 export class MessageService {
@@ -16,6 +18,8 @@ export class MessageService {
     private readonly roomService: RoomService,
     private readonly userService: UserService,
     @InjectRepository(Message) private messageRepo: Repository<Message>,
+    @InjectRepository(Message) private userRepo: Repository<User>,
+    @InjectRepository(Message) private roomRepo: Repository<Room>,
   ) {
     this.logger = new Logger(MessageService.name);
   }
@@ -27,8 +31,8 @@ export class MessageService {
         throw new BadRequestException(errors);
       });      
   
-      // const user = await this.userService.findOne(dto.userId);
-      // const room = await this.roomService.findOne(dto.roomId);
+      // const user = await this.userRepo.findOne(dto.user);
+      // const room = await this.roomRepo.findOne(dto.room);
   
       // if (!user || !room) {
       //   throw new BadRequestException('User or Room does not exist');
@@ -39,7 +43,7 @@ export class MessageService {
       message.user = data.user; //replace after user check
       message.room = data.room;
   
-      await this.messageRepo.save(message);
+      return await this.messageRepo.save(message);
     } catch (error) {
       throw error;
     }    

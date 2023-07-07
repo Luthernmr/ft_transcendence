@@ -25,6 +25,14 @@ interface Room {
   users: User[];
 }
 
+interface Message {
+  id: string;
+  text: string;
+  created_at: Date;
+  room: Room;
+  user: User;
+}
+
 interface ChatRoomProps {
   setSelectedRoom: (room: any) => void;
   selectedRoom: Room;
@@ -34,8 +42,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   setSelectedRoom,
   selectedRoom,
 }) => {
-  const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
+  const currentUser: User = JSON.parse(
+    sessionStorage.getItem("currentUser") || "{}"
+  );
   const [messageContent, setMessageContent] = useState<string>("");
+  const [messages, setMessages] = useState<Message[]>([]);
   const toast = useToast();
 
   const handleSendMessage = (e: FormEvent) => {
@@ -51,31 +62,37 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     }
     chatSocket.emit("sendMessage", {
       text: messageContent,
-      room: selectedRoom.id,
-      user: currentUser.id,
+      room: selectedRoom,
+      user: currentUser,
     });
 
     setMessageContent("");
   };
 
   const handleError = (error: { message: string }) => {
-    console.log("Here", error)
+    console.log("Here", error);
     toast({
       title: error.message,
       status: "error",
       isClosable: true,
       position: "top",
     });
+  };
 
+  const handleReceiveMessage = (receivedMessage: Message) => {
+    setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+    console.log("Here :", messages)
   };
 
   React.useEffect(() => {
     chatSocket.on("error", handleError);
+    chatSocket.on("receiveMessage", handleReceiveMessage);
     return () => {
       chatSocket.off("error", handleError);
+      chatSocket.off("receiveMessage", handleReceiveMessage);
     };
   }, []);
-  
+
   return (
     <Flex
       borderRadius={"md"}
@@ -96,20 +113,22 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
         </Heading>
       </Flex>
       <VStack flex="1" spacing={4} align={"stretch"} overflowY={"auto"}>
-        {/* {messages.map((message) => (
+        {messages.map((message) => (
           <Box
             key={message.id}
-            bg={message.userId === 1 ? "teal.500" : "gray.200"}
-            color={message.userId === 1 ? "white" : "black"}
-            alignSelf={message.userId === 1 ? "flex-end" : "flex-start"}
+            bg={message.user.id === currentUser.id ? "teal.500" : "gray.200"}
+            color={message.user.id === currentUser.id ? "white" : "black"}
+            alignSelf={
+              message.user.id === currentUser.id ? "flex-end" : "flex-start"
+            }
             borderRadius="lg"
             p={2}
             maxWidth="80%"
             mt={2}
           >
-            <Text>{message.content}</Text>
+            <Text>{message.text}</Text>
           </Box>
-        ))} */}
+        ))}
       </VStack>
       <form onSubmit={handleSendMessage}>
         <InputGroup size="md">
