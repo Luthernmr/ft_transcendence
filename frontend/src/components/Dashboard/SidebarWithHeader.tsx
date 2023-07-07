@@ -103,7 +103,7 @@ interface SidebarProps extends BoxProps {
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Box
-      transition="3s ease"
+      transition="3s ease-in-out"
       bg={useColorModeValue("white", "gray.900")}
       borderRight="1px"
       borderRightColor={useColorModeValue("gray.200", "gray.700")}
@@ -127,6 +127,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           icon={link.icon}
           routeName={link.routeName}
           onClose={onClose}
+          onClick={onClose}
         >
           {link.name}
         </NavItem>
@@ -167,9 +168,6 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
           <Icon
             mr="4"
             fontSize="16"
-            // _roomHover={{
-            //   color: "white",
-            // }}
             as={icon}
           />
         )}
@@ -179,7 +177,7 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
   );
 };
 
-interface MobileProps extends FlexProps {
+export interface MobileProps extends FlexProps {
   onOpen: () => void;
 }
 
@@ -203,7 +201,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       });
       setUser(res.data.user);
       sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-      //console.log(sessionStorage.getItem("currentUser"));
     };
     getUser();
   }, []);
@@ -268,7 +265,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">{user.nickname}</Text>
+                  <Text fontSize="sm" fontWeight={'bold'}>{user.nickname}</Text>
                 </VStack>
                 <Box display={{ base: "none", md: "flex" }}>
                   <FiChevronDown />
@@ -279,7 +276,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue("white", "gray.900")}
               borderColor={useColorModeValue("gray.200", "gray.700")}
             >
-              <MenuItem as={RouteLink} to="/Settings">
+              <MenuItem as={RouteLink} to="/Profile">
                 Settings
               </MenuItem>
               <MenuDivider />

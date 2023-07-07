@@ -1,7 +1,7 @@
 /*
 https://docs.nestjs.com/controllers#controllers
 */
-import { Request, Response} from 'express';
+import { Request, Response } from 'express';
 import { BadRequestException, Body, Controller, Get, Param, Post, Req, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from './user.service';
@@ -11,6 +11,9 @@ import { User } from './user.entity';
 import { diskStorage } from 'multer';
 import { HistoryService } from 'src/pong/history.service';
 import { request } from 'http';
+import * as fs from 'fs';
+import { PongHistory } from 'src/pong/pongHistory.entity';
+
 
 @Controller('user')
 export class UserController {
@@ -41,17 +44,62 @@ export class UserController {
 	@UseGuards()
 	async history(@Res() response: Response, @Param('id') id: number) {
 		try {
-      //console.log('usi id request hystory', id);
+			//console.log('usi id request hystory', id);
 
-      const user: any = await this.userService.getUserById(id);
-      delete user.password;
-      const history: any = await this.historyService.getUserHistory(user);
-      //console.log('history', history);
-      response.send({ history: history });
-    } catch (error) {
+			const user: any = await this.userService.getUserById(id);
+			delete user.password;
+			const history: any = await this.historyService.getUserHistory(user);
+			console.log('history', history);
+			response.send({ history: history });
+		} catch (error) {
 			//console.log(error);
 		}
 	}
+
+	@Get('stats/:id')
+	@UseGuards()
+	async stats(@Res() response: Response, @Param('id') id: number) {
+		try {
+			//console.log('usi id request hystory', id);
+
+			const user: any = await this.userService.getUserById(id);
+			delete user.password;
+			const historys = await this.historyService.getUserHistory(user);
+			let nbOfGame = historys.length;
+			let nbOfWin = 0;
+			let nbOfLoose = 0;
+
+			let pointTab = [];
+			let oponentTab = [];
+			let matchList = [];
+			let winrate = 0;
+			for (let i = 0; i < historys.length; i++) {
+				matchList.push(i + 1);
+				pointTab.push(historys[i].myScore);
+				oponentTab.push(historys[i].opponentScore);
+				if (historys[i].winner)
+					nbOfWin++;
+				else
+					nbOfLoose++;
+			}
+			winrate = Math.round((nbOfWin/nbOfGame)*100)
+			const stats = ({
+				nbOfGame: nbOfGame,
+				nbOfWin: nbOfWin,
+				nbOfLoose: nbOfLoose,
+				pointTab: pointTab,
+				matchList : matchList,
+				oponentTab: oponentTab,
+				winrate : winrate
+			})
+			console.log('history', historys);
+
+			response.send({ stats: stats });
+		} catch (error) {
+			//console.log(error);
+		}
+	}
+
 
 	@Post('settings')
 	@UseGuards(JwtTwoFactorGuard)
@@ -64,11 +112,11 @@ export class UserController {
 			const user: any = request.user;
 			if (!user)
 				return ("no user");
-			this.userService.changeNickname(user, nickname);
-			return response.send({ user });
+			await this.userService.changeNickname(user, nickname);
+			response.send({ user });
 		} catch (error) {
 			//console.log(error)
-		} 
+		}
 	}
 
 	@Post('avatar')
@@ -88,31 +136,45 @@ export class UserController {
 			if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
 				return callback(null, false);
 			}
-			callback (null, true);
+			callback(null, true);
 		}
 	}))
 	async addAvatar(@Req() request: Request, @UploadedFile() file: Express.Multer.File) {
 		//console.log(file);
 		try {
-			if (!file)
+			if (!file) {
+				console.log(file)
 				throw new BadRequestException('File is not an image');
-			else
-			{
+			}
+			else {
 				const response = {
-					filePath : `http://212.227.209.204:5000/user/avatars/${file.filename}`
+					filePath: `http://212.227.209.204:5000/user/avatars/${file.filename}`
 				};
 				const user: any = request.user;
-				this.userService.changeImg(user, response.filePath)
+				console.log("oldpath", user.imgPdp)
+				if (user.imgPdp) {
+					const oldFilePath = user.imgPdp
+					let split = oldFilePath.split('/')
+					console.log(split);
+					try {
+						if (oldFilePath) {
+							fs.unlinkSync(`./uploadedFiles/${split[5]}`);
+						}
+					} catch (error) {
+						console.error('Erreur lors de la suppression de l\'ancienne image :', error);
+					}
+				}
+				await this.userService.changeImg(user, response.filePath);
 				return response
 			}
 		} catch (error) {
-			console .log(error)
+			console.log(error)
 		}
 	}
 
 	@Get('avatars/:filename')
-	async getPicture(@Param('filename') filename : any, @Res() res: Response){
-		res.sendFile(filename ,{root :'./uploadedFiles'})
+	async getPicture(@Param('filename') filename: any, @Res() res: Response) {
+		res.sendFile(filename, { root: './uploadedFiles' })
 	}
 
 }

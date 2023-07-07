@@ -6,6 +6,8 @@ import { userSocket } from "../../sockets/sockets";
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import BlockUserButton from "./BlockUserButton";
 import AddFriendButton from "./AddFriendButton";
+import PongInviteButton from "./PongInviteButton";
+import UserCard from "./UserCard";
 
 export interface User {
 	id: number;
@@ -26,72 +28,51 @@ export default function AllUserItem() {
 		userSocket.on('userList', (data) => {
 			setUsers(data)
 		})
+		userSocket.on('reloadLists', () => {
+			userSocket.emit('getAllUsers')
+			userSocket.emit('getFriends')
+		})
 		userSocket.emit('getAllUsers')
 
 	}, []);
 
-	return (
-		<List>
-			{users.map((user) => (
-				<Popover key={user.id}>
-					<Box >
-						<ListItem  >
-							<PopoverTrigger>
-								<Flex alignItems={'center'} _hover={{ bg: 'gray.200', cursor: 'pointer' }} padding={'2'} w={'100%'} borderRadius={'8'}>
-									<Avatar
-										name={user.nickname}
-										size="sm"
-										src={user.imgPdp}>
-										{user.isOnline &&
-											<AvatarBadge boxSize='1em' bg='green.500' />
-										}
-										{!user.isOnline &&
-											<AvatarBadge borderColor='papayawhip' bg='tomato' boxSize='1em' />
-										}
-									</Avatar>
-									<Box ml='2'>
-										<Text fontSize='sm' fontWeight='bold'>
-											{user.nickname}
-											{user.isOnline &&
-												<Badge ml='1' colorScheme='purple'>
-													inGame
-												</Badge>
-											}
-											{!user.isOnline &&
-												<Badge ml='1' colorScheme='red'>
-													offline
-												</Badge>
-											}
-										</Text>
-										<Text fontSize='xs'>Student</Text>
+	if (users)
+		return (
+			<List>
+				{users.map((user) => (
+					<Popover key={user.id} isLazy>
+						<Box >
+							<ListItem  >
+								<PopoverTrigger>
+									<Box>
+										<UserCard user={user} />
 									</Box>
-								</Flex>
-
-							</PopoverTrigger>
-						</ListItem>
-					</Box>
-					<Portal>
-						<PopoverContent>
-							<PopoverArrow />
-							<PopoverHeader>
-								<Button w={'100%'} as={RouteLink} to={'/profile/' + user.id} alignItems={'center'} _hover={{ bg: 'gray.200' }} p={2} borderRadius={5}>
-									<Text>
-										Visit<Text as='b' color="teal"> {user.nickname}</Text> profile
-									</Text>
-									<ChevronRightIcon />
-								</Button>
-							</PopoverHeader>
-							<PopoverCloseButton />
-							<PopoverBody>
-								<Flex justifyContent={'space-between'}>
-									<AddFriendButton user={user} />
-									<BlockUserButton user={user} />
-								</Flex>
-							</PopoverBody>
-						</PopoverContent>
-					</Portal>
-				</Popover>
-			))}
-		</List>
-	)
+								</PopoverTrigger>
+							</ListItem>
+						</Box>
+						<Portal>
+							<PopoverContent>
+								<PopoverArrow />
+								<PopoverHeader>
+									<Button w={'100%'} as={RouteLink} to={'/profile/' + user.id} alignItems={'center'} _hover={{ bg: 'gray.200' }} p={2} borderRadius={5}>
+										<Text>
+											Visit<Text as='b' color="teal"> {user.nickname}</Text> profile
+										</Text>
+										<ChevronRightIcon />
+									</Button>
+								</PopoverHeader>
+								<PopoverCloseButton />
+								<PopoverBody>
+									<Flex justifyContent={'space-between'}>
+										<AddFriendButton user={user} />
+										<BlockUserButton user={user} />
+										<PongInviteButton user={user} />
+									</Flex>
+								</PopoverBody>
+							</PopoverContent>
+						</Portal>
+					</Popover>
+				))}
+			</List>
+		)
 }

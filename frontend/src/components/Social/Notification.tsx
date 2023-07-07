@@ -20,11 +20,10 @@ import {
 	Stack,
 } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import {
-	FiBell,
-} from 'react-icons/fi';
+import { FiBell } from 'react-icons/fi';
 import { userSocket } from '../../sockets/sockets';
 import { useToast } from '@chakra-ui/react'
+import {useNavigate } from "react-router-dom"; 
 
 export interface FriendRequest {
 	id: number;
@@ -35,14 +34,30 @@ export interface FriendRequest {
 
 
 const PendingRequest = () => {
-	
+	const navigate = useNavigate()
 	const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
 	const toast = useToast()
 	useEffect(() => {
-		userSocket.on("notifyRequest", () => {
-      //console.log('notified')
-      userSocket.emit("getPendingRequest");
-    });
+		userSocket.on('notifyRequest', () => {
+			// console.log('notified')
+			userSocket.emit('getPendingRequest')
+		})
+		
+		userSocket.on('pendingRequestsList', (data) => {
+			setFriendRequests(data);
+		})
+		userSocket.on('requestAcccepted', () => {
+			userSocket.emit('getPendingRequest')
+		})
+
+		userSocket.on('duelAcccepted', () => {
+			userSocket.emit('getPendingRequest')
+			navigate('/play')
+		})
+		userSocket.on('requestRejected', () => {
+			userSocket.emit('getPendingRequest')
+		})
+		userSocket.emit('getPendingRequest')
 
     userSocket.on("pendingRequestsList", (data) => {
       setFriendRequests(data);
@@ -74,12 +89,15 @@ const PendingRequest = () => {
 		})
 	}, []);
 
-	const handleAccept = async (id: number) => {
-		userSocket.emit('acceptFriendRequest', { requestId: id })
+	const handleAccept = async (id: number, type: string) => {
+		if (type == "Friend")
+			userSocket.emit('acceptFriendRequest', { requestId: id })
+		if (type == "Pong")
+			userSocket.emit('acceptPongRequest', { requestId: id })
 	}
 	
 	const handleReject = async (id: number) => {
-		userSocket.emit('rejectFriendRequest', { requestId: id })
+		userSocket.emit('rejectRequest', { requestId: id })
 	}
 	return (
 		<Box>
@@ -103,7 +121,7 @@ const PendingRequest = () => {
 									<Text><Text as='b'>{friendRequest.senderNickname}</Text> send you a {friendRequest.type} Request </Text>
 								</Flex>
 								<Stack spacing={2} direction='row' align='center'>
-									<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id)} >Accepter</Button>
+									<Button colorScheme='twitter' size='sm' onClick={() => handleAccept(friendRequest.id, friendRequest.type)} >Accepter</Button>
 									<Button colorScheme='gray' onClick={() => handleReject(friendRequest.id)} size='sm'>Rejeter</Button>
 								</Stack>
 							</Flex>

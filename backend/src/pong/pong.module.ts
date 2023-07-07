@@ -10,6 +10,6 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
 	imports: [TypeOrmModule.forFeature([PongHistory]), UserModule, AuthModule],
 	providers: [PongGateway, PongService, HistoryService],
-	exports: [TypeOrmModule, HistoryService]
+	exports: [TypeOrmModule, HistoryService, PongService]
 })
 export class PongModule {}

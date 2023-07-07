@@ -30,7 +30,9 @@ import Settings from "./Settings";
 import MatchHistory from "./MatchHistory";
 import { BlockList } from "net";
 import BlockedList from "./BlockedList";
-import ProfilInfo from "../Social/OtherUserInfo";
+import ProfilInfo from "./ProfileInfo";
+import UserStat from "./Stats";
+import UserStats from "./Stats";
 
 interface User {
 	id: number,
@@ -48,8 +50,12 @@ export default function UserProfile() {
 			borderRadius={"md"}
 			bg={"white"}
 			padding={"15px"}
+			minHeight={"100%"}
 			flex={"1"}
 			direction={"column"}
+			maxH={"100%"}
+			overflowY="auto"
+
 		>
 			<Tabs variant="soft-rounded" >
 				<TabList mb="1em">
@@ -59,11 +65,24 @@ export default function UserProfile() {
 				</TabList>
 				<TabPanels >
 					<TabPanel>
-						<Settings user={currentUser}/>
+							<Settings user={currentUser} />
 					</TabPanel>
 					<TabPanel >
-						<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"scroll"} >
+						<Box borderWidth='1px' borderRadius='lg' p={4} m={4}
+							overflowY="scroll"
+							sx={{
+								'&::-webkit-scrollbar': {
+									width: '5px',
+									borderRadius: '8px',
+									backgroundColor: `rgba(0, 0, 0, 0.05)`,
+								},
+								'&::-webkit-scrollbar-thumb': {
+									backgroundColor: `teal`,
+									borderRadius: '8px',
+								},
+							}}>
 							<MatchHistory user={currentUser} />
+
 						</Box>
 					</TabPanel>
 					<TabPanel>

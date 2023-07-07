@@ -41,58 +41,51 @@ export default function loginCard() {
 	const handleSubmit = async (event: any) => {
 		event.preventDefault();
 		try {
-      const response = await axios.post(
-        import.meta.env.VITE_BACKEND + "/api/login",
-        {
-          email: formValue.email,
-          password: formValue.password,
-        },
-        { withCredentials: true }
-      );
-      if (response.data.token) {
-        sessionStorage.setItem("jwt", response.data.token);
-        if (sessionStorage.getItem("jwt")) {
-          userSocket.auth = { token: response.data.token };
-          chatSocket.auth = { token: response.data.token };
-          pongSocket.auth = { token: response.data.token };
-          chatSocket.disconnect().connect();
-          userSocket.disconnect().connect();
-          pongSocket.disconnect().connect();
-          navigate("/home");
-          //pongSocket.emit("register", { token: response.data.token });
-        }
-      }
-      if (!response.data) {
-        onOpen();
-      }
-      //console.log(response.data.status);
-      if (response.data.status == 401 || response.data.status == 400) {
-        toast({
-          title: `invalid login , do you have an account ?`,
-          status: "error",
-          isClosable: true,
-          position: "top",
-        });
-      }
-    } catch (error) {
-      toast({
-        title: `Empty information`,
-        status: "error",
-        isClosable: true,
-        position: "top",
-      });
-      //console.log(error);
-    }
+			const response = await axios.post(
+				import.meta.env.VITE_BACKEND + "/api/login",
+				{
+					email: formValue.email,
+					password: formValue.password,
+				},
+				{ withCredentials: true }
+			);
+			if (response.data.token) {
+				sessionStorage.setItem("jwt", response.data.token);
+				if (sessionStorage.getItem("jwt")) {
+					userSocket.auth = { token: response.data.token };
+					chatSocket.auth = { token: response.data.token };
+					pongSocket.auth = { token: response.data.token };
+					chatSocket.disconnect().connect();
+					userSocket.disconnect().connect();
+					pongSocket.disconnect().connect();
+					navigate("/home");
+				}
+			}
+			if (!response.data) {
+				onOpen();
+			}
+			if (response.data.status == 401 || response.data.status == 400) {
+				toast({
+					title: response.data.message,
+					status: "error",
+					isClosable: true,
+					position: "top",
+				});
+			}
+		} catch (error) {
+			toast({
+				title: `Empty information`,
+				status: "error",
+				isClosable: true,
+				position: "top",
+			});
+		}
 	};
 
 	const connectAPI = async () => {
 		window.location.href = import.meta.env.VITE_42AUTH;
 	}
-	const [pinCode, setPinCode] = useState("");
-
 	const { isOpen, onOpen, onClose } = useDisclosure();
-
-	
 
 	return (
 		<form onSubmit={handleSubmit}>
@@ -137,10 +130,10 @@ export default function loginCard() {
 					</Box>
 				</Stack>
 			</Flex>
-		<Modal onClose={onClose} isOpen={isOpen} isCentered>
-			<TwoFA />
-		</Modal>
-			
+			<Modal onClose={onClose} isOpen={isOpen} isCentered>
+				<TwoFA />
+			</Modal>
+
 		</form>
 
 	)

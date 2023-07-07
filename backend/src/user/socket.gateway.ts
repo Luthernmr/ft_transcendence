@@ -10,6 +10,7 @@ import { FriendService } from 'src/social/friend.service';
 import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
 import { BadRequestException } from '@nestjs/common';
+import { PongService } from 'src/pong/pong.service';
 
 //console.log("Websocket: " + process.env.FRONTEND);
 
@@ -21,6 +22,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
 		private readonly friendService: FriendService,
+		private readonly pongService: PongService,
 
 	) { }
 
@@ -30,6 +32,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		if (user) {
 			user = await this.userService.setSocket(user.id, client.id);
 			await this.userService.setOnline(user);
+			this.server.emit('reloadLists')
 		}
 	}
 
@@ -39,6 +42,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		//console.log('use on deconnexion:', user)
 		if (user) {
 			await this.userService.setOffline(user);
+			this.server.emit('reloadLists')
 		}
 	}
 
@@ -52,46 +56,74 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 	}) {
 		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
-
-		const otherId = userReceiv.socketId;
 		try {
-      const alreadyExist = await this.friendService.getRelation(
-        userSender,
-        userReceiv,
-      );
-      //console.log('relation', alreadyExist);
-      if (alreadyExist != null)
-        throw new BadRequestException(
-          'Request already exists for this person.',
-        );
-      if (userReceiv.id == userSender.id)
-        throw new BadRequestException('can t send request');
-      await this.userService.createPendingRequest({
-        type: 'Friend',
-        senderId: userSender.id,
-        senderNickname: userSender.nickname,
-        senderPdp: userSender.imgPdp,
-        user: userReceiv,
-      });
+			const alreadyExist = await this.friendService.getRelation(userSender, userReceiv)
+			// console.log('relation', alreadyExist);
+			if (alreadyExist != null)
+				throw new BadRequestException('Alreedy friend.');
+			if (userReceiv.id == userSender.id)
+				throw new BadRequestException('can t send request');
+			await this.userService.createPendingRequest({
+				type: "Friend",
+				senderId: userSender.id,
+				senderNickname: userSender.nickname,
+				senderPdp: userSender.imgPdp,
+				user: userReceiv
+			})
+			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
+			otherSocket.emit('notifyRequest');
+			client.emit('sendSuccess');
+		}
+		catch (error) {
+			// console.log(error)
+			client.emit('alreadyFriend');
+		}
+	}
 
-      const socketMap = this.server.sockets;
-      //console.log('here', socketMap);
-      const otherSocket = await this.authService.getUserSocket(
-        this.server,
-        userReceiv.id,
-      );
-      //console.log('her2');
-      //for (const socket of sockets) {
-      //	const socketToken = socket?.handshake?.auth?.token;
-      	//console.log(socketToken)
-      //}
+	@SubscribeMessage('PongRequest')
+	async PongRequest(client: Socket, data: {
+		userReceiveId: any,
+	}) {
+		const userSender: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		const userReceiv: User = await this.userService.getUserById(data.userReceiveId)
+		try {
+			if (userReceiv.id == userSender.id)
+				throw new BadRequestException('can t send request');
+			await this.userService.createPendingRequest({
+				type: "Pong",
+				senderId: userSender.id,
+				senderNickname: userSender.nickname,
+				senderPdp: userSender.imgPdp,
+				user: userReceiv
+			})
+			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
+			otherSocket.emit('notifyRequest');
+			client.emit('sendSuccess');
+		}
+		catch (error) {
+			 console.log(error)
+			client.emit('alreadyFriend');
+		}
+	}
 
-      otherSocket.emit('notifyRequest');
-      client.emit('sendSuccess');
-    } catch (error) {
-      //console.log(error)
-      client.emit('alreadyFriend');
-    }
+	@SubscribeMessage('acceptPongRequest')
+	async acceptPongRequest(client: Socket, data: {
+		requestId: any,
+	}) {
+		try {
+			const currentUser: any = await this.authService.getUserByToken(client.handshake.auth.token);
+			const request: any = await this.userService.getPendingRequestById(data.requestId);
+			this.pongService.AcceptInvitation(currentUser?.id, request?.senderId);
+			const otherSocket = await this.authService.getUserSocket(this.server, request.senderId)
+
+			client.emit('duelAcccepted')
+			otherSocket.emit('duelAcccepted')
+			await this.userService.deletePendingRequestById(request);
+
+		}
+		catch (error) {
+			console.log(error)
+		}
 	}
 
 	@SubscribeMessage('acceptFriendRequest')
@@ -120,8 +152,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		}
 	}
 
-	@SubscribeMessage('rejectFriendRequest')
-	async rejectFriendRequest(client: Socket, data: {
+	@SubscribeMessage('rejectRequest')
+	async rejectRequest(client: Socket, data: {
 		requestId: any,
 	}) {
 		try {
