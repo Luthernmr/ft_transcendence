@@ -60,7 +60,7 @@ export class ChatService {
       });
       this.server.emit('roomCreated');
     } catch (error) {
-      this.server.emit('error', { message: error.message });
+      client.emit('error', { message: error.message });
     }
   }
 
@@ -90,8 +90,7 @@ export class ChatService {
       //   this.server.to(element.socketId).emit('newMessage', message);
       // });
     } catch (error) {
-      this.logger.log(error);
-      this.server.emit('error1', { message: error.message });
+      client.emit('error', { message: error.message });
     }
   }
 }

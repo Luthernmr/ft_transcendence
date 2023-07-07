@@ -38,6 +38,7 @@ export default function OtherProfilPage() {
 			>
 				<HStack>
 					<OtherProfilInfo user={user}/>
+					<UserStat user={user} />
 					
 				</HStack>
 				<Box borderWidth='1px' borderRadius='lg' p={4} m={4} overflowY={"auto"}

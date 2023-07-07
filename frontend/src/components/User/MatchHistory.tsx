@@ -15,14 +15,26 @@ export interface MatchHistory {
 }
 
 export default function MatchHistory(props: any) {
-	const [winCount, setWinCount] = useState(0)
-	const [looseCount, setLooseCount] = useState(0)
-	const [matchCount, setMatchCount] = useState(0)
+	const [matchHistorys, setMatchHistorys] = useState<MatchHistory[]>([])
+	useEffect(() => {
+		try {
+			const getHistory = async () => {
+				try {
+					const resp = await axios.get(
+						import.meta.env.VITE_BACKEND + "/user/history/" + props?.user?.id,
+						{
+							withCredentials: true,
+						}
+					);
+					setMatchHistorys(resp.data.history);
+				} catch (error) {
+				}
+			};
+			getHistory();
+		} catch (error) {
+		}
+	}, [props?.user?.id])
 
-
-	useEffect (() => {
-		setMatchCount(matchHistorys.length)
-	})
 	function handleBg(issue: any) {
 		if (issue)
 			return ('#68b7a1')
@@ -32,10 +44,8 @@ export default function MatchHistory(props: any) {
 	function handleIssue(issue: any) {
 		if (issue)
 		{
-			setWinCount(winCount + 1)
 			return ('WIN')
 		}
-		setLooseCount(looseCount + 1)
 		return ('LOOSE')
 	}
 

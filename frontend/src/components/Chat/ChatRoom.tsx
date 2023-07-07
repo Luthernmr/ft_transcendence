@@ -58,7 +58,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     setMessageContent("");
   };
 
-  const handleError = (error: { message: any }) => {
+  const handleError = (error: { message: string }) => {
     console.log("Here", error)
     toast({
       title: error.message,
@@ -66,11 +66,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
       isClosable: true,
       position: "top",
     });
-    chatSocket.off("error1", handleError);
+
   };
 
-  chatSocket.on("error1", handleError);
-
+  React.useEffect(() => {
+    chatSocket.on("error", handleError);
+    return () => {
+      chatSocket.off("error", handleError);
+    };
+  }, []);
+  
   return (
     <Flex
       borderRadius={"md"}
