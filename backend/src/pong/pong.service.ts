@@ -154,7 +154,6 @@ export interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRunt
 export enum PongState {
 	Load,
 	Home,
-	Queue,
 	Play,
 	Watch,
 }
@@ -348,13 +347,17 @@ export class PongService {
 
 		const queueInfos = this.UserInQueue(this.userInfos[currentPlayerInfoIndex].userId);
 		if (queueInfos.index >= 0) {
-			//console.log("user already in queue");
-			return;
+			if (queueInfos.custom === custom) {
+				console.log("user already in queue");
+				return;
+			} else {
+				this.LeaveQueue(currentPlayerInfoIndex);
+			}
 		}
 
-    const pendingPlayersArray = custom ? this.queueClassic : this.queueCustom;
+    const pendingPlayersArray = custom ? this.queueCustom : this.queueClassic;
 
-    //console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
+    console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
 
 		if (pendingPlayersArray.length >= 1) {
 			const opponentInfoIndex = pendingPlayersArray[0];
@@ -383,7 +386,7 @@ export class PongService {
 
 		const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
 		queueArray.splice(queueInfos.index, 1);
-		//console.log("User removed from the queue");
+		console.log("User removed from the queue");
 	}
 
 	GetRuntimeIndex(userIndex: UserInfosIndex) : number {
@@ -425,24 +428,21 @@ export class PongService {
 	}
 
 	GetGameState(socket: Socket) : GameDatas {
-		const userInNormalQueue = this.queueClassic.findIndex(data => this.userInfos[data].socket === socket);
-		const userInCustomQueue = this.queueCustom.findIndex(data => this.userInfos[data].socket === socket);
-
-		if (userInNormalQueue >= 0)
-			return { 	pongState: PongState.Queue,
-						payload: 0 };
-		else if (userInCustomQueue >= 0)
-			return { 	pongState: PongState.Queue,
-						payload: 1 };
-
 		const userInGame = this.FindIndexBySocketId(socket.id);
 
 		if (userInGame >= 0)
 			return { 	pongState: PongState.Play,
 						payload: this.GetCurrentGameDatas(socket, userInGame) };
 
+		
+		const userIndex = this.userInfos.findIndex(data => data.socket === socket);
+		const queueInfos = this.UserInQueue(this.userInfos[userIndex].userId);
+				
 		return { 	pongState: PongState.Home,
-					payload: null };
+					payload: {
+						pongQueue: queueInfos.index >= 0 ? queueInfos.custom === false : false,
+						gnopQueue: queueInfos.index >= 0 ? queueInfos.custom === true : false
+					} };
 	}
 
 	GetCurrentGameDatas(socket: Socket, index: number) : PongInitData {

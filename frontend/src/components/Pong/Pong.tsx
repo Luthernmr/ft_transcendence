@@ -14,6 +14,8 @@ function Pong() {
   const [pongState, setPongState] = useState<PongState>(PongState.Load);
   const [size, setSize] = useState(1);
 
+  const pongQueueOnInit = useRef<boolean>(false);
+  const gnopQueueOnInit = useRef<boolean>(false);
   const watching = useRef<boolean>(false);
 
   const [initDatas, setInitDatas] = useState<PongInitData>({
@@ -60,11 +62,16 @@ function Pong() {
     }
 
     function GameState(datas: any) {
-      setPongState(datas.pongState);
-
-      if (datas.pongState === PongState.Play) {
+      if (datas.pongState === PongState.Home) {
+        pongQueueOnInit.current = datas.payload.pongQueue;
+        gnopQueueOnInit.current = datas.payload.gnopQueue;
+      } else if (datas.pongState === PongState.Play) {
+        pongQueueOnInit.current = false;
+        gnopQueueOnInit.current = false;
         setInitDatas(datas.payload);
       }
+
+      setPongState(datas.pongState);
     }
 
     pongSocket.on('Init', Init);
@@ -108,11 +115,6 @@ function Pong() {
     }
   }, []);
 
-  const JoinQueue = (custom: boolean) => {
-    pongSocket.emit('queue', { custom: custom });
-    setPongState(PongState.Queue);
-  }
-
   const WatchGame = () => {
     pongSocket.emit('watch');
   }
@@ -123,11 +125,7 @@ function Pong() {
     )
   } else if (pongState === PongState.Home) {
     return (
-      <HomeScreen JoinPong={() => JoinQueue(false)} JoinGnop={() => JoinQueue(true)} WatchGame={WatchGame} />
-    )
-  } else if (pongState === PongState.Queue) {
-    return (
-      <QueueScreen leaveQueue={() => setPongState(PongState.Home)}/>
+      <HomeScreen pongQueue={pongQueueOnInit.current} gnopQueue={gnopQueueOnInit.current} WatchGame={WatchGame} />
     )
   } else if (pongState === PongState.Play || pongState === PongState.Watch) {
     return (
