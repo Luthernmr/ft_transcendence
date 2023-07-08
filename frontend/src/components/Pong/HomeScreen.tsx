@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Button, Center } from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Spacer } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import QueueWidget from './QueueWidget';
+import Matches from './Matches';
 
 interface HomeScreenProps {
 	pongQueue: boolean,
@@ -36,8 +37,23 @@ function HomeScreen(props: HomeScreenProps) {
 	
 	return (
 		<>
-			<QueueWidget joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
-			<QueueWidget joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+			<Flex direction='column'>
+				<Flex direction='row' basis='content'>
+					<Box bg='blue.100'>
+						<Flex direction='column'>
+							<Text align='center'>PONG</Text>
+							<QueueWidget joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+						</Flex>
+					</Box>
+					<Box bg='red.100'>
+						<Flex direction='column'>
+							<Text align='center'>GNOP</Text>
+							<QueueWidget joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+						</Flex>
+					</Box>
+				</Flex>
+				<Matches />
+			</Flex>
 			{/* <Button onClick={ props.JoinPong }>
 				Join PONG Queue
 			</Button>
