@@ -26,18 +26,18 @@ export default function App() {
 
 	const navigate = useNavigate();
 
-	userSocket.on("ping", () => {
-    //console.log("pinged");
-    userSocket.emit("pong");
-  });
+// 	userSocket.on("ping", () => {
+//     //console.log("pinged");
+//     userSocket.emit("pong");
+//   });
 
-  pongSocket.on("connect", () => {
-    //console.log("pong socket connecting");
-  });
+//   pongSocket.on("connect", () => {
+//     //console.log("pong socket connecting");
+//   });
 
-  chatSocket.on("connect", () => {
-    //console.log("chat socket connect");
-  });
+//   chatSocket.on("connect", () => {
+//     //console.log("chat socket connect");
+//   });
 
 	return (
 		<Routes>

@@ -121,7 +121,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
           {selectedRoom.name}
         </Heading>
       </Flex>
-      <VStack flex="1" spacing={4} align={"stretch"} overflowY={"auto"}>
+      <VStack marginY={"10px"}flex="1" spacing={4} align={"stretch"} overflowY={"auto"}>
         {messages.map((message) => (
           <Box
             key={message.id}

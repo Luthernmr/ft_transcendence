@@ -9,35 +9,41 @@ import { User } from './user.entity';
 import { FriendService } from 'src/social/friend.service';
 import 'dotenv/config'
 import { AuthService } from 'src/auth/auth.service';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Logger } from '@nestjs/common';
 import { PongService } from 'src/pong/pong.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
+import { ChatService } from 'src/chat/chat.service';
 
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
 	@WebSocketServer()
 	server: Server;
+	private logger: Logger;
 	constructor(
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
 		private readonly friendService: FriendService,
 		private readonly pongService: PongService,
 
-	) { }
+	) {     this.logger = new Logger(ChatService.name);}
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
+		// console.log("USER Socket ID: ", client.id);
 		if (user) {
-			user = await this.userService.setSocket(user.id, client.id);
-			await this.userService.setOnline(user);
+			// user = await this.userService.setSocket(user.id, client.id);
+			// await this.userService.setOnline(user);
 			this.server.emit('reloadLists')
 		}
+		else	
+			client.disconnect();
 	}
 
 	async handleDisconnect(client: Socket) {
 
 		const user: User = await this.authService.getUserByToken(client.handshake.auth.token)
 		if (user) {
+			
 			await this.userService.setOffline(user);
 			this.server.emit('reloadLists')
 		}

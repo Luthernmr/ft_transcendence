@@ -215,7 +215,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       //console.log("jwwwr", sessionStorage.getItem("jwt"));
     } catch (error) {}
   };
-  ``;
 
   return (
     <Flex

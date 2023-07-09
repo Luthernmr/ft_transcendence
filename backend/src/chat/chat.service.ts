@@ -36,6 +36,11 @@ export class ChatService {
   }
 
   async handleDisconnect(socket: Socket) {
+    //CLearing SocketId from User on disconnect
+    let user: User = await this.authService.getUserByToken(
+      socket.handshake.auth.token,
+    );
+    await this.userService.setSocket(user?.id,'');
     this.logger.log('id: ' + socket.id + ' disconnected');
   }
 
@@ -45,6 +50,7 @@ export class ChatService {
       client.handshake.auth.token,
     );
     if (user) {
+      
       user = await this.userService.setSocket(user.id, client.id);
       await this.userService.setOnline(user);
     }
@@ -87,6 +93,7 @@ export class ChatService {
     try {
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
+        console.log("Sending to : ", element.socketId);
         this.server.to(element.socketId).emit('receiveMessage', message);
       });
     } catch (error) {
