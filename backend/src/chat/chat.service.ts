@@ -111,7 +111,7 @@ export class ChatService {
   async getRoomMessages(client: Socket, room: Room) {
     try {
       const messages = await this.messageService.getMessagesByRoom(room.name);
-      // console.log('Room messages are :', messages)
+      //console.log('Room messages are :', messages)
       client.emit('roomMessages', messages);
     } catch (error) {
       client.emit('error', { message: error.message });
