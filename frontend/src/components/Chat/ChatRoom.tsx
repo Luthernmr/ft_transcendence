@@ -69,7 +69,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   };
 
   const handleError = (error: { message: string }) => {
-    console.log("Here", error);
+    // console.log("Here", error);
     toast({
       title: error.message,
       status: "error",
@@ -80,14 +80,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
   const handleReceiveMessage = (receivedMessage: Message) => {
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-    console.log("Here :", messages);
+    // console.log("Here :", messages);
   };
 
   React.useEffect(() => {
     chatSocket.emit("getRoomMessages", selectedRoom);
 
     const handleRoomMessages = (roomMessages: Message[]) => {
-      console.log(roomMessages);
+      // console.log(roomMessages);
       setMessages(roomMessages);
     };
 

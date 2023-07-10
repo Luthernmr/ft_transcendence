@@ -70,8 +70,8 @@ export class AuthService {
     }
 		if (otherSocket)
 			return (otherSocket)
-		else
-			throw new BadRequestException("no user found") 
+		// else
+		// 	throw new BadRequestException("no user found") 
 	  }
 
 	async logout(request: Request, response: Response) {

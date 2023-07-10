@@ -25,7 +25,7 @@ export class ChatService {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly messageService: MessageService,
-    private readonly gateway: GlobalGateway
+    private readonly gateway: GlobalGateway,
   ) {
     this.logger = new Logger(ChatService.name);
   }
@@ -39,10 +39,10 @@ export class ChatService {
 
   async handleDisconnect(socket: Socket) {
     //CLearing SocketId from User on disconnect
-    let user: User = await this.authService.getUserByToken(
-      socket.handshake.auth.token,
-    );
-    await this.userService.setSocket(user?.id,'');
+    // let user: User = await this.authService.getUserByToken(
+    //   socket.handshake.auth.token,
+    // );
+    // await this.userService.setSocket(user?.id, '');
     this.logger.log('id: ' + socket.id + ' disconnected');
   }
 
@@ -52,7 +52,6 @@ export class ChatService {
       client.handshake.auth.token,
     );
     if (user) {
-      
       user = await this.userService.setSocket(user.id, client.id);
       await this.userService.setOnline(user);
     }
@@ -64,7 +63,9 @@ export class ChatService {
       await this.roomService.createRoom(client, data);
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
-        this.gateway.chatNamespace.to(element.socketId).emit('roomList', rooms.rooms);
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('roomList', rooms.rooms);
       });
       this.gateway.chatNamespace.emit('roomCreated');
     } catch (error) {
@@ -95,8 +96,11 @@ export class ChatService {
     try {
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
-        console.log("Sending to : ", element.socketId, element.nickname);
-        this.gateway.chatNamespace.to(element.socketId).emit('receiveMessage', message);
+        const otherSocket = await this.authService.getUserSocket(
+          this.gateway.chatNamespace,
+          element.id,
+        );
+        if (otherSocket) otherSocket.emit('receiveMessage', message);
       });
     } catch (error) {
       client.emit('error', { message: error.message });
