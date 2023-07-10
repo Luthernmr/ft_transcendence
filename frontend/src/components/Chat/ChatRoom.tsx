@@ -132,6 +132,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
         spacing={4}
         align={"stretch"}
         overflowY={"auto"}
+        padding={"15px"}
       >
         {messages.map((message) => (
           <Box
