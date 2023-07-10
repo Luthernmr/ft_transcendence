@@ -169,7 +169,8 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
                       size="sm"
                       name={message.user.nickname}
                       src={message.user.imgPdp}
-                    />{" "}
+                      _hover={{ boxShadow: '0 0 0 3px teal' }}
+                    />
                     <Text ml={2}>{message.user?.nickname}</Text>
                   </Flex>
                 </PopoverTrigger>

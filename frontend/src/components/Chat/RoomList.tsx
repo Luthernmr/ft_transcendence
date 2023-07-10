@@ -120,7 +120,14 @@ const RoomList: React.FC<RoomListProps> = ({
       >
         {rooms?.length > 0 ? (
           rooms.map((room, index) => (
-            <Box h={"40px"} key={index} onClick={() => handleRoomClick(room)}>
+            <Box
+              h={"40px"}
+              key={index}
+              onClick={() => handleRoomClick(room)}
+              _hover={{
+                transform: "translateY(-2px) scale(0.99)",
+              }}
+            >
               <HStack>
                 <AvatarGroup size={"md"} max={3}>
                   {room?.users?.map((user: User) => (
