@@ -85,7 +85,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   @SubscribeMessage('quit')
   handleQuit(@ConnectedSocket() socket: Socket) {
     const opponentSocket = this.pongService.UserQuit(socket);
-    opponentSocket.emit('OpponentQuit');
+    opponentSocket?.emit('OpponentQuit');
   }
 
   @SubscribeMessage('keydown')

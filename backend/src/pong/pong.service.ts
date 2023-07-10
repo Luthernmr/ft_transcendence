@@ -68,10 +68,24 @@ enum FrontGameState {
 	Finished
 }
 
+interface UserDatas {
+	nickname: string,
+	imgPdp: string,
+	level: number
+}
+
 export interface PongInitData extends GameLayout, Score {
 	playerNumber: number,
 	gameState: FrontGameState,
 	winner: number,
+	user1Datas: UserDatas,
+	user2Datas: UserDatas
+}
+
+const BASE_USER_DATAS: UserDatas = {
+	nickname: "",
+	imgPdp: "",
+	level: 0
 }
 
 const BASE_INIT_DATAS: PongInitData = {
@@ -81,6 +95,8 @@ const BASE_INIT_DATAS: PongInitData = {
 	paddleHeight: PADDLE_HEIGHT,
 	scoreP1: 0,
 	scoreP2: 0,
+	user1Datas: BASE_USER_DATAS,
+	user2Datas: BASE_USER_DATAS,
 	playerNumber: 1,
 	gameState: FrontGameState.Playing,
 	winner: 0
@@ -117,7 +133,9 @@ const CUSTOM_INIT_DATAS = { ...BASE_INIT_DATAS, ...CUSTOM_ENTITIES }
 
 export interface UserPair {
 	indexUser1: number,
-	indexUser2: number
+	indexUser2: number,
+	user1Datas: UserDatas,
+	user2Datas: UserDatas
 }
 
 export interface BallRuntimeData {
@@ -154,7 +172,6 @@ export interface WatcherInitDatas extends GameLayout, PongInitEntities, BallRunt
 export enum PongState {
 	Load,
 	Home,
-	Queue,
 	Play,
 	Watch,
 }
@@ -348,13 +365,17 @@ export class PongService {
 
 		const queueInfos = this.UserInQueue(this.userInfos[currentPlayerInfoIndex].userId);
 		if (queueInfos.index >= 0) {
-			//console.log("user already in queue");
-			return;
+			if (queueInfos.custom === custom) {
+				console.log("user already in queue");
+				return;
+			} else {
+				this.LeaveQueue(currentPlayerInfoIndex);
+			}
 		}
 
-    const pendingPlayersArray = custom ? this.queueClassic : this.queueCustom;
+    const pendingPlayersArray = custom ? this.queueCustom : this.queueClassic;
 
-    //console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
+    console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
 
 		if (pendingPlayersArray.length >= 1) {
 			const opponentInfoIndex = pendingPlayersArray[0];
@@ -383,7 +404,7 @@ export class PongService {
 
 		const queueArray = queueInfos.custom ? this.queueCustom : this.queueClassic;
 		queueArray.splice(queueInfos.index, 1);
-		//console.log("User removed from the queue");
+		console.log("User removed from the queue");
 	}
 
 	GetRuntimeIndex(userIndex: UserInfosIndex) : number {
@@ -425,24 +446,21 @@ export class PongService {
 	}
 
 	GetGameState(socket: Socket) : GameDatas {
-		const userInNormalQueue = this.queueClassic.findIndex(data => this.userInfos[data].socket === socket);
-		const userInCustomQueue = this.queueCustom.findIndex(data => this.userInfos[data].socket === socket);
-
-		if (userInNormalQueue >= 0)
-			return { 	pongState: PongState.Queue,
-						payload: 0 };
-		else if (userInCustomQueue >= 0)
-			return { 	pongState: PongState.Queue,
-						payload: 1 };
-
 		const userInGame = this.FindIndexBySocketId(socket.id);
 
 		if (userInGame >= 0)
 			return { 	pongState: PongState.Play,
 						payload: this.GetCurrentGameDatas(socket, userInGame) };
 
+		
+		const userIndex = this.userInfos.findIndex(data => data.socket === socket);
+		const queueInfos = this.UserInQueue(this.userInfos[userIndex].userId);
+				
 		return { 	pongState: PongState.Home,
-					payload: null };
+					payload: {
+						pongQueue: queueInfos.index >= 0 ? queueInfos.custom === false : false,
+						gnopQueue: queueInfos.index >= 0 ? queueInfos.custom === true : false
+					} };
 	}
 
 	GetCurrentGameDatas(socket: Socket, index: number) : PongInitData {
@@ -460,13 +478,15 @@ export class PongService {
 			...this.scoreData[index],
 			playerNumber: playerNumber,
 			gameState: this.gameState[index] === GameState.WaitingForRestart ? FrontGameState.Finished : FrontGameState.Playing,
-			winner: this.gameState[index] === GameState.WaitingForRestart ? ( this.scoreData[index].scoreP1 > this.scoreData[index].scoreP2 ? 1 : 2 ) : 0
+			winner: this.gameState[index] === GameState.WaitingForRestart ? ( this.scoreData[index].scoreP1 > this.scoreData[index].scoreP2 ? 1 : 2 ) : 0,
+			user1Datas: this.usersRuntime[index].user1Datas,
+			user2Datas: this.usersRuntime[index].user2Datas
 		}
 
 		return state;
 	}
 
-	async SetPlayingState(player1: UserInfosIndex, player2: UserInfosIndex, state: boolean) {
+	async SetPlayingState(player1: UserInfosIndex, player2: UserInfosIndex, state: boolean) : Promise<{user1: User, user2: User}> {
 		const user1 = await this.userService.getUserById(this.userInfos[player1].userId);
 		const user2 = await this.userService.getUserById(this.userInfos[player2].userId);
 
@@ -477,16 +497,29 @@ export class PongService {
 		await this.userRepository.update(user2.id, {
 			isPlaying: state
 		});
+
+		return {user1: user1, user2: user2};
 	}
 
 	async CreateRoom(player1: UserInfosIndex, player2: UserInfosIndex, custom: boolean = false) {
 
 		await this.SetPlayingState(player1, player2, true);
 		this.pongGateway.ReloadList()
+		const {user1, user2} = await this.SetPlayingState(player1, player2, true);
 
 		const users: UserPair = {
 			indexUser1: player1,
 			indexUser2: player2,
+			user1Datas:  {
+				nickname: user1.nickname,
+				imgPdp: user1.imgPdp,
+				level: user1.level
+			},
+			user2Datas: {
+				nickname: user2.nickname,
+				imgPdp: user2.imgPdp,
+				level: user2.level
+			},
 		}
 		
 		this.usersRuntime.push(users);
@@ -500,20 +533,23 @@ export class PongService {
 		
 		const roomName = "room" + roomIndex;
 
-    const playerInfo1 = this.userInfos[player1];
-    const playerInfo2 = this.userInfos[player2];
+		const playerInfo1 = this.userInfos[player1];
+		const playerInfo2 = this.userInfos[player2];
 
-    this.userInfos[player1].socket.join(roomName);
-    this.userInfos[player2].socket.join(roomName);
+		this.userInfos[player1].socket.join(roomName);
+		this.userInfos[player2].socket.join(roomName);
 
-    const ids: IDPair = {
-      idP1: playerInfo1.userId,
-      idP2: playerInfo2.userId,
-    };
+		const ids: IDPair = {
+			idP1: playerInfo1.userId,
+			idP2: playerInfo2.userId,
+		};
 
-    this.idPairs.push(ids);
+		this.idPairs.push(ids);
 
 		const initDatas = custom ? CUSTOM_INIT_DATAS : STANDARD_INIT_DATAS;
+
+		initDatas.user1Datas = users.user1Datas;
+		initDatas.user2Datas = users.user2Datas;
 
 		const ball: BallRuntimeData = {
 			ballPosition: { ...initDatas.ballPosition },
@@ -521,11 +557,11 @@ export class PongService {
 			ballDelta: { ...initDatas.ballDelta },
 		};
 
-    this.ballRuntime.push(ball);
+		this.ballRuntime.push(ball);
 
-    custom
-      ? this.ballRuntimeCustom.push(ball)
-      : this.ballRuntimeStandard.push(ball);
+		custom
+		? this.ballRuntimeCustom.push(ball)
+		: this.ballRuntimeStandard.push(ball);
 
 		const paddles: PaddleRuntimeData = {
 			paddleWidth: initDatas.paddleWidth,
@@ -535,23 +571,23 @@ export class PongService {
 			paddle2Delta: 0
 		}
 
-    this.paddleRuntime.push(paddles);
+		this.paddleRuntime.push(paddles);
 
-    const score: Score = {
-      scoreP1: 0,
-      scoreP2: 0,
-    };
+		const score: Score = {
+		scoreP1: 0,
+		scoreP2: 0,
+		};
 
-    this.scoreData.push(score);
-    this.gameState.push(GameState.Connecting);
+		this.scoreData.push(score);
+		this.gameState.push(GameState.Connecting);
 
-    //console.log("room created");
+		//console.log("room created");
 
 		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2 });
 		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1 });
 
-    this.StartGameAtCountdown(this.usersRuntime.length - 1, COUNTDOWN);
-  }
+		this.StartGameAtCountdown(this.usersRuntime.length - 1, COUNTDOWN);
+  	}
 
 	RequestRestart(socket: Socket) {
 		const instanceIndex = this.FindIndexBySocketId(socket.id);

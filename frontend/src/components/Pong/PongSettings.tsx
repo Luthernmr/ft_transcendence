@@ -32,7 +32,9 @@ export interface GameLayout {
 export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntimeData, Score {
 	playerNumber: number,
   gameState: GameState,
-  winner: number
+  winner: number,
+  user1Datas: UserDatas,
+  user2Datas: UserDatas
 }
 
 export enum GameState {
@@ -88,7 +90,6 @@ export interface Score {
 export enum PongState {
   Load,
   Home,
-  Queue,
   Play,
   Watch,
 }
@@ -96,4 +97,10 @@ export enum PongState {
 export enum PongDisplay {
   Normal,
   Reversed
+}
+
+export interface UserDatas {
+  nickname: string,
+  imgPdp: string,
+  level: number
 }

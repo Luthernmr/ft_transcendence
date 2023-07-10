@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Button, ButtonGroup, Center } from '@chakra-ui/react';
+import { Spacer, Flex, Box } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import GameArea from './GameArea';
 import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
@@ -207,20 +207,12 @@ function GameScreen(props : GameScreenProps) {
 	}
 
 	return(
-		<div style={{
-			display: "flex",
-			flexDirection: "row",
-			width: 1060 * props.size,
-			height: 700 * props.size
-		}} >
-			<div style={{
-						width: '50%',
-						backgroundColor: 'lightgray'
-						}}>
+		<Flex width={1060 * props.size} height={700 * props.size}>
+			<Box w={1060 * props.size * 0.5} bg='gray.300'>
 				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
 					<Layer>
 						<Text text={countdown.current.toString()} fontSize={50} width={450} y={400} align='center' visible={countdown.current > 0} />
-						<Text text={`Player ${winner.current} won!`} fontSize={30} width={450} y={180} align='center' visible={winner.current != 0}/>
+						<Text text={`${winner.current === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won!`} fontSize={30} width={450} y={180} align='center' visible={winner.current != 0}/>
 						<Text text="Restart" fontSize={25} onClick={requestRestart} width={450} y={400} align='center' visible={gameState === GameState.Finished && props.watcher == false}/>
 						<Text text="Quit" fontSize={25} onClick={quit} width={450} y={450} align='center' visible={gameState === GameState.Finished}/>
 						<Text text="Opponent Disconnected !" fontSize={30} width={450} y={110} align='center' color='red' visible={opponentAlive === false && props.watcher == false}/>
@@ -235,24 +227,20 @@ function GameScreen(props : GameScreenProps) {
 									/>
 					</Layer>
 				</Stage>
-			</div>
-			<div style={{
-						width: '50%',
-						backgroundColor: 'lightyellow'
-						}}>
-				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
-					<Layer>
-						<UserArea 	width={props.initDatas.width}
-									height={props.initDatas.height}	
-									size={props.size}
-									mirror={playerNumber.current === 1 ? false : true}
-									scoreP1={score.current.scoreP1}
-									scoreP2={score.current.scoreP2}
-									/>
-					</Layer>
-				</Stage>
-			</div>
-		</div>
+			</Box>
+			<Spacer />
+			<Box w={1060 * props.size * 0.5} bg='yellow.100'>
+				<UserArea 	width={props.initDatas.width}
+							height={700 * props.size}
+							size={props.size}
+							mirror={playerNumber.current === 1 ? false : true}
+							scoreP1={playerNumber.current === 1 ? score.current.scoreP1 : score.current.scoreP2}
+							scoreP2={playerNumber.current === 1 ? score.current.scoreP2 : score.current.scoreP1}
+							user1Datas={playerNumber.current === 1 ? props.initDatas.user1Datas : props.initDatas.user2Datas}
+							user2Datas={playerNumber.current === 1 ? props.initDatas.user2Datas : props.initDatas.user1Datas}
+							/>
+			</Box>
+		</Flex>
 	)
 }
 
