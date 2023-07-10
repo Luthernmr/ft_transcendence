@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useRef, useEffect } from "react";
 import {
   Flex,
   Box,
@@ -48,6 +48,14 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const toast = useToast();
 
+  const messagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
     if (messageContent.trim() === "") {
@@ -69,7 +77,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   };
 
   const handleError = (error: { message: string }) => {
-    // console.log("Here", error);
     toast({
       title: error.message,
       status: "error",
@@ -80,14 +87,12 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
 
   const handleReceiveMessage = (receivedMessage: Message) => {
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-    // console.log("Here :", messages);
   };
 
   React.useEffect(() => {
     chatSocket.emit("getRoomMessages", selectedRoom);
 
     const handleRoomMessages = (roomMessages: Message[]) => {
-      // console.log(roomMessages);
       setMessages(roomMessages);
     };
 
@@ -121,24 +126,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
           {selectedRoom.name}
         </Heading>
       </Flex>
-      <VStack marginY={"10px"}flex="1" spacing={4} align={"stretch"} overflowY={"auto"}>
+      <VStack
+        marginY={"10px"}
+        flex="1"
+        spacing={4}
+        align={"stretch"}
+        overflowY={"auto"}
+      >
         {messages.map((message) => (
           <Box
             key={message.id}
-            bg={
-              message.user && message.user.id === currentUser.id
-                ? "teal.500"
-                : "gray.200"
-            }
-            color={
-              message.user && message.user.id === currentUser.id
-                ? "white"
-                : "black"
-            }
+            bg={message.user?.id === currentUser.id ? "teal.500" : "gray.200"}
+            color={message.user?.id === currentUser.id ? "white" : "black"}
             alignSelf={
-              message.user && message.user.id === currentUser.id
-                ? "flex-end"
-                : "flex-start"
+              message.user?.id === currentUser.id ? "flex-end" : "flex-start"
             }
             borderRadius="lg"
             p={2}
@@ -148,6 +149,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
             <Text>{message.text}</Text>
           </Box>
         ))}
+        <div ref={messagesEndRef} />
       </VStack>
       <form onSubmit={handleSendMessage}>
         <InputGroup size="md">

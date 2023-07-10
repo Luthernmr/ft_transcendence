@@ -58,7 +58,7 @@ export class MessageService {
     try {
       const room = await this.roomRepo.findOne({
         where: { name: roomName },
-        relations: ['messages'],
+        relations: ['messages', 'messages.user'],
       });
       if (!room) {
         throw new Error('Room not found');
