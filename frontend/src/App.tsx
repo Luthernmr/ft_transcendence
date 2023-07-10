@@ -32,18 +32,27 @@ export default function App() {
   //   pongSocket.on("connect", () => {
   //     //console.log("pong socket connecting");
   //   });
-
-  //   chatSocket.on("connect", () => {
-  //     //console.log("chat socket connect");
-  //   });
+  
+  chatSocket.on("disconnect", () => {
+    //console.log("chat socket connect");
+    // userSocket.connect();
+    // chatSocket.connect();
+    // pongSocket.connect();
+    });
 
   const getUser = async () => {
     const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
       withCredentials: true,
     });
     sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+    // chatSocket.connect();
+    // userSocket.connect();
+    // pongSocket.connect();
+    pongSocket.auth = { token: res.data.jwt };
+    userSocket.auth = { token: res.data.jwt };
+    chatSocket.auth = { token: res.data.jwt };
   };
-
+  
   chatSocket.on("connect", () => {
     getUser();
     console.log("chat socket connect");

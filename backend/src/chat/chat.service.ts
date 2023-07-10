@@ -95,7 +95,7 @@ export class ChatService {
     try {
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
-        console.log("Sending to : ", element.socketId);
+        console.log("Sending to : ", element.socketId, element.nickname);
         this.gateway.chatNamespace.to(element.socketId).emit('receiveMessage', message);
       });
     } catch (error) {

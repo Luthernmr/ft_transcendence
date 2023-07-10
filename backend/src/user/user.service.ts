@@ -38,9 +38,10 @@ export class UserService {
 
 	async setSocket(id: number, socketId: string) {
 		var user: any = await this.getUserById(id);
-		user.socketId = socketId;
+		if (user){
+			user.socketId = socketId;
 		user = await this.userRepository.save(user);
-		return user
+		return user}
 	}
 
 	async setOnline(user: User) {
