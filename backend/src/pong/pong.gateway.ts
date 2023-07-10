@@ -112,6 +112,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     socket.emit('gamestate', gameState);
   }
 
+  ReloadList()
+  {
+	this.gateway.userNamespace.emit('reloadLists')
+  }
+
   CloseRoom(roomID: number) {
     this.gateway.pongNamespace.socketsLeave("room" + roomID);
   }

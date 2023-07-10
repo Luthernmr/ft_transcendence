@@ -482,6 +482,7 @@ export class PongService {
 	async CreateRoom(player1: UserInfosIndex, player2: UserInfosIndex, custom: boolean = false) {
 
 		await this.SetPlayingState(player1, player2, true);
+		this.pongGateway.ReloadList()
 
 		const users: UserPair = {
 			indexUser1: player1,
@@ -686,7 +687,7 @@ export class PongService {
 		if (index >= 0) {
 			this.CleanDatas(index);
 			this.SetPlayingState(player1Index, player2Index, false);
-
+			this.pongGateway.ReloadList()
 			const lockedIndex1 = this.lockedUsers.findIndex(index => index === player1Index);
 			this.lockedUsers.splice(lockedIndex1, 1);
 			const lockedIndex2 = this.lockedUsers.findIndex(index => index === player2Index);

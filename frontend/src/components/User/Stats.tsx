@@ -74,14 +74,14 @@ export default function UserStats(props: any) {
 		datasets: [
 			{
 				label: 'Me',
-				data: stats.pointTab,
+				data: stats.pointTab.reverse(),
 				fill: false,
 				borderColor: 'teal',
 				tension: 0.1,
 			},
 			{
 				label: 'Oponent',
-				data: stats.oponentTab,
+				data: stats.oponentTab.reverse(),
 				fill: false,
 				borderColor: 'red',
 				tension: 0.1,
