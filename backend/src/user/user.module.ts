@@ -13,11 +13,12 @@ import { BlockedUser } from 'src/social/blockedUser.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { HistoryService } from 'src/pong/history.service';
 import { PongHistory } from 'src/pong/pongHistory.entity';
+import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @Module({
 	imports: [TypeOrmModule.forFeature([User]),  TypeOrmModule.forFeature([PendingRequest]), TypeOrmModule.forFeature([BlockedUser]), TypeOrmModule.forFeature([PongHistory])],
 	controllers: [UserController,],
-	providers: [UserService,HistoryService],
+	providers: [UserService,HistoryService, GlobalGateway],
 	exports: [TypeOrmModule, UserService, ]
 })
 export class UserModule { }

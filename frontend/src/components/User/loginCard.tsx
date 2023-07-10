@@ -55,9 +55,9 @@ export default function loginCard() {
 					userSocket.auth = { token: response.data.token };
 					chatSocket.auth = { token: response.data.token };
 					pongSocket.auth = { token: response.data.token };
-					// chatSocket.connect();
-					// userSocket.disconnect().connect();
-					// pongSocket.disconnect().connect();
+					chatSocket.disconnect().connect();
+					userSocket.disconnect().connect();
+					pongSocket.disconnect().connect();
 					navigate("/home");
 				}
 			}

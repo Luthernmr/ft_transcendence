@@ -8,9 +8,10 @@ import { AuthModule } from 'src/auth/auth.module';
 import { FriendModule } from 'src/social/friend.module';
 import { RoomService } from 'src/room/room.service';
 import { MessageService } from 'src/message/message.service';
+import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Room, Message]), UserModule, AuthModule, FriendModule],
-  providers: [ChatService, RoomService, MessageService]
+  providers: [ChatService, RoomService, MessageService, GlobalGateway]
 })
 export class ChatModule {}

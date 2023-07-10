@@ -13,19 +13,24 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { PongService } from 'src/pong/pong.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { ChatService } from 'src/chat/chat.service';
+import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
-export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, OnGatewayInit {
-	@WebSocketServer()
-	server: Server;
+export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+	// @WebSocketServer()
+	// gateway.userNamespace: Server;
 	private logger: Logger;
 	constructor(
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
 		private readonly friendService: FriendService,
 		private readonly pongService: PongService,
+		private readonly gateway: GlobalGateway
 
 	) {     this.logger = new Logger(ChatService.name);}
+	//   afterInit(server: Server) {
+	// 	throw new Error('Method not implemented.');
+	//   }
 
 	async handleConnection(client: Socket) {
 		let user: User = await this.authService.getUserByToken(client.handshake.auth.token)
@@ -33,7 +38,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		if (user) {
 			// user = await this.userService.setSocket(user.id, client.id);
 			// await this.userService.setOnline(user);
-			this.server.emit('reloadLists')
+			this.gateway.userNamespace.emit('reloadLists')
 		}
 		else	
 			client.disconnect();
@@ -45,11 +50,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 		if (user) {
 			
 			await this.userService.setOffline(user);
-			this.server.emit('reloadLists')
+			this.gateway.userNamespace.emit('reloadLists')
 		}
-	}
-
-	afterInit(server: Socket) {
 	}
 
 	@SubscribeMessage('friendRequest')
@@ -71,7 +73,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				senderPdp: userSender.imgPdp,
 				user: userReceiv
 			})
-			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
+			const otherSocket = await this.authService.getUserSocket(this.gateway.userNamespace, userReceiv.id)
 			otherSocket.emit('notifyRequest');
 			client.emit('sendSuccess');
 		}
@@ -96,7 +98,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 				senderPdp: userSender.imgPdp,
 				user: userReceiv
 			})
-			const otherSocket = await this.authService.getUserSocket(this.server, userReceiv.id)
+			const otherSocket = await this.authService.getUserSocket(this.gateway.userNamespace, userReceiv.id)
 			otherSocket.emit('notifyRequest');
 			client.emit('sendSuccess');
 		}
@@ -113,7 +115,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect, 
 			const currentUser: User = await this.authService.getUserByToken(client.handshake.auth.token);
 			const request: PendingRequest = await this.userService.getPendingRequestById(data.requestId);
 			this.pongService.AcceptInvitation(currentUser?.id, request?.senderId);
-			const otherSocket = await this.authService.getUserSocket(this.server, request.senderId)
+			const otherSocket = await this.authService.getUserSocket(this.gateway.userNamespace, request.senderId)
 			client.emit('duelAcccepted')
 			otherSocket.emit('duelAcccepted')
 			await this.userService.deletePendingRequestById(request);

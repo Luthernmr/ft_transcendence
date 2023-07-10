@@ -6,16 +6,18 @@ import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, W
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
+import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
 export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
-  @WebSocketServer()
-  server: Server
+  // @WebSocketServer()
+  // gateway.pongNamespace: Server
 
   constructor(
     private readonly authService: AuthService,
-    private readonly pongService: PongService) {
+    private readonly pongService: PongService,
+    private readonly gateway: GlobalGateway) {
     pongService.RegisterGateway(this);
   }
 
@@ -102,7 +104,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   private EmitEvent(event: string, roomID: number, datas: any) {
-    this.server.to("room" + roomID).emit(event, datas);
+    this.gateway.pongNamespace.to("room" + roomID).emit(event, datas);
   }
 
   EmitGameState(socket: Socket, gameState: GameDatas) {
@@ -111,7 +113,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   CloseRoom(roomID: number) {
-    this.server.socketsLeave("room" + roomID);
+    this.gateway.pongNamespace.socketsLeave("room" + roomID);
   }
 
   EmitInit(socket: Socket, initDatas: PongInitData) {

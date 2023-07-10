@@ -13,6 +13,7 @@ import { User } from 'src/user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
 import { Message } from 'src/message/entities/message.entity';
+import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -24,12 +25,13 @@ export class ChatService {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly messageService: MessageService,
+    private readonly gateway: GlobalGateway
   ) {
     this.logger = new Logger(ChatService.name);
   }
 
-  @WebSocketServer()
-  server: Server;
+  // @WebSocketServer()
+  // gateway.chatNamespace: Server;
 
   onModuleInit() {
     this.logger.log('Gateway initialized');
@@ -62,9 +64,9 @@ export class ChatService {
       await this.roomService.createRoom(client, data);
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
-        this.server.to(element.socketId).emit('roomList', rooms.rooms);
+        this.gateway.chatNamespace.to(element.socketId).emit('roomList', rooms.rooms);
       });
-      this.server.emit('roomCreated');
+      this.gateway.chatNamespace.emit('roomCreated');
     } catch (error) {
       client.emit('error', { message: error.message });
     }
@@ -73,7 +75,7 @@ export class ChatService {
   @SubscribeMessage('getUserRooms')
   async getUserRooms(payload: { userId: number }) {
     const rooms = await this.userService.getRoomsByUID(payload.userId);
-    this.server.emit('roomList', rooms.rooms);
+    this.gateway.chatNamespace.emit('roomList', rooms.rooms);
   }
 
   @SubscribeMessage('checkRoomPassword')
@@ -94,7 +96,7 @@ export class ChatService {
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
         console.log("Sending to : ", element.socketId);
-        this.server.to(element.socketId).emit('receiveMessage', message);
+        this.gateway.chatNamespace.to(element.socketId).emit('receiveMessage', message);
       });
     } catch (error) {
       client.emit('error', { message: error.message });

@@ -11,72 +11,92 @@ import { ReactNode, useEffect, useState } from "react";
 import UserProfile from "./components/User/Profile";
 import TwoFA from "./components/User/TwoFA";
 import OtherProfilPage from "./components/Social/OtherProfilPage";
-import {useNavigate } from "react-router-dom"; 
-
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function PrivateRoute({ children }: { children: ReactNode }) {
-
-	if (!sessionStorage.getItem('jwt')) {
-		return (<Navigate to="/Login" />)
-	}
-	return <>{children}</>
+  if (!sessionStorage.getItem("jwt")) {
+    return <Navigate to="/Login" />;
+  }
+  return <>{children}</>;
 }
 
 export default function App() {
+  const navigate = useNavigate();
 
-	const navigate = useNavigate();
+  // 	userSocket.on("ping", () => {
+  //     //console.log("pinged");
+  //     userSocket.emit("pong");
+  //   });
 
-// 	userSocket.on("ping", () => {
-//     //console.log("pinged");
-//     userSocket.emit("pong");
-//   });
+  //   pongSocket.on("connect", () => {
+  //     //console.log("pong socket connecting");
+  //   });
 
-//   pongSocket.on("connect", () => {
-//     //console.log("pong socket connecting");
-//   });
+  //   chatSocket.on("connect", () => {
+  //     //console.log("chat socket connect");
+  //   });
 
-//   chatSocket.on("connect", () => {
-//     //console.log("chat socket connect");
-//   });
+  const getUser = async () => {
+    const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
+      withCredentials: true,
+    });
+    sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+  };
 
-	return (
-		<Routes>
-			<Route path="/Register" element={<RegisterCard />} />
-			<Route path="/Login" element={<LoginCard />} />
-			<Route path="/Auth" element={<AuthElement />} />
-			<Route path="/2fa" element={<TwoFA />} />
-			<Route path="/" element={<Home />} />
-			<Route path="/Home" element={
-				<PrivateRoute>
-					<SidebarWithHeader children={<Chat />} />
-				</PrivateRoute>
-			}
-			/>
-			<Route path="/Chat" element={
-				<PrivateRoute>
-					<SidebarWithHeader children={<Chat />} />
-				</PrivateRoute>
-			}
-			/>
-			<Route path="/Play" element={
-				<PrivateRoute>
-					<SidebarWithHeader children={<Pong />} />
-				</PrivateRoute>
-			}
-			/>
-			<Route path="/profile" element={
-				<PrivateRoute>
-					<SidebarWithHeader children={<UserProfile />} />
-				</PrivateRoute>
-			}
-			/>
+  chatSocket.on("connect", () => {
+    getUser();
+    console.log("chat socket connect");
+  });
 
-			<Route path="/profile/:id" element={
-				<PrivateRoute>
-					<SidebarWithHeader children={<OtherProfilPage/>} />
-				</PrivateRoute>
-			}
-			/>
-		</Routes>
-	);
+  return (
+    <Routes>
+      <Route path="/Register" element={<RegisterCard />} />
+      <Route path="/Login" element={<LoginCard />} />
+      <Route path="/Auth" element={<AuthElement />} />
+      <Route path="/2fa" element={<TwoFA />} />
+      <Route path="/" element={<Home />} />
+      <Route
+        path="/Home"
+        element={
+          <PrivateRoute>
+            <SidebarWithHeader children={<Chat />} />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/Chat"
+        element={
+          <PrivateRoute>
+            <SidebarWithHeader children={<Chat />} />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/Play"
+        element={
+          <PrivateRoute>
+            <SidebarWithHeader children={<Pong />} />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <PrivateRoute>
+            <SidebarWithHeader children={<UserProfile />} />
+          </PrivateRoute>
+        }
+      />
+
+      <Route
+        path="/profile/:id"
+        element={
+          <PrivateRoute>
+            <SidebarWithHeader children={<OtherProfilPage />} />
+          </PrivateRoute>
+        }
+      />
+    </Routes>
+  );
 }
