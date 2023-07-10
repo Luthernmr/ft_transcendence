@@ -31,12 +31,15 @@ export default function AuthElement() {
           if (res.data.jwt) {
             sessionStorage.setItem("jwt", res.data.jwt);
             if (sessionStorage.getItem("jwt")) {
+              chatSocket.disconnect();
+              userSocket.disconnect();
+              pongSocket.disconnect();
               userSocket.auth = { token: res.data.jwt };
               chatSocket.auth = { token: res.data.jwt };
               pongSocket.auth = { token: res.data.jwt };
-              chatSocket.disconnect().connect();
-              userSocket.disconnect().connect();
-              pongSocket.disconnect().connect();
+              chatSocket.connect();
+              userSocket.connect();
+              pongSocket.connect();
               navigate("/home");
             }
             //pongSocket.emit("register", { token: res.data.jwt });

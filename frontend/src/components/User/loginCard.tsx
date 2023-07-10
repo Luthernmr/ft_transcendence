@@ -52,12 +52,15 @@ export default function loginCard() {
 			if (response.data.token) {
 				sessionStorage.setItem("jwt", response.data.token);
 				if (sessionStorage.getItem("jwt")) {
+					chatSocket.disconnect();
+					userSocket.disconnect();
+					pongSocket.disconnect();
 					userSocket.auth = { token: response.data.token };
 					chatSocket.auth = { token: response.data.token };
 					pongSocket.auth = { token: response.data.token };
-					chatSocket.disconnect().connect();
-					userSocket.disconnect().connect();
-					pongSocket.disconnect().connect();
+					chatSocket.connect();
+					userSocket.connect();
+					pongSocket.connect();
 					navigate("/home");
 				}
 			}

@@ -45,9 +45,6 @@ export default function App() {
       withCredentials: true,
     });
     sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-    // chatSocket.connect();
-    // userSocket.connect();
-    // pongSocket.connect();
     pongSocket.auth = { token: res.data.jwt };
     userSocket.auth = { token: res.data.jwt };
     chatSocket.auth = { token: res.data.jwt };
