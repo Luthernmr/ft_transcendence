@@ -37,15 +37,21 @@ function HomeScreen(props: HomeScreenProps) {
 	
 	return (
 		<>
+		<Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      height="100%"
+      flex={"1"}
+      direction="column">
 			<Flex direction='column' w='100%' h={600}>
-				<Box bg='red.100' w='100%' h='15%'>
+				<Box w='100%' h='15%'>
 					<Center>
-						<Box bg='gray.200' border='solid' w='90%' h='80%'>
-							<Center><Text as='b' fontSize='5xl'>PLAY</Text></Center>
+						<Box w='90%' h='80%'>
+							<Center><Text as='b' fontSize=';xl'>Play</Text></Center>
 						</Box>
 					</Center>
 				</Box>
-				<Flex bg='green.100' direction='row' w='100%' h='70%'>
+				<Flex direction='row' w='100%' h='70%'>
 					<Box w='100%'>
 						<Flex direction='column' w={[100, 280, 360, 530]} h={['10%', '50%', '80%', '100%']}>
 							<Center h='100%'>
@@ -73,6 +79,7 @@ function HomeScreen(props: HomeScreenProps) {
 			<Button onClick={ props.WatchGame }>
 				Watch Random Game
 			</Button> */}
+			</Flex>
 		</>
 	)
 }
