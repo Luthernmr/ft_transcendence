@@ -54,6 +54,10 @@ const RoomList: React.FC<RoomListProps> = ({
     });
   }, [currentUser.id]);
 
+  useEffect(() => {
+    console.log(rooms);
+  }, [rooms]);  
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [roomPassword, setRoomPassword] = useState("");
   const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);

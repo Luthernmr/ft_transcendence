@@ -74,10 +74,11 @@ export class ChatService {
   }
 
   @SubscribeMessage('getUserRooms')
-  async getUserRooms(payload: { userId: number }) {
-    const rooms = await this.userService.getRoomsByUID(payload.userId);
-    this.gateway.chatNamespace.emit('roomList', rooms.rooms);
-  }
+  async getUserRooms(client: Socket, payload: { userId: number }) {
+    console.log('Payload: ', payload)
+    const rooms = await this.roomService.getAllAccessibleRooms(payload.userId);
+    client.emit('roomList', rooms);
+  }  
 
   @SubscribeMessage('checkRoomPassword')
   async checkRoomPass(

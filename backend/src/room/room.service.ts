@@ -16,9 +16,6 @@ import { CreateRoomDto } from './dto/create-room.dto';
 
 @Injectable()
 export class RoomService {
-  findOne(roomId: any) {
-    throw new Error('Method not implemented.');
-  }
   private logger: Logger;
 
   constructor(
@@ -59,4 +56,17 @@ export class RoomService {
       throw error;
     }
   }
+
+  async getAllAccessibleRooms(userId: number): Promise<Room[]> {
+    const publicRooms = await this.roomRepo.find({ 
+      where: { isPrivate: false },
+      relations: ["users"]
+    });
+    const privateUserRooms = await this.roomRepo.find({ 
+      where: { isPrivate: true, users: { id: userId } },
+      relations: ["users"]
+    });
+    return [...publicRooms, ...privateUserRooms];
+  }
+  
 }
