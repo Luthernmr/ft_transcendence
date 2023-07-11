@@ -37,18 +37,23 @@ function HomeScreen(props: HomeScreenProps) {
 	
 	return (
 		<>
-			<Flex direction='column'>
-				<Flex direction='row' basis='content'>
-					<Box bg='blue.100'>
-						<Flex direction='column'>
-							<Text align='center'>PONG</Text>
-							<QueueWidget joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+			<Flex direction='column' w='100%'>
+				<Flex direction='row' w='100%' h='100%'>
+					<Box bg='blue.100' w='100%'>
+						<Flex direction='column' h='100%'>
+							<Text align='center'>PONG</Text>	
+							<Center h='100%'>
+								<QueueWidget joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+							</Center>
 						</Flex>
 					</Box>
-					<Box bg='red.100'>
-						<Flex direction='column'>
+					<Spacer />
+					<Box bg='red.100' w='100%'>
+						<Flex direction='column' h='100%'>
 							<Text align='center'>GNOP</Text>
-							<QueueWidget joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+							<Center h='100%'>
+								<QueueWidget joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+							</Center>
 						</Flex>
 					</Box>
 				</Flex>

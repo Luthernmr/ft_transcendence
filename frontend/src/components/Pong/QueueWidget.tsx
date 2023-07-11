@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Center } from '@chakra-ui/react';
+import { Button, Center, Box, Flex, Text } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 
 interface QueueQueueWidgetProps {
@@ -21,14 +21,19 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	if (props.joined === false) {
 		return (
 			<>
-				<Button onClick={JoinQueue}>Join Queue</Button>
+				<Box as='button' bg='green.100' w='50%' h='100%' onClick={JoinQueue}>
+					Join Queue
+				</Box>
 			</>
 		)
 	} else {
 		return (
 			<>
-				<h1>In Queue...</h1>
-				<Button onClick={LeaveQueue}>LeaveQueue</Button>
+				<Flex direction='column'>
+					<Text align='center'>In Queue...</Text>
+					<br></br>
+					<Button onClick={LeaveQueue}>LeaveQueue</Button>
+				</Flex>
 			</>
 		)
 	}
