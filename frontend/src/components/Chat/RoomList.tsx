@@ -49,14 +49,20 @@ const RoomList: React.FC<RoomListProps> = ({
 
   useEffect(() => {
     chatSocket.emit("getUserRooms", { userId: currentUser.id });
+
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
     });
-  }, [currentUser.id]);
 
-  useEffect(() => {
-    console.log(rooms);
-  }, [rooms]);  
+    chatSocket.on("roomCreated", () => {
+      chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    });
+
+    return () => {
+      chatSocket.off("roomList");
+      chatSocket.off("roomCreated");
+    };
+  }, [currentUser.id]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [roomPassword, setRoomPassword] = useState("");

@@ -62,11 +62,14 @@ export class RoomService {
       where: { isPrivate: false },
       relations: ["users"]
     });
-    const privateUserRooms = await this.roomRepo.find({ 
-      where: { isPrivate: true, users: { id: userId } },
-      relations: ["users"]
-    });
-    return [...publicRooms, ...privateUserRooms];
+    const privateUserRooms = await this.roomRepo
+    .createQueryBuilder('room')
+    .leftJoinAndSelect('room.users', 'user')
+    .where('room.isPrivate = :isPrivate', { isPrivate: true })
+    .getMany()
+    .then(rooms => rooms.filter(room => room.users.some(user => user.id === userId)));
+    
+  return [...publicRooms, ...privateUserRooms];
   }
   
 }
