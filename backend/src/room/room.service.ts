@@ -58,18 +58,19 @@ export class RoomService {
   }
 
   async getAllAccessibleRooms(userId: number): Promise<Room[]> {
-    const publicRooms = await this.roomRepo.find({ 
+    const publicRooms = await this.roomRepo.find({
       where: { isPrivate: false },
-      relations: ["users"]
+      relations: ['users'],
     });
     const privateUserRooms = await this.roomRepo
-    .createQueryBuilder('room')
-    .leftJoinAndSelect('room.users', 'user')
-    .where('room.isPrivate = :isPrivate', { isPrivate: true })
-    .getMany()
-    .then(rooms => rooms.filter(room => room.users.some(user => user.id === userId)));
-    
-  return [...publicRooms, ...privateUserRooms];
+      .createQueryBuilder('room')
+      .leftJoinAndSelect('room.users', 'user')
+      .where('room.isPrivate = :isPrivate', { isPrivate: true })
+      .getMany()
+      .then((rooms) =>
+        rooms.filter((room) => room.users.some((user) => user.id === userId)),
+      );
+
+    return [...publicRooms, ...privateUserRooms];
   }
-  
 }

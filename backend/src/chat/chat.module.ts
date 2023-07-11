@@ -11,7 +11,12 @@ import { MessageService } from 'src/message/message.service';
 import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Room, Message]), UserModule, AuthModule, FriendModule],
-  providers: [ChatService, RoomService, MessageService, GlobalGateway]
+  imports: [
+    TypeOrmModule.forFeature([Room, Message]),
+    UserModule,
+    AuthModule,
+    FriendModule,
+  ],
+  providers: [ChatService, RoomService, MessageService, GlobalGateway],
 })
 export class ChatModule {}

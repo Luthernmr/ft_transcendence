@@ -7,7 +7,6 @@ import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
-  ManyToOne,
   ManyToMany,
   JoinTable,
   OneToMany,
@@ -33,10 +32,10 @@ export class User {
   @Column({ default: false })
   isOnline: boolean;
 
-  @Column({default: false})
+  @Column({ default: false })
   isPlaying: boolean;
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   socketId: string;
 
   @Column({ nullable: true })
