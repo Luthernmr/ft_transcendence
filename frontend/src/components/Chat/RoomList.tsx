@@ -125,7 +125,7 @@ const RoomList: React.FC<RoomListProps> = ({
               key={index}
               onClick={() => handleRoomClick(room)}
               _hover={{
-                transform: "translateY(-2px) scale(0.99)",
+                transform: "scaleX(0.98)",
               }}
             >
               <HStack>
