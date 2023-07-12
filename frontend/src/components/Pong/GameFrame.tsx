@@ -50,9 +50,9 @@ function GameFrame({ width, height } : GameFrameProps) {
 
 	return (
 		<>
-            <Rect x={walls.current[2].x} y={walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill={WALL_COLOR}/>
-            <Rect x={walls.current[3].x} y={walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill={WALL_COLOR}/>
-			<Line points={[0, height / 2, width, height / 2]} stroke='black' strokeWidth={1} dash={[10, 10]}/>
+            <Rect x={walls.current[2].x} y={walls.current[2].y} width={walls.current[2].width} height={walls.current[2].height} fill={WALL_COLOR} cornerRadius={10}/>
+            <Rect x={walls.current[3].x} y={walls.current[3].y} width={walls.current[3].width} height={walls.current[3].height} fill={WALL_COLOR} cornerRadius={10}/>
+			      <Line points={[0, height / 2, width, height / 2]} stroke='black' strokeWidth={1} dash={[10, 10]}/>
 		</>
 	)
 }

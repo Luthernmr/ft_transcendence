@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas, UserDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -160,5 +160,15 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   EmitOpponentReconnected(socket: Socket) {
     socket.emit('OpponentReconnected')
+  }
+
+  EmitAddWatcher(roomID: number, datas: UserDatas) {
+    this.EmitEvent('AddWatcher', roomID, datas);
+  }
+
+
+  EmitRemoveWatcher(roomID: number, id: number) {
+    console.log("Sending id: " + id);
+    this.EmitEvent('RemoveWatcher', roomID, id);
   }
 }
