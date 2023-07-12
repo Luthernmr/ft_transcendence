@@ -11,11 +11,24 @@ import {
   InputRightElement,
   useToast,
   Button,
+  Avatar,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
+  Portal,
 } from "@chakra-ui/react";
-import { ArrowBackIcon } from "@chakra-ui/icons";
+import { ArrowBackIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FiSend } from "react-icons/fi";
 import { User } from "../Social/AllUserItem";
-import { chatSocket } from "../../sockets/sockets";
+import { chatSocket, userSocket } from "../../sockets/sockets";
+import AddFriendButton from "../Social/AddFriendButton";
+import BlockUserButton from "../Social/BlockUserButton";
+import PongInviteButton from "../Social/PongInviteButton";
+import { Link as RouteLink } from "react-router-dom";
 
 interface Room {
   id: number;
@@ -47,6 +60,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [messageContent, setMessageContent] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const toast = useToast();
+  const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -89,14 +103,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     chatSocket.emit("getRoomMessages", selectedRoom);
+    userSocket.emit("getBlockedList");
 
     const handleRoomMessages = (roomMessages: Message[]) => {
       setMessages(roomMessages);
     };
 
+    const handleBlockedUsers = (blockedUsers: User[]) => {
+      setBlockedUsers(blockedUsers);
+    };
+
     chatSocket.on("roomMessages", handleRoomMessages);
+    userSocket.on("blockedList", handleBlockedUsers);
     chatSocket.on("error", handleError);
     chatSocket.on("receiveMessage", handleReceiveMessage);
 
@@ -134,22 +154,82 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
         overflowY={"auto"}
         padding={"15px"}
       >
-        {messages.map((message) => (
+        {messages.map((message: any, index: number) => (
           <Box
-            key={message.id}
+            key={index}
             bg={message.user?.id === currentUser.id ? "teal.500" : "gray.200"}
             color={message.user?.id === currentUser.id ? "white" : "black"}
+            p={2}
             alignSelf={
               message.user?.id === currentUser.id ? "flex-end" : "flex-start"
             }
             borderRadius="lg"
-            p={2}
             maxWidth="80%"
             mt={2}
+            style={{
+              filter: blockedUsers?.some((user) => user.id === message.user.id)
+                ? "blur(10px)"
+                : "none",
+              pointerEvents: blockedUsers?.some(
+                (user) => user.id === message.user.id
+              )
+                ? "none"
+                : "auto",
+            }}
           >
-            <Text>{message.text}</Text>
+            <Flex flexDirection="column">
+              <Popover isLazy>
+                <PopoverTrigger>
+                  <Flex alignItems="center">
+                    <Avatar
+                      size="sm"
+                      name={message.user.nickname}
+                      src={message.user.imgPdp}
+                      _hover={{ boxShadow: "0 0 0 3px teal" }}
+                    />
+                    <Text ml={2}>{message.user?.nickname}</Text>
+                  </Flex>
+                </PopoverTrigger>
+                <Portal>
+                  <PopoverContent>
+                    <PopoverArrow />
+                    <PopoverHeader>
+                      <Button
+                        w={"100%"}
+                        as={RouteLink}
+                        to={"/profile/" + message.user?.id}
+                        alignItems={"center"}
+                        _hover={{ bg: "gray.200" }}
+                        p={2}
+                        borderRadius={5}
+                      >
+                        <Text>
+                          Visit
+                          <Text as="b" color="teal">
+                            {" "}
+                            {message.user?.nickname}
+                          </Text>
+                          's profile
+                        </Text>
+                        <ChevronRightIcon />
+                      </Button>
+                    </PopoverHeader>
+                    <PopoverCloseButton />
+                    <PopoverBody>
+                      <Flex justifyContent={"space-between"}>
+                        <AddFriendButton user={message.user} />
+                        <BlockUserButton user={message.user} />
+                        <PongInviteButton user={message.user} />
+                      </Flex>
+                    </PopoverBody>
+                  </PopoverContent>
+                </Portal>
+              </Popover>
+              <Text mt={1}>{message.text}</Text>
+            </Flex>
           </Box>
         ))}
+
         <div ref={messagesEndRef} />
       </VStack>
       <form onSubmit={handleSendMessage}>

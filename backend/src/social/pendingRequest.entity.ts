@@ -1,28 +1,33 @@
 import { User } from 'src/user/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, JoinTable, ManyToMany, ManyToOne, OneToOne } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  JoinTable,
+  ManyToOne,
+} from 'typeorm';
 
 @Entity('pendingRequest')
 export class PendingRequest {
-	@PrimaryGeneratedColumn()
-	id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-	@Column()
-	type: string;
+  @Column()
+  type: string;
 
-	@Column({ default: false })
-	accepted : boolean;
+  @Column({ default: false })
+  accepted: boolean;
 
-	@Column()
-	senderId: number
+  @Column()
+  senderId: number;
 
-	@Column({nullable : true})
-	senderNickname: string
+  @Column({ nullable: true })
+  senderNickname: string;
 
-	@Column({nullable : true})
-	senderPdp: string
+  @Column({ nullable: true })
+  senderPdp: string;
 
-	@ManyToOne(() => User, user => user.pendingRequests)
-	@JoinTable()
-	user : User
-	
+  @ManyToOne(() => User, (user) => user.pendingRequests)
+  @JoinTable()
+  user: User;
 }

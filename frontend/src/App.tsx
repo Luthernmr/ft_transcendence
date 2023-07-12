@@ -7,7 +7,7 @@ import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
 import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode } from "react";
 import UserProfile from "./components/User/Profile";
 import TwoFA from "./components/User/TwoFA";
 import OtherProfilPage from "./components/Social/OtherProfilPage";
@@ -24,21 +24,7 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 export default function App() {
   const navigate = useNavigate();
 
-  // 	userSocket.on("ping", () => {
-  //     //console.log("pinged");
-  //     userSocket.emit("pong");
-  //   });
-
-  //   pongSocket.on("connect", () => {
-  //     //console.log("pong socket connecting");
-  //   });
-  
-  chatSocket.on("disconnect", () => {
-    //console.log("chat socket connect");
-    // userSocket.connect();
-    // chatSocket.connect();
-    // pongSocket.connect();
-    });
+  chatSocket.on("disconnect", () => {});
 
   const getUser = async () => {
     const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
@@ -49,10 +35,9 @@ export default function App() {
     userSocket.auth = { token: res.data.jwt };
     chatSocket.auth = { token: res.data.jwt };
   };
-  
+
   chatSocket.on("connect", () => {
     getUser();
-    console.log("chat socket connect");
   });
 
   return (

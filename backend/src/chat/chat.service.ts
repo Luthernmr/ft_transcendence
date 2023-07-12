@@ -1,10 +1,6 @@
-import { BadGatewayException, Injectable, Logger } from '@nestjs/common';
-import {
-  SubscribeMessage,
-  WebSocketGateway,
-  WebSocketServer,
-} from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
+import { Injectable, Logger } from '@nestjs/common';
+import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 import { RoomService } from 'src/room/room.service';
 import { Room } from 'src/room/entities/room.entity';
 import { UserService } from 'src/user/user.service';
@@ -30,19 +26,11 @@ export class ChatService {
     this.logger = new Logger(ChatService.name);
   }
 
-  // @WebSocketServer()
-  // gateway.chatNamespace: Server;
-
   onModuleInit() {
     this.logger.log('Gateway initialized');
   }
 
   async handleDisconnect(socket: Socket) {
-    //CLearing SocketId from User on disconnect
-    // let user: User = await this.authService.getUserByToken(
-    //   socket.handshake.auth.token,
-    // );
-    // await this.userService.setSocket(user?.id, '');
     this.logger.log('id: ' + socket.id + ' disconnected');
   }
 
@@ -74,9 +62,9 @@ export class ChatService {
   }
 
   @SubscribeMessage('getUserRooms')
-  async getUserRooms(payload: { userId: number }) {
-    const rooms = await this.userService.getRoomsByUID(payload.userId);
-    this.gateway.chatNamespace.emit('roomList', rooms.rooms);
+  async getUserRooms(client: Socket, payload: { userId: number }) {
+    const rooms = await this.roomService.getAllAccessibleRooms(payload.userId);
+    client.emit('roomList', rooms);
   }
 
   @SubscribeMessage('checkRoomPassword')
@@ -111,7 +99,6 @@ export class ChatService {
   async getRoomMessages(client: Socket, room: Room) {
     try {
       const messages = await this.messageService.getMessagesByRoom(room.name);
-      // console.log('Room messages are :', messages)
       client.emit('roomMessages', messages);
     } catch (error) {
       client.emit('error', { message: error.message });

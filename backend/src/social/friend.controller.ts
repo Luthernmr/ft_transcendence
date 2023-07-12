@@ -1,4 +1,12 @@
-import { Controller, Post, Body, Get, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { Response, Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import { FriendService } from './friend.service';
@@ -7,26 +15,21 @@ import JwtTwoFactorGuard from 'src/auth/twofa.guard';
 
 @Controller('social')
 export class FriendController {
-	constructor(
-		private readonly userService: UserService,
-		private readonly authService: AuthService,
-		private readonly friendService: FriendService,
-	) { }
+  constructor(
+    private readonly userService: UserService,
+    private readonly authService: AuthService,
+    private readonly friendService: FriendService,
+  ) {}
 
-	@Post('addfriend')
-	@UseGuards(JwtTwoFactorGuard)
-	async addFriend(
-		@Body('id') id : number
-	){
-		this.friendService.addFriend(id);
-	}
-	@Get('allRequest')
-	@UseGuards(JwtTwoFactorGuard)
-	async allRequest(
-		@Req() request: Request,
-		@Res() response : Response
-	){
-		const user = await this.authService.getUserCookie(request);
-		response.send(await this.userService.getAllPendingRequest(user));
-	}
+  @Post('addfriend')
+  @UseGuards(JwtTwoFactorGuard)
+  async addFriend(@Body('id') id: number) {
+    this.friendService.addFriend(id);
+  }
+  @Get('allRequest')
+  @UseGuards(JwtTwoFactorGuard)
+  async allRequest(@Req() request: Request, @Res() response: Response) {
+    const user = await this.authService.getUserCookie(request);
+    response.send(await this.userService.getAllPendingRequest(user));
+  }
 }

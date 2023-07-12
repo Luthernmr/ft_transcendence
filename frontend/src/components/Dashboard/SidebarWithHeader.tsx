@@ -164,13 +164,7 @@ const NavItem = ({ icon, children, routeName, ...rest }: NavItemProps) => {
         }}
         {...rest}
       >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="16"
-            as={icon}
-          />
-        )}
+        {icon && <Icon mr="4" fontSize="16" as={icon} />}
         {children}
       </Flex>
     </Link>
@@ -206,13 +200,11 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   }, []);
   const signOut = async () => {
     try {
-      //console.log(response.data);
       sessionStorage.removeItem("jwt");
       sessionStorage.removeItem("currentUser");
       chatSocket.disconnect();
       userSocket.disconnect();
       pongSocket.disconnect();
-      //console.log("jwwwr", sessionStorage.getItem("jwt"));
     } catch (error) {}
   };
 
@@ -264,7 +256,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm" fontWeight={'bold'}>{user.nickname}</Text>
+                  <Text fontSize="sm" fontWeight={"bold"}>
+                    {user.nickname}
+                  </Text>
                 </VStack>
                 <Box display={{ base: "none", md: "flex" }}>
                   <FiChevronDown />
