@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Spacer, Flex, Box } from '@chakra-ui/react';
+import { Spacer, Flex, Box, Button } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import GameArea from './GameArea';
 import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
@@ -10,8 +10,8 @@ import UserArea from './UsersArea';
 
 interface GameScreenProps {
 	size: number,
-	watcher: boolean
-	initDatas: PongInitData;
+	watcher: boolean,
+	initDatas: PongInitData,
 	leaveGame: Function
 }
 
@@ -207,6 +207,8 @@ function GameScreen(props : GameScreenProps) {
 	}
 
 	return(
+		<>
+		<Text text="leave watch" onClick={() => {pongSocket.emit("LeaveWatch")}} visible={props.watcher == true} />
 		<Flex width={1060 * props.size} height={700 * props.size}>
 			<Box w={1060 * props.size * 0.5} bg='gray.300'>
 				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
@@ -214,8 +216,8 @@ function GameScreen(props : GameScreenProps) {
 						<Text text={countdown.current.toString()} fontSize={50} width={450} y={400} align='center' visible={countdown.current > 0} />
 						<Text text={`${winner.current === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won!`} fontSize={30} width={450} y={180} align='center' visible={winner.current != 0}/>
 						<Text text="Restart" fontSize={25} onClick={requestRestart} width={450} y={400} align='center' visible={gameState === GameState.Finished && props.watcher == false}/>
-						<Text text="Quit" fontSize={25} onClick={quit} width={450} y={450} align='center' visible={gameState === GameState.Finished}/>
-						<Text text="Opponent Disconnected !" fontSize={30} width={450} y={110} align='center' color='red' visible={opponentAlive === false && props.watcher == false}/>
+						<Text text="Quit" fontSize={25} onClick={quit} width={450} y={450} align='center' visible={gameState === GameState.Finished && props.watcher == false}/>
+						<Text text={playerNumber.current === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname + " disconnected !"} fontSize={30} width={450} y={110} align='center' color='red' visible={opponentAlive === false && props.watcher == false}/>
 						<GameArea 	width={props.initDatas.width}
 									height={props.initDatas.height}
 									size={props.size}
@@ -241,6 +243,7 @@ function GameScreen(props : GameScreenProps) {
 							/>
 			</Box>
 		</Flex>
+		</>
 	)
 }
 
