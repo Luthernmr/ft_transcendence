@@ -4,9 +4,10 @@ import { Spacer, Flex, Box, Button } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import GameArea from './GameArea';
 import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
-	Shape, Paddle, Score, OFFSET_X, OFFSET_Y, GameState }
+	Shape, Paddle, Score, OFFSET_X, OFFSET_Y, GameState, UserDatas }
 	from './PongSettings';
 import UserArea from './UsersArea';
+import WatchersArea from './WatchersArea';
 
 interface GameScreenProps {
 	size: number,
@@ -33,6 +34,7 @@ function GameScreen(props : GameScreenProps) {
 	const winner = useRef<number>(0);
 	const countdown = useRef<number>(0);
 	const [opponentAlive, setOpponentAlive] = useState<boolean>(true);
+	const watchers = useRef<UserDatas[]>([]);
 
 	//Time
 	const requestRef = useRef(0);
@@ -46,6 +48,7 @@ function GameScreen(props : GameScreenProps) {
 			ballDelta.current = datas.ballDelta;
 			score.current = { scoreP1: datas.scoreP1, scoreP2: datas.scoreP2 };
 			winner.current = datas.winner;
+			watchers.current = props.initDatas.watchers;
 			setPaddleP1({
 				pos: datas.paddle1Pos,
 				delta: datas.paddle1Delta
@@ -140,6 +143,15 @@ function GameScreen(props : GameScreenProps) {
 			props.leaveGame();
 		}
 
+		function AddWatcher(datas: UserDatas) {
+			watchers.current.push(datas);
+		}
+
+		function RemoveWatcher(id: number) {
+			const index = watchers.current.findIndex((w) => w.id === id);
+			watchers.current.splice(index, 1);
+		}
+
 		pongSocket.on('StartGame', Start);
 		pongSocket.on('BallDelta', BallDelta);
 		pongSocket.on('PaddleDelta', PaddleDelta);
@@ -148,6 +160,8 @@ function GameScreen(props : GameScreenProps) {
 		pongSocket.on('OpponentDisconnected', OpponentDisconnected);
 		pongSocket.on('OpponentReconnected', OpponentReconnected);
 		pongSocket.on('OpponentQuit', OpponentQuit);
+		pongSocket.on('AddWatcher', AddWatcher);
+		pongSocket.on('RemoveWatcher', RemoveWatcher);
 
 		return () => {
 			pongSocket.off('StartGame', Start);
@@ -158,6 +172,8 @@ function GameScreen(props : GameScreenProps) {
 			pongSocket.off('OpponentDisconnected', OpponentDisconnected);
 			pongSocket.off('OpponentReconnected', OpponentReconnected);
 			pongSocket.off('OpponentQuit', OpponentQuit);
+			pongSocket.off('AddWatcher', AddWatcher);
+			pongSocket.off('RemoveWatcher', RemoveWatcher);
 		}
 	}, [])
 
@@ -208,9 +224,19 @@ function GameScreen(props : GameScreenProps) {
 
 	return(
 		<>
-		<Text text="leave watch" onClick={() => {pongSocket.emit("LeaveWatch")}} visible={props.watcher == true} />
-		<Flex width={1060 * props.size} height={700 * props.size}>
-			<Box w={1060 * props.size * 0.5} bg='gray.300'>
+		<Flex width='100%' height={680 * props.size}>
+			<Box w='100%' borderRadius={10}>
+				<UserArea 	width={props.initDatas.width}
+							height={700 * props.size}
+							size={props.size}
+							mirror={playerNumber.current === 1 ? false : true}
+							scoreP1={playerNumber.current === 1 ? score.current.scoreP1 : score.current.scoreP2}
+							scoreP2={playerNumber.current === 1 ? score.current.scoreP2 : score.current.scoreP1}
+							user1Datas={playerNumber.current === 1 ? props.initDatas.user1Datas : props.initDatas.user2Datas}
+							user2Datas={playerNumber.current === 1 ? props.initDatas.user2Datas : props.initDatas.user1Datas}
+							/>
+			</Box>
+			<Box w={1060 * props.size * 0.5} bg='gray.100' borderRadius={10}>
 				<Stage x={OFFSET_X * props.size} y={OFFSET_Y * props.size} width={500} height={700} scale={{x: props.size, y: props.size}}>
 					<Layer>
 						<Text text={countdown.current.toString()} fontSize={50} width={450} y={400} align='center' visible={countdown.current > 0} />
@@ -230,17 +256,9 @@ function GameScreen(props : GameScreenProps) {
 					</Layer>
 				</Stage>
 			</Box>
-			<Spacer />
-			<Box w={1060 * props.size * 0.5} bg='yellow.100'>
-				<UserArea 	width={props.initDatas.width}
-							height={700 * props.size}
-							size={props.size}
-							mirror={playerNumber.current === 1 ? false : true}
-							scoreP1={playerNumber.current === 1 ? score.current.scoreP1 : score.current.scoreP2}
-							scoreP2={playerNumber.current === 1 ? score.current.scoreP2 : score.current.scoreP1}
-							user1Datas={playerNumber.current === 1 ? props.initDatas.user1Datas : props.initDatas.user2Datas}
-							user2Datas={playerNumber.current === 1 ? props.initDatas.user2Datas : props.initDatas.user1Datas}
-							/>
+			<Box w='100%'>
+				{props.watcher && <Button onClick={() => pongSocket.emit("LeaveWatch")}>Leave Watch</Button>}
+				<WatchersArea watchers={watchers.current}/>
 			</Box>
 		</Flex>
 		</>

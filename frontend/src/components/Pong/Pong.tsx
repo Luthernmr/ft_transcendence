@@ -36,8 +36,9 @@ function Pong() {
     playerNumber: 1,
     gameState: GameState.Playing,
     winner: 0,
-    user1Datas: {nickname: "", imgPdp: "", level: 0},
-    user2Datas: {nickname: "", imgPdp: "", level: 0},
+    user1Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
+    user2Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
+    watchers: []
   });
   
   useEffect(() => {

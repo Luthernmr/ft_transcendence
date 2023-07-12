@@ -7,6 +7,7 @@ import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { debug } from 'console';
+import { watch } from 'fs';
 
 const COUNTDOWN: number = 3000;
 
@@ -68,7 +69,8 @@ enum FrontGameState {
 	Finished
 }
 
-interface UserDatas {
+export interface UserDatas {
+	id: number,
 	nickname: string,
 	imgPdp: string,
 	level: number
@@ -79,10 +81,12 @@ export interface PongInitData extends GameLayout, Score {
 	gameState: FrontGameState,
 	winner: number,
 	user1Datas: UserDatas,
-	user2Datas: UserDatas
+	user2Datas: UserDatas,
+	watchers: Array<UserDatas>
 }
 
 const BASE_USER_DATAS: UserDatas = {
+	id: -1,
 	nickname: "",
 	imgPdp: "",
 	level: 0
@@ -99,7 +103,8 @@ const BASE_INIT_DATAS: PongInitData = {
 	user2Datas: BASE_USER_DATAS,
 	playerNumber: 1,
 	gameState: FrontGameState.Playing,
-	winner: 0
+	winner: 0,
+	watchers: []
 }
 
 export interface PongInitEntities extends BallRuntimeData, PaddleRuntimeData {
@@ -308,6 +313,9 @@ export class PongService {
 		this.LeaveQueue(index);
 
 		// Watcher
+		const watchRoomIndex = this.watchers[index];
+		if (watchRoomIndex >= 0)
+			this.RemoveWatcher(watchRoomIndex, index);
 		this.watchers[index] = -1;
 
 		// Running Game
@@ -446,24 +454,24 @@ export class PongService {
 		}
 	}
 
-	SendGameState(socket) {
-		const gameState = this.GetGameState(socket);
+	async SendGameState(socket) {
+		const gameState = await this.GetGameState(socket);
 		this.pongGateway.EmitGameState(socket, gameState);
 	}
 
-	GetGameState(socket: Socket) : GameDatas {
+	async GetGameState(socket: Socket) : Promise<GameDatas> {
 		const userInGame = this.FindIndexBySocketId(socket.id);
 
 		if (userInGame >= 0)
 			return { 	pongState: PongState.Play,
-						payload: this.GetCurrentGameDatas(socket, userInGame) };
+						payload: await this.GetCurrentGameDatas(socket, userInGame) };
 
 		const userIndex = this.userInfos.findIndex(data => data.socket === socket);
 
 		const watcherRuntimeRoomIndex = this.watchers[userIndex];
 		if (watcherRuntimeRoomIndex >= 0)
 			return { 	pongState: PongState.Watch,
-						payload: this.GetCurrentGameDatas(socket, watcherRuntimeRoomIndex) };
+						payload: await this.GetCurrentGameDatas(socket, watcherRuntimeRoomIndex) };
 
 		const queueInfos = this.UserInQueue(this.userInfos[userIndex].userId);
 				
@@ -474,7 +482,7 @@ export class PongService {
 					} };
 	}
 
-	GetCurrentGameDatas(socket: Socket, index: number) : PongInitData {
+	async GetCurrentGameDatas(socket: Socket, index: number) : Promise<PongInitData> {
 		let playerNumber = 2;
 		if (this.GetSocket(this.usersRuntime[index].indexUser2) === socket)
 			playerNumber = 1;
@@ -491,10 +499,24 @@ export class PongService {
 			gameState: this.gameState[index] === GameState.WaitingForRestart ? FrontGameState.Finished : FrontGameState.Playing,
 			winner: this.gameState[index] === GameState.WaitingForRestart ? ( this.scoreData[index].scoreP1 > this.scoreData[index].scoreP2 ? 1 : 2 ) : 0,
 			user1Datas: this.usersRuntime[index].user1Datas,
-			user2Datas: this.usersRuntime[index].user2Datas
+			user2Datas: this.usersRuntime[index].user2Datas,
+			watchers: await this.GetWatchersDatas(index)
 		}
 
 		return state;
+	}
+
+	async GetWatchersDatas(index: number) : Promise<Array<UserDatas>> {
+		const watchersList : Array<UserDatas> = [];
+
+		for (let i = 0; i < this.watchers.length; i++) {
+			if (this.watchers[i] === index) {
+				const user = await this.userService.getUserById(this.userInfos[i].userId);
+				watchersList.push(user);
+			}
+		}
+
+		return watchersList;
 	}
 
 	async SetPlayingState(player1: UserInfosIndex, player2: UserInfosIndex, state: boolean) : Promise<{user1: User, user2: User}> {
@@ -522,11 +544,13 @@ export class PongService {
 			indexUser1: player1,
 			indexUser2: player2,
 			user1Datas:  {
+				id: user1.id,
 				nickname: user1.nickname,
 				imgPdp: user1.imgPdp,
 				level: user1.level
 			},
 			user2Datas: {
+				id: user2.id,
 				nickname: user2.nickname,
 				imgPdp: user2.imgPdp,
 				level: user2.level
@@ -699,20 +723,25 @@ export class PongService {
 		this.AddWatcher(playerRuntimeRoomIndex, watcherUserInfosIndex);
 	}
 
-	AddWatcher(roomIndex: number, watcherInfoIndex: UserInfosIndex) {
+	async AddWatcher(roomIndex: number, watcherInfoIndex: UserInfosIndex) {
 		if (roomIndex < 0)
 			return;
+
+		const user = await this.userService.getUserById(this.userInfos[watcherInfoIndex].userId);
 
 		const socket = this.userInfos[watcherInfoIndex].socket;
 		
 		this.watchers[watcherInfoIndex] = roomIndex;
 
+		this.pongGateway.EmitAddWatcher(roomIndex, user);
+
 		socket.join('room' + this.roomID[roomIndex]);
 
-		const gameDatas = this.GetCurrentGameDatas(socket, roomIndex);
+		const gameDatas = await this.GetCurrentGameDatas(socket, roomIndex);
 
 		this.pongGateway.EmitGameState(socket, {pongState : PongState.Watch, payload : gameDatas});
 	}
+
 
 	RemoveWatcher(roomIndex: number, watcherInfoIndex: UserInfosIndex) {
 		const socket = this.userInfos[watcherInfoIndex].socket;
@@ -721,18 +750,21 @@ export class PongService {
 
 		socket.leave("room" + this.roomID[roomIndex]);
 
+		this.pongGateway.EmitRemoveWatcher(roomIndex, this.userInfos[watcherInfoIndex].userId);
+
 		this.SendGameState(socket);
 	}
 
 	RemoveWatcherBySocket(socket: Socket) {
 		const watcherInfoIndex = this.userInfos.findIndex(info => info.socket === socket);
-
+	
 		const watcherRoomIndex = this.watchers[watcherInfoIndex];
 		if (watcherRoomIndex < 0)
 			return;
-
+		
 		this.RemoveWatcher(watcherRoomIndex, watcherInfoIndex);
 	}
+
 
 	async StartGameAtCountdown(index: number, countdown: number) {				
 		this.pongGateway.EmitStartGame(this.roomID[index], COUNTDOWN / 1000);
