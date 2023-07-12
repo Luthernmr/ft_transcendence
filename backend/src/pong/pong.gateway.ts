@@ -98,9 +98,14 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.PaddleKeyUp(socket.id, input);
   }
 
-  @SubscribeMessage('watch')
-  handleWatch(@ConnectedSocket() socket: Socket, @MessageBody() roomIndex: number) {
-    this.pongService.AddWatcher(roomIndex, socket);
+  @SubscribeMessage('Watch')
+  handleWatch(@ConnectedSocket() socket: Socket) {
+    this.pongService.WatchRandom(socket);
+  }
+
+  @SubscribeMessage('LeaveWatch')
+  handleLeaveWatch(@ConnectedSocket() socket: Socket) {
+    this.pongService.RemoveWatcherBySocket(socket);
   }
 
   private EmitEvent(event: string, roomID: number, datas: any) {
@@ -145,7 +150,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.EmitEvent('End', roomID, datas);
   }
 
-  EmitWatcher(socket: Socket, datas: WatcherInitDatas) {
+  EmitWatcher(socket: Socket, datas: any) {
     socket.emit('Watcher', datas);
   }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Button, Center } from '@chakra-ui/react';
+import { Button, Center, Flex } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData, WatcherInitDatas,
           PongDisplay, PongState, GameState }
@@ -67,11 +67,16 @@ function Pong() {
       if (datas.pongState === PongState.Home) {
         pongQueueOnInit.current = datas.payload.pongQueue;
         gnopQueueOnInit.current = datas.payload.gnopQueue;
-      } else if (datas.pongState === PongState.Play) {
+      } else if (datas.pongState === PongState.Play || datas.pongState === PongState.Watch) {
         pongQueueOnInit.current = false;
         gnopQueueOnInit.current = false;
         setInitDatas(datas.payload);
       }
+
+      if (datas.pongState === PongState.Watch)
+        watching.current = true;
+      else
+        watching.current = false;
 
       setPongState(datas.pongState);
     }
@@ -117,21 +122,52 @@ function Pong() {
     }
   }, []);
 
-  const WatchGame = () => {
-    pongSocket.emit('watch');
+  const LeaveGame = () => {
+    pongQueueOnInit.current = false;
+    gnopQueueOnInit.current = false;
+    setPongState(PongState.Home)
   }
 
   if (pongState === PongState.Load) {
     return (
-      <LoadScreen />
+      <Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      minHeight={"100%"}
+      flex={"1"}
+      direction={"column"}
+      maxH={"100%"}
+      overflowY="auto">
+        <LoadScreen />
+      </Flex>
     )
   } else if (pongState === PongState.Home) {
     return (
-      <HomeScreen pongQueue={pongQueueOnInit.current} gnopQueue={gnopQueueOnInit.current} WatchGame={WatchGame} />
+      <>
+      <Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      minHeight={"100%"}
+      flex={"1"}
+      direction={"column"}
+      maxH={"100%"}
+      overflowY="auto">
+        <HomeScreen pongQueue={pongQueueOnInit.current} gnopQueue={gnopQueueOnInit.current} />
+      </Flex>
+      </>
     )
   } else if (pongState === PongState.Play || pongState === PongState.Watch) {
     return (
-      <GameScreen size={size} watcher={watching.current} initDatas={initDatas} leaveGame={() => setPongState(PongState.Home)}/>
+      <Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      minHeight={"100%"}
+      flex={"1"}
+      direction={"column"}
+      maxH={"100%"}
+      overflowY="auto">
+        <GameScreen size={size} watcher={watching.current} initDatas={initDatas} leaveGame={LeaveGame}/>
+      </Flex>
       )
   }
 }
