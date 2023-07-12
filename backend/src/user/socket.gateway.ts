@@ -35,6 +35,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.handshake.auth.token,
 			);
 			if (user) {
+				await this.userService.setOnline(user);
 				client.emit('success', { message: "Connected !" });
 
 				this.gateway.userNamespace.emit('reloadLists');

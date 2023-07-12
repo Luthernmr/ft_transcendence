@@ -56,7 +56,7 @@ export default function SidebarWithHeader({
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const currentUser: User = JSON.parse(
 		sessionStorage.getItem("currentUser") || "{}"
-	  );
+	);
 	return (
 		<>
 			<Flex
@@ -91,7 +91,7 @@ export default function SidebarWithHeader({
 				>
 					{children}
 					<Box ml={5}>
-						<FriendList/>
+						<FriendList />
 					</Box>
 				</Flex>
 			</Flex>
