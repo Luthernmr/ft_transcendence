@@ -24,12 +24,23 @@ export class FriendController {
   @Post('addfriend')
   @UseGuards(JwtTwoFactorGuard)
   async addFriend(@Body('id') id: number) {
-    this.friendService.addFriend(id);
+	try {
+		
+		await this.friendService.addFriend(id);
+	} catch (error) {
+		
+	}
   }
+
   @Get('allRequest')
   @UseGuards(JwtTwoFactorGuard)
   async allRequest(@Req() request: Request, @Res() response: Response) {
-    const user = await this.authService.getUserCookie(request);
-    response.send(await this.userService.getAllPendingRequest(user));
+	try {
+		const user = await this.authService.getUserCookie(request);
+		response.send(await this.userService.getAllPendingRequest(user));
+		
+	} catch (error) {
+		
+	}
   }
 }

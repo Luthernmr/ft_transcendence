@@ -29,17 +29,27 @@ export class UserController {
   @Get('all')
   @UseGuards(JwtTwoFactorGuard)
   async all(@Res() response: Response) {
-    const users = await this.userService.getAllUser();
-    const allUsers = { users: users };
-    response.send(allUsers);
+	try {
+		const users = await this.userService.getAllUser();
+		const allUsers = { users: users };
+		response.send(allUsers);
+		
+	} catch (error) {
+		
+	}
   }
 
   @Get(':id')
   @UseGuards(JwtTwoFactorGuard)
   async user(@Res() response: Response, @Param('id') id: number) {
-    const user = await this.userService.getUserById(id);
-    delete user.password;
-    response.send({ user: user });
+	try {
+		const user = await this.userService.getUserById(id);
+		delete user.password;
+		response.send({ user: user });
+		
+	} catch (error) {
+		
+	}
   }
 
   @Get('history/:id')
@@ -157,12 +167,19 @@ export class UserController {
         await this.userService.changeImg(user, response.filePath);
         return response;
       }
-    } catch (error) {}
+    } catch (error) {
+		console.log('hello', error)
+	}
   }
 
   @Get('avatars/:filename')
   @UseGuards(JwtTwoFactorGuard)
   async getPicture(@Param('filename') filename: any, @Res() res: Response) {
-    res.sendFile(filename, { root: './uploadedFiles' });
+	try {
+			res.sendFile(filename, { root: './uploadedFiles' });
+		
+	} catch (error) {
+		console.log('file has been deleted or not exist',error)
+	}
   }
 }

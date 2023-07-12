@@ -73,7 +73,7 @@ export default function AllfriendItem() {
 									<Button
 										w={"100%"}
 										as={RouteLink}
-										to={"/profile/" + friend.id}
+										to={"/profile/" + friend?.id}
 										alignItems={"center"}
 										_hover={{ bg: "gray.200" }}
 										p={2}
@@ -83,7 +83,7 @@ export default function AllfriendItem() {
 											Visit
 											<Text as="b" color="teal">
 												{" "}
-												{friend.nickname}
+												{friend?.nickname}
 											</Text>{" "}
 											profile
 										</Text>

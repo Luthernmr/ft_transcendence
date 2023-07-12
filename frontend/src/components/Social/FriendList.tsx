@@ -3,6 +3,9 @@ import AllUserItem from "./AllUserItem";
 import AllfriendItem from "./AllFriendsItem";
 
 export default function FriendList() {
+	const currentUser: User = JSON.parse(
+		sessionStorage.getItem("currentUser") || "{}"
+	  );
   return (
     <>
       <Tabs variant="soft-rounded">
@@ -15,7 +18,7 @@ export default function FriendList() {
             <AllfriendItem />
           </TabPanel>
           <TabPanel>
-            <AllUserItem />
+            <AllUserItem user={currentUser}/>
           </TabPanel>
         </TabPanels>
       </Tabs>

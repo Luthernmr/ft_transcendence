@@ -34,7 +34,7 @@ export interface User {
   ratioToNextLevel: number;
 }
 
-export default function AllUserItem() {
+export default function AllUserItem(props : any) {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
@@ -50,9 +50,9 @@ export default function AllUserItem() {
   if (users)
     return (
       <List>
-        {users.map((user) => (
-          <Popover key={user.id} isLazy>
-            <Box>
+        {users.map((user) => ( 
+			<Popover key={user.id} isLazy>
+            {props.user.id != user.id && <Box>
               <ListItem>
                 <PopoverTrigger>
                   <Box>
@@ -60,7 +60,7 @@ export default function AllUserItem() {
                   </Box>
                 </PopoverTrigger>
               </ListItem>
-            </Box>
+            </Box>}
             <Portal>
               <PopoverContent>
                 <PopoverArrow />

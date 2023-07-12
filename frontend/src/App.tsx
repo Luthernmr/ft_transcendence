@@ -13,6 +13,7 @@ import TwoFA from "./components/User/TwoFA";
 import OtherProfilPage from "./components/Social/OtherProfilPage";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useToast } from "@chakra-ui/react";
 
 function PrivateRoute({ children }: { children: ReactNode }) {
   if (!sessionStorage.getItem("jwt")) {
@@ -25,6 +26,28 @@ export default function App() {
   const navigate = useNavigate();
 
   chatSocket.on("disconnect", () => {});
+
+  const toast = useToast();
+
+
+  const handleError = (error: { message: string }) => {
+    toast({
+      title: error.message,
+      status: "error",
+      isClosable: true,
+      position: "top",
+    });
+  };
+  const handleSuccess = (sucess: { message: string }) => {
+    toast({
+      title: sucess.message,
+      status: "success",
+      isClosable: true,
+      position: "top",
+    });
+  };
+  userSocket.on("error", handleError);
+  userSocket.on("success", handleSuccess);
 
   const getUser = async () => {
     const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {

@@ -30,21 +30,33 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	async handleConnection(client: Socket) {
-		let user: User = await this.authService.getUserByToken(
-			client.handshake.auth.token,
-		);
-		if (user) {
+		try {
+			let user: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			if (user) {
+				client.emit('success', { message: "Connected !" });
+
 				this.gateway.userNamespace.emit('reloadLists');
-		} else client.disconnect();
+			} else client.disconnect();
+
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	async handleDisconnect(client: Socket) {
-		const user: User = await this.authService.getUserByToken(
-			client.handshake.auth.token,
-		);
-		if (user) {
-			await this.userService.setOffline(user);
-			this.gateway.userNamespace.emit('reloadLists');
+		try {
+
+			const user: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			if (user) {
+				await this.userService.setOffline(user);
+				this.gateway.userNamespace.emit('reloadLists');
+			}
+		} catch (error) {
+			client.emit('error', { message: error.message });
 		}
 	}
 
@@ -55,13 +67,14 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			userReceiveId: number;
 		},
 	) {
-		const userSender: User = await this.authService.getUserByToken(
-			client.handshake.auth.token,
-		);
-		const userReceiv: User = await this.userService.getUserById(
-			data.userReceiveId,
-		);
+		
 		try {
+			const userSender: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			const userReceiv: User = await this.userService.getUserById(
+				data.userReceiveId,
+			);
 			const alreadyExist = await this.friendService.getRelation(
 				userSender,
 				userReceiv,
@@ -69,7 +82,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (alreadyExist != null)
 				throw new BadRequestException('Alreedy friend.');
 			if (userReceiv.id == userSender.id)
-				throw new BadRequestException('can t send request');
+				throw new BadRequestException('Cannot invite yourself');
 			await this.userService.createPendingRequest({
 				type: 'Friend',
 				senderId: userSender.id,
@@ -82,9 +95,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userReceiv.id,
 			);
 			otherSocket.emit('notifyRequest');
-			client.emit('sendSuccess');
+			client.emit('success', { message: "Friend request sent" });
+
 		} catch (error) {
-			client.emit('alreadyFriend');
+			client.emit('error', { message: error.message });
 		}
 	}
 
@@ -95,15 +109,15 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			userReceiveId: number;
 		},
 	) {
-		const userSender: User = await this.authService.getUserByToken(
-			client.handshake.auth.token,
-		);
-		const userReceiv: User = await this.userService.getUserById(
-			data.userReceiveId,
-		);
 		try {
+			const userSender: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			const userReceiv: User = await this.userService.getUserById(
+				data.userReceiveId,
+			);
 			if (userReceiv.id == userSender.id)
-				throw new BadRequestException('can t send request');
+				throw new BadRequestException('Cannot play with yourself');
 			await this.userService.createPendingRequest({
 				type: 'Pong',
 				senderId: userSender.id,
@@ -116,9 +130,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userReceiv.id,
 			);
 			otherSocket.emit('notifyRequest');
-			client.emit('sendSuccess');
+			client.emit('success', { message: "Pong request sent" });
 		} catch (error) {
-			client.emit('alreadyFriend');
+			client.emit('error', { message: error.message });
 		}
 	}
 
@@ -143,7 +157,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit('duelAcccepted');
 			otherSocket.emit('duelAcccepted');
 			await this.userService.deletePendingRequestById(request);
-		} catch (error) { }
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	@SubscribeMessage('acceptFriendRequest')
@@ -175,7 +191,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.to(otherId).emit('reload');
 			client.emit('requestAcccepted');
 			await this.userService.deletePendingRequestById(request);
-		} catch (error) { }
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	@SubscribeMessage('rejectRequest')
@@ -190,7 +208,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				await this.userService.getPendingRequestById(data.requestId);
 			await this.userService.deletePendingRequestById(request);
 			client.emit('requestRejected');
-		} catch (error) { }
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	@SubscribeMessage('getFriends')
@@ -201,7 +221,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			);
 			const friendList = await this.friendService.getFriends(currentUser);
 			client.emit('friendsList', friendList);
-		} catch (error) { }
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	@SubscribeMessage('deleteFriend')
@@ -215,13 +237,21 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			);
 			await this.friendService.deleteFriend(currentUser, friendUser);
 			client.emit('reload');
-		} catch (error) { }
+
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	@SubscribeMessage('getAllUsers')
 	async getAllUsers(client: Socket) {
-		const users: User[] = await this.userService.getAllUser();
-		client.emit('userList', users);
+		try {
+			const users: User[] = await this.userService.getAllUser();
+			client.emit('userList', users);
+			
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	@SubscribeMessage('getPendingRequest')
@@ -234,7 +264,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				currentUser,
 			);
 			client.emit('pendingRequestsList', pendingRequests);
-		} catch (error) { }
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		}
 	}
 
 	/* -------------------------------------------------------------------------- */
@@ -248,27 +280,29 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			userBlockedId: any;
 		},
 	) {
-		const userSender: User = await this.authService.getUserByToken(
-			client.handshake.auth.token,
-		);
-		const userBlocked: any = await this.userService.getUserById(
-			data.userBlockedId,
-		);
-
+		
 		try {
+			const userSender: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			const userBlocked: any = await this.userService.getUserById(
+				data.userBlockedId,
+			);
 			const alreadyBlock: any = await this.friendService.getBlockedRelation(
 				userSender,
 				userBlocked,
 			);
 			if (userSender.id == userBlocked.id || alreadyBlock)
-				throw new BadRequestException('block error');
+				throw new BadRequestException('Cannot block this user');
 			await this.friendService.blockUser({
 				currentUser: userSender,
 				otherUser: userBlocked,
 			});
 			client.emit('userHasBlocked');
+			this.deleteFriend(client, data.userBlockedId);
+			client.emit('success', { message: "User blocked and deleted" });
 		} catch (error) {
-			client.emit('alreadyBlocked');
+			client.emit('error', { message: error.message });
 		}
 	}
 
@@ -282,7 +316,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				currentUser,
 			);
 			client.emit('blockedList', blockedList);
-		} catch (error) { }
+		} catch (error) {
+			client.emit('error', { message: error.message });
+		 }
 	}
 
 	@SubscribeMessage('unblockUser')
@@ -296,6 +332,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			);
 			await this.friendService.unblockUser(currentUser, otherUser);
 			client.emit('userHasBlocked');
-		} catch (error) { }
+		} catch (error)
+		{
+			client.emit('error', { message: error.message });
+		}
 	}
 }

@@ -8,7 +8,7 @@ export default function DeleteFriendButton(props: any) {
     userSocket.emit("deleteFriend", { friendId: id });
   }
   return (
-    <Button colorScheme="red" onClick={(e) => deleteFriend(e, props.friend.id)}>
+    <Button colorScheme="red" onClick={(e) => deleteFriend(e, props.user.id)}>
       <DeleteIcon />
     </Button>
   );
