@@ -1,9 +1,5 @@
-/*
-https://docs.nestjs.com/modules
-*/
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/user.entity';
-
 import { Module } from '@nestjs/common';
 import { Friend } from 'src/social/friend.entity';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
@@ -21,7 +17,15 @@ import { PongHistory } from 'src/pong/pongHistory.entity';
       username: 'root',
       password: 'root',
       database: 'ft_db',
-      entities: [User, Friend, PendingRequest, BlockedUser, Room, Message, PongHistory],
+      entities: [
+        User,
+        Friend,
+        PendingRequest,
+        BlockedUser,
+        Room,
+        Message,
+        PongHistory,
+      ],
       synchronize: true,
     }),
   ],

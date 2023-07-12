@@ -11,14 +11,14 @@ export class CreateRoomDto {
   @IsOptional()
   @IsString()
   readonly password?: string;
-  
+
   @IsArray()
   readonly users: User[];
-  
+
   @IsOptional()
   @IsArray()
   readonly admins: User[];
-  
+
   @IsOptional()
   @IsArray()
   readonly bannedUsers: User[];

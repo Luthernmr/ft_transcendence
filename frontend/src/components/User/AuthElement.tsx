@@ -42,7 +42,6 @@ export default function AuthElement() {
               pongSocket.connect();
               navigate("/home");
             }
-            //pongSocket.emit("register", { token: res.data.jwt });
           } else onOpen();
         } catch (error) {
           toast({
@@ -54,12 +53,11 @@ export default function AuthElement() {
         }
       };
       getAuthToken();
-      setAuthTokenCalled(true); // Mettre à jour l'état pour indiquer que getAuthToken a été appelée
+      setAuthTokenCalled(true);
     }
-  }, [authTokenCalled]); // Inclure authTokenCalled dans les dépendances du useEffect
+  }, [authTokenCalled]);
 
   async function handleclick() {
-    //console.log(response.data);
     sessionStorage.removeItem("jwt");
     sessionStorage.removeItem("currentUser");
     navigate("/login");

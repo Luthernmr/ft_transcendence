@@ -49,9 +49,19 @@ const RoomList: React.FC<RoomListProps> = ({
 
   useEffect(() => {
     chatSocket.emit("getUserRooms", { userId: currentUser.id });
+
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
     });
+
+    chatSocket.on("roomCreated", () => {
+      chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    });
+
+    return () => {
+      chatSocket.off("roomList");
+      chatSocket.off("roomCreated");
+    };
   }, [currentUser.id]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -125,7 +135,7 @@ const RoomList: React.FC<RoomListProps> = ({
               key={index}
               onClick={() => handleRoomClick(room)}
               _hover={{
-                transform: "translateY(-2px) scale(0.99)",
+                transform: "scaleX(0.98)",
               }}
             >
               <HStack>
