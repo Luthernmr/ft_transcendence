@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas, UserDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -98,9 +98,14 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.pongService.PaddleKeyUp(socket.id, input);
   }
 
-  @SubscribeMessage('watch')
-  handleWatch(@ConnectedSocket() socket: Socket, @MessageBody() roomIndex: number) {
-    this.pongService.AddWatcher(roomIndex, socket);
+  @SubscribeMessage('Watch')
+  handleWatch(@ConnectedSocket() socket: Socket) {
+    this.pongService.WatchRandom(socket);
+  }
+
+  @SubscribeMessage('LeaveWatch')
+  handleLeaveWatch(@ConnectedSocket() socket: Socket) {
+    this.pongService.RemoveWatcherBySocket(socket);
   }
 
   private EmitEvent(event: string, roomID: number, datas: any) {
@@ -145,7 +150,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.EmitEvent('End', roomID, datas);
   }
 
-  EmitWatcher(socket: Socket, datas: WatcherInitDatas) {
+  EmitWatcher(socket: Socket, datas: any) {
     socket.emit('Watcher', datas);
   }
 
@@ -155,5 +160,15 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   EmitOpponentReconnected(socket: Socket) {
     socket.emit('OpponentReconnected')
+  }
+
+  EmitAddWatcher(roomID: number, datas: UserDatas) {
+    this.EmitEvent('AddWatcher', roomID, datas);
+  }
+
+
+  EmitRemoveWatcher(roomID: number, id: number) {
+    console.log("Sending id: " + id);
+    this.EmitEvent('RemoveWatcher', roomID, id);
   }
 }

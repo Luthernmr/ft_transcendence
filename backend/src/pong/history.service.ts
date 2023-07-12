@@ -30,34 +30,39 @@ export class HistoryService {
 	}
 
 	async addEntry(ids: IDPair, score: Score, custom: boolean = false) {
-    const user1 = await this.userService.getUserById(ids.idP1);
-    const user2 = await this.userService.getUserById(ids.idP2);
+		const user1 = await this.userService.getUserById(ids.idP1);
+		const user2 = await this.userService.getUserById(ids.idP2);
 
-    const winner = score.scoreP1 > score.scoreP2 ? 1 : 2;
+		const winner = score.scoreP1 > score.scoreP2 ? 1 : 2;
 
-    const winnerUser = winner === 1 ? user1 : user2;
-    const loserUser = winnerUser === user1 ? user2 : user1;
+		const winnerUser = winner === 1 ? user1 : user2;
+		const loserUser = winnerUser === user1 ? user2 : user1;
 
-    const levelDiff = loserUser.level - winnerUser.level;
-    const xpGained =
-      levelDiff > 0 ? XP_GAIN_WIN * (levelDiff + 1) : XP_GAIN_WIN;
+		const levelDiff = loserUser.level - winnerUser.level;
+		const xpGained =
+		levelDiff > 0 ? XP_GAIN_WIN * (levelDiff + 1) : XP_GAIN_WIN;
 
-    await this.addXP(winnerUser, xpGained);
-    await this.addXP(loserUser, XP_GAIN_LOSS);
+		try {
+			await this.addXP(winnerUser, xpGained);
+			await this.addXP(loserUser, XP_GAIN_LOSS);
+		} catch (error) {
+			console.log(error)
+		}
 
-    //console.log('user1 lvl: ', user1.level, 'xp: ', user1.experience);
-    //console.log('user2 lvl: ', user2.level, 'xp: ', user2.experience);
+		const history = {
+		user1: user1,
+		user2: user2,
+		winner: winner,
+		scoreUser1: score.scoreP1,
+		scoreUser2: score.scoreP2,
+		customMode: custom
+		};
 
-    const history = {
-      user1: user1,
-      user2: user2,
-      winner: winner,
-      scoreUser1: score.scoreP1,
-      scoreUser2: score.scoreP2,
-	  customMode: custom
-    };
-
-    await this.pongHistory.save(history);
+		try {
+			await this.pongHistory.save(history);
+		} catch (error) {
+			console.log(error);
+		}
   }
 
 	async addXP(user: User, xp: number) {
@@ -76,19 +81,15 @@ export class HistoryService {
     const percentageToNextLevel = currentLevelXP / (userLevel * 100);
     const ratioToNextLevel = Math.trunc(percentageToNextLevel * 100);
 
-    //console.log(
-    //   'XP user ' + user.id,
-    //   ' : ',
-    //   userLevel,
-    //   userXP,
-    //   ratioToNextLevel,
-    // );
-
-    await this.userRepository.update(user.id, {
-      level: userLevel,
-      experience: userXP,
-      ratioToNextLevel: ratioToNextLevel,
-    });
+	try {
+		await this.userRepository.update(user.id, {
+		level: userLevel,
+		experience: userXP,
+		ratioToNextLevel: ratioToNextLevel,
+		});
+	} catch (error) {
+		console.log(error);
+	}
   }
 
 	async getAllHistories(): Promise<PongHistory[]> {

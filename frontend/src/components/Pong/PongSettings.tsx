@@ -34,7 +34,8 @@ export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntime
   gameState: GameState,
   winner: number,
   user1Datas: UserDatas,
-  user2Datas: UserDatas
+  user2Datas: UserDatas,
+  watchers: Array<UserDatas>
 }
 
 export enum GameState {
@@ -100,6 +101,7 @@ export enum PongDisplay {
 }
 
 export interface UserDatas {
+  id: number,
   nickname: string,
   imgPdp: string,
   level: number

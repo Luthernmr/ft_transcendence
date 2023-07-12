@@ -36,16 +36,16 @@ export class MessageService {
         throw new BadRequestException(errors);
       });
 
-      // const user = await this.userRepo.findOne(dto.user);
-      // const room = await this.roomRepo.findOne(dto.room);
+      const user = await this.userRepo.findOne({where: {id: data.user.id}});
+      const room = await this.roomRepo.findOne({where: {id: data.room.id}});
 
-      // if (!user || !room) {
-      //   throw new BadRequestException('User or Room does not exist');
-      // }
+      if (!user || !room) {
+        throw new BadRequestException('User or Room does not exist');
+      }
 
       const message = new Message();
       message.text = dto.text;
-      message.user = data.user; //replace after user check
+      message.user = data.user;
       message.room = data.room;
 
       return await this.messageRepo.save(message);

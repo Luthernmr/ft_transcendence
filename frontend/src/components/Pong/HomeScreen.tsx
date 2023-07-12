@@ -1,19 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Box, Button, Center, Flex, Spacer } from '@chakra-ui/react';
+import { Stage, Layer, Rect, Line } from 'react-konva';
+import { Box, Button, Center, Flex, Spacer, Text } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import QueueWidget from './QueueWidget';
-import Matches from './Matches';
+import MatchHistory from '../User/MatchHistory';
 
 interface HomeScreenProps {
 	pongQueue: boolean,
 	gnopQueue: boolean,
-	WatchGame: () => void;
 }
 
 function HomeScreen(props: HomeScreenProps) {
 	const [joinedClassic, setJoinedClassic] = useState<boolean>(props.pongQueue);
 	const [joinedCustom, setJoinedCustom] = useState<boolean>(props.gnopQueue);
+
+	const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
 
 	const JoinQueue = (custom: boolean) => {
 		pongSocket.emit('queue', { custom: custom });
@@ -37,32 +38,42 @@ function HomeScreen(props: HomeScreenProps) {
 	
 	return (
 		<>
-			<Flex direction='column'>
-				<Flex direction='row' basis='content'>
-					<Box bg='blue.100'>
-						<Flex direction='column'>
-							<Text align='center'>PONG</Text>
-							<QueueWidget joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+			<Flex direction='column' w='100%' h={600}>
+				<Button onClick={() => pongSocket.emit("Watch")}>Watch</Button>
+				<Box w='100%' h='15%'>
+					<Center>
+						<Text as='b' fontSize=';xl'>Play</Text>
+					</Center>
+				</Box>
+				<Flex direction='row' w='100%' h='70%'>
+					<Box w='100%'>
+						<Flex direction='column' w='100%' h={['10%', '50%', '80%', '100%']}>
+							<Center h='100%'>
+								<QueueWidget name='PONG' joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+							</Center>
 						</Flex>
 					</Box>
-					<Box bg='red.100'>
-						<Flex direction='column'>
-							<Text align='center'>GNOP</Text>
-							<QueueWidget joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+					<Spacer />
+					<Box w='100%'>
+						<Flex direction='column' w='100%' h={['10%', '50%', '80%', '100%']}>
+							<Center h='100%'>
+								<QueueWidget name='GNOP' joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+							</Center>
 						</Flex>
 					</Box>
 				</Flex>
-				<Matches />
+				<Flex direction='column'>
+					<Box h='15%'></Box>
+					<Box w='100%' h={100}>
+						<Center>
+							<Text as='b' fontSize=';xl'>Recent Matches</Text>
+						</Center>
+					</Box>
+					<Box w='100%' h='100%'>
+						<MatchHistory user={currentUser} />
+					</Box>
+				</Flex>
 			</Flex>
-			{/* <Button onClick={ props.JoinPong }>
-				Join PONG Queue
-			</Button>
-			<Button onClick={ props.JoinGnop }>
-				Join GNOP Queue
-			</Button>
-			<Button onClick={ props.WatchGame }>
-				Watch Random Game
-			</Button> */}
 		</>
 	)
 }

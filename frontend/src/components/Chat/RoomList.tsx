@@ -23,12 +23,20 @@ import {
   ModalCloseButton,
   useToast,
 } from "@chakra-ui/react";
-import { AddIcon, LockIcon, ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
+import {
+  AddIcon,
+  CloseIcon,
+  DeleteIcon,
+  LockIcon,
+  ViewIcon,
+  ViewOffIcon,
+} from "@chakra-ui/icons";
 import { chatSocket } from "../../sockets/sockets";
 import { User } from "../Social/AllUserItem";
 
 interface Room {
   id: number;
+  ownerId: number;
   name: string;
   password: string;
   isPrivate: boolean;
@@ -44,12 +52,15 @@ const RoomList: React.FC<RoomListProps> = ({
   setSelectedRoom,
   setShowCreateRoom,
 }) => {
-  const [rooms, setRooms] = useState<Room[]>([]);
   const currentUser = JSON.parse(sessionStorage.getItem("currentUser") || "{}");
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [roomPassword, setRoomPassword] = useState("");
+  const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     chatSocket.emit("getUserRooms", { userId: currentUser.id });
-
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
     });
@@ -64,11 +75,6 @@ const RoomList: React.FC<RoomListProps> = ({
     };
   }, [currentUser.id]);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [roomPassword, setRoomPassword] = useState("");
-  const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);
-  const toast = useToast();
-
   const handleRoomClick = (room: Room) => {
     if (room.password) {
       setSelectedRoomLocal(room);
@@ -76,6 +82,13 @@ const RoomList: React.FC<RoomListProps> = ({
     } else {
       setSelectedRoom(room);
     }
+  };
+
+  const handleDeleteRoom = (e: FormEvent, room: Room) => {
+    e.stopPropagation();
+    e.preventDefault();
+    chatSocket.emit("deleteRoom", room);
+    // chatSocket.emit("getUserRooms", { userId: currentUser.id });
   };
 
   const handlePasswordSubmit = (e: FormEvent) => {
@@ -131,12 +144,12 @@ const RoomList: React.FC<RoomListProps> = ({
         {rooms?.length > 0 ? (
           rooms.map((room, index) => (
             <Box
-              h={"40px"}
+              flex-direction={"column"}
+              p={2}
+              borderRadius={"8"}
               key={index}
               onClick={() => handleRoomClick(room)}
-              _hover={{
-                transform: "scaleX(0.98)",
-              }}
+              _hover={{ bg: "gray.200" }}
             >
               <HStack>
                 <AvatarGroup size={"md"} max={3}>
@@ -158,6 +171,25 @@ const RoomList: React.FC<RoomListProps> = ({
                 )}
                 {!room.isPrivate && !room.password && (
                   <ViewIcon boxSize={6} ml={2} color={"gray.500"} />
+                )}
+                {currentUser.id === room.ownerId ? (
+                  <IconButton
+                    icon={<DeleteIcon />}
+                    _hover={{ color: "red" }}
+                    color="gray"
+                    bg={"none"}
+                    aria-label="Call Segun"
+                    size="lg"
+                    onClick={(e) => handleDeleteRoom(e, room)}
+                  />
+                ) : (
+                  <IconButton
+                    _hover={{ color: "none" }}
+                    color="none"
+                    bg={"none"}
+                    aria-label="Hello ;)"
+                    size="lg"
+                  />
                 )}
               </HStack>
             </Box>

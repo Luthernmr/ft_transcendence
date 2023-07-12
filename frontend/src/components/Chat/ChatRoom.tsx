@@ -24,12 +24,11 @@ import {
 import { ArrowBackIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FiSend } from "react-icons/fi";
 import { User } from "../Social/AllUserItem";
-import { chatSocket } from "../../sockets/sockets";
+import { chatSocket, userSocket } from "../../sockets/sockets";
 import AddFriendButton from "../Social/AddFriendButton";
 import BlockUserButton from "../Social/BlockUserButton";
 import PongInviteButton from "../Social/PongInviteButton";
-import { Link as RouteLink } from 'react-router-dom';
-
+import { Link as RouteLink } from "react-router-dom";
 
 interface Room {
   id: number;
@@ -61,6 +60,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [messageContent, setMessageContent] = useState<string>("");
   const [messages, setMessages] = useState<Message[]>([]);
   const toast = useToast();
+  const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
@@ -103,14 +103,20 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     chatSocket.emit("getRoomMessages", selectedRoom);
+    userSocket.emit("getBlockedList");
 
     const handleRoomMessages = (roomMessages: Message[]) => {
       setMessages(roomMessages);
     };
 
+    const handleBlockedUsers = (blockedUsers: User[]) => {
+      setBlockedUsers(blockedUsers);
+    };
+
     chatSocket.on("roomMessages", handleRoomMessages);
+    userSocket.on("blockedList", handleBlockedUsers);
     chatSocket.on("error", handleError);
     chatSocket.on("receiveMessage", handleReceiveMessage);
 
@@ -160,6 +166,16 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
             borderRadius="lg"
             maxWidth="80%"
             mt={2}
+            style={{
+              filter: blockedUsers?.some((user) => user.id === message.user.id)
+                ? "blur(10px)"
+                : "none",
+              pointerEvents: blockedUsers?.some(
+                (user) => user.id === message.user.id
+              )
+                ? "none"
+                : "auto",
+            }}
           >
             <Flex flexDirection="column">
               <Popover isLazy>
@@ -169,7 +185,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
                       size="sm"
                       name={message.user.nickname}
                       src={message.user.imgPdp}
-                      _hover={{ boxShadow: '0 0 0 3px teal' }}
+                      _hover={{ boxShadow: "0 0 0 3px teal" }}
                     />
                     <Text ml={2}>{message.user?.nickname}</Text>
                   </Flex>
