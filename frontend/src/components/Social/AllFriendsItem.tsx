@@ -29,63 +29,58 @@ export interface Friend {
 }
 
 export default function AllfriendItem() {
-  const [friends, setFriends] = useState<Friend[]>([]);
-
-  useEffect(() => {
-    userSocket.on("friendsList", (data) => {
-      setFriends(data);
-    });
-    userSocket.on("requestAcccepted", () => {
-      userSocket.emit("getFriends");
-    });
-    userSocket.emit("getFriends");
-
-    userSocket.on("reload", () => {
-      userSocket.emit("getFriends");
-    });
-  }, []);
-
-		userSocket.on('reload', () => {
-			userSocket.emit('getFriends');
-		})
+	const [friends, setFriends] = useState<Friend[]>([]);
+  
+	useEffect(() => {
+	  userSocket.on("friendsList", (data) => {
+		setFriends(data);
+	  });
+  
+	  userSocket.on("requestAcccepted", () => {
+		userSocket.emit("getFriends");
+	  });
+  
+	  userSocket.on("reload", () => {
+		userSocket.emit("getFriends");
+	  });
+  
+	  userSocket.emit("getFriends");
 	}, []);
-
-
-
-
+  
 	return (
-		<List>
-			{friends.map((friend) => (
-				<Popover key={friend.id}>
-					<Box >
-						<ListItem  >
-							<PopoverTrigger>
-								<Box >
-									<UserCard as={'Button'} user={friend} />
-								</Box>
-							</PopoverTrigger>
-						</ListItem>
-					</Box>
-					<PopoverContent >
-						<PopoverArrow />
-						<PopoverHeader>
-							<Button w={'100%'} as={RouteLink} to={'/profile/' + friend.id} alignItems={'center'} _hover={{ bg: 'gray.200' }} p={2} borderRadius={5}>
-								<Text>
-									Visit<Text as='b' color="teal"> {friend.nickname}</Text> profile
-								</Text>
-								<ChevronRightIcon />
-							</Button>
-						</PopoverHeader>
-						<PopoverCloseButton />
-						<PopoverBody >
-							<Flex justifyContent={'space-between'}>
-								<PongInviteButton user={friend} />
-								<DeleteFriendButton friend={friend} />
-							</Flex>
-						</PopoverBody>
-					</PopoverContent>
-				</Popover>
-			))}
-		</List>
+	  <List>
+		{friends.map((friend) => (
+		  <Popover key={friend.id}>
+			<Box>
+			  <ListItem>
+				<PopoverTrigger>
+				  <Box>
+					<UserCard as={'Button'} user={friend} />
+				  </Box>
+				</PopoverTrigger>
+			  </ListItem>
+			</Box>
+			<PopoverContent>
+			  <PopoverArrow />
+			  <PopoverHeader>
+				<Button w={'100%'} as={RouteLink} to={'/profile/' + friend.id} alignItems={'center'} _hover={{ bg: 'gray.200' }} p={2} borderRadius={5}>
+				  <Text>
+					Visit<Text as='b' color="teal"> {friend.nickname}</Text> profile
+				  </Text>
+				  <ChevronRightIcon />
+				</Button>
+			  </PopoverHeader>
+			  <PopoverCloseButton />
+			  <PopoverBody>
+				<Flex justifyContent={'space-between'}>
+				  <PongInviteButton user={friend} />
+				  <DeleteFriendButton friend={friend} />
+				</Flex>
+			  </PopoverBody>
+			</PopoverContent>
+		  </Popover>
+		))}
+	  </List>
 	)
-}
+  }
+  
