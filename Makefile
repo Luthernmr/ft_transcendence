@@ -24,13 +24,15 @@ clean: stop
 	@if [ -n "$(VOLUMES)" ]; then \
 		docker volume rm $(VOLUMES); \
 	fi
+
+clean_folders:
 	@echo "Removing backend/dist and backend/node_modules..."
 	rm -rf backend/dist backend/node_modules
 	@echo "Removing frontend/node_modules..."
 	rm -rf frontend/node_modules
 
-fclean: clean
+fclean: clean clean_folders
 
 re: fclean up
 
-.PHONY: all up down stop restart build clean fclean re
+.PHONY: all up down stop restart build clean clean_folders fclean re

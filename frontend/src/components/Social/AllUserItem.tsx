@@ -39,11 +39,9 @@ export default function AllUserItem() {
 
   useEffect(() => {
     userSocket.on("userList", (data) => {
-      console.log("test");
       setUsers(data);
     });
     userSocket.on("reloadLists", () => {
-      console.log("reloadLists");
       userSocket.emit("getAllUsers");
       userSocket.emit("getFriends");
     });
