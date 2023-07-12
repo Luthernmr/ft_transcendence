@@ -7,6 +7,7 @@ import { User } from "./AllUserItem";
 import { Link as RouteLink, useNavigate } from "react-router-dom";
 import DeleteFriendButton from "./DeleteFriendButton";
 import UserCard from "./UserCard";
+import PongInviteButton from "./PongInviteButton";
 
 
 export interface Friend {
@@ -63,6 +64,7 @@ export default function AllfriendItem() {
 						<PopoverCloseButton />
 						<PopoverBody >
 							<Flex justifyContent={'space-between'}>
+								<PongInviteButton user={friend} />
 								<DeleteFriendButton friend={friend} />
 							</Flex>
 						</PopoverBody>
