@@ -45,7 +45,6 @@ export default function AllUserItem() {
     userSocket.on("reloadLists", () => {
       console.log("reloadLists");
       userSocket.emit("getAllUsers");
-      userSocket.emit("getFriends");
     });
     userSocket.emit("getAllUsers");
   }, []);

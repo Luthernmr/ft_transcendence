@@ -44,6 +44,7 @@ export class FriendService {
           nickname: true,
           imgPdp: true,
           isOnline: true,
+          isPlaying: true,
         },
       },
     });

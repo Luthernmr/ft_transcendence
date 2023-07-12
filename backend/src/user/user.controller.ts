@@ -137,7 +137,7 @@ export class UserController {
         throw new BadRequestException('File is not an image');
       } else {
         const response = {
-          filePath: `http://212.227.209.204:5000/user/avatars/${file.filename}`,
+          filePath: `${process.env.BACKEND}/user/avatars/${file.filename}`,
         };
         const user: any = request.user;
         if (user.imgPdp) {
