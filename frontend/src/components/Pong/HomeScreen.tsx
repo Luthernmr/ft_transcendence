@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Stage, Layer, Rect, Text, Line } from 'react-konva';
-import { Box, Button, Center, Flex, Spacer } from '@chakra-ui/react';
+import { Stage, Layer, Rect, Line } from 'react-konva';
+import { Box, Button, Center, Flex, Spacer, Text } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import QueueWidget from './QueueWidget';
 import Matches from './Matches';
@@ -37,22 +37,38 @@ function HomeScreen(props: HomeScreenProps) {
 	
 	return (
 		<>
-			<Flex direction='column'>
-				<Flex direction='row' basis='content'>
-					<Box bg='blue.100'>
-						<Flex direction='column'>
-							<Text align='center'>PONG</Text>
-							<QueueWidget joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+		<Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      height="100%"
+      flex={"1"}
+      direction="column">
+			<Flex direction='column' w='100%' h={600}>
+				<Box w='100%' h='15%'>
+					<Center>
+						<Box w='90%' h='80%'>
+							<Center><Text as='b' fontSize=';xl'>Play</Text></Center>
+						</Box>
+					</Center>
+				</Box>
+				<Flex direction='row' w='100%' h='70%'>
+					<Box w='100%'>
+						<Flex direction='column' w={[100, 280, 360, 530]} h={['10%', '50%', '80%', '100%']}>
+							<Center h='100%'>
+								<QueueWidget name='PONG' joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
+							</Center>
 						</Flex>
 					</Box>
-					<Box bg='red.100'>
-						<Flex direction='column'>
-							<Text align='center'>GNOP</Text>
-							<QueueWidget joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+					<Spacer />
+					<Box w='100%'>
+						<Flex direction='column' w={[100, 280, 360, 530]} h={['10%', '50%', '80%', '100%']}>
+							<Center h='100%'>
+								<QueueWidget name='GNOP' joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
+							</Center>
 						</Flex>
 					</Box>
 				</Flex>
-				<Matches />
+				{/* <Matches /> */}
 			</Flex>
 			{/* <Button onClick={ props.JoinPong }>
 				Join PONG Queue
@@ -63,6 +79,7 @@ function HomeScreen(props: HomeScreenProps) {
 			<Button onClick={ props.WatchGame }>
 				Watch Random Game
 			</Button> */}
+			</Flex>
 		</>
 	)
 }
