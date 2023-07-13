@@ -232,7 +232,7 @@ export default function Settings(props: any) {
         </HStack>
       </FormControl>
       <FormControl>
-        <FormLabel>Nom</FormLabel>
+        <FormLabel>Name</FormLabel>
         <Input
           type="text"
           value={profile.nickname}
@@ -242,7 +242,7 @@ export default function Settings(props: any) {
       </FormControl>
       <FormControl>
         <HStack justifyContent="space-between">
-          <FormLabel>Vérification en deux étapes (2FA)</FormLabel>
+          <FormLabel>Two Factor Authentification (2FA)</FormLabel>
           {
             <Switch
               isChecked={isChecked}
