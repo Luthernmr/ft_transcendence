@@ -38,6 +38,8 @@ export class Room {
   @JoinTable()
   bannedUsers: User[];
 
-  @OneToMany(() => Message, (message: Message) => message.room)
+  @OneToMany(() => Message, (message: Message) => message.room, {
+    cascade: true,
+  })
   messages: Message[];
 }

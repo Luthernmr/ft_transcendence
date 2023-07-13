@@ -20,8 +20,7 @@ export class Message {
   @CreateDateColumn()
   created_at: Date;
 
-  @JoinTable()
-  @ManyToOne(() => Room, (room: Room) => room.messages)
+  @ManyToOne(() => Room, (room: Room) => room.messages, { onDelete: 'CASCADE' })
   room: Room;
 
   @JoinTable()
