@@ -29,15 +29,15 @@ export default function Home() {
 								zIndex: -1,
 							}}
 						>
-							Bievenue
+							Welcome
 						</Text>
 						<br />{" "}
 						<Text color={"blue.400"} as={"span"}>
-							Sur notre Pong
+							On our ft_transcendence
 						</Text>{" "}
 					</Heading>
 					<Text fontSize={{ base: "md", lg: "lg" }} color={"gray.500"}>
-						projet etudiant
+						Student project
 					</Text>
 					<Stack direction={{ base: "column", md: "row" }} spacing={4}>
 						<Button
@@ -50,10 +50,10 @@ export default function Home() {
 								bg: "blue.500",
 							}}
 						>
-							s'inscrire
+							Register
 						</Button>
 						<Button as={RouteLink} to="/login" rounded={"full"}>
-							se connecter
+							Login
 						</Button>
 					</Stack>
 				</Stack>

@@ -103,9 +103,9 @@ export default function registerCard() {
                 Register 👋
               </Button>
               <Text>
-                J'ai deja un compte sale fou !{" "}
+                I already have an account you crazy man !{" "}
                 <Link color="teal.500" href="/Login">
-                  J'arrive l'equipe.
+                I'm coming the team.
                 </Link>
               </Text>
             </Stack>

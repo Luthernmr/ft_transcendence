@@ -245,7 +245,7 @@ const CreateRoom: React.FC<CreateRoomProps> = ({ setShowCreateRoom }) => {
             borderRadius="md"
             onClick={() => handleAddMember(user)}
           >
-            <Avatar size="sm" src={user.imgPdp}>
+            <Avatar size="sm" name={user.nickname} src={user.imgPdp}>
               <AvatarBadge
                 boxSize="1em"
                 bg={user.isOnline ? "green.500" : "tomato"}
