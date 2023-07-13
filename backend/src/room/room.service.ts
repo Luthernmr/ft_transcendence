@@ -73,4 +73,8 @@ export class RoomService {
 
     return [...publicRooms, ...privateUserRooms];
   }
+
+  async deleteRoom(roomId: number) {
+    await this.roomRepo.delete({ id: roomId });
+  }
 }

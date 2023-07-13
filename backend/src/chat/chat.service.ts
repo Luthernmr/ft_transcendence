@@ -104,4 +104,14 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
+
+  @SubscribeMessage('deleteRoom')
+  async deleteRoom(client: Socket, room: Room) {
+    try {
+      await this.roomService.deleteRoom(room.id);
+      this.gateway.chatNamespace.emit('roomDeleted', room.name);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
 }

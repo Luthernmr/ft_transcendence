@@ -64,6 +64,15 @@ const RoomList: React.FC<RoomListProps> = ({
     chatSocket.on("roomList", (rooms: Room[]) => {
       setRooms(rooms);
     });
+    chatSocket.on("roomDeleted", (roomName: string) => {
+      toast({
+        title: roomName + " room deleted",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+      chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    });
 
     chatSocket.on("roomCreated", () => {
       chatSocket.emit("getUserRooms", { userId: currentUser.id });
@@ -72,6 +81,7 @@ const RoomList: React.FC<RoomListProps> = ({
     return () => {
       chatSocket.off("roomList");
       chatSocket.off("roomCreated");
+      chatSocket.off("roomDeleted");
     };
   }, [currentUser.id]);
 
