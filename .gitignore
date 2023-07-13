@@ -7,3 +7,4 @@ frontend/.env
 .vscode
 .env
 backend/src/auth/auth.controller.ts
+backend/uploadedFiles/avatars
