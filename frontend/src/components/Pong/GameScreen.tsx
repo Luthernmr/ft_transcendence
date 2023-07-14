@@ -243,7 +243,7 @@ function GameScreen(props : GameScreenProps) {
 						<Text text={`${winner.current === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won!`} fontSize={30} width={450} y={180} align='center' visible={winner.current != 0}/>
 						<Text text="Restart" fontSize={25} onClick={requestRestart} width={450} y={400} align='center' visible={gameState === GameState.Finished && props.watcher == false}/>
 						<Text text="Quit" fontSize={25} onClick={quit} width={450} y={450} align='center' visible={gameState === GameState.Finished && props.watcher == false}/>
-						<Text text={playerNumber.current === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname + " disconnected !"} fontSize={30} width={450} y={110} align='center' color='red' visible={opponentAlive === false && props.watcher == false}/>
+						<Text text={(playerNumber.current === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname) + " disconnected !"} fontSize={30} width={450} y={110} align='center' color='red' visible={opponentAlive === false && props.watcher == false}/>
 						<GameArea 	width={props.initDatas.width}
 									height={props.initDatas.height}
 									size={props.size}

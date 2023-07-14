@@ -14,7 +14,9 @@ function WatchersArea(props: WatchersAreaProps) {
 		avatars.push(undefined);
 	}
 
-	for (let i = 0; i < props.watchers.length; i++) {
+	const max = Math.min(15, props.watchers.length);
+
+	for (let i = 0; i < max; i++) {
 		avatars[i] = props.watchers[i];
 	}
 	
