@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Center, Box, Flex, Text, Spinner,  } from '@chakra-ui/react';
+import { Button, Center, Box, Flex, Text, Spinner,VStack  } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 
 interface QueueQueueWidgetProps {
@@ -24,8 +24,8 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 			<>
 				<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
 					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25'
-					_hover={{
-						bg: "rgba(76, 175, 80, 0.3)"
+						_hover={{
+						bg: "rgba(255, 255, 255, 0.3)"
 						}} onClick={JoinQueue}>
 						<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
 						<Text fontSize={["xs", "sm", "md", "lg"]}>Join Queue</Text>
@@ -36,18 +36,45 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	} else {
 		return (
 			<>
-			<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
-				<Flex direction='column'>
-					<Spinner alignSelf='center' />
-					<br />
-					<Text align='center'>In Queue...</Text>
-					<br />
-					<Button onClick={LeaveQueue}>Leave Queue</Button>
-				</Flex>
-			</Box>
+				<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
+					<VStack h='100%' spacing={[2, 2, 5, 5]}>
+						<Box h='33%'>
+							<Center h='100%'>
+							<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
+							</Center>
+						</Box>
+						<Spinner size={['sm', 'sm', 'md', 'md']} alignSelf='center'/>
+						<Button bg='teal.300' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}
+								_hover={{
+								bg: "rgba(255, 255, 255, 0.3)"
+								}}>Leave</Button>
+					</VStack>
+				</Box>
 			</>
 		)
 	}
 }
 
 export default QueueWidget;
+
+// <Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
+// <Center h='100%'>
+// <Stack h='100%' bg="red.100" spacing={5}>
+// 	{/* <Box h='100%'>
+// 		<Center h='100%'> */}
+// 			<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
+// 		{/* </Center>
+// 	</Box>
+// 	<Box h='100%'> */}
+// 		{/* <Center h='100%'> */}
+// 			<Spinner size={['sm', 'sm', 'md', 'md']} alignSelf='center'/>
+// 		{/* </Center> */}
+// 	{/* </Box>
+// 	<Box h='100%'> */}
+// 			<Button _hover={{
+// 			bg: "rgba(255, 255, 255, 0.3)"
+// 			}} bg='teal.300' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}>Leave</Button>
+// 	{/* </Box> */}
+// </Stack>
+// </Center>
+// </Box>
