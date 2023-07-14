@@ -23,7 +23,8 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 		return (
 			<>
 				<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
-					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25' _hover={{
+					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25'
+					_hover={{
 						bg: "rgba(76, 175, 80, 0.3)"
 						}} onClick={JoinQueue}>
 						<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
@@ -35,7 +36,7 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	} else {
 		return (
 			<>
-				<Box bg='teal.300' w='50%' h='100%' borderRadius='25'>
+				<Box bg='teal.300' w='50%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
 				<Center h='100%'>
 					<Flex direction='column'>
 						<Spinner alignSelf='center' />

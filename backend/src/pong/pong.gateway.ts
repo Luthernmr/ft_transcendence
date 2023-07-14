@@ -168,7 +168,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
 
   EmitRemoveWatcher(roomID: number, id: number) {
-    console.log("Sending id: " + id);
     this.EmitEvent('RemoveWatcher', roomID, id);
   }
 }
