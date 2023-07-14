@@ -1,4 +1,4 @@
-export const OFFSET_X: number = 40;
+export const OFFSET_X: number = 100;
 export const OFFSET_Y: number = 40;
 
 export const WALL_WIDTH: number = 10;
@@ -35,7 +35,8 @@ export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntime
   winner: number,
   user1Datas: UserDatas,
   user2Datas: UserDatas,
-  watchers: Array<UserDatas>
+  watchers: Array<UserDatas>,
+  custom: boolean
 }
 
 export enum GameState {

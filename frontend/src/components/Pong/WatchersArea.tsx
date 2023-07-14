@@ -32,8 +32,8 @@ function WatchersArea(props: WatchersAreaProps) {
 					<Grid
 						w='70%'
 						h='100%'
-						templateRows='repeat(6, 1fr)'
-						templateColumns='repeat(3, 1fr)'
+						templateRows={{sm: 'repeat(3, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(3, 1fr)', xl: 'repeat(6, 1fr)'}}
+						templateColumns={{sm: 'repeat(5, 1fr)', md: 'repeat(5, 1fr)', lg: 'repeat(5, 1fr)', xl: 'repeat(3, 1fr)'}}
 						gap={4}>
 						{avatars.map((a, i) => <GridItem key={i} rowSpan={1}><Avatar name={a?.nickname} src={a?.imgPdp} w='100%' h='100%'/></GridItem>)}
 					</Grid>

@@ -38,7 +38,8 @@ function Pong() {
     winner: 0,
     user1Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
     user2Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
-    watchers: []
+    watchers: [],
+    custom: false
   });
   
   useEffect(() => {

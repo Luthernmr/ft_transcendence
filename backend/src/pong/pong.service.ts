@@ -82,7 +82,8 @@ export interface PongInitData extends GameLayout, Score {
 	winner: number,
 	user1Datas: UserDatas,
 	user2Datas: UserDatas,
-	watchers: Array<UserDatas>
+	watchers: Array<UserDatas>,
+	custom: boolean
 }
 
 const BASE_USER_DATAS: UserDatas = {
@@ -104,7 +105,8 @@ const BASE_INIT_DATAS: PongInitData = {
 	playerNumber: 1,
 	gameState: FrontGameState.Playing,
 	winner: 0,
-	watchers: []
+	watchers: [],
+	custom: false
 }
 
 export interface PongInitEntities extends BallRuntimeData, PaddleRuntimeData {
@@ -521,7 +523,8 @@ export class PongService {
 			winner: this.gameState[index] === GameState.WaitingForRestart ? ( this.scoreData[index].scoreP1 > this.scoreData[index].scoreP2 ? 1 : 2 ) : 0,
 			user1Datas: this.usersRuntime[index].user1Datas,
 			user2Datas: this.usersRuntime[index].user2Datas,
-			watchers: await this.GetWatchersDatas(roomID)
+			watchers: await this.GetWatchersDatas(roomID),
+			custom: this.customMode[index]
 		}
 
 		return state;
@@ -643,8 +646,8 @@ export class PongService {
 
 		//console.log("room created");
 
-		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2 });
-		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1 });
+		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2, custom: custom });
+		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1, custom: custom });
 
 		//console.log("CreateRoom requested StartGameAtCountdown for roomID " + roomID);
 		//this.StartGameAtCountdown(roomID, COUNTDOWN);

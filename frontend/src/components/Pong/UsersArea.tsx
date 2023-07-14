@@ -4,6 +4,9 @@ import { pongSocket } from '../../sockets/sockets';
 import { OFFSET_X, OFFSET_Y, UserDatas } from './PongSettings';
 import { Layout } from 'antd';
 
+const BASE_SCORE_SIZE = 85;
+const BASE_FONT_SIZE = 56;
+
 interface UserAreaProps {
 	width: number,
 	height: number,
@@ -23,27 +26,27 @@ function UserArea(props: UserAreaProps) {
 					<Flex w='100%' direction='column' height='100%'>
 						<Box width='100%'>
 							<Center>
-								<HStack spacing='10%'>
-									<Avatar name={props.user1Datas.nickname} src={props.user1Datas.imgPdp} size={["xm", "md", "lg", "xl"]} />
-									<Text as='b' fontSize={{ base: '12px', md: '10px', lg: '25px' }}>{props.user1Datas.nickname}</Text>
-								</HStack>
+								<Stack spacing={{sm: 1, md: 2, lg: 3, xl: 5}}>
+									<Avatar name={props.user1Datas.nickname} src={props.user1Datas.imgPdp} size={{sm: "sm", md: "md", lg: "lg", xl: "xl"}} />
+									<Text as='b' align='center' fontSize={{ base: '12px', md: '10px', lg: '25px' }}>{props.user1Datas.nickname}</Text>
+								</Stack>
 							</Center>
 						</Box>
 						<Spacer />
-						<Circle size='xm' bg='black' color='white'>
-							<Text fontSize={{ base: '23px', md: '20px', lg: '56px' }} align='center'>{props.scoreP1}</Text>
+						<Circle alignSelf='center' size={BASE_SCORE_SIZE * props.size} bg='black' color='white'>
+							<Text fontSize={BASE_FONT_SIZE * props.size} align='center'>{props.scoreP1}</Text>
 						</Circle>
 						<Spacer />
-						<Circle size='xm' bg='black' color='white'>
-							<Text fontSize={{ base: '23px', md: '20px', lg: '56px' }} align='center'>{props.scoreP2}</Text>
+						<Circle alignSelf='center' size={BASE_SCORE_SIZE * props.size} bg='black' color='white'>
+							<Text fontSize={BASE_FONT_SIZE * props.size} align='center'>{props.scoreP2}</Text>
 						</Circle>
 						<Spacer />
 						<Box width='100%'>
 							<Center>
-								<HStack spacing='10%'>
-									<Avatar name={props.user2Datas.nickname} src={props.user2Datas.imgPdp} size={["xm", "md", "lg", "xl"]} />
-									<Text as='b' fontSize={{ base: '12px', md: '10px', lg: '25px' }}>{props.user2Datas.nickname}</Text>
-								</HStack>
+								<Stack spacing={{sm: 1, md: 2, lg: 3, xl: 5}}>
+									<Text as='b' align='center' fontSize={{ base: '12px', md: '10px', lg: '25px' }}>{props.user2Datas.nickname}</Text>
+									<Avatar name={props.user2Datas.nickname} src={props.user2Datas.imgPdp} size={{sm: "sm", md: "md", lg: "lg", xl: "xl"}} />
+								</Stack>
 							</Center>
 						</Box>
 					</Flex>
