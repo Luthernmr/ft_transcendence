@@ -237,7 +237,6 @@ function GameScreen(props : GameScreenProps) {
 				<Box w={{sm: '50%', md:'50%', lg: '50%', xl: '50%'}} h={680 * props.size} borderRadius={10}>
 					<UserArea 	width={props.initDatas.width}
 								height={680 * props.size}
-								size={props.size}
 								mirror={playerNumber.current === 1 ? false : true}
 								scoreP1={playerNumber.current === 1 ? score.current.scoreP1 : score.current.scoreP2}
 								scoreP2={playerNumber.current === 1 ? score.current.scoreP2 : score.current.scoreP1}
