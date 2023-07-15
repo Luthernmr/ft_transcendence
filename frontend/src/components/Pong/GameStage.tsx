@@ -48,7 +48,7 @@ function GameStage(props: GameStageProps) {
 							align='center'
 							visible={props.countdown > 0}
 							/>
-					<Text 	text={`${props.winner === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won!`}
+					<Text 	text={`${props.winner === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won! 🎉`}
 							fontSize={30}
 							width={450}
 							y={180}
