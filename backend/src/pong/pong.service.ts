@@ -26,7 +26,7 @@ const BALL_START_POS_X: number = PONG_WIDTH / 2 - BALL_WIDTH / 2;
 const BALL_START_POS_X_CUSTOM: number = PONG_WIDTH / 2 - BALL_WIDTH_CUSTOM / 2;
 const BALL_START_POS_Y: number = PONG_HEIGHT / 2 - BALL_HEIGHT / 2;
 
-const BALL_SPEED: number = 10;
+const BALL_SPEED: number = 9;
 
 const OUTER_ANGLE_DELTA: number = 5 * BALL_SPEED;
 const INNER_ANGLE_DELTA: number = 2.5 * BALL_SPEED;
@@ -274,8 +274,6 @@ export class PongService {
 			this.userInfos[userIndex].socket = socket;
 			
 			// Game
-
-			//const roomIndex = this.FindIndexBySocketId(socket.id);
 			const roomID = this.GetRoomIDBySocketID(socket.id);
 
 			if (roomID >= 0) {
@@ -283,10 +281,6 @@ export class PongService {
 				const runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 				const users = this.usersRuntime[runtimeIndex];
 				this.pongGateway.EmitPlayerReconnected(roomID, socket.id === this.GetSocket(users.indexUser1)?.id ? 2 : 1);
-				// if (socket.id === this.GetSocket(users.indexUser1)?.id && this.GetSocket(users.indexUser2))
-				// 	this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser2].socket);
-				// else if (this.GetSocket(users.indexUser1))
-				// 	this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser1].socket);
 			}
 
 		} else {
@@ -324,25 +318,15 @@ export class PongService {
 		this.watchers[userInfoIndex] = -1;
 
 		// Running Game
-		//const roomIndex = this.FindIndexBySocketId(socket.id);
 		const roomID = this.GetRoomIDBySocketID(socket.id);
 
 		if (roomID >= 0) {
 			const runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 			const users = this.usersRuntime[runtimeIndex];
 			this.pongGateway.EmitPlayerDisconnected(roomID, socket.id === this.GetSocket(users.indexUser1)?.id ? 2 : 1);
-			// if (socket.id === this.GetSocket(users.indexUser1)?.id) {
-			// 	//this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser2].socket);
-			// 	this.pongGateway.EmitPlayerDisconnected(roomID, 2);
-			// }
-			// else if (this.GetSocket(users.indexUser1)) {
-			// 	this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser1].socket);
-			// 	this.pongGateway.EmitPlayerDisconnected(roomID, 1);
-			// }
 		}
 
 		// Socket
-		//console.log("Setting userInfo socket to null (user", this.userInfos[index].userId, ")");
 		this.userInfos[userInfoIndex].socket = null;
 
 		//console.log('User unregistered from pong');
@@ -484,7 +468,6 @@ export class PongService {
 	}
 
 	async GetGameState(socket: Socket) : Promise<GameDatas> {
-		//const userInGame = this.FindIndexBySocketId(socket.id);
 		const userRoomID = this.GetRoomIDBySocketID(socket.id);
 
 		if (userRoomID >= 0) {
@@ -660,7 +643,6 @@ export class PongService {
   	}
 
 	RequestRestart(socket: Socket) {
-		//const instanceIndex = this.FindIndexBySocketId(socket.id);
 		const roomID = this.GetRoomIDBySocketID(socket.id);
 
 		if (roomID < 0) {
@@ -701,7 +683,6 @@ export class PongService {
 	}
 
 	ClientIsReady(socket: Socket) {
-		//const instanceIndex = this.FindIndexBySocketId(socket.id);
 		const roomID = this.GetRoomIDBySocketID(socket.id);
 
 		if (roomID < 0) {
@@ -817,26 +798,35 @@ export class PongService {
 		this.RemoveWatcher(watcherRoomID, watcherInfoIndex);
 	}
 
-
 	StartGameAtCountdown(roomID: number, countdown: number) {				
 		let runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 		if (runtimeIndex < 0)
 			return;
 
+		const totalScore = this.scoreData[runtimeIndex].scoreP1 + this.scoreData[runtimeIndex].scoreP2;
+		const firstPlayer = (totalScore % 2) === 1 ? 2 : 1;
+
+		this.pongGateway.EmitSetStartingPlayer(roomID, firstPlayer);
 		this.pongGateway.EmitStartGame(roomID, COUNTDOWN / 1000);
 
-		setTimeout(() => this.StartGame(roomID), countdown);
+		setTimeout(() => this.StartGame(roomID, firstPlayer), countdown);
 	}
 
-	StartGame(roomID: number) {
+	StartGame(roomID: number, firstPlayer: number) {
 		let runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 		if (runtimeIndex < 0) {
 			console.log("StartGameAtCountdown: runtimeIndex not found " + runtimeIndex);
 			return;
 		}
 
-		this.ballRuntime[runtimeIndex].ballDelta = {x: BALL_START_DELTA_X, y: BALL_START_DELTA_Y};
+		const sign = firstPlayer === 1 ? 1 : -1;
+		const xAngle = this.getRandomInt(0, 2) === 0 ? INNER_ANGLE_DELTA : -INNER_ANGLE_DELTA;
+		this.ballRuntime[runtimeIndex].ballDelta = {x: xAngle, y: BALL_START_DELTA_Y * sign};
 		this.pongGateway.EmitBallDelta(roomID, this.ballRuntime[runtimeIndex]);
+	}
+
+	getRandomInt(min, max) {
+		return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 	}
 
 	RestartGame(roomID: number) {
@@ -1154,16 +1144,12 @@ export class PongService {
 				data.ballDelta.x = angle;
 			}
 
-			function getRandomInt(min, max) {
-				return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
-			}
-
 			if (data.ballPosition.y < PADDLE_HEIGHT / 2) {
 				if (paddleCollision(paddles.paddle1Pos, paddles.paddleWidth)) {
 					const runtimeIndex = this.ballRuntime.indexOf(data);
 					this.OnPlayerWin(this.roomID[runtimeIndex], 2);
 				} else {
-					bounceBall(getRandomInt(1, 6));
+					bounceBall(this.getRandomInt(1, 6));
 					data.ballPosition.y = PADDLE_HEIGHT;
 					const ballWidth = Math.min(data.ballWidth + BALL_CUSTOM_GAIN, BALL_MAX_WIDTH);
 					data.ballWidth = ballWidth;
@@ -1174,7 +1160,7 @@ export class PongService {
 					const runtimeIndex = this.ballRuntime.indexOf(data);
 					this.OnPlayerWin(this.roomID[runtimeIndex], 1);
 				} else {
-					bounceBall(getRandomInt(1, 6));
+					bounceBall(this.getRandomInt(1, 6));
 					data.ballPosition.y = PONG_HEIGHT - BALL_HEIGHT - PADDLE_HEIGHT;
 					const ballWidth = Math.min(data.ballWidth + BALL_CUSTOM_GAIN, BALL_MAX_WIDTH);
 					data.ballWidth = ballWidth;

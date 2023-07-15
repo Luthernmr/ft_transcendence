@@ -44,7 +44,7 @@ function Pong() {
   
   useEffect(() => {
     updateDimensions();
-    console.log("requestGameState");
+    //console.log("requestGameState");
     pongSocket.emit('requestGameState');
   }, [])
 
@@ -114,7 +114,7 @@ function Pong() {
       );
     }
 
-    console.log(rate);
+    //console.log(rate);
     setSize(rate);
   }
 

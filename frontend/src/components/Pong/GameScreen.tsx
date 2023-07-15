@@ -37,6 +37,7 @@ function GameScreen(props : GameScreenProps) {
 	const P1Alive = useRef<boolean>(true);
 	const P2Alive = useRef<boolean>(true);
 	const watchers = useRef<UserDatas[]>([]);
+	const [startingPlayer, setStartingPlayer] = useState<number>(1);
 
 	//Time
 	const requestRef = useRef(0);
@@ -162,6 +163,10 @@ function GameScreen(props : GameScreenProps) {
 			watchers.current.splice(index, 1);
 		}
 
+		function SetStartingPlayer(num: number) {
+			setStartingPlayer(num);
+		}
+
 		pongSocket.on('StartGame', Start);
 		pongSocket.on('BallDelta', BallDelta);
 		pongSocket.on('PaddleDelta', PaddleDelta);
@@ -172,6 +177,7 @@ function GameScreen(props : GameScreenProps) {
 		pongSocket.on('OpponentQuit', OpponentQuit);
 		pongSocket.on('AddWatcher', AddWatcher);
 		pongSocket.on('RemoveWatcher', RemoveWatcher);
+		pongSocket.on('SetStartingPlayer', SetStartingPlayer);
 
 		return () => {
 			pongSocket.off('StartGame', Start);
@@ -184,6 +190,7 @@ function GameScreen(props : GameScreenProps) {
 			pongSocket.off('OpponentQuit', OpponentQuit);
 			pongSocket.off('AddWatcher', AddWatcher);
 			pongSocket.off('RemoveWatcher', RemoveWatcher);
+			pongSocket.off('SetStartingPlayer', SetStartingPlayer);
 		}
 	}, [])
 
@@ -275,6 +282,7 @@ function GameScreen(props : GameScreenProps) {
 									paddleP2={paddleP2}
 									paddleShape={paddleShape.current}
 									watcher={props.watcher}
+									startingPlayer={startingPlayer}
 									/>
 						</Box>
 					</Center>

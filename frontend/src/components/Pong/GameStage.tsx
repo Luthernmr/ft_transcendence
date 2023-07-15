@@ -23,6 +23,7 @@ interface GameStageProps {
 	initDatas: PongInitData,
 	size: number,
 	watcher: boolean,
+	startingPlayer: number
 }
 
 function GameStage(props: GameStageProps) {	
@@ -41,6 +42,8 @@ function GameStage(props: GameStageProps) {
 					height={props.initDatas.height * props.size}
 					scale={{x: props.size, y: props.size}}>
 				<Layer>
+					<Rect width={props.initDatas.width} height={props.initDatas.height / 2} fill='black' opacity={props.startingPlayer === props.playerNumber ? 0 : 0.1} />
+					<Rect y={props.initDatas.height / 2} width={props.initDatas.width} height={props.initDatas.height / 2} fill='black' opacity={props.startingPlayer != props.playerNumber ? 0 : 0.1} />
 					<Text 	text={props.countdown.toString()}
 							fontSize={50}
 							width={450}

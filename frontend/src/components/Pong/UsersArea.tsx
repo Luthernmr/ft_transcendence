@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Avatar, Stack, Wrap, Text, WrapItem, Flex, Spacer, Box, Center, HStack, Circle, Square, Show, Hide} from '@chakra-ui/react';
+import { Avatar, Stack, Wrap, Text, WrapItem, Flex, Spacer, Box, Center, HStack, Circle, Square, Show, Hide, AvatarBadge} from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 import { OFFSET_X, OFFSET_Y, UserDatas } from './PongSettings';
 import { Layout } from 'antd';
@@ -14,7 +14,7 @@ interface UserAreaProps {
 	scoreP1: number,
 	scoreP2: number,
 	user1Datas: UserDatas,
-	user2Datas: UserDatas
+	user2Datas: UserDatas,
 }
 
 const avatarBreakpoints = {
@@ -65,7 +65,7 @@ function UserArea(props: UserAreaProps) {
 								<Stack spacing={nickAvatarSpacingBreakpoints}>
 									<Hide below='md'>
 										<Center>
-											<Avatar name={props.user1Datas.nickname} src={props.user1Datas.imgPdp} size={avatarBreakpoints} />
+											<Avatar border={10} name={props.user1Datas.nickname} src={props.user1Datas.imgPdp} size={avatarBreakpoints} />
 										</Center>
 									</Hide>
 									<Text as='b' align='center' fontSize={nicknameBreakpoints}>{props.user1Datas.nickname}</Text>

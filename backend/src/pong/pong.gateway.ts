@@ -117,8 +117,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     socket.emit('gamestate', gameState);
   }
 
-  ReloadList()
-  {
+  ReloadList() {
 	this.gateway.userNamespace.emit('reloadLists')
   }
 
@@ -174,8 +173,11 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     this.EmitEvent('AddWatcher', roomID, datas);
   }
 
-
   EmitRemoveWatcher(roomID: number, id: number) {
     this.EmitEvent('RemoveWatcher', roomID, id);
+  }
+
+  EmitSetStartingPlayer(roomID: number, startingPlayer: number) {
+    this.EmitEvent('SetStartingPlayer', roomID, startingPlayer);
   }
 }
