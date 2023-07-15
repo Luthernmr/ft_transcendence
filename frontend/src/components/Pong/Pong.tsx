@@ -114,6 +114,7 @@ function Pong() {
       );
     }
 
+    console.log(rate);
     setSize(rate);
   }
 

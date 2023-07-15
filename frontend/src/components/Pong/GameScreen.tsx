@@ -34,6 +34,8 @@ function GameScreen(props : GameScreenProps) {
 	const winner = useRef<number>(0);
 	const countdown = useRef<number>(0);
 	const [opponentAlive, setOpponentAlive] = useState<boolean>(true);
+	const P1Alive = useRef<boolean>(true);
+	const P2Alive = useRef<boolean>(true);
 	const watchers = useRef<UserDatas[]>([]);
 
 	//Time
@@ -131,12 +133,20 @@ function GameScreen(props : GameScreenProps) {
 			winner.current = winnerNumber;
 		}
 
-		function OpponentDisconnected() {
+		function PlayerDisconnected(p: number) {
 			setOpponentAlive(false);
+			if (p === 1)
+				P1Alive.current = false;
+			else
+				P2Alive.current = false;
 		}
 
-		function OpponentReconnected() {
+		function PlayerReconnected(p: number) {
 			setOpponentAlive(true);
+			if (p === 1)
+			P1Alive.current = true;
+		else
+			P2Alive.current = true;
 		}
 
 		function OpponentQuit() {
@@ -157,8 +167,8 @@ function GameScreen(props : GameScreenProps) {
 		pongSocket.on('PaddleDelta', PaddleDelta);
 		pongSocket.on('UpdateScore', UpdateScore);
 		pongSocket.on('End', EndGame);
-		pongSocket.on('OpponentDisconnected', OpponentDisconnected);
-		pongSocket.on('OpponentReconnected', OpponentReconnected);
+		pongSocket.on('PlayerDisconnected', PlayerDisconnected);
+		pongSocket.on('PlayerReconnected', PlayerReconnected);
 		pongSocket.on('OpponentQuit', OpponentQuit);
 		pongSocket.on('AddWatcher', AddWatcher);
 		pongSocket.on('RemoveWatcher', RemoveWatcher);
@@ -169,8 +179,8 @@ function GameScreen(props : GameScreenProps) {
 			pongSocket.off('PaddleDelta', PaddleDelta);
 			pongSocket.off('UpdateScore', UpdateScore);
 			pongSocket.off('End', EndGame);
-			pongSocket.off('OpponentDisconnected', OpponentDisconnected);
-			pongSocket.off('OpponentReconnected', OpponentReconnected);
+			pongSocket.off('PlayerDisconnected', PlayerDisconnected);
+			pongSocket.off('PlayerReconnected', PlayerReconnected);
 			pongSocket.off('OpponentQuit', OpponentQuit);
 			pongSocket.off('AddWatcher', AddWatcher);
 			pongSocket.off('RemoveWatcher', RemoveWatcher);
@@ -245,14 +255,16 @@ function GameScreen(props : GameScreenProps) {
 								/>
 				</Box>
 				{/* <Box w={1060 * props.size * 0.5} h={680 * props.size} bg='gray.100' borderRadius={10}> */}
-				<Box w='100%' h={680 * props.size} bg='gray.100' borderRadius={10}>
+				<Box w={'100%'} h={680 * props.size} bg='gray.100' borderRadius={10}>
 					<Center w='100%' h='100%'>
-						<Box w='70%' h='89%'>
+						<Box>
 						<GameStage
 									initDatas={props.initDatas}
 									countdown={countdown.current}
 									winner={winner.current}
 									playerNumber={playerNumber.current}
+									P1Alive={P1Alive.current}
+									P2Alive={P2Alive.current}
 									opponentAlive={opponentAlive}
 									requestRestart={requestRestart}
 									quit={quit}

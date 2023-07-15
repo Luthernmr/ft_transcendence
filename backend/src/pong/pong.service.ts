@@ -282,10 +282,11 @@ export class PongService {
 				socket.join("room" + roomID);
 				const runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 				const users = this.usersRuntime[runtimeIndex];
-				if (socket.id === this.GetSocket(users.indexUser1)?.id && this.GetSocket(users.indexUser2))
-					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser2].socket);
-				else if (this.GetSocket(users.indexUser1))
-					this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser1].socket);
+				this.pongGateway.EmitPlayerReconnected(roomID, socket.id === this.GetSocket(users.indexUser1)?.id ? 2 : 1);
+				// if (socket.id === this.GetSocket(users.indexUser1)?.id && this.GetSocket(users.indexUser2))
+				// 	this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser2].socket);
+				// else if (this.GetSocket(users.indexUser1))
+				// 	this.pongGateway.EmitOpponentReconnected(this.userInfos[users.indexUser1].socket);
 			}
 
 		} else {
@@ -329,10 +330,15 @@ export class PongService {
 		if (roomID >= 0) {
 			const runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 			const users = this.usersRuntime[runtimeIndex];
-			if (socket.id === this.GetSocket(users.indexUser1)?.id && this.GetSocket(users.indexUser2))
-			this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser2].socket);
-				else if (this.GetSocket(users.indexUser1))
-			this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser1].socket);
+			this.pongGateway.EmitPlayerDisconnected(roomID, socket.id === this.GetSocket(users.indexUser1)?.id ? 2 : 1);
+			// if (socket.id === this.GetSocket(users.indexUser1)?.id) {
+			// 	//this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser2].socket);
+			// 	this.pongGateway.EmitPlayerDisconnected(roomID, 2);
+			// }
+			// else if (this.GetSocket(users.indexUser1)) {
+			// 	this.pongGateway.EmitOpponentDisconnect(this.userInfos[users.indexUser1].socket);
+			// 	this.pongGateway.EmitPlayerDisconnected(roomID, 1);
+			// }
 		}
 
 		// Socket

@@ -158,8 +158,16 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     socket?.emit('OpponentDisconnected')
   }
 
+  EmitPlayerDisconnected(roomID: number, p: number) {
+    this.EmitEvent('PlayerDisconnected', roomID, p);
+  }
+
   EmitOpponentReconnected(socket: Socket) {
     socket.emit('OpponentReconnected')
+  }
+
+  EmitPlayerReconnected(roomID: number, p: number) {
+    this.EmitEvent('PlayerReconnected', roomID, p);
   }
 
   EmitAddWatcher(roomID: number, datas: UserDatas) {
