@@ -37,18 +37,26 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 		return (
 			<>
 				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
-					<VStack h='100%' spacing={[2, 2, 5, 5]}>
+					<Flex direction='column' w='100%' h='100%'>
 						<Box h='33%'>
 							<Center h='100%'>
-							<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
+								<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
 							</Center>
 						</Box>
-						<Spinner size={['sm', 'sm', 'md', 'md']} alignSelf='center'/>
-						<Button bg='teal.300' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}
-								_hover={{
-								bg: "rgba(255, 255, 255, 0.3)"
-								}}>Leave</Button>
-					</VStack>
+						<Box h='33%'>
+							<Center h='100%'>
+								<Spinner size={['sm', 'sm', 'md', 'md']} alignSelf='center'/>
+							</Center>
+						</Box>
+						<Box h='33%' w='100%'>
+							<Center h='100%'>
+								<Button bg='teal.300' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}
+										_hover={{
+										bg: "rgba(255, 255, 255, 0.3)"
+										}}>Leave</Button>
+								</Center>
+						</Box>
+					</Flex>
 				</Box>
 			</>
 		)
