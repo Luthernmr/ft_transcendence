@@ -39,7 +39,8 @@ function Pong() {
     user1Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
     user2Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
     watchers: [],
-    custom: false
+    custom: false,
+    countdown: 0
   });
   
   useEffect(() => {
@@ -172,6 +173,19 @@ function Pong() {
         <GameScreen size={size} watcher={watching.current} initDatas={initDatas} leaveGame={LeaveGame}/>
       </Flex>
       )
+  } else if (pongState === PongState.Error) {
+    return (
+      <Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      minHeight={"100%"}
+      flex={"1"}
+      direction={"column"}
+      maxH={"100%"}
+      overflowY="auto">
+        <Text>There seem to be an error retriving your informations...<br/>(It's not you, it's us.)</Text>
+       </Flex>
+    )
   }
 }
 

@@ -33,7 +33,6 @@ function GameScreen(props : GameScreenProps) {
 	const score = useRef<Score>({scoreP1: 0, scoreP2: 0});
 	const winner = useRef<number>(0);
 	const countdown = useRef<number>(0);
-	const [opponentAlive, setOpponentAlive] = useState<boolean>(true);
 	const P1Alive = useRef<boolean>(true);
 	const P2Alive = useRef<boolean>(true);
 	const watchers = useRef<UserDatas[]>([]);
@@ -52,6 +51,7 @@ function GameScreen(props : GameScreenProps) {
 			score.current = { scoreP1: datas.scoreP1, scoreP2: datas.scoreP2 };
 			winner.current = datas.winner;
 			watchers.current = props.initDatas.watchers;
+			countdown.current = props.initDatas.countdown;
 			setPaddleP1({
 				pos: datas.paddle1Pos,
 				delta: datas.paddle1Delta
@@ -104,14 +104,14 @@ function GameScreen(props : GameScreenProps) {
 			setGameState(GameState.Playing);
 			winner.current = 0;
 			countdown.current = delay;
-			MakeCountdown();
+			// MakeCountdown();
 
-			async function MakeCountdown() {
-				while (countdown.current > 0) {
-					await new Promise(r => setTimeout(r, 1000));
-					countdown.current -= 1;
-				}
-			}
+			// async function MakeCountdown() {
+			// 	while (countdown.current > 0) {
+			// 		await new Promise(r => setTimeout(r, 1000));
+			// 		countdown.current -= 1;
+			// 	}
+			// }
 		}
 
 		function BallDelta(values: BallRuntimeData) {
@@ -135,7 +135,6 @@ function GameScreen(props : GameScreenProps) {
 		}
 
 		function PlayerDisconnected(p: number) {
-			setOpponentAlive(false);
 			if (p === 1)
 				P1Alive.current = false;
 			else
@@ -143,7 +142,6 @@ function GameScreen(props : GameScreenProps) {
 		}
 
 		function PlayerReconnected(p: number) {
-			setOpponentAlive(true);
 			if (p === 1)
 			P1Alive.current = true;
 		else
@@ -167,6 +165,10 @@ function GameScreen(props : GameScreenProps) {
 			setStartingPlayer(num);
 		}
 
+		function Countdown(seconds: number) {
+			countdown.current = seconds;
+		}
+
 		pongSocket.on('StartGame', Start);
 		pongSocket.on('BallDelta', BallDelta);
 		pongSocket.on('PaddleDelta', PaddleDelta);
@@ -178,6 +180,7 @@ function GameScreen(props : GameScreenProps) {
 		pongSocket.on('AddWatcher', AddWatcher);
 		pongSocket.on('RemoveWatcher', RemoveWatcher);
 		pongSocket.on('SetStartingPlayer', SetStartingPlayer);
+		pongSocket.on('Countdown', Countdown);
 
 		return () => {
 			pongSocket.off('StartGame', Start);
@@ -191,6 +194,7 @@ function GameScreen(props : GameScreenProps) {
 			pongSocket.off('AddWatcher', AddWatcher);
 			pongSocket.off('RemoveWatcher', RemoveWatcher);
 			pongSocket.off('SetStartingPlayer', SetStartingPlayer);
+			pongSocket.off('Countdown', Countdown);
 		}
 	}, [])
 
@@ -199,11 +203,11 @@ function GameScreen(props : GameScreenProps) {
 		  return;
 		
 		let input = 0;
-	
+		
 		if (e.code == 'ArrowLeft') input = playerNumber.current === 1 ? -1 : 1;
 		else if (e.code == 'ArrowRight') input = playerNumber.current === 1 ? 1 : -1;
 		else return;
-	
+		
 		pongSocket.emit('keydown', input);
 	}
 
@@ -272,7 +276,6 @@ function GameScreen(props : GameScreenProps) {
 									playerNumber={playerNumber.current}
 									P1Alive={P1Alive.current}
 									P2Alive={P2Alive.current}
-									opponentAlive={opponentAlive}
 									requestRestart={requestRestart}
 									quit={quit}
 									gameState={gameState}

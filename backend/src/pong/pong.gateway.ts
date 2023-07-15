@@ -84,8 +84,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('quit')
   handleQuit(@ConnectedSocket() socket: Socket) {
-    const opponentSocket = this.pongService.UserQuit(socket);
-    opponentSocket?.emit('OpponentQuit');
+    this.pongService.UserQuit(socket);
   }
 
   @SubscribeMessage('keydown')
@@ -165,6 +164,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     socket.emit('OpponentReconnected')
   }
 
+  EmitOpponentQuit(socket: Socket) {
+    socket?.emit('OpponentQuit');
+  }
+
   EmitPlayerReconnected(roomID: number, p: number) {
     this.EmitEvent('PlayerReconnected', roomID, p);
   }
@@ -179,5 +182,9 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   EmitSetStartingPlayer(roomID: number, startingPlayer: number) {
     this.EmitEvent('SetStartingPlayer', roomID, startingPlayer);
+  }
+
+  EmitCountdown(roomID: number, countdown: number) {
+    this.EmitEvent('Countdown', roomID, countdown);
   }
 }

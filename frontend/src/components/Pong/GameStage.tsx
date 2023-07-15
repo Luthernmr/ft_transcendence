@@ -12,7 +12,6 @@ interface GameStageProps {
 	playerNumber: number,
 	P1Alive: boolean,
 	P2Alive: boolean,
-	opponentAlive: boolean,
 	requestRestart: Function,
 	quit: Function,
 	gameState: GameState,
