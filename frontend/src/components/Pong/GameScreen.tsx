@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Spacer, Flex, Box, Button, Center, Text } from '@chakra-ui/react';
+import { Spacer, Flex, Box, Button, Center, Text, Divider } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 // import GameArea from './GameArea';
 import { Vector2, PongInitData, BallRuntimeData, PaddleRuntimeData,
@@ -224,9 +224,12 @@ function GameScreen(props : GameScreenProps) {
 
 	return(
 		<>
-		<Box w='100%' h='15%'>
-			<Center w='100%' h='80%'>
-				<Text as='b' fontSize={{sm: 15, md:20, lg: 30, xl: 40}}>Welcome to {props.initDatas.custom ? "GNOP" : "PONG"}!</Text>
+		<Box w='100%' h={['10%', '10%', '20%', '20%']} minHeight={50}>
+			<Center w='100%' h='100%'>
+				<Box w='80%' h='70%' border='2px' borderColor='gray.100' borderRadius={20}>
+					<Center w='100%' h='100%'><Text as='b' fontSize={{sm: 15, md:22, lg: 30, xl: 40}}>Welcome to {props.initDatas.custom ? "GNOP" : "PONG"}!</Text>
+					</Center>
+				</Box>
 			</Center>
 		</Box>
 		<Flex direction={{sm: 'column', md:'column', lg: 'column', xl: 'row'}} width='100%' height={680 * props.size}>
@@ -266,10 +269,10 @@ function GameScreen(props : GameScreenProps) {
 					</Center>
 				</Box>
 			</Flex>
-			<Box w={{sm: '100%', md:'100%', lg: '100%', xl: '40%'}}>
-				{props.watcher && <Button onClick={() => pongSocket.emit("LeaveWatch")}>Leave Watch</Button>}
-				<WatchersArea watchers={watchers.current}/>
-			</Box>
+			<Flex direction='column' w={{sm: '100%', md:'100%', lg: '100%', xl: '40%'}}>
+				<Box w='100%' h={{sm: '10px', md:'20px', lg: '20px', xl: '0px'}}></Box>
+				<WatchersArea watchers={watchers.current} isWatcher={props.watcher} leaveWatch={() => pongSocket.emit("LeaveWatch")}/>
+			</Flex>
 		</Flex>
 		</>
 	)
