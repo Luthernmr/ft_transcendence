@@ -34,6 +34,7 @@ function WatchersArea(props: WatchersAreaProps) {
 						</Box>
 					</Center>
 				</Box>
+				<Box h='15%'/>
 				<Center w='100%' h='80%'>
 					<Grid
 						w='70%'

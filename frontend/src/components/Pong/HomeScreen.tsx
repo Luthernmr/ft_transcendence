@@ -39,7 +39,7 @@ function HomeScreen(props: HomeScreenProps) {
 	return (
 		<>
 			<Flex direction='column' w='100%' h='100%'>
-				<Button onClick={() => pongSocket.emit("Watch")}>Watch</Button>
+				{/* <Button onClick={() => pongSocket.emit("Watch")}>Watch</Button> */}
 				<Box w='100%' h={['10%', '10%', '20%', '20%']}>
 					<Center w='100%' h='100%'>
 						<Text as='b' fontSize='2xl'>Play</Text>

@@ -26,6 +26,14 @@ interface GameStageProps {
 }
 
 function GameStage(props: GameStageProps) {	
+	const [hoverRestart, setHoverRestart] = useState<boolean>(false);
+	const [hoverQuit, setHoverQuit] = useState<boolean>(false);
+	const [restartRequested, setRestartRequested] = useState<boolean>(false);
+	
+	useEffect(() => {
+		setRestartRequested(false);
+	}, [props.winner]);
+
 	return (
 		<>
 			<Stage 	x={WALL_WIDTH * props.size}
@@ -33,10 +41,76 @@ function GameStage(props: GameStageProps) {
 					height={props.initDatas.height * props.size}
 					scale={{x: props.size, y: props.size}}>
 				<Layer>
-					<Text text={props.countdown.toString()} fontSize={50} width={450} y={400} align='center' visible={props.countdown > 0} />
-					<Text text={`${props.winner === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won!`} fontSize={30} width={450} y={180} align='center' visible={props.winner != 0}/>
-					<Text text="Restart" fontSize={25} onClick={() => props.requestRestart()} width={450} y={380} align='center' visible={props.gameState === GameState.Finished && props.watcher == false}/>
-					<Text text="Quit" fontSize={25} onClick={() => props.quit()} width={450} y={430} align='center' visible={props.gameState === GameState.Finished && props.watcher == false}/>
+					<Text 	text={props.countdown.toString()}
+							fontSize={50}
+							width={450}
+							y={400}
+							align='center'
+							visible={props.countdown > 0}
+							/>
+					<Text 	text={`${props.winner === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname} won!`}
+							fontSize={30}
+							width={450}
+							y={180}
+							align='center'
+							visible={props.winner != 0}
+							/>
+					<Text 	text="Restart"
+							fontSize={25}
+							opacity={restartRequested ? 0.2 : (hoverRestart ? 0.5 : 1)}
+							onClick={() => {
+								setRestartRequested(true);
+								props.requestRestart();
+							}}
+							width={450}
+							y={380}
+							align='center'
+							lineJoin= 'round'
+							visible={props.gameState === GameState.Finished && props.watcher == false}
+							onMouseEnter={e => {
+								if (restartRequested)
+									return;
+								const stage = e.target.getStage();
+								if (stage === null)
+									return;
+								const container = stage.container();
+								container.style.cursor = "pointer";
+								setHoverRestart(true);
+							}}
+							onMouseLeave={e => {
+								const stage = e.target.getStage();
+								if (stage === null)
+									return;
+								const container = stage.container();
+								container.style.cursor = "default";
+								setHoverRestart(false);
+							}}
+							/>
+					<Text 	text="Quit"
+							fontSize={25}
+							fill={hoverQuit ? 'gray' : 'black'}
+							onClick={() => props.quit()}
+							width={450}
+							y={430}
+							align='center'
+							visible={props.gameState === GameState.Finished && props.watcher == false}
+							onMouseEnter={e => {
+								const stage = e.target.getStage();
+								if (stage === null)
+									return;
+								const container = stage.container();
+								container.style.cursor = "pointer";
+								setHoverQuit(true);
+							}}
+							onMouseLeave={e => {
+								const stage = e.target.getStage();
+								if (stage === null)
+									return;
+								const container = stage.container();
+								container.style.cursor = "default";
+								setHoverQuit(false);
+							}}
+							/>
 					<Text 	fill='red'
 							text={(props.playerNumber === 1 ? props.initDatas.user1Datas.nickname : props.initDatas.user2Datas.nickname) + " disconnected !"}
 							fontSize={30}
