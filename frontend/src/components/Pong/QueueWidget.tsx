@@ -22,7 +22,7 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	if (props.joined === false) {
 		return (
 			<>
-				<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
+				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
 					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25'
 						_hover={{
 						bg: "rgba(255, 255, 255, 0.3)"
@@ -36,7 +36,7 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	} else {
 		return (
 			<>
-				<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
+				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
 					<VStack h='100%' spacing={[2, 2, 5, 5]}>
 						<Box h='33%'>
 							<Center h='100%'>
