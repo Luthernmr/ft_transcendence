@@ -37,7 +37,9 @@ export interface PongInitData extends GameLayout, BallRuntimeData, PaddleRuntime
   user2Datas: UserDatas,
   watchers: Array<UserDatas>,
   custom: boolean,
-  countdown: number
+  countdown: number,
+  P1alive: boolean,
+  P2alive: boolean
 }
 
 export enum GameState {

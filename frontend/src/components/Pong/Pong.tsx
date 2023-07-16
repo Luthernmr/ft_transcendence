@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { Button, Center, Flex } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
-import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData, WatcherInitDatas,
-          PongDisplay, PongState, GameState }
+import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData,
+          PongState, GameState }
           from './PongSettings';
 import HomeScreen from './HomeScreen';
 import GameScreen from './GameScreen';
@@ -40,7 +40,9 @@ function Pong() {
     user2Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
     watchers: [],
     custom: false,
-    countdown: 0
+    countdown: 0,
+    P1alive: true,
+    P2alive: true
   });
   
   useEffect(() => {

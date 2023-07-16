@@ -52,6 +52,8 @@ function GameScreen(props : GameScreenProps) {
 			winner.current = datas.winner;
 			watchers.current = props.initDatas.watchers;
 			countdown.current = props.initDatas.countdown;
+			P1Alive.current = props.initDatas.P2alive;
+			P2Alive.current = props.initDatas.P1alive;
 			setPaddleP1({
 				pos: datas.paddle1Pos,
 				delta: datas.paddle1Delta
@@ -104,14 +106,6 @@ function GameScreen(props : GameScreenProps) {
 			setGameState(GameState.Playing);
 			winner.current = 0;
 			countdown.current = delay;
-			// MakeCountdown();
-
-			// async function MakeCountdown() {
-			// 	while (countdown.current > 0) {
-			// 		await new Promise(r => setTimeout(r, 1000));
-			// 		countdown.current -= 1;
-			// 	}
-			// }
 		}
 
 		function BallDelta(values: BallRuntimeData) {

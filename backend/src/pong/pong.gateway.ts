@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas, UserDatas } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, GameDatas, UserDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -48,7 +48,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   handleDisconnect(socket: Socket) {
     //console.log("Socket disconnected from pong :" + socket.id);
-    //this.pongService.CloseRoom(socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }
 
@@ -69,7 +68,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('leaveQueue')
   handleLeaveQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
-    this.pongService.LeaveQueueSocket(socket);
+    this.pongService.LeaveQueueBySocket(socket);
   }
 
   @SubscribeMessage('clientReady')
