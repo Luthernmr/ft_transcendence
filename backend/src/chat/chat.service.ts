@@ -84,11 +84,9 @@ export class ChatService {
     try {
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
-        const otherSocket = await this.authService.getUserSocket(
-          this.gateway.chatNamespace,
-          element.id,
-        );
-        if (otherSocket) otherSocket.emit('receiveMessage', message);
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('receiveMessage', message);
       });
     } catch (error) {
       client.emit('error', { message: error.message });
@@ -114,4 +112,17 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
+  
+  @SubscribeMessage('joinRoom')
+  async joinRoom(client: Socket, data: { userId: number; room: Room }) {
+    try {
+      const { userId, room } = data;
+      const updatedRoom = await this.roomService.addUserToRoom(userId, room);
+      this.gateway.chatNamespace.emit('updatedRoom');
+      client.emit('joinedRoom', updatedRoom);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+  
 }

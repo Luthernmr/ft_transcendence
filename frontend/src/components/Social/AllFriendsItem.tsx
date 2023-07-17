@@ -36,7 +36,6 @@ export default function AllfriendItem() {
 
 	useEffect(() => {
 		userSocket.on("friendsList", (data) => {
-			console.log('cc')
 			setFriends(data);
 		});
 		userSocket.on("requestAcccepted", () => {

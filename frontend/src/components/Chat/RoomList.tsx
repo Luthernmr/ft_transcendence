@@ -25,7 +25,6 @@ import {
 } from "@chakra-ui/react";
 import {
   AddIcon,
-  CloseIcon,
   DeleteIcon,
   LockIcon,
   ViewIcon,
@@ -77,20 +76,30 @@ const RoomList: React.FC<RoomListProps> = ({
     chatSocket.on("roomCreated", () => {
       chatSocket.emit("getUserRooms", { userId: currentUser.id });
     });
+    
+    chatSocket.on("updatedRoom", () => {
+      chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    });
 
     return () => {
       chatSocket.off("roomList");
       chatSocket.off("roomCreated");
       chatSocket.off("roomDeleted");
+      chatSocket.off("updatedRoom");
     };
   }, [currentUser.id]);
 
   const handleRoomClick = (room: Room) => {
+    chatSocket.emit("joinRoom", { userId: currentUser.id, room: room });
     if (room.password) {
       setSelectedRoomLocal(room);
       onOpen();
     } else {
-      setSelectedRoom(room);
+      console.log('Here')
+      chatSocket.on("joinedRoom", (joinedRoom: Room) => {
+        console.log(joinedRoom)
+        setSelectedRoom(joinedRoom);
+      });
     }
   };
 
@@ -98,7 +107,6 @@ const RoomList: React.FC<RoomListProps> = ({
     e.stopPropagation();
     e.preventDefault();
     chatSocket.emit("deleteRoom", room);
-    // chatSocket.emit("getUserRooms", { userId: currentUser.id });
   };
 
   const handlePasswordSubmit = (e: FormEvent) => {

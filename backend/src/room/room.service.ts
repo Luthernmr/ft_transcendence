@@ -13,6 +13,8 @@ import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { User } from 'src/user/user.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class RoomService {
@@ -21,6 +23,7 @@ export class RoomService {
   constructor(
     @InjectRepository(Room) private roomRepo: Repository<Room>,
     private readonly authService: AuthService,
+    private readonly userService: UserService,
   ) {
     this.logger = new Logger(RoomService.name);
   }
@@ -76,5 +79,31 @@ export class RoomService {
 
   async deleteRoom(roomId: number) {
     await this.roomRepo.delete({ id: roomId });
+  }
+
+  async addUserToRoom(userId: number, payload: Room) {
+    const room = await this.roomRepo.findOne({
+      where: { id: payload.id },
+      relations: ['users'],
+    });
+  
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+  
+    const userAlreadyInRoom = room.users.some((user) => user.id === userId);
+  
+    if (!userAlreadyInRoom) {
+      const user = await this.userService.getUserById(userId);
+  
+      if (!user) {
+        throw new BadRequestException('User does not exist');
+      }
+  
+      room.users.push(user);
+      await this.roomRepo.save(room);
+    }
+  
+    return room;
   }
 }
