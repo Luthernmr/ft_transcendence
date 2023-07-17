@@ -90,30 +90,32 @@ const RoomList: React.FC<RoomListProps> = ({
   }, [currentUser.id]);
 
   const handleRoomClick = (room: Room) => {
-    chatSocket.emit("joinRoom", { userId: currentUser.id, room: room });
     if (room.password) {
       setSelectedRoomLocal(room);
       onOpen();
     } else {
-      console.log('Here')
+      chatSocket.emit("joinRoom", { userId: currentUser.id, room: room });
       chatSocket.on("joinedRoom", (joinedRoom: Room) => {
-        console.log(joinedRoom)
         setSelectedRoom(joinedRoom);
       });
     }
   };
-
+  
   const handleDeleteRoom = (e: FormEvent, room: Room) => {
     e.stopPropagation();
     e.preventDefault();
     chatSocket.emit("deleteRoom", room);
   };
-
+  
   const handlePasswordSubmit = (e: FormEvent) => {
     e.preventDefault();
     chatSocket.on("passCheck", (check: boolean) => {
       if (check && selectedRoom) {
-        setSelectedRoom(selectedRoom);
+        chatSocket.emit("joinRoom", { userId: currentUser.id, room: selectedRoom });
+        chatSocket.on("joinedRoom", (selectedRoom: Room) => {
+          setSelectedRoom(selectedRoom);
+        });
+        // setSelectedRoom(selectedRoom);
       } else {
         setRoomPassword("");
         toast({
