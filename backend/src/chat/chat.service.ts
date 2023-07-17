@@ -35,13 +35,17 @@ export class ChatService {
   }
 
   async handleConnection(client: Socket) {
-    this.logger.log('id: ' + client.id + ' connected');
-    let user: User = await this.authService.getUserByToken(
-      client.handshake.auth.token,
-    );
-    if (user) {
-      user = await this.userService.setSocket(user.id, client.id);
-      await this.userService.setOnline(user);
+    try {
+      this.logger.log('id: ' + client.id + ' connected');
+      let user: User = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      if (user) {
+        user = await this.userService.setSocket(user.id, client.id);
+        await this.userService.setOnline(user);
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
     }
   }
 
@@ -63,8 +67,14 @@ export class ChatService {
 
   @SubscribeMessage('getUserRooms')
   async getUserRooms(client: Socket, payload: { userId: number }) {
-    const rooms = await this.roomService.getAllAccessibleRooms(payload.userId);
-    client.emit('roomList', rooms);
+    try {
+      const rooms = await this.roomService.getAllAccessibleRooms(
+        payload.userId,
+      );
+      client.emit('roomList', rooms);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
   }
 
   @SubscribeMessage('checkRoomPassword')
@@ -72,11 +82,15 @@ export class ChatService {
     client: Socket,
     payload: { room: Room; password: string },
   ) {
-    const answer = await bcrypt.compare(
-      payload.password,
-      payload.room.password,
-    );
-    client.emit('passCheck', answer);
+    try {
+      const answer = await bcrypt.compare(
+        payload.password,
+        payload.room.password,
+      );
+      client.emit('passCheck', answer);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
   }
 
   @SubscribeMessage('sendMessage')
@@ -112,7 +126,7 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
-  
+
   @SubscribeMessage('joinRoom')
   async joinRoom(client: Socket, data: { userId: number; room: Room }) {
     try {
@@ -124,5 +138,4 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
-  
 }
