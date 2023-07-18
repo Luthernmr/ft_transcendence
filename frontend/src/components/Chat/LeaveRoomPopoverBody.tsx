@@ -32,7 +32,10 @@ const LeaveRoomPopoverBody: React.FC<LeaveRoomPopoverBodyProps> = ({
   };
 
   const handleSubmit = () => {
-    chatSocket.emit("leaveRoom", { roomId: selectedRoom.id, newOwnerId: selectedUserId });
+    chatSocket.emit("leaveRoom", {
+      roomId: selectedRoom.id,
+      newOwnerId: selectedUserId,
+    });
     setSelectedRoom(null);
   };
 

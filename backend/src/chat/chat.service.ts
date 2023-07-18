@@ -150,7 +150,11 @@ export class ChatService {
       );
       const updatedRoom = await this.roomService.leaveRoom(user.id, payload);
       this.gateway.chatNamespace.emit('updatedRoom');
-      client.emit('leftRoom', updatedRoom);
+      updatedRoom.users.forEach(async (element) => {
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('leftRoom', user.nickname, updatedRoom);
+      });
     } catch (error) {
       client.emit('error', { message: error.message });
     }

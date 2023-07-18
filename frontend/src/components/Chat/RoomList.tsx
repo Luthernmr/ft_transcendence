@@ -76,7 +76,7 @@ const RoomList: React.FC<RoomListProps> = ({
     chatSocket.on("roomCreated", () => {
       chatSocket.emit("getUserRooms", { userId: currentUser.id });
     });
-    
+
     chatSocket.on("updatedRoom", () => {
       chatSocket.emit("getUserRooms", { userId: currentUser.id });
     });
@@ -100,18 +100,21 @@ const RoomList: React.FC<RoomListProps> = ({
       });
     }
   };
-  
+
   const handleDeleteRoom = (e: FormEvent, room: Room) => {
     e.stopPropagation();
     e.preventDefault();
     chatSocket.emit("deleteRoom", room);
   };
-  
+
   const handlePasswordSubmit = (e: FormEvent) => {
     e.preventDefault();
     chatSocket.on("passCheck", (check: boolean) => {
       if (check && selectedRoom) {
-        chatSocket.emit("joinRoom", { userId: currentUser.id, room: selectedRoom });
+        chatSocket.emit("joinRoom", {
+          userId: currentUser.id,
+          room: selectedRoom,
+        });
         chatSocket.on("joinedRoom", (selectedRoom: Room) => {
           setSelectedRoom(selectedRoom);
         });

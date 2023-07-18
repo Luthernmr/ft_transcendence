@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useRef, useEffect } from "react";
+import React, { useState, useEffect, FormEvent, useRef } from "react";
 import {
   Flex,
   Box,
@@ -21,10 +21,7 @@ import {
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
-import {
-  ArrowBackIcon,
-  ChevronRightIcon,
-} from "@chakra-ui/icons";
+import { ArrowBackIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import { FiLogOut, FiSend } from "react-icons/fi";
 import { User } from "../Social/AllUserItem";
 import { chatSocket, userSocket } from "../../sockets/sockets";
@@ -34,7 +31,7 @@ import PongInviteButton from "../Social/PongInviteButton";
 import { Link as RouteLink } from "react-router-dom";
 import LeaveRoomPopoverBody from "./LeaveRoomPopoverBody";
 
-export interface Room {
+interface Room {
   id: number;
   name: string;
   password: string;
@@ -43,41 +40,32 @@ export interface Room {
   ownerId: number;
 }
 
-export interface Message {
+interface Message {
   id: number;
   text: string;
   created_at: Date;
   user: User;
 }
 
-interface ChatRoomProps {
-  setSelectedRoom: (room: any) => void;
+interface Props {
+  setSelectedRoom: (room: Room | null) => void;
   selectedRoom: Room;
 }
 
-const ChatRoom: React.FC<ChatRoomProps> = ({
-  setSelectedRoom,
-  selectedRoom,
-}) => {
+const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   const currentUser: User = JSON.parse(
     sessionStorage.getItem("currentUser") || "{}"
   );
   const [messageContent, setMessageContent] = useState<string>("");
-  const [messages, setMessages] = useState<Message[]>([]);
-  const toast = useToast();
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const toast = useToast();
 
   const handleLeaveRoom = () => {
     chatSocket.emit("leaveRoom", selectedRoom.id);
     setSelectedRoom(null);
   };
-
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
 
   const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
@@ -95,44 +83,55 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
       room: selectedRoom,
       user: currentUser,
     });
-
     setMessageContent("");
   };
 
-  const handleError = (error: { message: string }) => {
+  const handleRoomMessages = (roomMessages: Message[]) =>
+    setMessages(roomMessages);
+  const handleBlockedUsers = (blockedUsers: User[]) =>
+    setBlockedUsers(blockedUsers);
+  const handleError = (error: { message: string }) =>
     toast({
       title: error.message,
       status: "error",
       isClosable: true,
       position: "top",
     });
-  };
-
-  const handleReceiveMessage = (receivedMessage: Message) => {
+  const handleReceiveMessage = (receivedMessage: Message) =>
     setMessages((prevMessages) => [...prevMessages, receivedMessage]);
-  };
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   useEffect(() => {
     chatSocket.emit("getRoomMessages", selectedRoom);
     userSocket.emit("getBlockedList");
-
-    const handleRoomMessages = (roomMessages: Message[]) => {
-      setMessages(roomMessages);
-    };
-
-    const handleBlockedUsers = (blockedUsers: User[]) => {
-      setBlockedUsers(blockedUsers);
-    };
-
     chatSocket.on("roomMessages", handleRoomMessages);
     userSocket.on("blockedList", handleBlockedUsers);
     chatSocket.on("error", handleError);
     chatSocket.on("receiveMessage", handleReceiveMessage);
-
+    chatSocket.on("leftRoom", (userName: string, updatedRoom: Room) => {
+      if (selectedRoom.id === updatedRoom.id) {
+        toast({
+          title: userName + " just left the room.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+        if (userName != currentUser.nickname) {
+          setSelectedRoom(updatedRoom);
+        }
+      }
+    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
+      chatSocket.off("blockedList", handleRoomMessages);
       chatSocket.off("error", handleError);
       chatSocket.off("receiveMessage", handleReceiveMessage);
+      chatSocket.off("leftRoom", handleReceiveMessage);
     };
   }, []);
 
