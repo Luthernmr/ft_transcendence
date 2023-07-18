@@ -31,7 +31,7 @@ import PongInviteButton from "../Social/PongInviteButton";
 import { Link as RouteLink } from "react-router-dom";
 import LeaveRoomPopoverBody from "./LeaveRoomPopoverBody";
 
-interface Room {
+export interface Room {
   id: number;
   name: string;
   password: string;
@@ -40,7 +40,7 @@ interface Room {
   ownerId: number;
 }
 
-interface Message {
+export interface Message {
   id: number;
   text: string;
   created_at: Date;
