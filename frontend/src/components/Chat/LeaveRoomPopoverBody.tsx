@@ -11,16 +11,19 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Room } from "./ChatRoom";
+import { chatSocket } from "../../sockets/sockets";
 import { CheckIcon } from "@chakra-ui/icons";
 
 interface LeaveRoomPopoverBodyProps {
   selectedRoom: Room;
   currentUser: User;
+  setSelectedRoom: (room: Room | null) => void;
 }
 
 const LeaveRoomPopoverBody: React.FC<LeaveRoomPopoverBodyProps> = ({
   selectedRoom,
   currentUser,
+  setSelectedRoom,
 }) => {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
@@ -29,8 +32,8 @@ const LeaveRoomPopoverBody: React.FC<LeaveRoomPopoverBodyProps> = ({
   };
 
   const handleSubmit = () => {
-    // Implement your submit logic here
-    // for example, you might emit a socket event here
+    chatSocket.emit("leaveRoom", { roomId: selectedRoom.id, newOwnerId: selectedUserId });
+    setSelectedRoom(null);
   };
 
   return (

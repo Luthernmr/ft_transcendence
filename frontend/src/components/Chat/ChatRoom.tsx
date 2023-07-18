@@ -66,20 +66,11 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const toast = useToast();
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
-  // const [newOwnerId, setNewOwnerId] = useState(null);
-  // const [showOwnerSelect, setShowOwnerSelect] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
-  // useEffect(() => {
-  //   if (currentUser.id === selectedRoom.ownerId) {
-  //     setShowOwnerSelect(true);
-  //   }
-  // }, [selectedRoom]);
-
   const handleLeaveRoom = () => {
-    // Emit leaveRoom event through WebSocket connection.
-    // If showOwnerSelect is true, pass newOwnerId as well.
-    // Your WebSocket client might look something like socket.emit('leaveRoom', { roomId: selectedRoom.id, newOwnerId });
+    chatSocket.emit("leaveRoom", selectedRoom.id);
+    setSelectedRoom(null);
   };
 
   useEffect(() => {
@@ -178,7 +169,7 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
                 <LeaveRoomPopoverBody
                   selectedRoom={selectedRoom}
                   currentUser={currentUser}
-                  // handleLeaveRoom={handleLeaveRoom}
+                  setSelectedRoom={setSelectedRoom}
                 />
               </PopoverBody>
             </PopoverContent>
