@@ -155,7 +155,8 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
           {selectedRoom.name}
         </Heading>
 
-        {currentUser.id === selectedRoom.ownerId ? (
+        {currentUser.id === selectedRoom.ownerId &&
+        selectedRoom.users.length > 1 ? (
           <Popover>
             <PopoverTrigger>
               <IconButton icon={<FiLogOut />} aria-label={"Leave"} />
@@ -177,7 +178,14 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
           <IconButton
             icon={<FiLogOut />}
             aria-label={"Leave"}
-            onClick={handleLeaveRoom}
+            onClick={() => {
+              if (currentUser.id === selectedRoom.ownerId) {
+                chatSocket.emit("deleteRoom", selectedRoom);
+              } else {
+                handleLeaveRoom();
+              }
+              setSelectedRoom(null);
+            }}
           />
         )}
       </Flex>
