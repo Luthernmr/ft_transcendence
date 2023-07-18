@@ -22,14 +22,15 @@ import {
   Portal,
 } from "@chakra-ui/react";
 import { ArrowBackIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { FiLogOut, FiSend } from "react-icons/fi";
+import { FiLogOut, FiSend, FiSettings } from "react-icons/fi";
 import { User } from "../Social/AllUserItem";
 import { chatSocket, userSocket } from "../../sockets/sockets";
 import AddFriendButton from "../Social/AddFriendButton";
 import BlockUserButton from "../Social/BlockUserButton";
 import PongInviteButton from "../Social/PongInviteButton";
 import { Link as RouteLink } from "react-router-dom";
-import LeaveRoomPopoverBody from "./LeaveRoomPopoverBody";
+import LeavePopover from "./LeavePopover";
+import SettingsPopover from "./SettingsPopover";
 
 export interface Room {
   id: number;
@@ -155,39 +156,65 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
           {selectedRoom.name}
         </Heading>
 
-        {currentUser.id === selectedRoom.ownerId &&
-        selectedRoom.users.length > 1 ? (
-          <Popover>
-            <PopoverTrigger>
-              <IconButton icon={<FiLogOut />} aria-label={"Leave"} />
-            </PopoverTrigger>
-            <PopoverContent>
-              <PopoverArrow />
-              <PopoverCloseButton />
-              <PopoverHeader>Choose a new owner</PopoverHeader>
-              <PopoverBody>
-                <LeaveRoomPopoverBody
-                  selectedRoom={selectedRoom}
-                  currentUser={currentUser}
-                  setSelectedRoom={setSelectedRoom}
+        <Flex>
+          {currentUser.id === selectedRoom.ownerId && (
+            <Popover>
+              <PopoverTrigger>
+                <IconButton
+                  icon={<FiSettings />}
+                  aria-label={"Settings"}
+                  mr={2}
                 />
-              </PopoverBody>
-            </PopoverContent>
-          </Popover>
-        ) : (
-          <IconButton
-            icon={<FiLogOut />}
-            aria-label={"Leave"}
-            onClick={() => {
-              if (currentUser.id === selectedRoom.ownerId) {
-                chatSocket.emit("deleteRoom", selectedRoom);
-              } else {
-                handleLeaveRoom();
-              }
-              setSelectedRoom(null);
-            }}
-          />
-        )}
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverHeader>Change Room Settings</PopoverHeader>
+                <PopoverBody>
+                  <SettingsPopover
+                    selectedRoom={selectedRoom}
+                    currentUser={currentUser}
+                    setSelectedRoom={setSelectedRoom}
+                  />
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+          )}
+
+          {currentUser.id === selectedRoom.ownerId &&
+          selectedRoom.users.length > 1 ? (
+            <Popover>
+              <PopoverTrigger>
+                <IconButton icon={<FiLogOut />} aria-label={"Leave"} />
+              </PopoverTrigger>
+              <PopoverContent>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverHeader>Choose a new owner</PopoverHeader>
+                <PopoverBody>
+                  <LeavePopover
+                    selectedRoom={selectedRoom}
+                    currentUser={currentUser}
+                    setSelectedRoom={setSelectedRoom}
+                  />
+                </PopoverBody>
+              </PopoverContent>
+            </Popover>
+          ) : (
+            <IconButton
+              icon={<FiLogOut />}
+              aria-label={"Leave"}
+              onClick={() => {
+                if (currentUser.id === selectedRoom.ownerId) {
+                  chatSocket.emit("deleteRoom", selectedRoom);
+                } else {
+                  handleLeaveRoom();
+                }
+                setSelectedRoom(null);
+              }}
+            />
+          )}
+        </Flex>
       </Flex>
       <VStack
         marginY={"10px"}

@@ -14,13 +14,13 @@ import { Room } from "./ChatRoom";
 import { chatSocket } from "../../sockets/sockets";
 import { CheckIcon } from "@chakra-ui/icons";
 
-interface LeaveRoomPopoverBodyProps {
+interface LeavePopoverProps {
   selectedRoom: Room;
   currentUser: User;
   setSelectedRoom: (room: Room | null) => void;
 }
 
-const LeaveRoomPopoverBody: React.FC<LeaveRoomPopoverBodyProps> = ({
+const LeavePopover: React.FC<LeavePopoverProps> = ({
   selectedRoom,
   currentUser,
   setSelectedRoom,
@@ -99,4 +99,4 @@ const LeaveRoomPopoverBody: React.FC<LeaveRoomPopoverBodyProps> = ({
   );
 };
 
-export default LeaveRoomPopoverBody;
+export default LeavePopover;
