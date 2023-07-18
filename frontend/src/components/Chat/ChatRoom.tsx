@@ -169,7 +169,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
               <PopoverContent>
                 <PopoverArrow />
                 <PopoverCloseButton />
-                <PopoverHeader>Change Room Settings</PopoverHeader>
+                <PopoverHeader>Room Settings</PopoverHeader>
                 <PopoverBody>
                   <SettingsPopover
                     selectedRoom={selectedRoom}

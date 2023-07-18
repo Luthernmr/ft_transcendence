@@ -6,12 +6,11 @@ import {
   FormLabel,
   Input,
   VStack,
-  Button,
   Avatar,
   AvatarBadge,
-
   Text,
-  Spacer
+  Spacer,
+  IconButton,
 } from "@chakra-ui/react";
 import { chatSocket } from "../../sockets/sockets";
 import { Room } from "./ChatRoom";
@@ -37,18 +36,27 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
     chatSocket.emit("changeRoomPassword", selectedRoom.id, password);
   };
 
-  const handleAdminSelection = useCallback((user: User) => {
-    if (user.id !== currentUser.id) {
-      const adminExists = admins.find((admin) => admin.id === user.id);
-      if (!adminExists) {
-        setAdmins([...admins, user]);
-        chatSocket.emit("addAdminToRoom", selectedRoom.id, user.id);
-      } else {
-        setAdmins(admins.filter((admin) => admin.id !== user.id));
-        chatSocket.emit("removeAdminFromRoom", selectedRoom.id, user.id);
+  const handleAdminSelection = useCallback(
+    (user: User) => {
+      if (user.id !== currentUser.id) {
+        const adminExists = admins.find((admin) => admin.id === user.id);
+        if (!adminExists) {
+          setAdmins([...admins, user]);
+        } else {
+          setAdmins(admins.filter((admin) => admin.id !== user.id));
+        }
       }
-    }
-  }, [admins, currentUser, selectedRoom]);
+    },
+    [admins, currentUser]
+  );
+
+  const handleAdminUpdate = () => {
+    chatSocket.emit(
+      "updateAdmins",
+      selectedRoom.id,
+      admins.map((admin) => admin.id)
+    );
+  };
 
   useEffect(() => {
     chatSocket.on("updateRoom", setSelectedRoom);
@@ -58,55 +66,76 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   }, [setSelectedRoom]);
 
   return (
-    <VStack spacing={4}>
-      <Box>
-        <FormControl id="password">
-          <FormLabel>Password</FormLabel>
+    <VStack spacing={4} w="full" align="stretch">
+      <FormControl id="password">
+        <FormLabel>Change password</FormLabel>
+        <Flex align="center">
           <Input
             type="password"
+            placeholder="Leave blank to suppress"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-        </FormControl>
-        <Button onClick={handlePasswordChange}>Change Password</Button>
-      </Box>
+          <IconButton
+            colorScheme="teal"
+            ml={2}
+            aria-label="Change password"
+            icon={<CheckIcon />}
+            onClick={handlePasswordChange}
+          />
+        </Flex>
+      </FormControl>
 
-      <Text mb={2} fontWeight="semibold">Select Admins:</Text>
-      <Box
-        mb={4}
-        overflowY="scroll"
-        maxHeight="200px"
-        border="1px solid"
-        borderColor="gray.200"
-        borderRadius="md"
-        p={2}
-      >
-        {users.map((user) => (
-          <Flex
-            key={user.id}
-            align="center"
-            _hover={{ bg: "gray.100" }}
-            cursor="pointer"
-            p={2}
-            borderRadius="md"
-            onClick={() => handleAdminSelection(user)}
-          >
-            <Avatar size="sm" name={user.nickname}>
-              <AvatarBadge boxSize="1em" bg={user.isOnline ? "green.500" : "tomato"} />
-            </Avatar>
-            <Box ml="2">
-              <Text fontSize="sm" fontWeight="bold">{user.nickname}</Text>
-            </Box>
-            {(admins.some((admin) => admin.id === user.id) ||
-              user.id === currentUser.id) && (
-              <>
-                <Spacer />
-                <CheckIcon color="green.500" />
-              </>
-            )}
-          </Flex>
-        ))}
-      </Box>
+      <FormControl id="admins" flex="1">
+        <FormLabel>Select Admins:</FormLabel>
+        <Box
+          mb={4}
+          overflowY="scroll"
+          maxHeight="200px"
+          border="1px solid"
+          borderColor="gray.200"
+          borderRadius="md"
+          p={2}
+        >
+          {users.map((user) => (
+            <Flex
+              key={user.id}
+              align="center"
+              _hover={{ bg: "gray.100" }}
+              cursor="pointer"
+              p={2}
+              borderRadius="md"
+              onClick={() => handleAdminSelection(user)}
+            >
+              <Avatar size="sm" name={user.nickname}>
+                <AvatarBadge
+                  boxSize="1em"
+                  bg={user.isOnline ? "green.500" : "tomato"}
+                />
+              </Avatar>
+              <Box ml="2">
+                <Text fontSize="sm" fontWeight="bold">
+                  {user.nickname}
+                </Text>
+              </Box>
+              {(admins.some((admin) => admin.id === user.id) ||
+                user.id === currentUser.id) && (
+                <>
+                  <Spacer />
+                  <CheckIcon color="green.500" />
+                </>
+              )}
+            </Flex>
+          ))}
+        </Box>
+      </FormControl>
+
+      <IconButton
+        aria-label="Confirm admin selection"
+        icon={<CheckIcon />}
+        colorScheme="teal"
+        onClick={handleAdminUpdate}
+      />
     </VStack>
   );
 };
