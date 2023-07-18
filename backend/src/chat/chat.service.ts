@@ -138,4 +138,21 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
+
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(
+    client: Socket,
+    payload: { roomId: number; newOwnerId?: number },
+  ) {
+    try {
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      const updatedRoom = await this.roomService.leaveRoom(user.id, payload);
+      this.gateway.chatNamespace.emit('updatedRoom');
+      client.emit('leftRoom', updatedRoom);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
 }

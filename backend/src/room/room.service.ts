@@ -86,24 +86,59 @@ export class RoomService {
       where: { id: payload.id },
       relations: ['users'],
     });
-  
+
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }
-  
+
     const userAlreadyInRoom = room.users.some((user) => user.id === userId);
-  
+
     if (!userAlreadyInRoom) {
       const user = await this.userService.getUserById(userId);
-  
+
       if (!user) {
         throw new BadRequestException('User does not exist');
       }
-  
+
       room.users.push(user);
       await this.roomRepo.save(room);
     }
-  
+
+    return room;
+  }
+
+  async leaveRoom(
+    userId: number,
+    payload: { roomId: number; newOwnerId?: number },
+  ) {
+    const room = await this.roomRepo.findOne({
+      where: { id: payload.roomId },
+      relations: ['users'],
+    });
+
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    if (room.ownerId === userId) {
+      if (!payload.newOwnerId) {
+        throw new BadRequestException('New owner must be specified');
+      }
+
+      const newOwner = room.users.find(
+        (user) => user.id === payload.newOwnerId,
+      );
+
+      if (!newOwner) {
+        throw new BadRequestException('New owner does not exist');
+      }
+
+      room.ownerId = newOwner.id;
+    }
+
+    room.users = room.users.filter((user) => user.id !== userId);
+    await this.roomRepo.save(room);
+
     return room;
   }
 }

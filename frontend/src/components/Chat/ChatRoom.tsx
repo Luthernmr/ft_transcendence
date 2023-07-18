@@ -21,24 +21,29 @@ import {
   PopoverTrigger,
   Portal,
 } from "@chakra-ui/react";
-import { ArrowBackIcon, ChevronRightIcon } from "@chakra-ui/icons";
-import { FiSend } from "react-icons/fi";
+import {
+  ArrowBackIcon,
+  ChevronRightIcon,
+} from "@chakra-ui/icons";
+import { FiLogOut, FiSend } from "react-icons/fi";
 import { User } from "../Social/AllUserItem";
 import { chatSocket, userSocket } from "../../sockets/sockets";
 import AddFriendButton from "../Social/AddFriendButton";
 import BlockUserButton from "../Social/BlockUserButton";
 import PongInviteButton from "../Social/PongInviteButton";
 import { Link as RouteLink } from "react-router-dom";
+import LeaveRoomPopoverBody from "./LeaveRoomPopoverBody";
 
-interface Room {
+export interface Room {
   id: number;
   name: string;
   password: string;
   isPrivate: boolean;
   users: User[];
+  ownerId: number;
 }
 
-interface Message {
+export interface Message {
   id: number;
   text: string;
   created_at: Date;
@@ -61,8 +66,21 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
   const [messages, setMessages] = useState<Message[]>([]);
   const toast = useToast();
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
-
+  // const [newOwnerId, setNewOwnerId] = useState(null);
+  // const [showOwnerSelect, setShowOwnerSelect] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+
+  // useEffect(() => {
+  //   if (currentUser.id === selectedRoom.ownerId) {
+  //     setShowOwnerSelect(true);
+  //   }
+  // }, [selectedRoom]);
+
+  const handleLeaveRoom = () => {
+    // Emit leaveRoom event through WebSocket connection.
+    // If showOwnerSelect is true, pass newOwnerId as well.
+    // Your WebSocket client might look something like socket.emit('leaveRoom', { roomId: selectedRoom.id, newOwnerId });
+  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -142,9 +160,36 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
           icon={<ArrowBackIcon />}
           onClick={() => setSelectedRoom(null)}
         />
+
         <Heading size={"md"} textAlign={"center"} flex={"1"}>
           {selectedRoom.name}
         </Heading>
+
+        {currentUser.id === selectedRoom.ownerId ? (
+          <Popover>
+            <PopoverTrigger>
+              <IconButton icon={<FiLogOut />} aria-label={"Leave"} />
+            </PopoverTrigger>
+            <PopoverContent>
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader>Choose a new owner</PopoverHeader>
+              <PopoverBody>
+                <LeaveRoomPopoverBody
+                  selectedRoom={selectedRoom}
+                  currentUser={currentUser}
+                  // handleLeaveRoom={handleLeaveRoom}
+                />
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <IconButton
+            icon={<FiLogOut />}
+            aria-label={"Leave"}
+            onClick={handleLeaveRoom}
+          />
+        )}
       </Flex>
       <VStack
         marginY={"10px"}
@@ -229,7 +274,6 @@ const ChatRoom: React.FC<ChatRoomProps> = ({
             </Flex>
           </Box>
         ))}
-
         <div ref={messagesEndRef} />
       </VStack>
       <form onSubmit={handleSendMessage}>
