@@ -1,16 +1,7 @@
 import { useState } from "react";
 import RoomList from "./RoomList";
-import ChatRoom from "./ChatRoom";
+import ChatRoom, { Room } from "./ChatRoom";
 import CreateRoom from "./CreateRoom";
-import { User } from "../Social/AllUserItem";
-
-interface Room {
-  id: number;
-  name: string;
-  password: string;
-  isPrivate: boolean;
-  users: User[];
-}
 
 function Chat() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -20,6 +11,7 @@ function Chat() {
     return <CreateRoom setShowCreateRoom={setShowCreateRoom} />;
   }
   if (selectedRoom) {
+    console.log(selectedRoom);
     return (
       <ChatRoom setSelectedRoom={setSelectedRoom} selectedRoom={selectedRoom} />
     );

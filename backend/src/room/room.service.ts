@@ -63,11 +63,12 @@ export class RoomService {
   async getAllAccessibleRooms(userId: number): Promise<Room[]> {
     const publicRooms = await this.roomRepo.find({
       where: { isPrivate: false },
-      relations: ['users'],
+      relations: ['users', 'admins'],
     });
     const privateUserRooms = await this.roomRepo
       .createQueryBuilder('room')
       .leftJoinAndSelect('room.users', 'user')
+      .leftJoinAndSelect('room.admins', 'admin') 
       .where('room.isPrivate = :isPrivate', { isPrivate: true })
       .getMany()
       .then((rooms) =>
@@ -176,9 +177,9 @@ export class RoomService {
   ) {
     const room = await this.roomRepo.findOne({
       where: { id: payload.roomId },
-      relations: ['users'],
+      relations: ['users', 'admins'],
     });
-
+    
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }

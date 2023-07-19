@@ -32,15 +32,7 @@ import {
 } from "@chakra-ui/icons";
 import { chatSocket } from "../../sockets/sockets";
 import { User } from "../Social/AllUserItem";
-
-interface Room {
-  id: number;
-  ownerId: number;
-  name: string;
-  password: string;
-  isPrivate: boolean;
-  users: User[];
-}
+import { Room } from "./ChatRoom";
 
 interface RoomListProps {
   setSelectedRoom: (room: Room) => void;

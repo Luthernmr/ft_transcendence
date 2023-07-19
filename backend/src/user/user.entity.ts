@@ -59,12 +59,10 @@ export class User {
   @ManyToMany(() => Room, (room: Room) => room.users)
   rooms: Room[];
 
-  @JoinTable()
   @ManyToMany(() => Room, (room: Room) => room.bannedUsers, { eager: true })
-  bannedRooms: Array<Room>;
+  bannedRooms: Room[];
 
   @ManyToMany(() => Room, (room: Room) => room.admins)
-  @JoinTable()
   adminRooms: Room[];
 
   @OneToMany(() => Message, (message: Message) => message.user)
