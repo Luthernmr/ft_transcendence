@@ -38,6 +38,7 @@ export interface Room {
   password: string;
   isPrivate: boolean;
   users: User[];
+  admins: User[];
   ownerId: number;
 }
 
@@ -64,7 +65,9 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   const toast = useToast();
 
   const handleLeaveRoom = () => {
-    chatSocket.emit("leaveRoom", selectedRoom.id);
+    chatSocket.emit("leaveRoom", {
+      roomId: selectedRoom.id,
+    });
     setSelectedRoom(null);
   };
 
@@ -127,12 +130,36 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         }
       }
     });
+    chatSocket.on('roomPasswordChanged', (updatedRoom: Room) => {
+      if (selectedRoom.id === updatedRoom.id) {
+        toast({
+          title: "Room password has been changed.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(updatedRoom);
+      }
+    });
+    chatSocket.on('adminsUpdated', (updatedRoom: Room) => {
+      if (selectedRoom.id === updatedRoom.id) {
+        toast({
+          title: "Room admins have been updated.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(updatedRoom);
+      }
+    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
       chatSocket.off("blockedList", handleRoomMessages);
       chatSocket.off("error", handleError);
       chatSocket.off("receiveMessage", handleReceiveMessage);
       chatSocket.off("leftRoom", handleReceiveMessage);
+      chatSocket.off('roomPasswordChanged');
+      chatSocket.off('adminsUpdated');
     };
   }, []);
 

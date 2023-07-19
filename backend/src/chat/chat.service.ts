@@ -159,4 +159,56 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
+
+  @SubscribeMessage('changeRoomPassword')
+  async changeRoomPassword(
+    client: Socket,
+    payload: { roomId: number; password: string },
+  ) {
+    try {
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      if (user) {
+        const updatedRoom = await this.roomService.updateRoomPassword(
+          user.id,
+          payload,
+        );
+        this.gateway.chatNamespace.emit('updatedRoom');
+        updatedRoom.users.forEach(async (element) => {
+          this.gateway.chatNamespace
+            .to(element.socketId)
+            .emit('roomPasswordChanged', updatedRoom);
+        });
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('updateAdmins')
+  async updateAdmins(
+    client: Socket,
+    payload: { roomId: number; adminList: User[] },
+  ) {
+    try {
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      if (user) {
+        const updatedRoom = await this.roomService.updateAdmins(
+          user.id,
+          payload,
+        );
+        this.gateway.chatNamespace.emit('updatedRoom');
+        updatedRoom.users.forEach(async (element) => {
+          this.gateway.chatNamespace
+            .to(element.socketId)
+            .emit('adminsUpdated', updatedRoom);
+        });
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
 }

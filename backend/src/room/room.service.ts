@@ -141,4 +141,55 @@ export class RoomService {
 
     return room;
   }
+
+  async updateRoomPassword(
+    userId: number,
+    payload: { roomId: number; password: string },
+  ) {
+    const room = await this.roomRepo.findOne({
+      where: { id: payload.roomId },
+      relations: ['users'],
+    });
+
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    if (room.ownerId !== userId) {
+      throw new BadRequestException('Only the owner can change the password');
+    }
+
+    let hashedPassword = null;
+    if (payload.password) {
+      const salt = await bcrypt.genSalt();
+      hashedPassword = await bcrypt.hash(payload.password, salt);
+    }
+    room.password = hashedPassword;
+    await this.roomRepo.save(room);
+
+    return room;
+  }
+
+  async updateAdmins(
+    userId: number,
+    payload: { roomId: number; adminList: User[] },
+  ) {
+    const room = await this.roomRepo.findOne({
+      where: { id: payload.roomId },
+      relations: ['users'],
+    });
+
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    if (room.ownerId !== userId) {
+      throw new BadRequestException('Only the owner can update admins');
+    }
+
+    room.admins = payload.adminList;
+    await this.roomRepo.save(room);
+
+    return room;
+  }
 }

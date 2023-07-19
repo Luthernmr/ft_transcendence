@@ -33,7 +33,18 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   const [users, setUsers] = useState<User[]>(selectedRoom.users);
 
   const handlePasswordChange = () => {
-    chatSocket.emit("changeRoomPassword", selectedRoom.id, password);
+    chatSocket.emit("changeRoomPassword", {
+      roomId: selectedRoom.id,
+      password: password,
+    });
+  };
+
+  const handleAdminUpdate = () => {
+    console.log("Here");
+    chatSocket.emit("updateAdmins", {
+      roomId: selectedRoom.id,
+      adminList: admins.map((admin) => admin.id),
+    });
   };
 
   const handleAdminSelection = useCallback(
@@ -49,14 +60,6 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
     },
     [admins, currentUser]
   );
-
-  const handleAdminUpdate = () => {
-    chatSocket.emit(
-      "updateAdmins",
-      selectedRoom.id,
-      admins.map((admin) => admin.id)
-    );
-  };
 
   useEffect(() => {
     chatSocket.on("updateRoom", setSelectedRoom);
