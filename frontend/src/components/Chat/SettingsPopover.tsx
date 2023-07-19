@@ -21,8 +21,6 @@ interface SettingsPopoverProps {
   selectedRoom: Room;
   currentUser: User;
   setSelectedRoom: (room: Room | null) => void;
-  admins: User[];
-  setAdmins: (admins: User[]) => void;
 }
 
 const SettingsPopover: React.FC<SettingsPopoverProps> = ({
@@ -30,10 +28,9 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   currentUser,
   setSelectedRoom,
   onClose,
-  admins,
-  setAdmins,
 }) => {
   const [password, setPassword] = useState<string>("");
+  const [admins, setAdmins] = useState<User[]>(selectedRoom.admins || []);
   const [users] = useState<User[]>(selectedRoom.users);
 
   const handlePasswordChange = () => {
@@ -47,7 +44,7 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   const handleAdminUpdate = () => {
     chatSocket.emit("updateAdmins", {
       roomId: selectedRoom.id,
-      adminList: admins.map((admin) => admin),
+      adminList: admins.map((admin) => admin.id),
     });
     onClose();
   };
