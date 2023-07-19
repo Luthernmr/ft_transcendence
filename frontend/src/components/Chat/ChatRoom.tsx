@@ -130,7 +130,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         }
       }
     });
-    chatSocket.on('roomPasswordChanged', (updatedRoom: Room) => {
+    chatSocket.on("roomPasswordChanged", (updatedRoom: Room) => {
       if (selectedRoom.id === updatedRoom.id) {
         toast({
           title: "Room password has been changed.",
@@ -141,7 +141,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         setSelectedRoom(updatedRoom);
       }
     });
-    chatSocket.on('adminsUpdated', (updatedRoom: Room) => {
+    chatSocket.on("adminsUpdated", (updatedRoom: Room) => {
       if (selectedRoom.id === updatedRoom.id) {
         toast({
           title: "Room admins have been updated.",
@@ -158,8 +158,8 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("error", handleError);
       chatSocket.off("receiveMessage", handleReceiveMessage);
       chatSocket.off("leftRoom", handleReceiveMessage);
-      chatSocket.off('roomPasswordChanged');
-      chatSocket.off('adminsUpdated');
+      chatSocket.off("roomPasswordChanged");
+      chatSocket.off("adminsUpdated");
     };
   }, []);
 
@@ -186,25 +186,30 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         <Flex>
           {currentUser.id === selectedRoom.ownerId && (
             <Popover>
-              <PopoverTrigger>
-                <IconButton
-                  icon={<FiSettings />}
-                  aria-label={"Settings"}
-                  mr={2}
-                />
-              </PopoverTrigger>
-              <PopoverContent>
-                <PopoverArrow />
-                <PopoverCloseButton />
-                <PopoverHeader>Room Settings</PopoverHeader>
-                <PopoverBody>
-                  <SettingsPopover
-                    selectedRoom={selectedRoom}
-                    currentUser={currentUser}
-                    setSelectedRoom={setSelectedRoom}
-                  />
-                </PopoverBody>
-              </PopoverContent>
+              {({ onClose }) => (
+                <>
+                  <PopoverTrigger>
+                    <IconButton
+                      icon={<FiSettings />}
+                      aria-label={"Settings"}
+                      mr={2}
+                    />
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <PopoverArrow />
+                    <PopoverCloseButton />
+                    <PopoverHeader>Room Settings</PopoverHeader>
+                    <PopoverBody>
+                      <SettingsPopover
+                        onClose={onClose}
+                        selectedRoom={selectedRoom}
+                        currentUser={currentUser}
+                        setSelectedRoom={setSelectedRoom}
+                      />
+                    </PopoverBody>
+                  </PopoverContent>
+                </>
+              )}
             </Popover>
           )}
 

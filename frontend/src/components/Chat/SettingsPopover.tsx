@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Flex,
@@ -9,7 +9,6 @@ import {
   Avatar,
   AvatarBadge,
   Text,
-  Spacer,
   IconButton,
 } from "@chakra-ui/react";
 import { chatSocket } from "../../sockets/sockets";
@@ -18,6 +17,7 @@ import { User } from "../Social/AllUserItem";
 import { CheckIcon } from "@chakra-ui/icons";
 
 interface SettingsPopoverProps {
+  onClose: () => void;
   selectedRoom: Room;
   currentUser: User;
   setSelectedRoom: (room: Room | null) => void;
@@ -27,16 +27,18 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   selectedRoom,
   currentUser,
   setSelectedRoom,
+  onClose,
 }) => {
-  const [password, setPassword] = useState<string>(selectedRoom.password || "");
+  const [password, setPassword] = useState<string>("");
   const [admins, setAdmins] = useState<User[]>(selectedRoom.admins || []);
-  const [users, setUsers] = useState<User[]>(selectedRoom.users);
+  const [users] = useState<User[]>(selectedRoom.users);
 
   const handlePasswordChange = () => {
     chatSocket.emit("changeRoomPassword", {
       roomId: selectedRoom.id,
       password: password,
     });
+    onClose();
   };
 
   const handleAdminUpdate = () => {
@@ -44,21 +46,19 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
       roomId: selectedRoom.id,
       adminList: admins.map((admin) => admin.id),
     });
+    onClose();
   };
 
-  const handleAdminSelection = useCallback(
-    (user: User) => {
-      if (user.id !== currentUser.id) {
-        const adminExists = admins.find((admin) => admin.id === user.id);
-        if (!adminExists) {
-          setAdmins([...admins, user]);
-        } else {
-          setAdmins(admins.filter((admin) => admin.id !== user.id));
-        }
+  const handleAdminSelection = (user: User) => {
+    if (user.id !== currentUser.id) {
+      const adminExists = admins.find((admin) => admin.id === user.id);
+      if (!adminExists) {
+        setAdmins([...admins, user]);
+      } else {
+        setAdmins(admins.filter((admin) => admin.id !== user.id));
       }
-    },
-    [admins, currentUser]
-  );
+    }
+  };
 
   useEffect(() => {
     chatSocket.on("updateRoom", setSelectedRoom);
@@ -70,7 +70,7 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   return (
     <VStack spacing={4} w="full" align="stretch">
       <FormControl id="password">
-        <FormLabel>Change password</FormLabel>
+        <FormLabel>Update or suppress password:</FormLabel>
         <Flex align="center">
           <Input
             type="password"
@@ -109,23 +109,22 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
               borderRadius="md"
               onClick={() => handleAdminSelection(user)}
             >
-              <Avatar size="sm" name={user.nickname}>
+              <Avatar size="sm" name={user.nickname} src={user.imgPdp}>
                 <AvatarBadge
                   boxSize="1em"
                   bg={user.isOnline ? "green.500" : "tomato"}
                 />
               </Avatar>
+
               <Box ml="2">
                 <Text fontSize="sm" fontWeight="bold">
                   {user.nickname}
                 </Text>
               </Box>
+
               {(admins.some((admin) => admin.id === user.id) ||
                 user.id === currentUser.id) && (
-                <>
-                  <Spacer />
-                  <CheckIcon color="green.500" />
-                </>
+                <CheckIcon color="green.500" ml="auto" />
               )}
             </Flex>
           ))}
