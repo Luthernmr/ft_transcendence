@@ -31,6 +31,7 @@ import PongInviteButton from "../Social/PongInviteButton";
 import { Link as RouteLink } from "react-router-dom";
 import LeavePopover from "./LeavePopover";
 import SettingsPopover from "./SettingsPopover";
+import UserOptions from "./UserOptions";
 
 export interface Room {
   id: number;
@@ -296,6 +297,15 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                   <PopoverContent>
                     <PopoverArrow />
                     <PopoverHeader>
+                      <UserOptions
+                        isAdmin={
+                          selectedRoom.ownerId === currentUser.id ||
+                          selectedRoom.admins.some(
+                            (admin) => admin.id === currentUser.id
+                          )
+                        }
+                        userId={message.user.id}
+                      />
                       <Button
                         w={"100%"}
                         as={RouteLink}
