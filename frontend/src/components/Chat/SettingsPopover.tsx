@@ -44,7 +44,7 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
   const handleAdminUpdate = () => {
     chatSocket.emit("updateAdmins", {
       roomId: selectedRoom.id,
-      adminList: admins.map((admin) => admin.id),
+      adminList: admins.map((admin) => admin),
     });
     onClose();
   };
