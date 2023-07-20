@@ -85,7 +85,7 @@ export class RoomService {
   async addUserToRoom(userId: number, payload: Room) {
     const room = await this.roomRepo.findOne({
       where: { id: payload.id },
-      relations: ['users'],
+      relations: ['users', 'admins'],
     });
 
     if (!room) {

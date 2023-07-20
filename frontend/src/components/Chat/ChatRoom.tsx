@@ -55,7 +55,6 @@ interface Props {
 }
 
 const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
-  console.log("here: " ,selectedRoom)
   const currentUser: User = JSON.parse(
     sessionStorage.getItem("currentUser") || "{}"
   );

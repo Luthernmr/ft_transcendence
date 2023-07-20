@@ -1,7 +1,7 @@
 import { useState } from "react";
 import RoomList from "./RoomList";
-import ChatRoom, { Room } from "./ChatRoom";
 import CreateRoom from "./CreateRoom";
+import ChatRoom, { Room } from "./ChatRoom";
 
 function Chat() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
@@ -11,7 +11,6 @@ function Chat() {
     return <CreateRoom setShowCreateRoom={setShowCreateRoom} />;
   }
   if (selectedRoom) {
-    console.log(selectedRoom);
     return (
       <ChatRoom setSelectedRoom={setSelectedRoom} selectedRoom={selectedRoom} />
     );
