@@ -114,7 +114,7 @@ export class RoomService {
   ) {
     const room = await this.roomRepo.findOne({
       where: { id: payload.roomId },
-      relations: ['users'],
+      relations: ['users', 'admins'],
     });
 
     if (!room) {
@@ -138,6 +138,7 @@ export class RoomService {
     }
 
     room.users = room.users.filter((user) => user.id !== userId);
+    room.admins = room.admins.filter((user) => user.id !== userId);
     await this.roomRepo.save(room);
 
     return room;
