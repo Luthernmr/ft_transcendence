@@ -225,7 +225,7 @@ export class ChatService {
         room.id,
       );
       this.gateway.chatNamespace.emit('updatedRoom');
-      updatedRoom.users.forEach(async (element) => {
+      room.users.forEach(async (element) => {
         this.gateway.chatNamespace
           .to(element.socketId)
           .emit('userKicked', targetUser.nickname, updatedRoom);

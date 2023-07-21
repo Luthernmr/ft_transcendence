@@ -154,6 +154,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       }
     });
     chatSocket.on('userKicked', (kickedNickname: string, updatedRoom: Room) => {
+      console.log("kicked: ", kickedNickname)
       if (selectedRoom.id === updatedRoom.id) {
         if (kickedNickname === currentUser.nickname) {
           toast({
