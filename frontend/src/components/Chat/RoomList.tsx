@@ -163,7 +163,6 @@ const RoomList: React.FC<RoomListProps> = ({
               borderRadius={"8"}
               key={index}
               onClick={() => {
-                // Only handle click if the user is not banned
                 if (
                   !room.bannedUsers ||
                   !room.bannedUsers.find((user) => user.id === currentUser.id)
@@ -178,7 +177,6 @@ const RoomList: React.FC<RoomListProps> = ({
                     ? "none"
                     : "gray.200",
               }}
-              // If the user is banned, apply a gray overlay and disable pointer events
               style={
                 room.bannedUsers &&
                 room.bannedUsers.find((user) => user.id === currentUser.id)
