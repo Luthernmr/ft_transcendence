@@ -305,7 +305,10 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                           )
                         }
                         userId={message.user.id}
+                        currentUserId={currentUser.id}
+                        ownerId={selectedRoom.ownerId}
                       />
+
                       <Button
                         w={"100%"}
                         as={RouteLink}

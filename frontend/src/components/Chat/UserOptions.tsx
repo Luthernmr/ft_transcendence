@@ -6,10 +6,17 @@ import { FiMeh } from "react-icons/fi";
 interface UserOptionsProps {
   isAdmin: boolean;
   userId: number;
+  currentUserId: number;
+  ownerId: number;
 }
 
-const UserOptions: React.FC<UserOptionsProps> = ({ isAdmin, userId }) => {
-  if (!isAdmin) return null;
+const UserOptions: React.FC<UserOptionsProps> = ({
+  isAdmin,
+  userId,
+  currentUserId,
+  ownerId,
+}) => {
+  if (!isAdmin || userId === currentUserId || userId === ownerId) return null;
 
   const handleKick = (userId: number) => {
     // kick logic
