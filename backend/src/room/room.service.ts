@@ -68,7 +68,7 @@ export class RoomService {
     const privateUserRooms = await this.roomRepo
       .createQueryBuilder('room')
       .leftJoinAndSelect('room.users', 'user')
-      .leftJoinAndSelect('room.admins', 'admin') 
+      .leftJoinAndSelect('room.admins', 'admin')
       .where('room.isPrivate = :isPrivate', { isPrivate: true })
       .getMany()
       .then((rooms) =>
@@ -180,7 +180,7 @@ export class RoomService {
       where: { id: payload.roomId },
       relations: ['users', 'admins'],
     });
-    
+
     if (!room) {
       throw new BadRequestException('Room does not exist');
     }
@@ -190,6 +190,43 @@ export class RoomService {
     }
 
     room.admins = payload.adminList;
+    await this.roomRepo.save(room);
+
+    return room;
+  }
+
+  async kickUser(operatorUserId: number, targetUserId: number, roomId: number) {
+    const room = await this.roomRepo.findOne({
+      where: { id: roomId },
+      relations: ['users', 'admins'],
+    });
+
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    const operatorUser = room.users.find((user) => user.id === operatorUserId);
+
+    if (!operatorUser) {
+      throw new BadRequestException(
+        'Operator user does not exist in this room',
+      );
+    }
+
+    if (
+      room.ownerId !== operatorUserId &&
+      !room.admins.some((admin) => admin.id === operatorUserId)
+    ) {
+      throw new BadRequestException('Only the owner or admins can kick users');
+    }
+
+    const targetUser = room.users.find((user) => user.id === targetUserId);
+
+    if (!targetUser) {
+      throw new BadRequestException('Target user does not exist in this room');
+    }
+
+    room.users = room.users.filter((user) => user.id !== targetUserId);
     await this.roomRepo.save(room);
 
     return room;

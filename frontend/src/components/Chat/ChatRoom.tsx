@@ -153,6 +153,27 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         setSelectedRoom(updatedRoom);
       }
     });
+    chatSocket.on('userKicked', (kickedNickname: string, updatedRoom: Room) => {
+      if (selectedRoom.id === updatedRoom.id) {
+        if (kickedNickname === currentUser.nickname) {
+          toast({
+            title: "You were kicked from the room.",
+            status: "error",
+            isClosable: true,
+            position: "top",
+          });
+          setSelectedRoom(null);
+        } else {
+          toast({
+            title: kickedNickname + " was kicked from the room.",
+            status: "info",
+            isClosable: true,
+            position: "top",
+          });
+          setSelectedRoom(updatedRoom);
+        }
+      }
+    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
       chatSocket.off("blockedList", handleRoomMessages);
@@ -161,6 +182,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("leftRoom", handleReceiveMessage);
       chatSocket.off("roomPasswordChanged");
       chatSocket.off("adminsUpdated");
+      chatSocket.off('userKicked');
     };
   }, []);
 
