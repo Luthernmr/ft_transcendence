@@ -162,8 +162,33 @@ const RoomList: React.FC<RoomListProps> = ({
               p={2}
               borderRadius={"8"}
               key={index}
-              onClick={() => handleRoomClick(room)}
-              _hover={{ bg: "gray.200" }}
+              onClick={() => {
+                // Only handle click if the user is not banned
+                if (
+                  !room.bannedUsers ||
+                  !room.bannedUsers.find((user) => user.id === currentUser.id)
+                ) {
+                  handleRoomClick(room);
+                }
+              }}
+              _hover={{
+                bg:
+                  room.bannedUsers &&
+                  room.bannedUsers.find((user) => user.id === currentUser.id)
+                    ? "none"
+                    : "gray.200",
+              }}
+              // If the user is banned, apply a gray overlay and disable pointer events
+              style={
+                room.bannedUsers &&
+                room.bannedUsers.find((user) => user.id === currentUser.id)
+                  ? {
+                      backgroundColor: "gray",
+                      opacity: 0.5,
+                      pointerEvents: "none",
+                    }
+                  : {}
+              }
             >
               <HStack>
                 <AvatarGroup size={"md"} max={3}>

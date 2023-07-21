@@ -40,6 +40,7 @@ export interface Room {
   isPrivate: boolean;
   users: User[];
   admins: User[];
+  bannedUsers: User[];
   ownerId: number;
 }
 
@@ -154,7 +155,6 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       }
     });
     chatSocket.on('userKicked', (kickedNickname: string, updatedRoom: Room) => {
-      console.log("kicked: ", kickedNickname)
       if (selectedRoom.id === updatedRoom.id) {
         if (kickedNickname === currentUser.nickname) {
           toast({
@@ -175,6 +175,28 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         }
       }
     });
+
+    chatSocket.on('userBanned', (bannedNickname: string, updatedRoom: Room) => {
+      if (selectedRoom.id === updatedRoom.id) {
+        if (bannedNickname === currentUser.nickname) {
+          toast({
+            title: "You were banned from the room.",
+            status: "error",
+            isClosable: true,
+            position: "top",
+          });
+          setSelectedRoom(null);
+        } else {
+          toast({
+            title: bannedNickname + " was banned from the room.",
+            status: "info",
+            isClosable: true,
+            position: "top",
+          });
+          setSelectedRoom(updatedRoom);
+        }
+      }
+    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
       chatSocket.off("blockedList", handleRoomMessages);
@@ -184,6 +206,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("roomPasswordChanged");
       chatSocket.off("adminsUpdated");
       chatSocket.off('userKicked');
+      chatSocket.off('userBanned');
     };
   }, []);
 

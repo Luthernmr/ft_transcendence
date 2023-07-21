@@ -234,4 +234,27 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
+
+  @SubscribeMessage('banUser')
+  async banUser(
+    client: Socket,
+    data: { targetUser: User; room: Room; user: User },
+  ) {
+    try {
+      const { targetUser, room, user } = data;
+      const updatedRoom = await this.roomService.banUser(
+        user.id,
+        targetUser.id,
+        room.id,
+      );
+      this.gateway.chatNamespace.emit('updatedRoom');
+      room.users.forEach(async (element) => {
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('userBanned', targetUser.nickname, updatedRoom);
+      });
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
 }

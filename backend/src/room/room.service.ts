@@ -63,7 +63,7 @@ export class RoomService {
   async getAllAccessibleRooms(userId: number): Promise<Room[]> {
     const publicRooms = await this.roomRepo.find({
       where: { isPrivate: false },
-      relations: ['users', 'admins'],
+      relations: ['users', 'admins', 'bannedUsers'],
     });
     const privateUserRooms = await this.roomRepo
       .createQueryBuilder('room')
@@ -85,7 +85,7 @@ export class RoomService {
   async addUserToRoom(userId: number, payload: Room) {
     const room = await this.roomRepo.findOne({
       where: { id: payload.id },
-      relations: ['users', 'admins'],
+      relations: ['users', 'admins', 'bannedUsers'],
     });
 
     if (!room) {
@@ -114,7 +114,7 @@ export class RoomService {
   ) {
     const room = await this.roomRepo.findOne({
       where: { id: payload.roomId },
-      relations: ['users', 'admins'],
+      relations: ['users', 'admins', 'bannedUsers'],
     });
 
     if (!room) {
@@ -178,7 +178,7 @@ export class RoomService {
   ) {
     const room = await this.roomRepo.findOne({
       where: { id: payload.roomId },
-      relations: ['users', 'admins'],
+      relations: ['users', 'admins', 'bannedUsers'],
     });
 
     if (!room) {
@@ -198,7 +198,7 @@ export class RoomService {
   async kickUser(operatorUserId: number, targetUserId: number, roomId: number) {
     const room = await this.roomRepo.findOne({
       where: { id: roomId },
-      relations: ['users', 'admins'],
+      relations: ['users', 'admins', 'bannedUsers'],
     });
 
     if (!room) {
@@ -227,6 +227,44 @@ export class RoomService {
     }
 
     room.users = room.users.filter((user) => user.id !== targetUserId);
+    await this.roomRepo.save(room);
+
+    return room;
+  }
+
+  async banUser(operatorUserId: number, targetUserId: number, roomId: number) {
+    const room = await this.roomRepo.findOne({
+      where: { id: roomId },
+      relations: ['users', 'admins', 'bannedUsers'],
+    });
+
+    if (!room) {
+      throw new BadRequestException('Room does not exist');
+    }
+
+    const operatorUser = room.users.find((user) => user.id === operatorUserId);
+
+    if (!operatorUser) {
+      throw new BadRequestException(
+        'Operator user does not exist in this room',
+      );
+    }
+
+    if (
+      room.ownerId !== operatorUserId &&
+      !room.admins.some((admin) => admin.id === operatorUserId)
+    ) {
+      throw new BadRequestException('Only the owner or admins can ban users');
+    }
+
+    const targetUser = room.users.find((user) => user.id === targetUserId);
+
+    if (!targetUser) {
+      throw new BadRequestException('Target user does not exist in this room');
+    }
+
+    room.users = room.users.filter((user) => user.id !== targetUserId);
+    room.bannedUsers.push(targetUser);
     await this.roomRepo.save(room);
 
     return room;
