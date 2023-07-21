@@ -2,31 +2,32 @@ import React from "react";
 import { Button, Stack, Spacer, Box } from "@chakra-ui/react";
 import { CloseIcon, WarningIcon } from "@chakra-ui/icons";
 import { FiMeh } from "react-icons/fi";
+import { User } from "../Social/AllUserItem";
 
 interface UserOptionsProps {
   isAdmin: boolean;
-  userId: number;
+  targetedUser: User;
   currentUserId: number;
   ownerId: number;
 }
 
 const UserOptions: React.FC<UserOptionsProps> = ({
   isAdmin,
-  userId,
+  targetedUser,
   currentUserId,
   ownerId,
 }) => {
-  if (!isAdmin || userId === currentUserId || userId === ownerId) return null;
+  if (!isAdmin || targetedUser.id === currentUserId || targetedUser.id === ownerId) return null;
 
-  const handleKick = (userId: number) => {
+  const handleKick = (user: User) => {
     // kick logic
   };
 
-  const handleBan = (userId: number) => {
+  const handleBan = (user: User) => {
     // ban logic
   };
 
-  const handleMute = (userId: number) => {
+  const handleMute = (user: User) => {
     // mute logic
   };
 
@@ -37,21 +38,21 @@ const UserOptions: React.FC<UserOptionsProps> = ({
         <Button
           leftIcon={<CloseIcon />}
           variant="outline"
-          onClick={() => handleKick(userId)}
+          onClick={() => handleKick(targetedUser)}
         >
           Kick
         </Button>
         <Button
           leftIcon={<WarningIcon />}
           variant="outline"
-          onClick={() => handleBan(userId)}
+          onClick={() => handleBan(targetedUser)}
         >
           Ban
         </Button>
         <Button
           leftIcon={<FiMeh />}
           variant="outline"
-          onClick={() => handleMute(userId)}
+          onClick={() => handleMute(targetedUser)}
         >
           Mute
         </Button>
