@@ -305,8 +305,9 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                           )
                         }
                         targetedUser={message.user}
-                        currentUserId={currentUser.id}
+                        currentUser={currentUser}
                         ownerId={selectedRoom.ownerId}
+                        selectedRoom={selectedRoom}
                       />
 
                       <Button

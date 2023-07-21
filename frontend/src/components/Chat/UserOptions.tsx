@@ -3,32 +3,53 @@ import { Button, Stack, Spacer, Box } from "@chakra-ui/react";
 import { CloseIcon, WarningIcon } from "@chakra-ui/icons";
 import { FiMeh } from "react-icons/fi";
 import { User } from "../Social/AllUserItem";
+import { chatSocket } from "../../sockets/sockets";
+import { Room } from "./ChatRoom";
 
 interface UserOptionsProps {
   isAdmin: boolean;
   targetedUser: User;
-  currentUserId: number;
+  currentUser: User;
   ownerId: number;
+  selectedRoom: Room;
 }
 
 const UserOptions: React.FC<UserOptionsProps> = ({
   isAdmin,
   targetedUser,
-  currentUserId,
+  currentUser,
   ownerId,
+  selectedRoom,
 }) => {
-  if (!isAdmin || targetedUser.id === currentUserId || targetedUser.id === ownerId) return null;
+  if (
+    !isAdmin ||
+    targetedUser.id === currentUser.id ||
+    targetedUser.id === ownerId
+  )
+    return null;
 
-  const handleKick = (user: User) => {
-    // kick logic
+  const handleKick = (user: User, selectedRoom: Room, currentUser: User) => {
+    chatSocket.emit("kickUser", {
+      targetUser: user,
+      room: selectedRoom,
+      user: currentUser,
+    });
   };
 
-  const handleBan = (user: User) => {
-    // ban logic
+  const handleBan = (user: User, selectedRoom: Room, currentUser: User) => {
+    chatSocket.emit("banUser", {
+      targetUser: user,
+      room: selectedRoom,
+      user: currentUser,
+    });
   };
 
-  const handleMute = (user: User) => {
-    // mute logic
+  const handleMute = (user: User, selectedRoom: Room, currentUser: User) => {
+    chatSocket.emit("muteUser", {
+      targetUser: user,
+      room: selectedRoom,
+      user: currentUser,
+    });
   };
 
   return (
@@ -38,21 +59,21 @@ const UserOptions: React.FC<UserOptionsProps> = ({
         <Button
           leftIcon={<CloseIcon />}
           variant="outline"
-          onClick={() => handleKick(targetedUser)}
+          onClick={() => handleKick(targetedUser, selectedRoom, currentUser)}
         >
           Kick
         </Button>
         <Button
           leftIcon={<WarningIcon />}
           variant="outline"
-          onClick={() => handleBan(targetedUser)}
+          onClick={() => handleBan(targetedUser, selectedRoom, currentUser)}
         >
           Ban
         </Button>
         <Button
           leftIcon={<FiMeh />}
           variant="outline"
-          onClick={() => handleMute(targetedUser)}
+          onClick={() => handleMute(targetedUser, selectedRoom, currentUser)}
         >
           Mute
         </Button>
