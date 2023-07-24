@@ -41,7 +41,11 @@ export class AuthController {
 			});
 			delete user.password;
 			return user;
-		} catch (error) { }
+		} catch (error) {
+			return {
+				message: 'register',
+			};
+		}
 	}
 
 	@Post('login')
@@ -60,14 +64,12 @@ export class AuthController {
 			}
 			if(user.isOnline)
 				throw new BadRequestException('already connected');
-
 			const token = await this.authService.login(user, response);
 			await this.authService.loginTwoFa(user, response, false);
 			if (!user.isTwoFA)
 				return token;
 			return;
 		} catch (error) {
-			
 			return error;
 		}
 	}
@@ -96,7 +98,9 @@ export class AuthController {
 		try {
 			await this.authService.logout(request, response);
 		} catch (error) {
-
+			return {
+				message: 'unauthorized',
+			};
 		}
 	}
 
@@ -135,7 +139,9 @@ export class AuthController {
 			);
 			return await this.twoFAService.pipeQrCodeStream(response, otpauthUrl);
 		} catch (error) {
-
+			return {
+				message: 'cannot generate new qrcode',
+			};
 		}
 	}
 
@@ -148,8 +154,7 @@ export class AuthController {
 		try {
 			const user = await this.authService.getUserCookie(request);
 			const isCodeValid = await this.twoFAService.isTwoFACodeValid(
-				twoFaCodeDto.twoFaCode,
-				user,
+				twoFaCodeDto.twoFaCode, user
 			);
 			if (!isCodeValid) {
 				throw new UnauthorizedException('Wrong authentication code');
@@ -163,9 +168,14 @@ export class AuthController {
 	@Post('turn-off')
 	@UseGuards(JwtTwoFactorGuard)
 	async turnOffTwoFA(@Req() request: Request) {
-		const user = await this.authService.getUserCookie(request);
-
-		await this.userService.turnOffTwoFA(user.id);
+		try {
+			const user = await this.authService.getUserCookie(request);
+			await this.userService.turnOffTwoFA(user.id);
+		} catch (error) {
+			return {
+				message: 'cannot activate 2FA',
+			};
+		}
 	}
 
 	@Post('2fa')
@@ -177,7 +187,8 @@ export class AuthController {
 	) {
 		try {
 			const user = await this.authService.getUserCookie(request);
-			if (!user) throw new UnauthorizedException('user not here');
+			if (!user)
+				throw new UnauthorizedException('user not here');
 			const isCodeValid = await this.twoFAService.isTwoFACodeValid(
 				twoFaCodeDto.twoFaCode,
 				user,
@@ -189,6 +200,11 @@ export class AuthController {
 			await this.authService.loginTwoFa(user, response, true);
 			response.send({ jwt: jwtToken });
 			return { jwt: jwtToken };
-		} catch (error) { }
+		} catch (error) 
+		{
+			return {
+				message: 'failed 2fa',
+			};
+		}
 	}
 }

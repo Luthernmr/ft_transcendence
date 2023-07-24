@@ -166,9 +166,8 @@ export default function Settings(props: any) {
   return (
     <VStack spacing={4} align="stretch">
       <FormControl>
-        <HStack spacing={4}>
           <Flex alignItems={"center"} flexDirection={"row"}>
-            <HStack>
+            <VStack>
               <CircularProgress
                 transform={"rotate(180deg)"}
                 value={props?.user?.ratioToNextLevel}
@@ -218,7 +217,7 @@ export default function Settings(props: any) {
                 </CircularProgressLabel>
               </CircularProgress>
               <UserStats user={props.user} />
-            </HStack>
+            </VStack>
           </Flex>
           <input
             hidden
@@ -229,7 +228,6 @@ export default function Settings(props: any) {
             placeholder="test"
             onChange={(event) => handleAvatarChange(event)}
           />
-        </HStack>
       </FormControl>
       <FormControl>
         <FormLabel>Name</FormLabel>

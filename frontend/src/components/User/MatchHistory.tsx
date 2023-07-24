@@ -87,11 +87,11 @@ export default function MatchHistory(props: any) {
                       <Avatar
                         name={props?.user?.nickname}
                         src={props?.user?.imgPdp}
-                        size="xl"
+                        size={['sm', 'md', 'lg', 'xl']}
                       />
                       <Text
                         fontWeight={"hairline"}
-                        fontSize={"2xl"}
+                        fontSize={['sm', 'md', 'lg', 'xl']}
                         color={"white"}
                       >
                         VS
@@ -102,25 +102,25 @@ export default function MatchHistory(props: any) {
                         to={"/profile/" + matchHistory?.opponent?.id}
                         name={matchHistory?.opponent?.nickname}
                         src={matchHistory?.opponent?.imgPdp}
-                        size="xl"
+                        size={['sm', 'md', 'lg', 'xl']}
                       />
                     </HStack>
                     <Flex flexDirection={"column"} alignItems={"center"}>
                       <Text
                         fontWeight={"thin"}
-                        fontSize={"2xl"}
+                        fontSize={['sm', 'md', 'lg', 'xl']}
                         color={"yellow.300"}
                       >
                         {handleIssue(matchHistory?.winner)}
                       </Text>
-                      <Text fontSize={"4xl"} color={"white"}>
+                      <Text fontSize={['sm', 'md', 'lg', 'xl']} color={"white"}>
                         {matchHistory?.myScore} - {matchHistory?.opponentScore}{" "}
                       </Text>
                     </Flex>
                     {matchHistory?.customMode && (
                       <Text
                         fontWeight={"hairline"}
-                        fontSize={"2xl"}
+                        fontSize={['sm', 'md', 'lg', 'xl']}
                         color={"white"}
                       >
                         GNOP GAME
@@ -129,7 +129,7 @@ export default function MatchHistory(props: any) {
                     {!matchHistory?.customMode && (
                       <Text
                         fontWeight={"hairline"}
-                        fontSize={"2xl"}
+                        fontSize={['sm', 'md', 'lg', 'xl']}
                         color={"white"}
                       >
                         NORMAL GAME

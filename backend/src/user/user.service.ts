@@ -26,6 +26,10 @@ export class UserService {
     return users;
   }
 
+  async getAllUserOnline(): Promise<User[]> {
+    const users = await this.userRepository.find({where : {isOnline : true}});
+    return users;
+  }
   async getUserById(id: number): Promise<User> {
     return await this.userRepository.findOne({ where: { id: id } });
   }

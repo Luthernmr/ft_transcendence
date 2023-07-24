@@ -49,7 +49,6 @@ export default function AuthElement() {
 			else
 			{
 				console.log(res)
-
 				onOpen();
 			}
 

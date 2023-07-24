@@ -63,6 +63,11 @@ export default function App() {
     getUser();
   });
 
+  userSocket.on("ping", () => {
+	console.log('ping')
+    userSocket.emit("pong")
+  });
+
   return (
     <Routes>
       <Route path="/Register" element={<RegisterCard />} />

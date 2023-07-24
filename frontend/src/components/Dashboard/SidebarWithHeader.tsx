@@ -21,6 +21,14 @@ import {
 	MenuDivider,
 	MenuItem,
 	MenuList,
+	Button,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
 } from "@chakra-ui/react";
 import {
 	FiSettings,
@@ -36,6 +44,8 @@ import axios from "axios";
 import Notification from "../Social/Notification";
 import FriendList from "../Social/FriendList";
 import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
+import MediaQuery from 'react-responsive';
+import { ChatIcon } from "@chakra-ui/icons";
 
 interface LinkItemProps {
 	name: string;
@@ -91,7 +101,9 @@ export default function SidebarWithHeader({
 				>
 					{children}
 					<Box ml={5}>
-						<FriendList />
+						<MediaQuery minWidth={1224}>
+							<FriendList />
+						</MediaQuery>
 					</Box>
 				</Flex>
 			</Flex>
@@ -211,6 +223,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 		} catch (error) { }
 	};
 
+
 	return (
 		<Flex
 			ml={{ base: 0, md: 60 }}
@@ -241,6 +254,17 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			</Text>
 
 			<HStack spacing={{ base: "0", md: "6" }}>
+				<MediaQuery maxWidth={1224}>
+					<Menu>
+						<MenuButton>
+							<Button colorScheme="teal">UserList</Button>
+
+						</MenuButton>
+						<MenuList zIndex={'999'}>
+							<FriendList />
+						</MenuList>
+					</Menu>
+				</MediaQuery>
 				<Notification />
 				<Flex alignItems={"center"}>
 					<Menu>

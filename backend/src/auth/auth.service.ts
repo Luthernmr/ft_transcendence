@@ -67,11 +67,13 @@ export class AuthService {
     let otherSocket: Socket = null;
     for (const socket of sockets) {
       let token = (socket as any)[1].handshake.auth.token;
-      if (!token) return null;
+      if (!token)
+	  	return null;
       const user: User = await this.getUserByToken(token);
       if (userId == user.id) otherSocket = socket[1];
     }
-    if (otherSocket) return otherSocket;
+    if (otherSocket)
+		return otherSocket;
   }
 
   async logout(request: Request, response: Response) {
