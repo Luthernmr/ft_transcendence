@@ -1,6 +1,6 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Request } from 'express';
 import { UserService } from '../user/user.service';
 
@@ -22,6 +22,8 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
 
   async validate(payload: any) {
     const user = await this.userService.getUserById(payload.id);
+	if (!user)
+		throw new BadRequestException('Error while getting user')
     if (!user.isTwoFA) {
       return user;
     }
