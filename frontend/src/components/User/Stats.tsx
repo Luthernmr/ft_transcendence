@@ -107,16 +107,18 @@ export default function UserStats(props: any) {
 	);
 
 	return (
-		<Box width={'100%'} marginTop={'30px'} alignItems={'center'}>
-			<Flex borderWidth="1px" borderRadius="lg" flexDirection={'column'} alignItems={'center'}>
-				<LineChart />
-				<VStack>
-					<Text>winrate</Text>
-					<CircularProgress value={40} color="green.400">
-						<CircularProgressLabel>{stats.winrate} %</CircularProgressLabel>
-					</CircularProgress>
-				</VStack>
-			</Flex>
-		</Box>
+		<VStack>
+			<Box width={'95%'} m={3} >
+				<Flex borderWidth="1px" borderRadius="lg" flexDirection={'column'} alignItems={'center'}>
+					<LineChart />
+					<VStack>
+						<Text>winrate</Text>
+						<CircularProgress value={40} color="green.400">
+							<CircularProgressLabel>{stats.winrate} %</CircularProgressLabel>
+						</CircularProgress>
+					</VStack>
+				</Flex>
+			</Box>
+		</VStack>
 	);
 }

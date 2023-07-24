@@ -216,7 +216,9 @@ export default function Settings(props: any) {
                   </Box>
                 </CircularProgressLabel>
               </CircularProgress>
-              <UserStats user={props.user} />
+				<Box w={'95%'}>
+              		<UserStats user={props.user} />
+				</Box>
             </VStack>
           </Flex>
           <input

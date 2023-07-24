@@ -160,17 +160,24 @@ const BellButton = () => {
     userSocket.on("requestAcccepted", () => {
       setNotified(false);
     });
-
+	userSocket.on("duelAcccepted", () => {
+		setNotified(false);
+	  });
+  
     userSocket.on("notifyRequest", () => {
       setNotified(true);
     });
     userSocket.on("pendingRequestsList", (data) => {
-      if (data.length) setNotified(true);
+      if (data.length)
+	  	setNotified(true);
     });
 
     userSocket.on("requestRejected", () => {
       setNotified(false);
     });
+	userSocket.on("duelRejected", () => {
+		setNotified(false);
+	  });
   }, [notified]);
 
   if (notified)

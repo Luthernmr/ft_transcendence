@@ -144,11 +144,13 @@ export default function MatchHistory(props: any) {
       );
     } else
       return (
+		<>
         <Center>
           <Heading color={"gray.500"}>
             This user has not yet played a game
           </Heading>
         </Center>
+		</>
       );
   }
 }

@@ -43,7 +43,6 @@ export default function UserProfile() {
 						<Settings user={currentUser} />
 					</TabPanel>
 					<TabPanel>
-
 						<Box w='100%' h='100%' maxHeight={'70vh'} overflowY="scroll"
 							sx={{
 								"&::-webkit-scrollbar": {

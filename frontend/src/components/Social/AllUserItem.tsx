@@ -51,7 +51,7 @@ export default function AllUserItem(props : any) {
     return (
       <List>
         {users.map((user) => ( 
-			<Popover key={user.id} isLazy>
+			<Popover key={user.id} isLazy >
             {props.user.id != user.id && <Box>
               <ListItem>
                 <PopoverTrigger>
@@ -62,7 +62,7 @@ export default function AllUserItem(props : any) {
               </ListItem>
             </Box>}
             <Portal>
-              <PopoverContent>
+              <PopoverContent >
                 <PopoverArrow />
                 <PopoverHeader>
                   <Button
@@ -87,7 +87,7 @@ export default function AllUserItem(props : any) {
                 </PopoverHeader>
                 <PopoverCloseButton />
                 <PopoverBody>
-                  <Flex justifyContent={"space-between"}>
+                  <Flex justifyContent={"space-between"} zIndex={'99999999999'}>
                     <AddFriendButton user={user} />
                     <BlockUserButton user={user} />
                     <PongInviteButton user={user} />
