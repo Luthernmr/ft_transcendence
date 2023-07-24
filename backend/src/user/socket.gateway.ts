@@ -36,6 +36,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			);
 			if (user) {
 				await this.userService.setOnline(user);
+				console.log('test connect')
 				client.emit('success', { message: "Connected !" });
 
 				this.gateway.userNamespace.emit('reloadLists');

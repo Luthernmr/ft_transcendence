@@ -58,11 +58,16 @@ export class AuthController {
 			if (!(await bcrypt.compare(loginDto.password, user.password))) {
 				throw new BadRequestException('wrong password');
 			}
+			if(user.isOnline)
+				throw new BadRequestException('already connected');
+
 			const token = await this.authService.login(user, response);
 			await this.authService.loginTwoFa(user, response, false);
-			if (!user.isTwoFA) return token;
+			if (!user.isTwoFA)
+				return token;
 			return;
 		} catch (error) {
+			
 			return error;
 		}
 	}
@@ -89,10 +94,9 @@ export class AuthController {
 		@Req() request: Request,
 	) {
 		try {
-			
 			await this.authService.logout(request, response);
 		} catch (error) {
-			
+
 		}
 	}
 
@@ -120,10 +124,10 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	async qrcode(@Req() request: Request, @Res() response: Response) {
 		try {
-			
+
 			const user: Partial<User> = await this.authService.getUserCookie(request);
 			const { otpauthUrl } = await this.twoFAService.generateTwoFASecret(user);
-	
+
 			response.setHeader('Content-Type', 'image/png');
 			response.setHeader(
 				'Content-Disposition',
@@ -131,7 +135,7 @@ export class AuthController {
 			);
 			return await this.twoFAService.pipeQrCodeStream(response, otpauthUrl);
 		} catch (error) {
-			
+
 		}
 	}
 

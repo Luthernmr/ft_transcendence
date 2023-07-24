@@ -18,6 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { HistoryService } from 'src/pong/history.service';
 import * as fs from 'fs';
+import * as path from 'path';
 
 @Controller('user')
 export class UserController {
@@ -174,12 +175,19 @@ export class UserController {
 
   @Get('avatars/:filename')
   @UseGuards(JwtTwoFactorGuard)
-  async getPicture(@Param('filename') filename: any, @Res() res: Response) {
-	try {
-			res.sendFile(filename, { root: './uploadedFiles' });
-		
-	} catch (error) {
-		console.log('file has been deleted or not exist',error)
-	}
+  async getPicture(@Param('filename') filename: string, @Res() res: Response) {
+    const filePath = path.join('./uploadedFiles', filename);
+
+    // Vérifier si le fichier existe
+    fs.stat(filePath, (err, stats) => {
+      if (err || !stats.isFile()) {
+        // Le fichier n'existe pas
+        console.log('Le fichier a été supprimé ou n\'existe pas:', filename);
+       // res.status(404).json({ message: 'Le fichier demandé est introuvable.' });
+      } else {
+        // Le fichier existe, envoyer le fichier
+        res.sendFile(filename, {root : "./uploadedFiles"});
+      }
+    });
   }
 }

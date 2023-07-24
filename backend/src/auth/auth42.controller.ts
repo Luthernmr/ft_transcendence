@@ -1,4 +1,4 @@
-import { Controller, Get, Res, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Res, Req, UseGuards, BadRequestException } from '@nestjs/common';
 import { Response } from 'express';
 import { auth42Guard } from './auth42.guard';
 import { Auth42Service } from './auth42.service';
@@ -17,11 +17,21 @@ export class Auth42Controller {
     @Res({ passthrough: true }) response: Response,
     @Req() request: any,
   ) {
-    let token = await this.auth42Service.login(request.user);
-    const user = await this.authService.getUserByToken(token);
-    await this.authService.loginTwoFa(user, response, true);
-    response.cookie('jwt', token, { httpOnly: true });
-    if (!user.isTwoFA) return { jwt: token };
-    return;
+	try {
+		let token = await this.auth42Service.login(request.user);
+		const user = await this.authService.getUserByToken(token);
+		if(user.isOnline)
+		{
+			response.status(403);
+			return;
+		}//FIXME - moyen de return vrai message error
+		await this.authService.loginTwoFa(user, response, true);
+		response.cookie('jwt', token, { httpOnly: true });
+		if (!user.isTwoFA)
+			return { jwt: token };
+		return;	
+	} catch (error) {
+		
+	}
   }
 }
