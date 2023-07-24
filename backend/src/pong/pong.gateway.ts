@@ -2,7 +2,7 @@ import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect,
 import { Interval } from '@nestjs/schedule';
 import { Server, Socket } from "socket.io";
 import { Inject, Injectable } from '@nestjs/common';
-import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, WatcherInitDatas, GameDatas, UserDatas } from './pong.service';
+import { PongService, PongInitData, BallRuntimeData, PaddleRuntimeData, Score, GameDatas, UserDatas } from './pong.service';
 import { User } from '../user/user.entity';
 import { AuthService } from 'src/auth/auth.service';
 import { UserService } from 'src/user/user.service';
@@ -48,7 +48,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   handleDisconnect(socket: Socket) {
     //console.log("Socket disconnected from pong :" + socket.id);
-    //this.pongService.CloseRoom(socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }
 
@@ -69,7 +68,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('leaveQueue')
   handleLeaveQueue(@ConnectedSocket() socket: Socket, @MessageBody() datas: { custom: boolean } ) {
-    this.pongService.LeaveQueueSocket(socket);
+    this.pongService.LeaveQueueBySocket(socket);
   }
 
   @SubscribeMessage('clientReady')
@@ -84,8 +83,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('quit')
   handleQuit(@ConnectedSocket() socket: Socket) {
-    const opponentSocket = this.pongService.UserQuit(socket);
-    opponentSocket?.emit('OpponentQuit');
+    this.pongService.UserQuit(socket);
   }
 
   @SubscribeMessage('keydown')
@@ -117,8 +115,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     socket.emit('gamestate', gameState);
   }
 
-  ReloadList()
-  {
+  ReloadList() {
 	this.gateway.userNamespace.emit('reloadLists')
   }
 
@@ -158,17 +155,35 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     socket?.emit('OpponentDisconnected')
   }
 
+  EmitPlayerDisconnected(roomID: number, p: number) {
+    this.EmitEvent('PlayerDisconnected', roomID, p);
+  }
+
   EmitOpponentReconnected(socket: Socket) {
     socket.emit('OpponentReconnected')
+  }
+
+  EmitOpponentQuit(socket: Socket) {
+    socket?.emit('OpponentQuit');
+  }
+
+  EmitPlayerReconnected(roomID: number, p: number) {
+    this.EmitEvent('PlayerReconnected', roomID, p);
   }
 
   EmitAddWatcher(roomID: number, datas: UserDatas) {
     this.EmitEvent('AddWatcher', roomID, datas);
   }
 
-
   EmitRemoveWatcher(roomID: number, id: number) {
-    console.log("Sending id: " + id);
     this.EmitEvent('RemoveWatcher', roomID, id);
+  }
+
+  EmitSetStartingPlayer(roomID: number, startingPlayer: number) {
+    this.EmitEvent('SetStartingPlayer', roomID, startingPlayer);
+  }
+
+  EmitCountdown(roomID: number, countdown: number) {
+    this.EmitEvent('Countdown', roomID, countdown);
   }
 }

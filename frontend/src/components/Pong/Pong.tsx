@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Rect, Text, Line } from 'react-konva';
 import { Button, Center, Flex } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
-import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData, WatcherInitDatas,
-          PongDisplay, PongState, GameState }
+import {  MAX_WIN_WIDTH, MAX_WIN_HEIGHT, MIN_WIN_WIDTH, MIN_WIN_HEIGHT, PongInitData,
+          PongState, GameState }
           from './PongSettings';
 import HomeScreen from './HomeScreen';
 import GameScreen from './GameScreen';
@@ -38,12 +38,16 @@ function Pong() {
     winner: 0,
     user1Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
     user2Datas: {id: -1, nickname: "", imgPdp: "", level: 0},
-    watchers: []
+    watchers: [],
+    custom: false,
+    countdown: 0,
+    P1alive: true,
+    P2alive: true
   });
   
   useEffect(() => {
     updateDimensions();
-    console.log("requestGameState");
+    //console.log("requestGameState");
     pongSocket.emit('requestGameState');
   }, [])
 
@@ -113,6 +117,7 @@ function Pong() {
       );
     }
 
+    //console.log(rate);
     setSize(rate);
   }
 
@@ -170,6 +175,19 @@ function Pong() {
         <GameScreen size={size} watcher={watching.current} initDatas={initDatas} leaveGame={LeaveGame}/>
       </Flex>
       )
+  } else if (pongState === PongState.Error) {
+    return (
+      <Flex       borderRadius={"md"}
+      bg={"white"}
+      padding={"15px"}
+      minHeight={"100%"}
+      flex={"1"}
+      direction={"column"}
+      maxH={"100%"}
+      overflowY="auto">
+        <Text>There seem to be an error retriving your informations...<br/>(It's not you, it's us.)</Text>
+       </Flex>
+    )
   }
 }
 

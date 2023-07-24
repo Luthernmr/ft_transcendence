@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Center, Box, Flex, Text, Spinner,  } from '@chakra-ui/react';
+import { Button, Center, Box, Flex, Text, Spinner,VStack  } from '@chakra-ui/react';
 import { pongSocket } from '../../sockets/sockets';
 
 interface QueueQueueWidgetProps {
@@ -22,9 +22,10 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	if (props.joined === false) {
 		return (
 			<>
-				<Box bg='teal.300' w='70%' h='100%' borderRadius='25' minWidth={50} minHeight={100}>
-					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25' _hover={{
-						bg: "rgba(76, 175, 80, 0.3)"
+				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
+					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25'
+						_hover={{
+						bg: "rgba(255, 255, 255, 0.3)"
 						}} onClick={JoinQueue}>
 						<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
 						<Text fontSize={["xs", "sm", "md", "lg"]}>Join Queue</Text>
@@ -35,17 +36,28 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	} else {
 		return (
 			<>
-				<Box bg='teal.300' w='50%' h='100%' borderRadius='25'>
-				<Center h='100%'>
-					<Flex direction='column'>
-						<Spinner alignSelf='center' />
-						<br />
-						<Text align='center'>In Queue...</Text>
-						<br />
-						<Button onClick={LeaveQueue}>Leave Queue</Button>
+				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
+					<Flex direction='column' w='100%' h='100%'>
+						<Box h='33%'>
+							<Center h='100%'>
+								<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
+							</Center>
+						</Box>
+						<Box h='33%'>
+							<Center h='100%'>
+								<Spinner size={['sm', 'sm', 'md', 'md']} alignSelf='center'/>
+							</Center>
+						</Box>
+						<Box h='33%' w='100%'>
+							<Center h='100%'>
+								<Button bg='teal.300' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}
+										_hover={{
+										bg: "rgba(255, 255, 255, 0.3)"
+										}}>Leave</Button>
+								</Center>
+						</Box>
 					</Flex>
-				</Center>
-			</Box>
+				</Box>
 			</>
 		)
 	}

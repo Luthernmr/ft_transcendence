@@ -25,7 +25,6 @@ import {
 } from "@chakra-ui/react";
 import {
   AddIcon,
-  CloseIcon,
   DeleteIcon,
   LockIcon,
   ViewIcon,
@@ -33,15 +32,7 @@ import {
 } from "@chakra-ui/icons";
 import { chatSocket } from "../../sockets/sockets";
 import { User } from "../Social/AllUserItem";
-
-interface Room {
-  id: number;
-  ownerId: number;
-  name: string;
-  password: string;
-  isPrivate: boolean;
-  users: User[];
-}
+import { Room } from "./ChatRoom";
 
 interface RoomListProps {
   setSelectedRoom: (room: Room) => void;
@@ -78,10 +69,15 @@ const RoomList: React.FC<RoomListProps> = ({
       chatSocket.emit("getUserRooms", { userId: currentUser.id });
     });
 
+    chatSocket.on("updatedRoom", () => {
+      chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    });
+
     return () => {
       chatSocket.off("roomList");
       chatSocket.off("roomCreated");
       chatSocket.off("roomDeleted");
+      chatSocket.off("updatedRoom");
     };
   }, [currentUser.id]);
 
@@ -90,7 +86,10 @@ const RoomList: React.FC<RoomListProps> = ({
       setSelectedRoomLocal(room);
       onOpen();
     } else {
-      setSelectedRoom(room);
+      chatSocket.emit("joinRoom", { userId: currentUser.id, room: room });
+      chatSocket.on("joinedRoom", (joinedRoom: Room) => {
+        setSelectedRoom(joinedRoom);
+      });
     }
   };
 
@@ -98,14 +97,19 @@ const RoomList: React.FC<RoomListProps> = ({
     e.stopPropagation();
     e.preventDefault();
     chatSocket.emit("deleteRoom", room);
-    // chatSocket.emit("getUserRooms", { userId: currentUser.id });
   };
 
   const handlePasswordSubmit = (e: FormEvent) => {
     e.preventDefault();
     chatSocket.on("passCheck", (check: boolean) => {
       if (check && selectedRoom) {
-        setSelectedRoom(selectedRoom);
+        chatSocket.emit("joinRoom", {
+          userId: currentUser.id,
+          room: selectedRoom,
+        });
+        chatSocket.on("joinedRoom", (selectedRoom: Room) => {
+          setSelectedRoom(selectedRoom);
+        });
       } else {
         setRoomPassword("");
         toast({
@@ -158,8 +162,31 @@ const RoomList: React.FC<RoomListProps> = ({
               p={2}
               borderRadius={"8"}
               key={index}
-              onClick={() => handleRoomClick(room)}
-              _hover={{ bg: "gray.200" }}
+              onClick={() => {
+                if (
+                  !room.bannedUsers ||
+                  !room.bannedUsers.find((user) => user.id === currentUser.id)
+                ) {
+                  handleRoomClick(room);
+                }
+              }}
+              _hover={{
+                bg:
+                  room.bannedUsers &&
+                  room.bannedUsers.find((user) => user.id === currentUser.id)
+                    ? "none"
+                    : "gray.200",
+              }}
+              style={
+                room.bannedUsers &&
+                room.bannedUsers.find((user) => user.id === currentUser.id)
+                  ? {
+                      backgroundColor: "gray",
+                      opacity: 0.5,
+                      pointerEvents: "none",
+                    }
+                  : {}
+              }
             >
               <HStack>
                 <AvatarGroup size={"md"} max={3}>

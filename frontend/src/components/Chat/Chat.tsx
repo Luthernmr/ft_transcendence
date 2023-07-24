@@ -1,16 +1,7 @@
 import { useState } from "react";
 import RoomList from "./RoomList";
-import ChatRoom from "./ChatRoom";
 import CreateRoom from "./CreateRoom";
-import { User } from "../Social/AllUserItem";
-
-interface Room {
-  id: number;
-  name: string;
-  password: string;
-  isPrivate: boolean;
-  users: User[];
-}
+import ChatRoom, { Room } from "./ChatRoom";
 
 function Chat() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);

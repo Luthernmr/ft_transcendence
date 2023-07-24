@@ -35,13 +35,17 @@ export class ChatService {
   }
 
   async handleConnection(client: Socket) {
-    this.logger.log('id: ' + client.id + ' connected');
-    let user: User = await this.authService.getUserByToken(
-      client.handshake.auth.token,
-    );
-    if (user) {
-      user = await this.userService.setSocket(user.id, client.id);
-      await this.userService.setOnline(user);
+    try {
+      this.logger.log('id: ' + client.id + ' connected');
+      let user: User = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      if (user) {
+        user = await this.userService.setSocket(user.id, client.id);
+        await this.userService.setOnline(user);
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
     }
   }
 
@@ -63,8 +67,14 @@ export class ChatService {
 
   @SubscribeMessage('getUserRooms')
   async getUserRooms(client: Socket, payload: { userId: number }) {
-    const rooms = await this.roomService.getAllAccessibleRooms(payload.userId);
-    client.emit('roomList', rooms);
+    try {
+      const rooms = await this.roomService.getAllAccessibleRooms(
+        payload.userId,
+      );
+      client.emit('roomList', rooms);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
   }
 
   @SubscribeMessage('checkRoomPassword')
@@ -72,11 +82,15 @@ export class ChatService {
     client: Socket,
     payload: { room: Room; password: string },
   ) {
-    const answer = await bcrypt.compare(
-      payload.password,
-      payload.room.password,
-    );
-    client.emit('passCheck', answer);
+    try {
+      const answer = await bcrypt.compare(
+        payload.password,
+        payload.room.password,
+      );
+      client.emit('passCheck', answer);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
   }
 
   @SubscribeMessage('sendMessage')
@@ -84,11 +98,9 @@ export class ChatService {
     try {
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
-        const otherSocket = await this.authService.getUserSocket(
-          this.gateway.chatNamespace,
-          element.id,
-        );
-        if (otherSocket) otherSocket.emit('receiveMessage', message);
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('receiveMessage', message);
       });
     } catch (error) {
       client.emit('error', { message: error.message });
@@ -110,6 +122,137 @@ export class ChatService {
     try {
       await this.roomService.deleteRoom(room.id);
       this.gateway.chatNamespace.emit('roomDeleted', room.name);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('joinRoom')
+  async joinRoom(client: Socket, data: { userId: number; room: Room }) {
+    try {
+      const { userId, room } = data;
+      const updatedRoom = await this.roomService.addUserToRoom(userId, room);
+      this.gateway.chatNamespace.emit('updatedRoom');
+      client.emit('joinedRoom', updatedRoom);
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('leaveRoom')
+  async leaveRoom(
+    client: Socket,
+    payload: { roomId: number; newOwnerId?: number },
+  ) {
+    try {
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      const updatedRoom = await this.roomService.leaveRoom(user.id, payload);
+      this.gateway.chatNamespace.emit('updatedRoom');
+      updatedRoom.users.forEach(async (element) => {
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('leftRoom', user.nickname, updatedRoom);
+      });
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('changeRoomPassword')
+  async changeRoomPassword(
+    client: Socket,
+    payload: { roomId: number; password: string },
+  ) {
+    try {
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      if (user) {
+        const updatedRoom = await this.roomService.updateRoomPassword(
+          user.id,
+          payload,
+        );
+        this.gateway.chatNamespace.emit('updatedRoom');
+        updatedRoom.users.forEach(async (element) => {
+          this.gateway.chatNamespace
+            .to(element.socketId)
+            .emit('roomPasswordChanged', updatedRoom);
+        });
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('updateAdmins')
+  async updateAdmins(
+    client: Socket,
+    payload: { roomId: number; adminList: User[] },
+  ) {
+    try {
+      const user = await this.authService.getUserByToken(
+        client.handshake.auth.token,
+      );
+      if (user) {
+        const updatedRoom = await this.roomService.updateAdmins(
+          user.id,
+          payload,
+        );
+        this.gateway.chatNamespace.emit('updatedRoom');
+        updatedRoom.users.forEach(async (element) => {
+          this.gateway.chatNamespace
+            .to(element.socketId)
+            .emit('adminsUpdated', updatedRoom);
+        });
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('kickUser')
+  async kickUser(
+    client: Socket,
+    data: { targetUser: User; room: Room; user: User },
+  ) {
+    try {
+      const { targetUser, room, user } = data;
+      const updatedRoom = await this.roomService.kickUser(
+        user.id,
+        targetUser.id,
+        room.id,
+      );
+      this.gateway.chatNamespace.emit('updatedRoom');
+      room.users.forEach(async (element) => {
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('userKicked', targetUser.nickname, updatedRoom);
+      });
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('banUser')
+  async banUser(
+    client: Socket,
+    data: { targetUser: User; room: Room; user: User },
+  ) {
+    try {
+      const { targetUser, room, user } = data;
+      const updatedRoom = await this.roomService.banUser(
+        user.id,
+        targetUser.id,
+        room.id,
+      );
+      this.gateway.chatNamespace.emit('updatedRoom');
+      room.users.forEach(async (element) => {
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('userBanned', targetUser.nickname, updatedRoom);
+      });
     } catch (error) {
       client.emit('error', { message: error.message });
     }

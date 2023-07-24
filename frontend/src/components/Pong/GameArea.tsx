@@ -16,7 +16,7 @@ interface GameAreaProps {
 	ball: Vector2 & Shape,
 	paddleP1: number,
 	paddleP2: number,
-	paddleShape: Shape
+	paddleShape: Shape,
 }
 
 function GameArea({width, height, size, mirror, ball, paddleP1, paddleP2, paddleShape}: GameAreaProps) {	
