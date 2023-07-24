@@ -19,89 +19,108 @@ export class FriendService {
   ) {}
 
   async addFriend(data): Promise<any> {
-    return this.friendRepository.save(data);
+	try {
+		return this.friendRepository.save(data);
+	} catch (error) {
+		return error
+	}
   }
 
   async blockUser(data): Promise<any> {
-    return this.blockedUserRepository.save(data);
+	try {
+		return this.blockedUserRepository.save(data);
+	} catch (error) {
+		return error
+	}
   }
 
   async deleteFriend(currentUser: User, friendUser: User) {
     try {
       const relation: any = await this.getRelation(currentUser, friendUser);
       await this.friendRepository.delete(relation);
-    } catch (error) {}
+    } catch (error) {
+		return error
+	}
   }
   async getFriends(currentUser: User): Promise<any> {
-    const theyRequested = await this.friendRepository.find({
-      where: {
-        userA: currentUser,
-      },
-      relations: ['userB'],
-      select: {
-        userB: {
-          id: true,
-          nickname: true,
-          imgPdp: true,
-          isOnline: true,
-          isPlaying: true,
-        },
-      },
-    });
-
-    const iRequested = await this.friendRepository.find({
-      where: {
-        userB: currentUser,
-      },
-      relations: ['userA'],
-      select: {
-        userA: {
-          id: true,
-          nickname: true,
-          imgPdp: true,
-          isOnline: true,
-        },
-      },
-    });
-
-    const friendList = [];
-    for (let i = 0; i < theyRequested.length; i++) {
-      if (
-        !iRequested.find((item) => item.userA.id === theyRequested[i].userB.id)
-      ) {
-        friendList.push(theyRequested[i].userB);
-      }
-    }
-    for (let i = 0; i < iRequested.length; i++) {
-      if (
-        !theyRequested.find((item) => item.userB.id === iRequested[i].userA.id)
-      ) {
-        friendList.push(iRequested[i].userA);
-      }
-    }
-    return friendList;
+	  try {
+		  const theyRequested = await this.friendRepository.find({
+			where: {
+			  userA: currentUser,
+			},
+			relations: ['userB'],
+			select: {
+			  userB: {
+				id: true,
+				nickname: true,
+				imgPdp: true,
+				isOnline: true,
+				isPlaying: true,
+			  },
+			},
+		  });
+	  
+		  const iRequested = await this.friendRepository.find({
+			where: {
+			  userB: currentUser,
+			},
+			relations: ['userA'],
+			select: {
+			  userA: {
+				id: true,
+				nickname: true,
+				imgPdp: true,
+				isOnline: true,
+			  },
+			},
+		  });
+	  
+		  const friendList = [];
+		  for (let i = 0; i < theyRequested.length; i++) {
+			if (
+			  !iRequested.find((item) => item.userA.id === theyRequested[i].userB.id)
+			) {
+			  friendList.push(theyRequested[i].userB);
+			}
+		  }
+		  for (let i = 0; i < iRequested.length; i++) {
+			if (
+			  !theyRequested.find((item) => item.userB.id === iRequested[i].userA.id)
+			) {
+			  friendList.push(iRequested[i].userA);
+			}
+		  }
+		  return friendList;
+	} catch (error) {
+		return error
+	}
   }
 
   async getRelation(currentUser: User, userReceived: User) {
-    const relation1 = await this.friendRepository.find({
-      where: {
-        userA: currentUser,
-        userB: userReceived,
-      },
-    });
-
-    const relation2 = await this.friendRepository.find({
-      where: {
-        userA: userReceived,
-        userB: currentUser,
-      },
-    });
-
-    if (relation1.length) {
-      return relation1;
-    } else if (relation2.length) {
-      return relation2;
-    } else return null;
+   try {
+	   const relation1 = await this.friendRepository.find({
+		 where: {
+		   userA: currentUser,
+		   userB: userReceived,
+		 },
+	   });
+   
+	   const relation2 = await this.friendRepository.find({
+		 where: {
+		   userA: userReceived,
+		   userB: currentUser,
+		 },
+	   });
+   
+	   if (relation1.length) {
+		 return relation1;
+	   } else if (relation2.length) {
+		 return relation2;
+	   } else return null;
+	
+   } catch (error) {
+	 return error
+   }
   }
 
   /* -------------------------------------------------------------------------- */
@@ -109,41 +128,50 @@ export class FriendService {
   /* -------------------------------------------------------------------------- */
 
   async getBlockedRelation(currentUser: User, otherUser: User) {
-    const relation1 = await this.blockedUserRepository.find({
-      where: {
-        currentUser: currentUser,
-        otherUser: otherUser,
-      },
-    });
-
-    if (relation1.length) {
-      return relation1;
-    }
+    try {
+		const relation1 = await this.blockedUserRepository.find({
+		  where: {
+			currentUser: currentUser,
+			otherUser: otherUser,
+		  },
+		});
+	
+		if (relation1.length) {
+		  return relation1;
+		}	
+	} catch (error) {
+		return error
+	}
   }
 
   async getBlockedUsers(currentUser: User): Promise<any> {
-    const blockedList = await this.blockedUserRepository.find({
-      where: {
-        currentUser: currentUser,
-      },
-      relations: ['otherUser'],
-      select: {
-        otherUser: {
-          id: true,
-          nickname: true,
-          imgPdp: true,
-          isOnline: true,
-        },
-      },
-    });
-
-    let blockedList2 = [];
-
-    for (let i = 0; i < blockedList.length; i++) {
-      blockedList2.push(blockedList[i].otherUser);
-    }
-
-    return blockedList2;
+	try {
+		const blockedList = await this.blockedUserRepository.find({
+		  where: {
+			currentUser: currentUser,
+		  },
+		  relations: ['otherUser'],
+		  select: {
+			otherUser: {
+			  id: true,
+			  nickname: true,
+			  imgPdp: true,
+			  isOnline: true,
+			},
+		  },
+		});
+	
+		let blockedList2 = [];
+	
+		for (let i = 0; i < blockedList.length; i++) {
+		  blockedList2.push(blockedList[i].otherUser);
+		}
+	
+		return blockedList2;
+		
+	} catch (error) {
+		return error
+	}
   }
 
   async unblockUser(currentUser: User, otherUser: User) {
@@ -151,6 +179,8 @@ export class FriendService {
       let relation: any = await this.getBlockedRelation(currentUser, otherUser);
 
       await this.blockedUserRepository.delete(relation);
-    } catch (error) {}
+    } catch (error) {
+		return error
+	}
   }
 }

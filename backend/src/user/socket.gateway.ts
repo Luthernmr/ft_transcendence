@@ -123,6 +123,8 @@ async Friend(
 			this.gateway.userNamespace,
 			userReceiv.id,
 		);
+		if (!otherSocket)
+			throw new BadRequestException('Cannot request offline person');
 		otherSocket.emit('notifyRequest');
 		client.emit('success', { message: "Friend request sent" });
 
@@ -158,6 +160,8 @@ async PongRequest(
 			this.gateway.userNamespace,
 			userReceiv.id,
 		);
+		if (!otherSocket)
+			throw new BadRequestException('Cannot request offline person');
 		otherSocket.emit('notifyRequest');
 		client.emit('success', { message: "Pong request sent" });
 	} catch (error) {

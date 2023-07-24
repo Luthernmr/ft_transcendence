@@ -13,18 +13,26 @@ export class TwoFAService {
   }
 
   public async generateTwoFASecret(user: Partial<User>) {
-    const secret = authenticator.generateSecret();
-    const otpauthUrl = authenticator.keyuri(user.email, '2FA', secret);
-    await this.userService.setTwoFASecret(secret, user.id);
-    return {
-      secret,
-      otpauthUrl,
-    };
-  }
+	try {
+		const secret = authenticator.generateSecret();
+		const otpauthUrl = authenticator.keyuri(user.email, '2FA', secret);
+		await this.userService.setTwoFASecret(secret, user.id);
+		return {
+		  secret,
+		  otpauthUrl,
+		};
+	} catch (error) {
+		return error;
+	}
+}
   public async isTwoFACodeValid(twoFACode: string, user: User) {
-    return authenticator.verify({
-      token: twoFACode,
-      secret: user.twoFASecret,
-    });
+	try {
+		return authenticator.verify({
+		  token: twoFACode,
+		  secret: user.twoFASecret,
+		});
+	} catch (error) {
+		return (error);
+	}
   }
 }
