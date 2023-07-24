@@ -60,7 +60,8 @@ export default function App() {
   };
 
   chatSocket.on("connect", () => {
-    getUser();
+	if (sessionStorage.getItem('currentUser'))
+    	getUser();
   });
 
   userSocket.on("ping", () => {

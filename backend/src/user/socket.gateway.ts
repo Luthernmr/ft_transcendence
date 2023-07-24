@@ -38,13 +38,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				await this.userService.setOnline(user);
 				setInterval(async () => {
 					let users = (await this.userService.getAllUserOnline());
-					console.log(users);
+					//console.log(users);
 					for (let user of users) {
 						const otherSocket = await this.authService.getUserSocket(
 							this.gateway.userNamespace,
 							user.id,
 						);
-						console.log('others', otherSocket)
+					//	console.log('others', otherSocket)
 						if (!otherSocket)
 							this.userService.setOffline(user);
 					};

@@ -32,7 +32,7 @@ export class Auth42Service {
 			const jwt = await this.jwtService.signAsync(payload);
 			return jwt;
 		} catch (error) {
-			return error:
+			return error;
 		}
 	}
 }
