@@ -200,14 +200,14 @@ export default function Settings(props: any) {
                     position={"absolute"}
                     left={"calc(50% - 15px)"}
                     bottom={"-15px"}
-                    h={"20px"}
+                    h={"25px"}
                     w={"30px"}
-                    bg={"black"}
+                    bg={"purple.400"}
                     border={"2px"}
                     borderColor={"teal.500"}
                     borderRadius={"8px"}
                     zIndex={9999}
-                    p={"1px"}
+                    p={1}
                     alignSelf={"center"}
                   >
                     <Text m="-1" fontSize={"1.5em"} color={"white"}>
@@ -215,7 +215,7 @@ export default function Settings(props: any) {
                     </Text>
                   </Box>
                 </CircularProgressLabel>
-              </CircularProgress>
+              </CircularProgress >
 				<Box w={'95%'}>
               		<UserStats user={props.user} />
 				</Box>

@@ -7,6 +7,7 @@ import {
 	Flex,
 	Text,
 	VStack,
+	Wrap,
 } from "@chakra-ui/react";
 import {
 	Chart as ChartJS,
@@ -109,15 +110,15 @@ export default function UserStats(props: any) {
 	return (
 		<VStack>
 			<Box width={'95%'} m={3} >
-				<Flex borderWidth="1px" borderRadius="lg" flexDirection={'column'} alignItems={'center'}>
+				<Wrap borderWidth="1px" borderRadius="lg" flexDirection={'column'} alignItems={'center'}>
 					<LineChart />
 					<VStack>
 						<Text>winrate</Text>
-						<CircularProgress value={40} color="green.400">
+						<CircularProgress value={40} color="purple.400">
 							<CircularProgressLabel>{stats.winrate} %</CircularProgressLabel>
 						</CircularProgress>
 					</VStack>
-				</Flex>
+				</Wrap>
 			</Box>
 		</VStack>
 	);

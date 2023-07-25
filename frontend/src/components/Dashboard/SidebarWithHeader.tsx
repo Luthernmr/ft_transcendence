@@ -36,6 +36,7 @@ import {
 	FiChevronDown,
 	FiMessageSquare,
 } from "react-icons/fi";
+import { FaUsers } from 'react-icons/fa';
 import { BsJoystick } from "react-icons/bs";
 import { RiGamepadLine } from "react-icons/ri";
 import { IconType } from "react-icons";
@@ -100,11 +101,11 @@ export default function SidebarWithHeader({
 					justifyContent={"space-between"}
 				>
 					{children}
-					<Box ml={5}>
-						<MediaQuery minWidth={1224}>
+					<MediaQuery minWidth={1224}>
+						<Box ml={5}>
 							<FriendList />
-						</MediaQuery>
-					</Box>
+						</Box>
+					</MediaQuery>
 				</Flex>
 			</Flex>
 		</>
@@ -257,14 +258,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 				<MediaQuery maxWidth={1224}>
 					<Menu>
 						<MenuButton>
-							<Icon viewBox='0 0 64 64' color='red.500' width={'40px'} height={'40px'}>
-							<circle xmlns="http://www.w3.org/2000/svg" cx="22.83" cy="22.57" r="7.51"/>
-							<path xmlns="http://www.w3.org/2000/svg" d="M38,49.94a15.2,15.2,0,0,0-15.21-15.2h0a15.2,15.2,0,0,0-15.2,15.2Z"/>
-							<circle xmlns="http://www.w3.org/2000/svg" cx="44.13" cy="27.22" r="6.05"/>
-							<path xmlns="http://www.w3.org/2000/svg" d="M42.4,49.94h14A12.24,12.24,0,0,0,44.13,37.7h0a12.21,12.21,0,0,0-5.75,1.43"/>
-							</Icon>
+								<FaUsers size={'1.3em'}/>
 						</MenuButton>
-						<MenuList zIndex={'1'}>
+						<MenuList zIndex={'1'} p={3}>
 							<FriendList />
 						</MenuList>
 					</Menu>
