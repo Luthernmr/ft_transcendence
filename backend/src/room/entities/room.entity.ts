@@ -1,4 +1,5 @@
 import { Message } from '../../message/entities/message.entity';
+import { Mute } from './muted-user.entity';
 import { User } from 'src/user/user.entity';
 import {
   Entity,
@@ -37,6 +38,9 @@ export class Room {
   @ManyToMany(() => User, (user: User) => user.bannedRooms)
   @JoinTable()
   bannedUsers: User[];
+
+  @OneToMany(() => Mute, (mute) => mute.room)
+  mutes: Mute[];
 
   @OneToMany(() => Message, (message: Message) => message.room, {
     cascade: true,

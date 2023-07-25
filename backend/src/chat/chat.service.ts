@@ -96,6 +96,12 @@ export class ChatService {
   @SubscribeMessage('sendMessage')
   async sendMessage(client: Socket, data: Message) {
     try {
+      const { text, room, user } = data;
+      const isMuted = await this.roomService.isMuted(user.id, room.id);
+      if (isMuted) {
+        client.emit('error', { message: 'You are currently muted' });
+        return;
+      }
       const message = await this.messageService.createMessage(data);
       data.room.users.forEach(async (element) => {
         this.gateway.chatNamespace
@@ -252,6 +258,24 @@ export class ChatService {
         this.gateway.chatNamespace
           .to(element.socketId)
           .emit('userBanned', targetUser.nickname, updatedRoom);
+      });
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
+  }
+
+  @SubscribeMessage('muteUser')
+  async muteUser(
+    client: Socket,
+    data: { targetUser: User; room: Room; user: User },
+  ) {
+    try {
+      const { targetUser, room, user } = data;
+      await this.roomService.muteUser(user.id, targetUser.id, room.id);
+      room.users.forEach(async (element) => {
+        this.gateway.chatNamespace
+          .to(element.socketId)
+          .emit('userMuted', targetUser.nickname);
       });
     } catch (error) {
       client.emit('error', { message: error.message });

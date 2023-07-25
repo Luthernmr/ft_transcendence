@@ -1,13 +1,16 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   Logger,
+  NotFoundException,
+  UnauthorizedException,
   ValidationError,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AuthService } from 'src/auth/auth.service';
 import { Room } from 'src/room/entities/room.entity';
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Socket } from 'socket.io';
 import * as bcrypt from 'bcrypt';
 import { plainToClass } from 'class-transformer';
@@ -15,6 +18,7 @@ import { validateOrReject } from 'class-validator';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
+import { Mute } from './entities/muted-user.entity';
 
 @Injectable()
 export class RoomService {
@@ -22,6 +26,7 @@ export class RoomService {
 
   constructor(
     @InjectRepository(Room) private roomRepo: Repository<Room>,
+    @InjectRepository(Mute) private muteRepo: Repository<Mute>,
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {
@@ -269,4 +274,63 @@ export class RoomService {
 
     return room;
   }
+
+  async muteUser(
+    requestingUserId: number,
+    targetUserId: number,
+    roomId: number,
+  ): Promise<void> {
+    const room = await this.roomRepo.findOne({
+      where: { id: roomId },
+      relations: ['admins', 'bannedUsers'],
+    });
+
+    if (!room) {
+      throw new NotFoundException('Room not found');
+    }
+
+    const requestingUser = await this.userService.getUserById(requestingUserId);
+    const targetUser = await this.userService.getUserById(targetUserId);
+
+    if (!requestingUser || !targetUser) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (
+      room.ownerId !== requestingUser.id &&
+      !room.admins.some((admin) => admin.id === requestingUser.id)
+    ) {
+      throw new UnauthorizedException(
+        'You do not have permission to mute users in this room',
+      );
+    }
+
+    const existingMute = await this.muteRepo.findOne({
+      where: { user: targetUser, room: room, muteEnd: MoreThan(new Date()) },
+    });
+
+    if (existingMute) {
+      throw new ConflictException('User is already muted');
+    }
+
+    const mute = new Mute();
+    mute.user = targetUser;
+    mute.room = room;
+    mute.muteEnd = new Date(Date.now() + 60 * 1000);
+    await this.muteRepo.save(mute);
+  }
+
+  async isMuted(userId: number, roomId: number): Promise<boolean> {
+    const currentTimestamp = new Date();
+  
+    const user = await this.userService.getUserById(userId);
+    const room = await this.roomRepo.findOne({ where: { id: roomId } });
+  
+    const mute = await this.muteRepo.findOne({
+      where: { user: user, room: room, muteEnd: MoreThan(currentTimestamp) },
+    });
+  
+    return !!mute;
+  }
+  
 }
