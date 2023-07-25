@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
@@ -22,7 +22,7 @@ export class Auth42Service {
 					pendingRequests: [],
 				});
 			}
-			await this.userService.setOnline(user);
+				await this.userService.setOnline(user);
 			const payload = {
 				id: user.id,
 				nickname: user.nickname,

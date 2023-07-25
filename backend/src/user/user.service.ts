@@ -133,7 +133,7 @@ export class UserService {
 	   }
 	   return await this.pendingRequest.save(data);
    } catch (error) {
-	return error
+	throw error
    }
   }
 

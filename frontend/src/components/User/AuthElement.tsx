@@ -42,7 +42,7 @@ export default function AuthElement() {
               pongSocket.connect();
               navigate("/home");
             }
-          } else if(res.status == 403)
+          } else if(res.status == 403 )
 		  {
 				console.log(res)
 			}
@@ -51,8 +51,9 @@ export default function AuthElement() {
 				console.log(res)
 				onOpen();
 			}
-
+			console.log(res)
         } catch (error) {
+			console.log(error)
           toast({
             title: `Failde to connect with api`,
             status: "error",

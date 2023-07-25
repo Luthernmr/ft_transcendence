@@ -27,6 +27,9 @@ export class PendingRequest {
   @Column({ nullable: true })
   senderPdp: string;
 
+  @Column({ nullable: true })
+  custom: boolean;
+
   @ManyToOne(() => User, (user) => user.pendingRequests)
   @JoinTable()
   user: User;

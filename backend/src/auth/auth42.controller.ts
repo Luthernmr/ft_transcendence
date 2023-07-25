@@ -20,15 +20,13 @@ export class Auth42Controller {
 	try {
 		let token = await this.auth42Service.login(request.user);
 		const user = await this.authService.getUserByToken(token);
-		if(user.isOnline)
+		if (user)
 		{
-			response.status(403);
-			return;
-		}//FIXME - moyen de return vrai message error
-		await this.authService.loginTwoFa(user, response, true);
-		response.cookie('jwt', token, { httpOnly: true });
-		if (!user.isTwoFA)
-			return { jwt: token };
+			await this.authService.loginTwoFa(user, response, true);
+			response.cookie('jwt', token, { httpOnly: true });
+			if (!user.isTwoFA)
+				return { jwt: token };
+		}
 		return;	
 	} catch (error) {
 		

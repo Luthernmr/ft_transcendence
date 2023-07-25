@@ -6,15 +6,25 @@ import 'dotenv/config';
 @Injectable()
 export class auth42Strategy extends PassportStrategy(Strategy, '42') {
   constructor() {
-    super({
-      authorizationURL: process.env.AUTHORIZATION_URL,
-      tokenURL: process.env.TOKEN_URL,
-      clientID: process.env.CLIENT_ID,
-      clientSecret: process.env.CLIENT_SECRET,
-      callbackURL: process.env.CALLBACK_URL,
-    });
+	try {
+		super({
+			
+		  authorizationURL: process.env.AUTHORIZATION_URL,
+		  tokenURL: process.env.TOKEN_URL,
+		  clientID: process.env.CLIENT_ID,
+		  clientSecret: process.env.CLIENT_SECRET,
+		  callbackURL: process.env.CALLBACK_URL,
+		});	
+	} catch (error) {
+	console.log(error)	
+	}
   }
   validate(access_token: string, refresh_token: string, user: any): any {
-    return { access_token, user };
+	try {
+		return { access_token, user };
+		
+	} catch (error) {
+		console.log('error')
+	}
   }
 }

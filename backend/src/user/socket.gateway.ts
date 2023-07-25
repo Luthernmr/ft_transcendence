@@ -108,10 +108,14 @@ async Friend(
 			userSender,
 			userReceiv,
 		);
+		console.log(alreadyExist)
 		if (alreadyExist != null)
+		{
 			throw new BadRequestException('Alreedy friend.');
+		}
 		if (userReceiv.id == userSender.id)
 			throw new BadRequestException('Cannot invite yourself');
+		
 		await this.userService.createPendingRequest({
 			type: 'Friend',
 			senderId: userSender.id,
@@ -123,9 +127,10 @@ async Friend(
 			this.gateway.userNamespace,
 			userReceiv.id,
 		);
-		if (!otherSocket)
-			throw new BadRequestException('Cannot request offline person');
-		otherSocket.emit('notifyRequest');
+		if (otherSocket)
+			otherSocket.emit('notifyRequest');
+		else
+			client.to(userReceiv.socketId).emit('reload');
 		client.emit('success', { message: "Friend request sent" });
 
 	} catch (error) {
@@ -137,7 +142,8 @@ async Friend(
 async PongRequest(
 	client: Socket,
 	data: {
-	userReceiveId: number;
+	userReceiveId: number,
+	custom : boolean,
 },
 ) {
 	try {
@@ -149,12 +155,19 @@ async PongRequest(
 		);
 		if (userReceiv.id == userSender.id)
 			throw new BadRequestException('Cannot play with yourself');
+		const alreadyBlock: any = await this.friendService.getBlockedRelation(
+				userSender,
+				userReceiv,
+			);
+		if (alreadyBlock)
+			throw new BadRequestException('Cannot play with blocked user');
 		await this.userService.createPendingRequest({
 			type: 'Pong',
 			senderId: userSender.id,
 			senderNickname: userSender.nickname,
 			senderPdp: userSender.imgPdp,
 			user: userReceiv,
+			custom : data.custom
 		});
 		const otherSocket = await this.authService.getUserSocket(
 			this.gateway.userNamespace,
@@ -182,7 +195,7 @@ async acceptPongRequest(
 		);
 		const request: PendingRequest =
 			await this.userService.getPendingRequestById(data.requestId);
-		this.pongService.AcceptInvitation(currentUser?.id, request?.senderId);
+		this.pongService.AcceptInvitation(currentUser?.id, request?.senderId, request?.custom);
 		const otherSocket = await this.authService.getUserSocket(
 			this.gateway.userNamespace,
 			request.senderId,
