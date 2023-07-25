@@ -32,6 +32,7 @@ import { Link as RouteLink } from "react-router-dom";
 import LeavePopover from "./LeavePopover";
 import SettingsPopover from "./SettingsPopover";
 import UserOptions from "./UserOptions";
+import DirectMessageButton from "../Social/DirectMessageButton";
 
 export interface Room {
   id: number;
@@ -414,6 +415,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                         <AddFriendButton user={message.user} />
                         <BlockUserButton user={message.user} />
                         <PongInviteButton user={message.user} />
+                        <DirectMessageButton user={message.user} currentUser={currentUser} />
                       </Flex>
                     </PopoverBody>
                   </PopoverContent>

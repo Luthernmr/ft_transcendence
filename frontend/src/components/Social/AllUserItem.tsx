@@ -22,6 +22,7 @@ import BlockUserButton from "./BlockUserButton";
 import AddFriendButton from "./AddFriendButton";
 import PongInviteButton from "./PongInviteButton";
 import UserCard from "./UserCard";
+import DirectMessageButton from "./DirectMessageButton";
 
 export interface User {
   id: number;
@@ -36,6 +37,9 @@ export interface User {
 
 export default function AllUserItem(props : any) {
   const [users, setUsers] = useState<User[]>([]);
+  const currentUser: User = JSON.parse(
+    sessionStorage.getItem("currentUser") || "{}"
+  );
 
   useEffect(() => {
     userSocket.on("userList", (data) => {
@@ -91,9 +95,10 @@ export default function AllUserItem(props : any) {
                     <AddFriendButton user={user} />
                     <BlockUserButton user={user} />
                     <PongInviteButton user={user} />
+                    <DirectMessageButton user={user} currentUser={currentUser} />
                   </Flex>
                 </PopoverBody>
-              </PopoverContent>
+              </PopoverContent>x
             </Portal>
           </Popover>
         ))}

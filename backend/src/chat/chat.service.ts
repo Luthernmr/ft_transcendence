@@ -48,10 +48,19 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
-
+  @SubscribeMessage('createDirectMessageRoom')
+  async handleCreateDirectMessageRoom(client: Socket, data: { targetUser: User; user: User }) {
+    const { targetUser, user } = data;
+    await this.createRoom(client, { users: [user, targetUser] }, true);
+  }
+  
   @SubscribeMessage('createRoom')
-  async createRoom(client: Socket, data: Partial<Room>) {
+  async createRoom(client: Socket, data: Partial<Room>, isDirectMessage = false) {
     try {
+      if (isDirectMessage && data.users && data.users.length === 2) {
+        data.name = `DM-${data.users[0].id}-${data.users[1].id}`;
+        data.isPrivate = true;
+      }
       await this.roomService.createRoom(client, data);
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
