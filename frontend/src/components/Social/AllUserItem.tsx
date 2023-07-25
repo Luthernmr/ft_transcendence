@@ -98,7 +98,7 @@ export default function AllUserItem(props : any) {
                     <DirectMessageButton user={user} currentUser={currentUser} />
                   </Flex>
                 </PopoverBody>
-              </PopoverContent>x
+              </PopoverContent>
             </Portal>
           </Popover>
         ))}
