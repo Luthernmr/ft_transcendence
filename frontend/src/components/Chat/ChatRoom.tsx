@@ -64,6 +64,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   const [blockedUsers, setBlockedUsers] = useState<User[]>([]);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [isMuted, setIsMuted] = useState(false);
   const toast = useToast();
 
   const handleLeaveRoom = () => {
@@ -75,6 +76,15 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
 
   const handleSendMessage = (e: FormEvent) => {
     e.preventDefault();
+    if (isMuted) {
+      toast({
+        title: "You are currently muted",
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+      return;
+    }
     if (messageContent.trim() === "") {
       toast({
         title: "Type a message",
@@ -154,7 +164,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         setSelectedRoom(updatedRoom);
       }
     });
-    chatSocket.on('userKicked', (kickedNickname: string, updatedRoom: Room) => {
+    chatSocket.on("userKicked", (kickedNickname: string, updatedRoom: Room) => {
       if (selectedRoom.id === updatedRoom.id) {
         if (kickedNickname === currentUser.nickname) {
           toast({
@@ -176,7 +186,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       }
     });
 
-    chatSocket.on('userBanned', (bannedNickname: string, updatedRoom: Room) => {
+    chatSocket.on("userBanned", (bannedNickname: string, updatedRoom: Room) => {
       if (selectedRoom.id === updatedRoom.id) {
         if (bannedNickname === currentUser.nickname) {
           toast({
@@ -197,6 +207,27 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         }
       }
     });
+    chatSocket.on("muteStatus", (muted) => {
+      setIsMuted(muted);
+    });
+
+    chatSocket.on("userMuted", (nickname: string) => {
+      if (nickname === currentUser.nickname) {
+        toast({
+          title: "You've been muted.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+      } else {
+        toast({
+          title: nickname + "has been muted.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+      }
+    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
       chatSocket.off("blockedList", handleRoomMessages);
@@ -205,8 +236,9 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("leftRoom", handleReceiveMessage);
       chatSocket.off("roomPasswordChanged");
       chatSocket.off("adminsUpdated");
-      chatSocket.off('userKicked');
-      chatSocket.off('userBanned');
+      chatSocket.off("userKicked");
+      chatSocket.off("userBanned");
+      chatSocket.off("muteStatus");
     };
   }, []);
 

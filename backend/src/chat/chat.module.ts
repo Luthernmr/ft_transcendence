@@ -9,10 +9,11 @@ import { FriendModule } from 'src/social/friend.module';
 import { RoomService } from 'src/room/room.service';
 import { MessageService } from 'src/message/message.service';
 import { GlobalGateway } from 'src/websockets/global.gateway';
+import { Mute } from 'src/room/entities/muted-user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Room, Message]),
+    TypeOrmModule.forFeature([Room, Message, Mute]),
     UserModule,
     AuthModule,
     FriendModule,
