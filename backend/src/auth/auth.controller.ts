@@ -10,9 +10,12 @@ import {
 	UsePipes,
 	ValidationPipe,
 	UnauthorizedException,
+	HttpException,
+	HttpStatus,
+	ValidationError,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Response, Request } from 'express';
+import { Response, Request, response } from 'express';
 import { UserService } from 'src/user/user.service';
 import { LoginDto, RegisterDto, twoFaCodeDto } from 'src/user/user.dto';
 import { AuthService } from 'src/auth/auth.service';
@@ -20,6 +23,10 @@ import { TwoFAService } from './twofa.service';
 import JwtTwoFactorGuard from './twofa.guard';
 import { LocalAuthGuard } from './auth.guard';
 import { User } from 'src/user/user.entity';
+import { plainToClass } from 'class-transformer';
+import { CreateRoomDto } from 'src/room/dto/create-room.dto';
+import { validateOrReject } from 'class-validator';
+
 
 @Controller('api')
 export class AuthController {
@@ -29,22 +36,27 @@ export class AuthController {
 		private readonly twoFAService: TwoFAService,
 	) { }
 	@Post('register')
-	async register(@Body() registerDto: RegisterDto) {
+	@UsePipes(new ValidationPipe())
+	async register(@Body() data : any, @Res({ passthrough: true }) response: Response) {
 		try {
+			const dto = plainToClass(RegisterDto,data);
+			console.log(data);
+			console.log(dto);
+			await validateOrReject(dto).catch((errors: ValidationError[]) => {
+				throw new BadRequestException(errors);
+			  });
 			const salt = await bcrypt.genSalt();
-			const hashedPassword = await bcrypt.hash(registerDto.password, salt);
+			const hashedPassword = await bcrypt.hash(dto.password, salt);
 			const user = await this.userService.create({
-				nickname: registerDto.nickname,
-				email: registerDto.email,
+				nickname: dto.nickname,
+				email: dto.email,
 				password: hashedPassword,
 				pendingRequests: [],
 			});
 			delete user.password;
 			return user;
 		} catch (error) {
-			return {
-				message: 'register',
-			};
+			return error
 		}
 	}
 
@@ -57,7 +69,7 @@ export class AuthController {
 		try {
 			const user = await this.userService.getUser(loginDto.email);
 			if (!user) {
-				throw new BadRequestException('user not exist');
+				throw new BadRequestException('Wrong email');
 			}
 			if (!(await bcrypt.compare(loginDto.password, user.password))) {
 				throw new BadRequestException('wrong password');

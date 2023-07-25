@@ -177,15 +177,10 @@ export class UserController {
   @UseGuards(JwtTwoFactorGuard)
   async getPicture(@Param('filename') filename: string, @Res() res: Response) {
     const filePath = path.join('./uploadedFiles', filename);
-
-    // Vérifier si le fichier existe
     fs.stat(filePath, (err, stats) => {
       if (err || !stats.isFile()) {
-        // Le fichier n'existe pas
         console.log('Le fichier a été supprimé ou n\'existe pas:', filename);
-       // res.status(404).json({ message: 'Le fichier demandé est introuvable.' });
       } else {
-        // Le fichier existe, envoyer le fichier
         res.sendFile(filename, {root : "./uploadedFiles"});
       }
     });
