@@ -211,7 +211,6 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
     chatSocket.on("muteStatus", (muted) => {
       setIsMuted(muted);
     });
-
     chatSocket.on("userMuted", (nickname: string) => {
       if (nickname === currentUser.nickname) {
         toast({
@@ -222,11 +221,27 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         });
       } else {
         toast({
-          title: nickname + "has been muted.",
+          title: nickname + " has been muted.",
           status: "info",
           isClosable: true,
           position: "top",
         });
+      }
+    });
+    chatSocket.on("joinedRoom", (updatedRoom: Room) => {
+      if (selectedRoom.id === updatedRoom.id) {
+        setSelectedRoom(updatedRoom);
+      }
+    });
+    chatSocket.on('roomDeleted', (deletedRoomName) => {
+      if (selectedRoom.name === deletedRoomName) {
+        toast({
+          title: deletedRoomName + " has been deleted.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(null);
       }
     });
     return () => {
@@ -240,6 +255,8 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("userKicked");
       chatSocket.off("userBanned");
       chatSocket.off("muteStatus");
+      chatSocket.off('joinedRoom');
+      chatSocket.off('roomDeleted');
     };
   }, []);
 
@@ -415,7 +432,10 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                         <AddFriendButton user={message.user} />
                         <BlockUserButton user={message.user} />
                         <PongInviteButton user={message.user} />
-                        <DirectMessageButton user={message.user} currentUser={currentUser} />
+                        <DirectMessageButton
+                          user={message.user}
+                          currentUser={currentUser}
+                        />
                       </Flex>
                     </PopoverBody>
                   </PopoverContent>

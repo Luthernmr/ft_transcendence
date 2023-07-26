@@ -271,10 +271,15 @@ export class ChatService {
       );
       this.gateway.chatNamespace.emit('updatedRoom');
       room.users.forEach(async (element) => {
-        this.gateway.chatNamespace
-          .to(element.socketId)
-          .emit('userKicked', targetUser.nickname, updatedRoom);
+        if (element.id !== targetUser.id) {
+          this.gateway.chatNamespace
+            .to(element.socketId)
+            .emit('userKicked', targetUser.nickname, updatedRoom);
+        }
       });
+      this.gateway.chatNamespace
+        .to(targetUser.socketId)
+        .emit('userKicked', targetUser.nickname, updatedRoom);
     } catch (error) {
       client.emit('error', { message: error.message });
     }
@@ -294,10 +299,15 @@ export class ChatService {
       );
       this.gateway.chatNamespace.emit('updatedRoom');
       room.users.forEach(async (element) => {
-        this.gateway.chatNamespace
-          .to(element.socketId)
-          .emit('userBanned', targetUser.nickname, updatedRoom);
+        if (element.id !== targetUser.id) {
+          this.gateway.chatNamespace
+            .to(element.socketId)
+            .emit('userBanned', targetUser.nickname, updatedRoom);
+        }
       });
+      this.gateway.chatNamespace
+      .to(targetUser.socketId)
+      .emit('userBanned', targetUser.nickname, updatedRoom);
     } catch (error) {
       client.emit('error', { message: error.message });
     }
