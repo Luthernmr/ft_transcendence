@@ -46,19 +46,39 @@ export default function registerCard() {
 					password: formValue.password,
 				}
 			);
-			console.log('here', res)
 			if (res.data.status == 401 || res.data.status == 400) {
+				const messages = res.data.response.message
+				if (!(typeof messages == "string")) {
+					messages.map((validationError: any) => {
+						const { target, value, property, constraints } = validationError;
 						toast({
-							title: res.data.message,
+							title: `${property}: ${Object.values(constraints).join(', ')}`,
 							status: "error",
 							isClosable: true,
 							position: "top",
 						});
+					})
 				}
+				else
+				{
+					toast({
+						title: res.data.response.message,
+						status: "error",
+						isClosable: true,
+						position: "top",
+					});
+				}
+			}
 			else
 				navigate("/login");
 		} catch (error: any) {
 			console.log(error)
+			toast({
+				title: 'Invalid information',
+				status: "error",
+				isClosable: true,
+				position: "top",
+			});
 		}
 	};
 	return (

@@ -1,49 +1,58 @@
 import {
-  IsEmail,
-  IsNotEmpty,
-  IsString,
-  Length,
-  Matches,
-  MaxLength,
-  Min,
-  MinLength,
+	IsEmail,
+	IsNotEmpty,
+	IsString,
+	Length,
+	Matches,
+	MaxLength,
+	Min,
+	MinLength,
+	IsAlpha,
 } from 'class-validator';
 
 export class LoginDto {
-  @IsEmail()
-  email: string;
+	@IsEmail()
+	email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @Length(1, 20)
-  password: string;
+	@IsString()
+	@IsNotEmpty()
+	@Length(1, 20)
+	password: string;
 }
 
-export class twoFaCodeDto {
-  @IsNotEmpty()
-  @MinLength(6)
-  @MaxLength(6)
-  @IsString()
-  twoFaCode: string;
+export class TwoFaCodeDto {
+	@IsNotEmpty()
+	@MinLength(6)
+	@MaxLength(6)
+	@IsString()
+	twoFaCode: string;
 }
 
+export class NicknameDto {
+	@IsString()
+	@IsNotEmpty()
+	@Length(4,20)
+	@IsAlpha()
+	nickname: string;
+}
 export class RegisterDto {
-  @IsString()
-  @IsNotEmpty()
-  nickname: string;
-  //@Length(4,20)
+	@IsString()
+	@IsNotEmpty()
+	@Length(4,20)
+	@IsAlpha()
+	nickname: string;
 
-  @IsEmail()
-  @IsNotEmpty()
-  email: string;
+	@IsEmail()
+	@IsNotEmpty()
+	email: string;
 
-  // @IsString()
-  // @IsNotEmpty()
-  // @MinLength(2)
-  // @MaxLength(50)
-  // @Matches(
-  // 	/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  // 	message: 'The password must have a Uppercase, lowercase letter and a number'
-  // })
-  password: string;
+	@IsString()
+	@IsNotEmpty()
+	@MinLength(2)
+	@MaxLength(50)
+	@Matches(
+		/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+		message: 'The password must have a Uppercase, lowercase letter and a number'
+	})
+	password: string;
 }
