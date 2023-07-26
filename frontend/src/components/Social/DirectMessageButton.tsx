@@ -1,5 +1,6 @@
-import { Button, useToast } from "@chakra-ui/react";
+import { Button, IconButton, useToast } from "@chakra-ui/react";
 import { chatSocket } from "../../sockets/sockets";
+import { ChatIcon } from "@chakra-ui/icons";
 
 export default function DirectMessageButton(props: any) {
   const { user, currentUser } = props;
@@ -16,16 +17,19 @@ export default function DirectMessageButton(props: any) {
       });
       return;
     }
-    
+
     chatSocket.emit("createDirectMessageRoom", {
       targetUser: user,
       user: currentUser,
     });
   };
-  
+
   return (
-    <Button colorScheme="teal" onClick={handleCreateDirectMessage}>
-      Direct Message
-    </Button>
+    <IconButton
+      icon={<ChatIcon />}
+      colorScheme="blue"
+      onClick={handleCreateDirectMessage}
+      aria-label={""}
+    />
   );
 }

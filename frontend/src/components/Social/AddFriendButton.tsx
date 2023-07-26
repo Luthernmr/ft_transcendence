@@ -14,7 +14,7 @@ export default function AddFriendButton(props: any) {
       onClick={(e) => sendFriendRequest(e, props.user.id)}
     >
       <AddIcon />
-      Add to friends
+      Add friend
     </Button>
   );
 }

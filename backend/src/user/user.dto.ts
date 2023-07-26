@@ -37,13 +37,13 @@ export class RegisterDto {
   @IsNotEmpty()
   email: string;
 
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2)
-  @MaxLength(50)
-  @Matches(
-  	/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-  	message: 'The password must have a Uppercase, lowercase letter and a number'
-  })
+  // @IsString()
+  // @IsNotEmpty()
+  // @MinLength(2)
+  // @MaxLength(50)
+  // @Matches(
+  // 	/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
+  // 	message: 'The password must have a Uppercase, lowercase letter and a number'
+  // })
   password: string;
 }

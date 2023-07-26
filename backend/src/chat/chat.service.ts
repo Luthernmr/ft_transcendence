@@ -48,20 +48,46 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
+  
   @SubscribeMessage('createDirectMessageRoom')
-  async handleCreateDirectMessageRoom(client: Socket, data: { targetUser: User; user: User }) {
-    const { targetUser, user } = data;
-    await this.createRoom(client, { users: [user, targetUser] }, true);
+  async handleCreateDirectMessageRoom(
+    client: Socket,
+    data: { targetUser: User; user: User },
+  ) {
+    try {
+      const { targetUser, user } = data;
+      const room = await this.createRoom(client, { users: [user, targetUser] }, true);
+      if (room) {
+        client.emit('directRoomCreated', { room });
+      }
+    } catch (error) {
+      client.emit('error', { message: error.message });
+    }
   }
   
+
   @SubscribeMessage('createRoom')
-  async createRoom(client: Socket, data: Partial<Room>, isDirectMessage = false) {
+  async createRoom(
+    client: Socket,
+    data: Partial<Room>,
+    isDirectMessage = false,
+  ) {
     try {
+      let room;
       if (isDirectMessage && data.users && data.users.length === 2) {
-        data.name = `DM-${data.users[0].id}-${data.users[1].id}`;
+        const userNicknameShort = data.users[0].nickname.substring(0, 3);
+        const targetUserNicknameShort = data.users[1].nickname.substring(0, 3);
+        const sortedNicknames = [
+          userNicknameShort,
+          targetUserNicknameShort,
+        ].sort();
+
+        data.name = `${sortedNicknames[0]}${sortedNicknames[1]}`;
         data.isPrivate = true;
+        room = await this.roomService.createRoom(client, data);
+      } else {
+        room = await this.roomService.createRoom(client, data);
       }
-      await this.roomService.createRoom(client, data);
       data.users.forEach(async (element) => {
         const rooms = await this.userService.getRoomsByUID(element.id);
         this.gateway.chatNamespace
@@ -69,6 +95,7 @@ export class ChatService {
           .emit('roomList', rooms.rooms);
       });
       this.gateway.chatNamespace.emit('roomCreated');
+      return room;
     } catch (error) {
       client.emit('error', { message: error.message });
     }
