@@ -98,7 +98,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 
   @SubscribeMessage('Watch')
   handleWatch(@ConnectedSocket() socket: Socket) {
-    this.pongService.WatchRandom(socket);
+    const watch = this.pongService.WatchRandom(socket);
+    if (watch === false)
+      return {status: "NONE"};
+    return {status: "OK"};
   }
 
   @SubscribeMessage('LeaveWatch')
