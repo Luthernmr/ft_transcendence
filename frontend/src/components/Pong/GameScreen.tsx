@@ -247,9 +247,9 @@ function GameScreen(props : GameScreenProps) {
 				</Box>
 			</Center>
 		</Box>
-		<Flex direction={{sm: 'column', md:'column', lg: 'column', xl: 'row'}} width='100%' height={680 * props.size}>
+		<Flex direction={{base: 'column', sm: 'column', md:'column', lg: 'column', xl: 'row'}} width='100%' height={680 * props.size}>
 			<Flex width='100%'>
-				<Box w={{sm: '50%', md:'50%', lg: '50%', xl: '50%'}} h={680 * props.size} borderRadius={10}>
+				<Box w={{base: '50%', sm: '50%', md:'50%', lg: '50%', xl: '50%'}} h={680 * props.size} borderRadius={10}>
 					<UserArea 	width={props.initDatas.width}
 								height={680 * props.size}
 								mirror={playerNumber.current === 1 ? false : true}
@@ -285,8 +285,8 @@ function GameScreen(props : GameScreenProps) {
 					</Center>
 				</Box>
 			</Flex>
-			<Flex direction='column' w={{sm: '100%', md:'100%', lg: '100%', xl: '40%'}}>
-				<Box w='100%' h={{sm: '10px', md:'20px', lg: '20px', xl: '0px'}}></Box>
+			<Flex direction='column' w={{base: '100%', sm: '100%', md:'100%', lg: '100%', xl: '40%'}}>
+				<Box w='100%' h={{base:'10px', sm: '10px', md:'20px', lg: '20px', xl: '0px'}}></Box>
 				<WatchersArea watchers={watchers.current} isWatcher={props.watcher} leaveWatch={() => pongSocket.emit("LeaveWatch")}/>
 			</Flex>
 		</Flex>
