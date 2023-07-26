@@ -22,7 +22,9 @@ export class Auth42Service {
 					pendingRequests: [],
 				});
 			}
-				await this.userService.setOnline(user);
+			if (user.isOnline)
+				throw new BadRequestException('Already Online')
+			await this.userService.setOnline(user);
 			const payload = {
 				id: user.id,
 				nickname: user.nickname,
@@ -32,7 +34,7 @@ export class Auth42Service {
 			const jwt = await this.jwtService.signAsync(payload);
 			return jwt;
 		} catch (error) {
-			return error;
+			throw error;
 		}
 	}
 }

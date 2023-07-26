@@ -72,7 +72,6 @@ export default function registerCard() {
 			else
 				navigate("/login");
 		} catch (error: any) {
-			console.log(error)
 			toast({
 				title: 'Invalid information',
 				status: "error",

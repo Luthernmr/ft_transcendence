@@ -114,9 +114,7 @@ export class UserController {
     @Req() request: Request,
   ) {
     try {
-		console.log(data);
 		const dto = plainToClass(NicknameDto, data);
-		console.log(dto);
 		await validateOrReject(dto).catch((errors: ValidationError[]) => {
 			throw new BadRequestException(errors);
 		  });
@@ -126,7 +124,6 @@ export class UserController {
       await this.userService.changeNickname(user, dto.nickname);
       response.send({ user });
     } catch (error) {
-		console.log(error);
 		return error;
 	}
   }
@@ -184,7 +181,6 @@ export class UserController {
         return response;
       }
     } catch (error) {
-		console.log('hello', error)
 	}
   }
 
@@ -194,7 +190,6 @@ export class UserController {
     const filePath = path.join('./uploadedFiles', filename);
     fs.stat(filePath, (err, stats) => {
       if (err || !stats.isFile()) {
-        console.log('Le fichier a été supprimé ou n\'existe pas:', filename);
       } else {
         res.sendFile(filename, {root : "./uploadedFiles"});
       }

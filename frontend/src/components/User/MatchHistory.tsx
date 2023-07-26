@@ -15,6 +15,7 @@ import { Link as RouteLink } from "react-router-dom";
 
 import { User } from "../Social/AllUserItem";
 import axios from "axios";
+import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 
 export interface MatchHistory {
   id: number;
@@ -30,7 +31,7 @@ enum HistoryState {
   Loaded
 }
 
-export default function MatchHistory(props: any) {
+export default function MatchHistory(props: any){
   const [matchHistorys, setMatchHistorys] = useState<MatchHistory[]>([]);
   const [historyState, setHistoryState] = useState<HistoryState>(HistoryState.Loading);
   
@@ -67,7 +68,7 @@ export default function MatchHistory(props: any) {
   if (historyState === HistoryState.Loading) {
     return (
       <>
-        <Center><Spinner /></Center>
+        <Center><Spinner/></Center>
       </>
     )
   } else if (historyState === HistoryState.Loaded) {
@@ -153,4 +154,5 @@ export default function MatchHistory(props: any) {
 		</>
       );
   }
+  return <div>Something went wrong!</div>;
 }

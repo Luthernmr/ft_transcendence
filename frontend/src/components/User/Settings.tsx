@@ -98,8 +98,6 @@ export default function Settings(props: any) {
 					})
 				}
 				else if (messages) {
-
-					console.log('prout')
 					toast({
 						title: response.data.response.message,
 						status: "error",
@@ -176,8 +174,6 @@ export default function Settings(props: any) {
 					})
 				}
 				else if (messages) {
-
-					console.log('prout')
 					toast({
 						title: response.data.response.message,
 						status: "error",

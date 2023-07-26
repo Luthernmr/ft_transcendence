@@ -24,12 +24,8 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 
 export default function App() {
   const navigate = useNavigate();
-
   chatSocket.on("disconnect", () => {});
-
   const toast = useToast();
-
-
   const handleError = (error: { message: string }) => {
     toast({
       title: error.message,
@@ -65,7 +61,6 @@ export default function App() {
   });
 
   userSocket.on("ping", () => {
-	console.log('ping')
     userSocket.emit("pong")
   });
 
@@ -108,7 +103,6 @@ export default function App() {
           </PrivateRoute>
         }
       />
-
       <Route
         path="/profile/:id"
         element={

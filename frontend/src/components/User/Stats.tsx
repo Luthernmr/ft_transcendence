@@ -62,12 +62,10 @@ export default function UserStats(props: any) {
 					);
 					setStats(resp.data.stats);
 				} catch (error) {
-					//console.log("error", error);
 				}
 			};
 			getHistory();
 		} catch (error) {
-			//console.log(error);
 		}
 	}, [props?.user?.id]);
 

@@ -29,7 +29,7 @@ export class Auth42Controller {
 		}
 		return;	
 	} catch (error) {
-		
+		return error
 	}
   }
 }

@@ -59,7 +59,7 @@ async handleConnection(client: Socket) {
 			);
 			if (user) {
 				await this.userService.setOnline(user);
-			this.logger.log('Connected');
+			this.logger.log(user.nickname + ' Connected');
 			this.gateway.userNamespace.emit('reloadLists');
 		} else client.disconnect();
 
@@ -80,7 +80,6 @@ async pong(client: Socket){
 		if (!user)
 			this.handleDisconnect(client)
 	} catch (error) {
-		//console.log(' Error while decoding token',error)
 		this.handleDisconnect(client);
 		return;
 	}
@@ -122,7 +121,6 @@ async Friend(
 			userSender,
 			userReceiv,
 		);
-		console.log(alreadyExist)
 		if (alreadyExist != null)
 		{
 			throw new BadRequestException('Alreedy friend.');
