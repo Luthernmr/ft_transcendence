@@ -48,7 +48,7 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
-  
+
   @SubscribeMessage('createDirectMessageRoom')
   async handleCreateDirectMessageRoom(
     client: Socket,
@@ -56,7 +56,11 @@ export class ChatService {
   ) {
     try {
       const { targetUser, user } = data;
-      const room = await this.createRoom(client, { users: [user, targetUser] }, true);
+      const room = await this.createRoom(
+        client,
+        { users: [user, targetUser] },
+        true,
+      );
       if (room) {
         client.emit('directRoomCreated', { room });
       }
@@ -64,7 +68,6 @@ export class ChatService {
       client.emit('error', { message: error.message });
     }
   }
-  
 
   @SubscribeMessage('createRoom')
   async createRoom(
