@@ -17,7 +17,7 @@ import {
 import * as bcrypt from 'bcrypt';
 import { Response, Request, response } from 'express';
 import { UserService } from 'src/user/user.service';
-import { LoginDto, RegisterDto, twoFaCodeDto } from 'src/user/user.dto';
+import { LoginDto, RegisterDto, TwoFaCodeDto } from 'src/user/user.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { TwoFAService } from './twofa.service';
 import JwtTwoFactorGuard from './twofa.guard';
@@ -27,7 +27,6 @@ import { plainToClass } from 'class-transformer';
 import { CreateRoomDto } from 'src/room/dto/create-room.dto';
 import { validateOrReject } from 'class-validator';
 
-
 @Controller('api')
 export class AuthController {
 	constructor(
@@ -36,7 +35,6 @@ export class AuthController {
 		private readonly twoFAService: TwoFAService,
 	) { }
 	@Post('register')
-	@UsePipes(new ValidationPipe())
 	async register(@Body() data : any, @Res({ passthrough: true }) response: Response) {
 		try {
 			const dto = plainToClass(RegisterDto,data);
@@ -53,35 +51,41 @@ export class AuthController {
 				password: hashedPassword,
 				pendingRequests: [],
 			});
-			delete user.password;
-			return user;
+			if (!user)
+				throw new BadRequestException('Impossible to create user with this informations');
 		} catch (error) {
-			return error
+			console.log(error);
+			return error;
 		}
 	}
 
 	@Post('login')
 	@UsePipes(new ValidationPipe())
 	async login(
-		@Body() loginDto: LoginDto,
+		@Body() data : any,
 		@Res({ passthrough: true }) response: Response,
 	) {
 		try {
-			const user = await this.userService.getUser(loginDto.email);
+			const dto = plainToClass(LoginDto,data);
+			await validateOrReject(dto).catch((errors: ValidationError[]) => {
+				throw new BadRequestException(errors);
+			  });
+			const user = await this.userService.getUser(dto.email);
 			if (!user) {
-				throw new BadRequestException('Wrong email');
+				throw new BadRequestException('Email does not exist');
 			}
-			if (!(await bcrypt.compare(loginDto.password, user.password))) {
-				throw new BadRequestException('wrong password');
+			if (!(await bcrypt.compare(dto.password, user.password))) {
+				throw new BadRequestException('Wrong password');
 			}
 			if(user.isOnline)
-				throw new BadRequestException('already connected');
+				throw new BadRequestException('Already connected');
 			const token = await this.authService.login(user, response);
 			await this.authService.loginTwoFa(user, response, false);
 			if (!user.isTwoFA)
 				return token;
 			return;
 		} catch (error) {
+			console.log(error)
 			return error;
 		}
 	}
@@ -161,12 +165,19 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	async turnOnTwoFA(
 		@Req() request: Request,
-		@Body() twoFaCodeDto: twoFaCodeDto,
+		@Body() data : any,
 	) {
 		try {
+			console.log(data);
+			const dto = plainToClass(TwoFaCodeDto, data);
+			console.log(dto);
+			await validateOrReject(dto).catch((errors: ValidationError[]) => {
+				throw new BadRequestException(errors);
+			  });
+			  
 			const user = await this.authService.getUserCookie(request);
 			const isCodeValid = await this.twoFAService.isTwoFACodeValid(
-				twoFaCodeDto.twoFaCode, user
+				dto.twoFaCode, user
 			);
 			if (!isCodeValid) {
 				throw new UnauthorizedException('Wrong authentication code');
@@ -193,16 +204,23 @@ export class AuthController {
 	@Post('2fa')
 	@UseGuards(LocalAuthGuard)
 	async authenticate(
-		@Res() response: Response,
+		@Res({ passthrough: true }) response: Response,
 		@Req() request: Request,
-		@Body() twoFaCodeDto: twoFaCodeDto,
+		@Body() data : any,
 	) {
 		try {
+			console.log(data);
+			const dto = plainToClass(TwoFaCodeDto, data);
+			console.log(dto);
+			await validateOrReject(dto).catch((errors: ValidationError[]) => {
+				this.authService.logout(request, response);
+				throw new BadRequestException(errors);
+			  });
 			const user = await this.authService.getUserCookie(request);
 			if (!user)
 				throw new UnauthorizedException('user not here');
 			const isCodeValid = await this.twoFAService.isTwoFACodeValid(
-				twoFaCodeDto.twoFaCode,
+				dto.twoFaCode,
 				user,
 			);
 			if (!isCodeValid) {
@@ -212,11 +230,9 @@ export class AuthController {
 			await this.authService.loginTwoFa(user, response, true);
 			response.send({ jwt: jwtToken });
 			return { jwt: jwtToken };
-		} catch (error) 
-		{
-			return {
-				message: 'failed 2fa',
-			};
+		} catch (error) {
+			console.log(error)
+			return error;
 		}
 	}
 }

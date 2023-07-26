@@ -17,7 +17,7 @@ export class UserService {
 	try {
 		return await this.userRepository.save(data);
 	} catch (error) {
-		throw error
+		throw new BadRequestException('Email already exist')
 	}
   }
 

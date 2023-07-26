@@ -11,6 +11,7 @@ import {
   UploadedFile,
   UseGuards,
   UseInterceptors,
+  ValidationError,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import JwtTwoFactorGuard from 'src/auth/twofa.guard';
@@ -19,6 +20,10 @@ import { diskStorage } from 'multer';
 import { HistoryService } from 'src/pong/history.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import { plainToClass } from 'class-transformer';
+import { NicknameDto, TwoFaCodeDto } from './user.dto';
+import { validateOrReject } from 'class-validator';
+
 
 @Controller('user')
 export class UserController {
@@ -104,16 +109,26 @@ export class UserController {
   @Post('settings')
   @UseGuards(JwtTwoFactorGuard)
   async settings(
-    @Body('nickname') nickname: string,
+    @Body() data : any,
     @Res({ passthrough: true }) response: Response,
     @Req() request: Request,
   ) {
     try {
+		console.log(data);
+		const dto = plainToClass(NicknameDto, data);
+		console.log(dto);
+		await validateOrReject(dto).catch((errors: ValidationError[]) => {
+			throw new BadRequestException(errors);
+		  });
       const user: any = request.user;
-      if (!user) return 'no user';
-      await this.userService.changeNickname(user, nickname);
+      if (!user)
+	  	return 'no user';
+      await this.userService.changeNickname(user, dto.nickname);
       response.send({ user });
-    } catch (error) {}
+    } catch (error) {
+		console.log(error);
+		return error;
+	}
   }
 
   @Post('avatar')

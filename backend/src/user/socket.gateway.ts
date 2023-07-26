@@ -26,29 +26,40 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly pongService: PongService,
 		private readonly gateway: GlobalGateway,
 	) {
-		this.logger = new Logger(ChatService.name);
+		this.logger = new Logger(UserService.name);
 	}
 
-	async handleConnection(client: Socket) {
-		try {
-			let user: User = await this.authService.getUserByToken(
-				client.handshake.auth.token,
+	
+	async ping(){
+		setInterval(async () => {
+			let users = (await this.userService.getAllUserOnline());
+			this.logger.log('Ping');
+			for (let user of users) {
+				const otherSocket = await this.authService.getUserSocket(
+					this.gateway.userNamespace,
+					user.id,
+				);
+			if (!otherSocket)
+			{
+				this.userService.setOffline(user);
+				this.gateway.userNamespace.emit('reloadLists');
+			}
+		};
+	}, 20000);
+}
+
+onModuleInit() {
+	this.logger.log('Gateway initialized');
+	this.ping()
+  }
+async handleConnection(client: Socket) {
+	try {
+		let user: User = await this.authService.getUserByToken(
+			client.handshake.auth.token,
 			);
 			if (user) {
 				await this.userService.setOnline(user);
-				setInterval(async () => {
-					let users = (await this.userService.getAllUserOnline());
-					//console.log(users);
-					for (let user of users) {
-						const otherSocket = await this.authService.getUserSocket(
-							this.gateway.userNamespace,
-							user.id,
-						);
-					//	console.log('others', otherSocket)
-						if (!otherSocket)
-							this.userService.setOffline(user);
-					};
-			}, 10000);
+			this.logger.log('Connected');
 			this.gateway.userNamespace.emit('reloadLists');
 		} else client.disconnect();
 
@@ -61,10 +72,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 async pong(client: Socket){
 
 	try {
-		console.log('pong')
+		
 		let user: User = await this.authService.getUserByToken(
 			client.handshake.auth.token,
-		);
+			);
+			this.logger.log(user.nickname + ' pong');
 		if (!user)
 			this.handleDisconnect(client)
 	} catch (error) {
@@ -83,6 +95,8 @@ async pong(client: Socket){
 		if (user) {
 			await this.userService.setOffline(user);
 			this.gateway.userNamespace.emit('reloadLists');
+			this.logger.log('Disconnected');
+
 		}
 	} catch (error) {
 		client.emit('error', { message: error.message });
