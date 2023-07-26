@@ -31,7 +31,6 @@ export class TwoFAService {
 
 		// Générez un nouvel objet TOTP en utilisant la clé secrète
 		const totp = authenticator.generate(user.twoFASecret )
-		console.log(totp);
 
 		return authenticator.verify({
 		  token: twoFACode,

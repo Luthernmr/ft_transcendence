@@ -67,7 +67,6 @@ export default function loginCard() {
 			if (!response.data) {
 				onOpen();
 			}
-			console.log(response)
 			if (response.data.status == 401 || response.data.status == 400) {
 				const messages = response.data.response.message
 				if (!(typeof messages == "string")) {
@@ -82,7 +81,6 @@ export default function loginCard() {
 					})
 				}
 				else {
-					console.log('prout')
 					toast({
 						title: response.data.response.message,
 						status: "error",

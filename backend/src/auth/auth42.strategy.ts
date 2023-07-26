@@ -16,7 +16,6 @@ export class auth42Strategy extends PassportStrategy(Strategy, '42') {
 		  callbackURL: process.env.CALLBACK_URL,
 		});	
 	} catch (error) {
-	console.log(error)	
 	}
   }
   validate(access_token: string, refresh_token: string, user: any): any {
@@ -24,7 +23,6 @@ export class auth42Strategy extends PassportStrategy(Strategy, '42') {
 		return { access_token, user };
 		
 	} catch (error) {
-		console.log('error')
 	}
   }
 }

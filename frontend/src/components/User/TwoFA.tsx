@@ -35,8 +35,6 @@ export default function TwoFA() {
 				},
 				{ withCredentials: true }
 			);
-
-			console.log('here', response)
 			if (response.data.status == 401 || response.data.status == 400) {
 				const messages = response.data.response.message
 				if (!(typeof messages == "string")) {
@@ -52,7 +50,6 @@ export default function TwoFA() {
 				}
 				else if (messages) {
 
-					console.log('prout')
 					toast({
 						title: response.data.response.message,
 						status: "error",
@@ -74,8 +71,6 @@ export default function TwoFA() {
 			}
 			onClose();
 		} catch (error) {
-		console.log('prout1')
-
 			toast({
 				title: `invalid code`,
 				status: "error",

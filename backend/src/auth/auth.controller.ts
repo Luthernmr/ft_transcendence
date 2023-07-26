@@ -38,8 +38,6 @@ export class AuthController {
 	async register(@Body() data : any, @Res({ passthrough: true }) response: Response) {
 		try {
 			const dto = plainToClass(RegisterDto,data);
-			console.log(data);
-			console.log(dto);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				throw new BadRequestException(errors);
 			  });
@@ -54,7 +52,6 @@ export class AuthController {
 			if (!user)
 				throw new BadRequestException('Impossible to create user with this informations');
 		} catch (error) {
-			console.log(error);
 			return error;
 		}
 	}
@@ -85,7 +82,6 @@ export class AuthController {
 				return token;
 			return;
 		} catch (error) {
-			console.log(error)
 			return error;
 		}
 	}
@@ -131,7 +127,6 @@ export class AuthController {
 				return response.send({ online: true });
 			}
 		} catch (error) {
-			console.error(error);
 			return response.send({ message: 'no cookie set', online: false });
 		}
 	}
@@ -168,9 +163,7 @@ export class AuthController {
 		@Body() data : any,
 	) {
 		try {
-			console.log(data);
 			const dto = plainToClass(TwoFaCodeDto, data);
-			console.log(dto);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				throw new BadRequestException(errors);
 			  });
@@ -209,9 +202,7 @@ export class AuthController {
 		@Body() data : any,
 	) {
 		try {
-			console.log(data);
 			const dto = plainToClass(TwoFaCodeDto, data);
-			console.log(dto);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				this.authService.logout(request, response);
 				throw new BadRequestException(errors);
@@ -231,7 +222,6 @@ export class AuthController {
 			response.send({ jwt: jwtToken });
 			return { jwt: jwtToken };
 		} catch (error) {
-			console.log(error)
 			return error;
 		}
 	}

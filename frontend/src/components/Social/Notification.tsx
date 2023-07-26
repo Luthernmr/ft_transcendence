@@ -155,9 +155,9 @@ const PendingRequest = () => {
 		return (
 			<>
 				<Center>
-					<Heading color={"gray.500"}>
+					<Text color={"gray.500"}>
 						No notifications for the moment
-					</Heading>
+					</Text>
 				</Center>
 			</>
 		);
