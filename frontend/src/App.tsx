@@ -29,25 +29,7 @@ export default function App() {
   const navigate = useNavigate();
   chatSocket.on("disconnect", () => {});
   const toast = useToast();
-  const handleError = (error: { message: string }) => {
-    toast({
-      title: error.message,
-      status: "error",
-      isClosable: true,
-      position: "top",
-    });
-  };
-  const handleSuccess = (sucess: { message: string }) => {
-    toast({
-      title: sucess.message,
-      status: "success",
-      isClosable: true,
-      position: "top",
-    });
-  };
-  userSocket.on("error", handleError);
-  userSocket.on("success", handleSuccess);
-
+ 
   const getUser = async () => {
     const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
       withCredentials: true,
@@ -57,14 +39,6 @@ export default function App() {
     userSocket.auth = { token: res.data.jwt };
     chatSocket.auth = { token: res.data.jwt };
   };
-
-  chatSocket.on("connect", () => {
-    if (sessionStorage.getItem("currentUser")) getUser();
-  });
-  
-  userSocket.on("ping", () => {
-    userSocket.emit("pong");
-  });
 	useEffect(() => {
 		const handleError = (error: { message: string }) => {
 			toast({
