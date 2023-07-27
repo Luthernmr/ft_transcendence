@@ -28,7 +28,7 @@ export interface Friend {
 	nickname: string;
 	imgPdp: string;
 	isOnline: boolean;
-	isPlaying : boolean;
+	isPlaying: boolean;
 }
 
 export default function AllfriendItem() {
@@ -102,4 +102,10 @@ export default function AllfriendItem() {
 				))}
 			</List>
 		);
+	else
+		return (
+			<>
+				<Text>No friend</Text>
+			</>
+		)
 }
