@@ -26,10 +26,8 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 
 export default function App() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
-  const navigate = useNavigate();
-  chatSocket.on("disconnect", () => {});
   const toast = useToast();
- 
+  
   const getUser = async () => {
     const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
       withCredentials: true,
