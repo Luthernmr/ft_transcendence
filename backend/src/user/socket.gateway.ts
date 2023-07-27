@@ -61,6 +61,8 @@ async handleConnection(client: Socket) {
 				await this.userService.setOnline(user);
 			this.logger.log(user.nickname + ' Connected');
 			this.gateway.userNamespace.emit('reloadLists');
+			client.emit('success', { message: "Connected" });
+
 		} else client.disconnect();
 
 	} catch(error) {
@@ -95,6 +97,8 @@ async pong(client: Socket){
 			await this.userService.setOffline(user);
 			this.gateway.userNamespace.emit('reloadLists');
 			this.logger.log('Disconnected');
+			client.emit('success', { message: "Disconnected" });
+
 		}
 	} catch (error) {
 		client.emit('error', { message: error.message });

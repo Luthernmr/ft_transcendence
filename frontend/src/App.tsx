@@ -7,7 +7,7 @@ import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
 import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import UserProfile from "./components/User/Profile";
 import TwoFA from "./components/User/TwoFA";
 import OtherProfilPage from "./components/Social/OtherProfilPage";
@@ -18,10 +18,10 @@ import SelectedRoomContext from "./components/Chat/SelectedRoomContext";
 import { Room } from "./components/Chat/ChatRoom";
 
 function PrivateRoute({ children }: { children: ReactNode }) {
-  if (!sessionStorage.getItem("jwt")) {
-    return <Navigate to="/Login" />;
-  }
-  return <>{children}</>;
+	if (!sessionStorage.getItem("jwt")) {
+		return <Navigate to="/Login" />;
+	}
+	return <>{children}</>;
 }
 
 export default function App() {

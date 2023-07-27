@@ -8,6 +8,7 @@ import {
 	Min,
 	MinLength,
 	IsAlpha,
+	IsNumberString
 } from 'class-validator';
 
 export class LoginDto {
@@ -25,6 +26,7 @@ export class TwoFaCodeDto {
 	@MinLength(6)
 	@MaxLength(6)
 	@IsString()
+	@IsNumberString()
 	twoFaCode: string;
 }
 
