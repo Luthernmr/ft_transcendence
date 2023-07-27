@@ -16,7 +16,7 @@ export class JwtTwoFactorStrategy extends PassportStrategy(
           return request?.cookies?.twofa;
         },
       ]),
-      secretOrKey: 'secret',
+      secretOrKey: process.env.SECRET,
     });
   }
 

@@ -1,10 +1,11 @@
 import { Box, Button, Flex, HStack, Menu, MenuButton, MenuList, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, VStack, useDisclosure } from "@chakra-ui/react";
 import { userSocket } from "../../sockets/sockets";
+import { useEffect } from "react";
 
 export default function PongInviteButton(props: any) {
 	function sendPongRequest(e: any, id: number, custom: boolean) {
 		e.preventDefault();
-		userSocket.emit("PongRequest", { userReceiveId: id, custom: custom });
+			userSocket.emit("PongRequest", { userReceiveId: id, custom: custom });
 	}
 
 	const { isOpen, onOpen, onClose } = useDisclosure()

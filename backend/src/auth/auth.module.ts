@@ -13,7 +13,7 @@ import JwtTwoFactorGuard from './twofa.guard';
 @Module({
   imports: [
     JwtModule.register({
-      secret: 'secret',
+      secret: process.env.SECRET,
       signOptions: { expiresIn: '999d' },
     }),
     UserModule,
