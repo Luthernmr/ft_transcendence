@@ -61,7 +61,7 @@ export default function App() {
   chatSocket.on("connect", () => {
     if (sessionStorage.getItem("currentUser")) getUser();
   });
-
+  
   userSocket.on("ping", () => {
     userSocket.emit("pong");
   });

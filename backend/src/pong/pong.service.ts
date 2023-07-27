@@ -24,7 +24,7 @@ const BALL_START_POS_X: number = PONG_WIDTH / 2 - BALL_WIDTH / 2;
 const BALL_START_POS_X_CUSTOM: number = PONG_WIDTH / 2 - BALL_WIDTH_CUSTOM / 2;
 const BALL_START_POS_Y: number = PONG_HEIGHT / 2 - BALL_HEIGHT / 2;
 
-const BALL_SPEED: number = 9;
+const BALL_SPEED: number = 7;
 
 const OUTER_ANGLE_DELTA: number = 5 * BALL_SPEED;
 const INNER_ANGLE_DELTA: number = 2.5 * BALL_SPEED;
@@ -765,7 +765,7 @@ export class PongService {
 		}
 	}
 
-	WatchRandom(socket: Socket) {
+	WatchRandom(socket: Socket) : boolean {
 		const watcherInfoIndex = this.GetInfoIndexBySocketID(socket.id);
 
 		if (watcherInfoIndex < 0) {
@@ -773,7 +773,12 @@ export class PongService {
 			return;
 		}
 
+		if (this.usersRuntime.length <= 0)
+			return false;
+
 		this.AddWatcherByUser(this.userInfos[watcherInfoIndex].userId, this.userInfos[this.usersRuntime[0].indexUser1].userId);
+
+		return true;
 	}
 
 	AddWatcherByUser(userWatcherID: number, userPlayerID: number) {

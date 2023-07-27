@@ -216,6 +216,9 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 	}, []);
 	const signOut = async () => {
 		try {
+			await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+				withCredentials: true,
+			});
 			sessionStorage.removeItem("jwt");
 			sessionStorage.removeItem("currentUser");
 			chatSocket.disconnect();
@@ -223,7 +226,11 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 			pongSocket.disconnect();
 		} catch (error) { }
 	};
-
+	userSocket.on("disconnect", () => {
+		if (sessionStorage.getItem('currentUser'))
+			signOut();
+	  });
+	
 
 	return (
 		<Flex

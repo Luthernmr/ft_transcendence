@@ -39,8 +39,8 @@ function WatchersArea(props: WatchersAreaProps) {
 					<Grid
 						w='70%'
 						h='100%'
-						templateRows={{sm: 'repeat(3, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(3, 1fr)', xl: 'repeat(6, 1fr)'}}
-						templateColumns={{sm: 'repeat(5, 1fr)', md: 'repeat(5, 1fr)', lg: 'repeat(5, 1fr)', xl: 'repeat(3, 1fr)'}}
+						templateRows={{base: 'repeat(3, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(3, 1fr)', lg: 'repeat(3, 1fr)', xl: 'repeat(6, 1fr)'}}
+						templateColumns={{base: 'repeat(5, 1fr)', sm: 'repeat(5, 1fr)', md: 'repeat(5, 1fr)', lg: 'repeat(5, 1fr)', xl: 'repeat(3, 1fr)'}}
 						gap={4}>
 						{avatars.map((a, i) => <GridItem key={i} rowSpan={1}><Avatar name={a?.nickname} src={a?.imgPdp} w='100%' h='100%'/></GridItem>)}
 					</Grid>
@@ -49,7 +49,7 @@ function WatchersArea(props: WatchersAreaProps) {
 				<Flex direction='column'>
 					<Box h='20%' minHeight={'10px'} />
 					<Center>
-						<Button w={{sm: '20%', md:'20%', lg: '30%', xl: '50%'}}
+						<Button w={{base: '20%', sm: '20%', md:'20%', lg: '30%', xl: '50%'}}
 								fontSize={{sm: 10, md:14, lg: 17, xl: 20}}
 								onClick={() => props.leaveWatch()}
 								bg='red.100'
