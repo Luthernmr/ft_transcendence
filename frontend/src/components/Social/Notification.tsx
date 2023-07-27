@@ -103,7 +103,6 @@ const PendingRequest = () => {
 				<Tabs variant="soft-rounded" colorScheme="blue">
 					<TabList>
 						<Tab>Notifications</Tab>
-						<Tab>New Message</Tab>
 					</TabList>
 					<TabPanels>
 						<TabPanel>
@@ -142,9 +141,6 @@ const PendingRequest = () => {
 									</Stack>
 								</Flex>
 							))}
-						</TabPanel>
-						<TabPanel>
-							<p>two!</p>
 						</TabPanel>
 					</TabPanels>
 				</Tabs>
