@@ -95,7 +95,6 @@ async pong(client: Socket){
 			await this.userService.setOffline(user);
 			this.gateway.userNamespace.emit('reloadLists');
 			this.logger.log('Disconnected');
-
 		}
 	} catch (error) {
 		client.emit('error', { message: error.message });

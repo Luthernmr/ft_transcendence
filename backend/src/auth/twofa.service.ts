@@ -27,11 +27,6 @@ export class TwoFAService {
 }
   public async isTwoFACodeValid(twoFACode: string, user: User) {
 	try {
-		 // Remplacez cela par une clé secrète sécurisée pour votre application
-
-		// Générez un nouvel objet TOTP en utilisant la clé secrète
-		const totp = authenticator.generate(user.twoFASecret )
-
 		return authenticator.verify({
 		  token: twoFACode,
 		  secret: user.twoFASecret,

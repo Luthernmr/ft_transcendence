@@ -26,6 +26,7 @@ import { User } from 'src/user/user.entity';
 import { plainToClass } from 'class-transformer';
 import { CreateRoomDto } from 'src/room/dto/create-room.dto';
 import { validateOrReject } from 'class-validator';
+import { request } from 'http';
 
 @Controller('api')
 export class AuthController {
@@ -35,12 +36,12 @@ export class AuthController {
 		private readonly twoFAService: TwoFAService,
 	) { }
 	@Post('register')
-	async register(@Body() data : any, @Res({ passthrough: true }) response: Response) {
+	async register(@Body() data: any, @Res({ passthrough: true }) response: Response) {
 		try {
-			const dto = plainToClass(RegisterDto,data);
+			const dto = plainToClass(RegisterDto, data);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				throw new BadRequestException(errors);
-			  });
+			});
 			const salt = await bcrypt.genSalt();
 			const hashedPassword = await bcrypt.hash(dto.password, salt);
 			const user = await this.userService.create({
@@ -59,14 +60,25 @@ export class AuthController {
 	@Post('login')
 	@UsePipes(new ValidationPipe())
 	async login(
-		@Body() data : any,
+		@Body() data: any,
 		@Res({ passthrough: true }) response: Response,
+		@Req() request: Request,
 	) {
 		try {
-			const dto = plainToClass(LoginDto,data);
+			const dto = plainToClass(LoginDto, data);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				throw new BadRequestException(errors);
-			  });
+			});
+
+			if(!(await this.authService.getUserCookie(request)).isOnline)
+			{
+				await this.authService.logout(request, response);
+			}
+			else if (request.cookies['jwt']) {
+				console.log(request.cookies)
+				throw new BadRequestException('Already connected in other window');
+			}
+
 			const user = await this.userService.getUser(dto.email);
 			if (!user) {
 				throw new BadRequestException('Email does not exist');
@@ -74,7 +86,7 @@ export class AuthController {
 			if (!(await bcrypt.compare(dto.password, user.password))) {
 				throw new BadRequestException('Wrong password');
 			}
-			if(user.isOnline)
+			if (user.isOnline)
 				throw new BadRequestException('Already connected');
 			const token = await this.authService.login(user, response);
 			await this.authService.loginTwoFa(user, response, false);
@@ -160,14 +172,14 @@ export class AuthController {
 	@UseGuards(LocalAuthGuard)
 	async turnOnTwoFA(
 		@Req() request: Request,
-		@Body() data : any,
+		@Body() data: any,
 	) {
 		try {
 			const dto = plainToClass(TwoFaCodeDto, data);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				throw new BadRequestException(errors);
-			  });
-			  
+			});
+
 			const user = await this.authService.getUserCookie(request);
 			const isCodeValid = await this.twoFAService.isTwoFACodeValid(
 				dto.twoFaCode, user
@@ -199,14 +211,14 @@ export class AuthController {
 	async authenticate(
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: Request,
-		@Body() data : any,
+		@Body() data: any,
 	) {
 		try {
 			const dto = plainToClass(TwoFaCodeDto, data);
 			await validateOrReject(dto).catch((errors: ValidationError[]) => {
 				this.authService.logout(request, response);
 				throw new BadRequestException(errors);
-			  });
+			});
 			const user = await this.authService.getUserCookie(request);
 			if (!user)
 				throw new UnauthorizedException('user not here');

@@ -6,30 +6,36 @@ import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class Auth42Controller {
-  constructor(
-    private readonly auth42Service: Auth42Service,
-    private authService: AuthService,
-  ) {}
+	constructor(
+		private readonly auth42Service: Auth42Service,
+		private authService: AuthService,
+	) { }
 
-  @Get('42')
-  @UseGuards(auth42Guard)
-  async login42(
-    @Res({ passthrough: true }) response: Response,
-    @Req() request: any,
-  ) {
-	try {
-		let token = await this.auth42Service.login(request.user);
-		const user = await this.authService.getUserByToken(token);
-		if (user)
-		{
-			await this.authService.loginTwoFa(user, response, true);
-			response.cookie('jwt', token, { httpOnly: true });
-			if (!user.isTwoFA)
-				return { jwt: token };
+	@Get('42')
+	@UseGuards(auth42Guard)
+	async login42(
+		@Res({ passthrough: true }) response: Response,
+		@Req() request: any,
+	) {
+		try {
+			if(!(await this.authService.getUserCookie(request)).isOnline)
+			{
+				await this.authService.logout(request, response);
+			}
+			else if (request.cookies['jwt']) {
+				throw new BadRequestException('Already connected in other window');
+			}
+			let token = await this.auth42Service.login(request.user);
+			const user = await this.authService.getUserByToken(token);
+			if (user) {
+				await this.authService.loginTwoFa(user, response, true);
+				response.cookie('jwt', token, { httpOnly: true });
+				if (!user.isTwoFA)
+					return { jwt: token };
+			}
+			return;
+		} catch (error) {
+			return error
 		}
-		return;	
-	} catch (error) {
-		return error
 	}
-  }
 }

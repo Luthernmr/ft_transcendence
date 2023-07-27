@@ -59,7 +59,7 @@ export default function App() {
 	if (sessionStorage.getItem('currentUser'))
     	getUser();
   });
-
+  
   userSocket.on("ping", () => {
     userSocket.emit("pong")
   });
