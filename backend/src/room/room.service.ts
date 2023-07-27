@@ -44,6 +44,7 @@ export class RoomService {
         client.handshake.auth.token,
       );
       if (room) {
+        client.emit('roomAlreadyExists', room);
         throw new BadRequestException('Room already exists');
       }
       let hashedPassword = null;
@@ -58,7 +59,8 @@ export class RoomService {
         password: hashedPassword,
         users: dto.users,
       };
-      await this.roomRepo.save(payload);
+      const savedRoom = await this.roomRepo.save(payload);
+      return savedRoom;
     } catch (error) {
       this.logger.log(error);
       throw error;
@@ -322,15 +324,14 @@ export class RoomService {
 
   async isMuted(userId: number, roomId: number): Promise<boolean> {
     const currentTimestamp = new Date();
-  
+
     const user = await this.userService.getUserById(userId);
     const room = await this.roomRepo.findOne({ where: { id: roomId } });
-  
+
     const mute = await this.muteRepo.findOne({
       where: { user: user, room: room, muteEnd: MoreThan(currentTimestamp) },
     });
-  
+
     return !!mute;
   }
-  
 }

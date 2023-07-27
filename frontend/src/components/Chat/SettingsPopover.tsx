@@ -31,7 +31,7 @@ const SettingsPopover: React.FC<SettingsPopoverProps> = ({
 }) => {
   const [password, setPassword] = useState<string>("");
   const [admins, setAdmins] = useState<User[]>(selectedRoom.admins || []);
-  const [users] = useState<User[]>(selectedRoom.users);
+  const [users] = useState<User[]>(selectedRoom.users || []);
 
   const handlePasswordChange = () => {
     chatSocket.emit("changeRoomPassword", {

@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import RoomList from "./RoomList";
 import CreateRoom from "./CreateRoom";
 import ChatRoom, { Room } from "./ChatRoom";
+import SelectedRoomContext from "./SelectedRoomContext";
 
 function Chat() {
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const { selectedRoom, setSelectedRoom } = useContext(SelectedRoomContext);
   const [showCreateRoom, setShowCreateRoom] = useState(false);
 
   if (showCreateRoom) {

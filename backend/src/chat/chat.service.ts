@@ -62,7 +62,7 @@ export class ChatService {
         true,
       );
       if (room) {
-        client.emit('directRoomCreated', { room });
+        client.emit('directRoomCreated', room);
       }
     } catch (error) {
       client.emit('error', { message: error.message });

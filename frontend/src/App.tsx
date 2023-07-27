@@ -7,13 +7,15 @@ import RegisterCard from "./components/User/registerCard";
 import Home from "./components/Dashboard/Home";
 import { pongSocket, userSocket, chatSocket } from "./sockets/sockets";
 import AuthElement from "./components/User/AuthElement";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import UserProfile from "./components/User/Profile";
 import TwoFA from "./components/User/TwoFA";
 import OtherProfilPage from "./components/Social/OtherProfilPage";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useToast } from "@chakra-ui/react";
+import SelectedRoomContext from "./components/Chat/SelectedRoomContext";
+import { Room } from "./components/Chat/ChatRoom";
 
 function PrivateRoute({ children }: { children: ReactNode }) {
   if (!sessionStorage.getItem("jwt")) {
@@ -23,6 +25,7 @@ function PrivateRoute({ children }: { children: ReactNode }) {
 }
 
 export default function App() {
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const navigate = useNavigate();
   chatSocket.on("disconnect", () => {});
   const toast = useToast();
@@ -56,61 +59,62 @@ export default function App() {
   };
 
   chatSocket.on("connect", () => {
-	if (sessionStorage.getItem('currentUser'))
-    	getUser();
+    if (sessionStorage.getItem("currentUser")) getUser();
   });
 
   userSocket.on("ping", () => {
-    userSocket.emit("pong")
+    userSocket.emit("pong");
   });
 
   return (
-    <Routes>
-      <Route path="/Register" element={<RegisterCard />} />
-      <Route path="/Login" element={<LoginCard />} />
-      <Route path="/Auth" element={<AuthElement />} />
-      <Route path="/2fa" element={<TwoFA />} />
-      <Route path="/" element={<Home />} />
-      <Route
-        path="/Home"
-        element={
-          <PrivateRoute>
-            <SidebarWithHeader children={<Chat />} />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/Chat"
-        element={
-          <PrivateRoute>
-            <SidebarWithHeader children={<Chat />} />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/Play"
-        element={
-          <PrivateRoute>
-            <SidebarWithHeader children={<Pong />} />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/profile"
-        element={
-          <PrivateRoute>
-            <SidebarWithHeader children={<UserProfile />} />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/profile/:id"
-        element={
-          <PrivateRoute>
-            <SidebarWithHeader children={<OtherProfilPage />} />
-          </PrivateRoute>
-        }
-      />
-    </Routes>
+    <SelectedRoomContext.Provider value={{ selectedRoom, setSelectedRoom }}>
+      <Routes>
+        <Route path="/Register" element={<RegisterCard />} />
+        <Route path="/Login" element={<LoginCard />} />
+        <Route path="/Auth" element={<AuthElement />} />
+        <Route path="/2fa" element={<TwoFA />} />
+        <Route path="/" element={<Home />} />
+        <Route
+          path="/Home"
+          element={
+            <PrivateRoute>
+              <SidebarWithHeader children={<Chat />} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/Chat"
+          element={
+            <PrivateRoute>
+              <SidebarWithHeader children={<Chat />} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/Play"
+          element={
+            <PrivateRoute>
+              <SidebarWithHeader children={<Pong />} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <SidebarWithHeader children={<UserProfile />} />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile/:id"
+          element={
+            <PrivateRoute>
+              <SidebarWithHeader children={<OtherProfilPage />} />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </SelectedRoomContext.Provider>
   );
 }

@@ -233,7 +233,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         setSelectedRoom(updatedRoom);
       }
     });
-    chatSocket.on('roomDeleted', (deletedRoomName) => {
+    chatSocket.on("roomDeleted", (deletedRoomName) => {
       if (selectedRoom.name === deletedRoomName) {
         toast({
           title: deletedRoomName + " has been deleted.",
@@ -255,8 +255,8 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("userKicked");
       chatSocket.off("userBanned");
       chatSocket.off("muteStatus");
-      chatSocket.off('joinedRoom');
-      chatSocket.off('roomDeleted');
+      chatSocket.off("joinedRoom");
+      chatSocket.off("roomDeleted");
     };
   }, []);
 
@@ -311,7 +311,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
           )}
 
           {currentUser.id === selectedRoom.ownerId &&
-          selectedRoom.users.length > 1 ? (
+          selectedRoom?.users?.length > 1 ? (
             <Popover>
               <PopoverTrigger>
                 <IconButton icon={<FiLogOut />} aria-label={"Leave"} />
@@ -395,8 +395,8 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                     <PopoverHeader>
                       <UserOptions
                         isAdmin={
-                          selectedRoom.ownerId === currentUser.id ||
-                          selectedRoom.admins.some(
+                          selectedRoom?.ownerId === currentUser.id ||
+                          selectedRoom?.admins?.some(
                             (admin) => admin.id === currentUser.id
                           )
                         }
