@@ -20,6 +20,8 @@ import {
 	Stack,
 	Center,
 	Heading,
+	ScaleFade,
+	Fade,
 } from "@chakra-ui/react";
 import React, { useEffect, useState } from "react";
 import { FiBell } from "react-icons/fi";
@@ -161,6 +163,7 @@ const PendingRequest = () => {
 
 const BellButton = () => {
 	const [notified, setNotified] = useState(false);
+	const [count, setCount] = useState(0);
 
 	const handleNotify = async () => {
 		setNotified(false);
@@ -178,8 +181,13 @@ const BellButton = () => {
 			setNotified(true);
 		});
 		userSocket.on("pendingRequestsList", (data) => {
-			if (data.length)
+			if (data.length) {
+				if (data.length < 100)
+					setCount(data.length)
+				else
+					setCount(99);
 				setNotified(true);
+			}
 		});
 
 		userSocket.on("requestRejected", () => {
@@ -200,18 +208,20 @@ const BellButton = () => {
 					icon={
 						<>
 							<FiBell color={"gray.750"} />
-							<Box
-								as={"span"}
-								color={"white"}
-								position={"absolute"}
-								top={"10px"}
-								right={"10px"}
-								boxSize="0.7em"
-								bgColor={"red"}
-								borderRadius={"100%"}
-								zIndex={9999}
-								p={"1px"}
-							></Box>
+								<Box
+									as={"span"}
+									color={"white"}
+									position={"absolute"}
+									top={"10px"}
+									right={"10px"}
+									boxSize="0.7em"
+									bgColor={"red"}
+									borderRadius={"100%"}
+									zIndex={9999}
+									transition={'ease-in-out'}
+								>
+									<Text fontSize={'9px'} m={'1px'} >{count}</Text>
+								</Box>
 						</>
 					}
 				/>

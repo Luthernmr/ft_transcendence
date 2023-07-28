@@ -104,7 +104,7 @@ export class AuthController {
 		try {
 			const user = await this.authService.getUserCookie(request);
 			if (!user) return 'no user';
-			const { password, twoFASecret, ...result } = user;
+			const { password, twoFASecret, email, ...result } = user;
 			return response.send({ user: result });
 		} catch (e) {
 			return {
