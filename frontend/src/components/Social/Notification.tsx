@@ -212,7 +212,6 @@ const BellButton = () => {
                 boxSize="0.7em"
                 bgColor={"red"}
                 borderRadius={"100%"}
-                zIndex={9999}
                 transition={"ease-in-out"}
               >
                 <Text fontSize={"9px"} m={"1px"}>

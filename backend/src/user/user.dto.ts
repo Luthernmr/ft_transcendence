@@ -34,14 +34,14 @@ export class NicknameDto {
 	@IsString()
 	@IsNotEmpty()
 	@Length(4,20)
-	@IsAlpha()
+	@Matches(RegExp('^[A-Za-zıöüçğşİÖÜÇĞŞñÑáéíóúÁÉÍÓÚ ]+$'))
 	nickname: string;
 }
 export class RegisterDto {
 	@IsString()
 	@IsNotEmpty()
 	@Length(4,20)
-	@IsAlpha()
+	@Matches(RegExp('^[A-Za-zıöüçğşİÖÜÇĞŞñÑáéíóúÁÉÍÓÚ ]+$'))
 	nickname: string;
 
 	@IsEmail()

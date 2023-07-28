@@ -379,14 +379,14 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
             <Flex flexDirection="column">
               <Popover isLazy>
                 <PopoverTrigger>
-                  <Flex alignItems="center">
+                  <Flex alignItems="center" _hover={{ cursor : 'pointer' }}>
                     <Avatar
                       size="sm"
                       name={message.user.nickname}
                       src={message.user.imgPdp}
-                      _hover={{ boxShadow: "0 0 0 3px teal" }}
+                      _hover={{ boxShadow: "0 0 0 3px teal",  cursor : 'pointer' }}
                     />
-                    <Text ml={2}>{message.user?.nickname}</Text>
+                    <Text _hover={{ cursor : 'pointer' }} ml={2}>{message.user?.nickname}</Text>
                   </Flex>
                 </PopoverTrigger>
                 <Portal>
@@ -411,7 +411,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                         as={RouteLink}
                         to={"/profile/" + message.user?.id}
                         alignItems={"center"}
-                        _hover={{ bg: "gray.200" }}
+                        _hover={{ bg: "gray.200"}}
                         p={2}
                         borderRadius={5}
                       >
