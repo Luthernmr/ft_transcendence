@@ -239,7 +239,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       bg={useColorModeValue("white", "gray.900")}
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue("gray.200", "gray.700")}
-      justifyContent={{ base: "space-between" }}
+      justifyContent={{ base: "space-between" , md : "flex-end"}}
       {...rest}
     >
       <IconButton
@@ -286,7 +286,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm" fontWeight={"bold"}>
+                  <Text fontSize="sm" fontWeight={"light"}>
                     {user.nickname}
                   </Text>
                 </VStack>
