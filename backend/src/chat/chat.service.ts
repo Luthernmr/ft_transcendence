@@ -78,14 +78,9 @@ export class ChatService {
     try {
       let room;
       if (isDirectMessage && data.users && data.users.length === 2) {
-        const userNicknameShort = data.users[0].nickname.substring(0, 3);
-        const targetUserNicknameShort = data.users[1].nickname.substring(0, 3);
-        const sortedNicknames = [
-          userNicknameShort,
-          targetUserNicknameShort,
-        ].sort();
-
-        data.name = `${sortedNicknames[0]}${sortedNicknames[1]}`;
+        const sortedIDs = [data.users[0].id, data.users[1].id].sort();
+  
+        data.name = `💬 ${sortedIDs[0]}${sortedIDs[1]}`;
         data.isPrivate = true;
         room = await this.roomService.createRoom(client, data);
       } else {
