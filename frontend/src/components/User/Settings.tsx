@@ -272,7 +272,7 @@ export default function Settings(props: any) {
 					type="file"
 					id="avatar"
 					name="avatar"
-					accept="image/*"
+					accept="image/png,image/jpeg, image/jpg, image/gif"
 					placeholder="test"
 					onChange={(event) => handleAvatarChange(event)}
 				/>
