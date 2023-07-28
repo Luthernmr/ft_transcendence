@@ -135,10 +135,17 @@ export class FriendService {
 			otherUser: otherUser,
 		  },
 		});
-	
-		if (relation1.length) {
-		  return relation1;
-		}	
+		const relation2 = await this.blockedUserRepository.find({
+			where: {
+				currentUser: otherUser,
+				otherUser: currentUser,
+			},
+		  });
+		  if (relation1.length) {
+			return relation1;
+		  } else if (relation2.length) {
+			return relation2;
+		  } else return null;
 	} catch (error) {
 		return error
 	}

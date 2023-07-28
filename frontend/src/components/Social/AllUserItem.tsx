@@ -56,7 +56,7 @@ export default function AllUserItem(props: any) {
 			<List>
 				{users.map((user) => (
 					<Popover key={user.id} isLazy >
-						{props.user.id != user.id && <Box>
+						{currentUser.id != user.id && <Box>
 							<ListItem>
 								<PopoverTrigger>
 									<Box>

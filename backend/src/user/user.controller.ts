@@ -169,10 +169,10 @@ export class UserController {
 				};
 				const user: any = request.user;
 				if (user.imgPdp) {
-					const oldFilePath = user.imgPdp;
-					let split = oldFilePath.split('/');
 					try {
+						const oldFilePath = user.imgPdp;
 						if (oldFilePath) {
+							let split = oldFilePath.split('/');
 							fs.unlinkSync(`./uploadedFiles/${split[5]}`);
 						}
 					} catch (error) {

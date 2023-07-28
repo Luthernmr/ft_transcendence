@@ -263,12 +263,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
         <MediaQuery maxWidth={1224}>
           <Menu>
             <MenuButton>
-              <IconButton
-                size={"lg"}
-                variant="ghost"
-                aria-label="open menu"
-                icon={<PiUsersThreeLight />}
-              />
+            <PiUsersThreeLight />
             </MenuButton>
             <MenuList zIndex={"1"} p={3}>
               <FriendList />
