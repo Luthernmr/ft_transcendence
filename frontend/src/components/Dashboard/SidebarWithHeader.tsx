@@ -21,14 +21,6 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
 } from "@chakra-ui/react";
 import {
   FiSettings,
@@ -40,13 +32,12 @@ import { PiUsersThreeLight } from "react-icons/pi";
 import { BsJoystick } from "react-icons/bs";
 import { RiGamepadLine } from "react-icons/ri";
 import { IconType } from "react-icons";
-import { Link as RouteLink, useNavigate } from "react-router-dom";
+import { Link as RouteLink } from "react-router-dom";
 import axios from "axios";
 import Notification from "../Social/Notification";
 import FriendList from "../Social/FriendList";
 import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
 import MediaQuery from "react-responsive";
-import { ChatIcon, TriangleDownIcon } from "@chakra-ui/icons";
 
 interface LinkItemProps {
   name: string;
@@ -65,9 +56,6 @@ export default function SidebarWithHeader({
   children: ReactNode;
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const currentUser: User = JSON.parse(
-    sessionStorage.getItem("currentUser") || "{}"
-  );
   return (
     <>
       <Flex
