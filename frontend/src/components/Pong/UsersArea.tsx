@@ -54,6 +54,15 @@ const nickAvatarSpacingBreakpoints = {
 	xl: 5
 }
 
+function StringMaxLength(s: string, n: number) : string {
+	if (s.length <= n)
+		return s;
+	
+	const stringCut=s.slice(0, n - 2) + ".";
+	console.log("cut " + s + " to " + stringCut);
+	return stringCut;
+}
+
 function UserArea(props: UserAreaProps) {
 	return (
 		<>
@@ -68,7 +77,7 @@ function UserArea(props: UserAreaProps) {
 											<Avatar border={10} name={props.user1Datas.nickname} src={props.user1Datas.imgPdp} size={avatarBreakpoints} />
 										</Center>
 									</Hide>
-									<Text as='b' align='center' fontSize={nicknameBreakpoints}>{props.user1Datas.nickname}</Text>
+									<Text as='b' align='center' fontSize={nicknameBreakpoints}>{StringMaxLength(props.user1Datas.nickname, 10)}</Text>
 								</Stack>
 							</Center>
 						</Box>
@@ -82,7 +91,7 @@ function UserArea(props: UserAreaProps) {
 						<Box width='100%' h='100%'>
 							<Center h='100%'>
 									<Stack spacing={nickAvatarSpacingBreakpoints}>
-										<Text as='b' align='center' fontSize={nicknameBreakpoints}>{props.user2Datas.nickname}</Text>
+										<Text as='b' align='center' fontSize={nicknameBreakpoints}>{StringMaxLength(props.user2Datas.nickname, 10)}</Text>
 										<Hide below='md'>
 											<Center>
 												<Avatar name={props.user2Datas.nickname} src={props.user2Datas.imgPdp} size={avatarBreakpoints} />

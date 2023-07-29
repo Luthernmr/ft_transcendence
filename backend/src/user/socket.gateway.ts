@@ -173,7 +173,7 @@ async PongRequest(
 				userReceiv,
 			);
 		if (alreadyBlock)
-			throw new BadRequestException('This user blocked you');
+			throw new BadRequestException('Relation blocked');
 		await this.userService.createPendingRequest({
 			type: 'Pong',
 			senderId: userSender.id,

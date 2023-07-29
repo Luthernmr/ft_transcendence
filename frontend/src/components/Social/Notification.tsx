@@ -49,19 +49,11 @@ const PendingRequest = () => {
       userSocket.emit("getPendingRequest");
     });
 
-    userSocket.on("duelRejected", () => {
-      toast({
-        title: `Duel rejected`,
-        description: "You or your opponent are unavailable right now",
-        status: "error",
-        isClosable: true,
-        position: "top",
-      });
-    });
     userSocket.on("duelAcccepted", () => {
       userSocket.emit("getPendingRequest");
       navigate("/play");
     });
+
     userSocket.on("requestRejected", () => {
       userSocket.emit("getPendingRequest");
     });
@@ -94,6 +86,22 @@ const PendingRequest = () => {
         position: "top",
       });
     });
+
+    function duelRejected() {
+      toast({
+        title: `Duel rejected`,
+        description: "You or your opponent are unavailable.",
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+    }
+
+    userSocket.on("duelRejected", duelRejected);
+
+    return () => {
+      userSocket.off("duelRejected", duelRejected);
+    }
   }, []);
 
   const handleAccept = async (id: number, type: string) => {
