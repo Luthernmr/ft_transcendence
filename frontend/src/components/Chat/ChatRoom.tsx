@@ -33,8 +33,7 @@ import LeavePopover from "./LeavePopover";
 import SettingsPopover from "./SettingsPopover";
 import UserOptions from "./UserOptions";
 import DirectMessageButton from "../Social/DirectMessageButton";
-import UserListPopover from "./UserListPopOver";
-import { PiUsersThreeLight } from "react-icons/pi";
+import UserListPopover from "./UserListPopover";
 
 export interface Room {
   id: number;
@@ -276,6 +275,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
           aria-label={"Go back"}
           icon={<ArrowBackIcon />}
           onClick={() => setSelectedRoom(null)}
+          mr={2}
         />
         <UserListPopover
           selectedRoom={selectedRoom}
