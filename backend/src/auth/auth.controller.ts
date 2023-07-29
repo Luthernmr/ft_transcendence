@@ -9,13 +9,10 @@ import {
 	UseGuards,
 	UsePipes,
 	ValidationPipe,
-	UnauthorizedException,
-	HttpException,
-	HttpStatus,
-	ValidationError,
+	UnauthorizedException, ValidationError
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
-import { Response, Request, response } from 'express';
+import { Response, Request } from 'express';
 import { UserService } from 'src/user/user.service';
 import { LoginDto, RegisterDto, TwoFaCodeDto } from 'src/user/user.dto';
 import { AuthService } from 'src/auth/auth.service';
@@ -24,9 +21,7 @@ import JwtTwoFactorGuard from './twofa.guard';
 import { LocalAuthGuard } from './auth.guard';
 import { User } from 'src/user/user.entity';
 import { plainToClass } from 'class-transformer';
-import { CreateRoomDto } from 'src/room/dto/create-room.dto';
 import { validateOrReject } from 'class-validator';
-import { request } from 'http';
 
 @Controller('api')
 export class AuthController {

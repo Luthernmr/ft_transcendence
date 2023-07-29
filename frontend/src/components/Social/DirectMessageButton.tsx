@@ -1,10 +1,10 @@
 import { IconButton, useToast } from "@chakra-ui/react";
-import { chatSocket, userSocket } from "../../sockets/sockets";
+import { chatSocket } from "../../sockets/sockets";
 import { ChatIcon } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import SelectedRoomContext from "../Chat/SelectedRoomContext";
 import { useContext } from "react";
-import ChatRoom, { Room } from "../Chat/ChatRoom";
+import { Room } from "../Chat/ChatRoom";
 
 export default function DirectMessageButton(props: any) {
   const navigate = useNavigate();
