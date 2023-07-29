@@ -70,22 +70,6 @@ const PendingRequest = () => {
     });
     userSocket.emit("getPendingRequest");
 
-    userSocket.on("sendSuccess", () => {
-      toast({
-        title: `A request has been sent`,
-        status: "success",
-        isClosable: true,
-        position: "top",
-      });
-    });
-    userSocket.on("alreadyFriend", () => {
-      toast({
-        title: `You can't send more friend request`,
-        status: "error",
-        isClosable: true,
-        position: "top",
-      });
-    });
 
     function duelRejected() {
       toast({

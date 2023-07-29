@@ -357,8 +357,10 @@ async blockUser(
 			userSender,
 			userBlocked,
 		);
-		if (userSender.id == userBlocked.id || alreadyBlock)
-			throw new BadRequestException('Cannot block this user');
+		if (alreadyBlock)
+			throw new BadRequestException('User already blocked');	
+		else if (userSender.id == userBlocked.id)
+			throw new BadRequestException('Cannot block yourself');
 		await this.friendService.blockUser({
 			currentUser: userSender,
 			otherUser: userBlocked,

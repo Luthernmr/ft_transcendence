@@ -65,6 +65,12 @@ export default function App() {
 		userSocket.on("ping", () => {
 			userSocket.emit("pong")
 		});
+
+		return () =>{
+			userSocket.off("error", handleError)
+			userSocket.off("success", handleSuccess)
+		}
+
 	})
 
 	return (
