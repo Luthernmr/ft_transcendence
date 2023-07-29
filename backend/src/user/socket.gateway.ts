@@ -122,9 +122,15 @@ async Friend(
 			userSender,
 			userReceiv,
 		);
+		const alreadyBlock: any = await this.friendService.getBlockedRelation(
+			userSender,
+			userReceiv,
+		);
+		if (alreadyBlock)
+			throw new BadRequestException('User is blocked');	
 		if (alreadyExist != null)
 		{
-			throw new BadRequestException('Alreedy friend.');
+			throw new BadRequestException('Already friend.');
 		}
 		if (userReceiv.id == userSender.id)
 			throw new BadRequestException('Cannot invite yourself');
@@ -246,6 +252,7 @@ async acceptFriendRequest(
 			friendUser,
 			currentUser,
 		);
+		
 		if (alreadyExist != null) throw new BadRequestException('Already friend');
 		await this.friendService.addFriend({
 			userA: currentUser,
