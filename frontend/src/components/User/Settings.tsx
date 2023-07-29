@@ -120,12 +120,14 @@ export default function Settings(props: any) {
 
 	useEffect(() => {
 		const getUser = async () => {
-			const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-				withCredentials: true,
-			});
-			setProfile(res.data.user);
-			setPreview(res?.data?.user?.imgPdp);
-			sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+			try {
+				const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
+					withCredentials: true,
+				});
+				setProfile(res.data.user);
+				setPreview(res?.data?.user?.imgPdp);
+				sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+			} catch (error) {console.log(error)}
 		};
 		if (profile.isTwoFA)
 		setIsChecked(true);
@@ -143,13 +145,15 @@ export default function Settings(props: any) {
 			);
 			setIsChecked(false);
 		} else {
-			const resp: any = await axios.get(
-				import.meta.env.VITE_BACKEND + "/api/generate" + location.search,
-				{ withCredentials: true, responseType: "blob" }
-			);
-			const qrUrl = URL.createObjectURL(resp.data);
-			setQrcode(qrUrl);
-			onOpen();
+			try {
+				const resp: any = await axios.get(
+					import.meta.env.VITE_BACKEND + "/api/generate" + location.search,
+					{ withCredentials: true, responseType: "blob" }
+				);
+				const qrUrl = URL.createObjectURL(resp.data);
+				setQrcode(qrUrl);
+				onOpen();
+			} catch (error) {console.log(error)}
 		}
 	}
 

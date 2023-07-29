@@ -206,11 +206,13 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
 
   useEffect(() => {
     const getUser = async () => {
-      const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-        withCredentials: true,
-      });
-      setUser(res.data.user);
-      sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+      try {
+        const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
+          withCredentials: true,
+        });
+        setUser(res.data.user);
+        sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+      } catch (error) { console.log(error) }
     };
     getUser();
   }, []);
@@ -224,7 +226,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       chatSocket.disconnect();
       userSocket.disconnect();
       pongSocket.disconnect();
-    } catch (error) {}
+    } catch (error) {console.log(error)}
   };
   userSocket.on("disconnect", () => {
     if (sessionStorage.getItem("currentUser")) signOut();

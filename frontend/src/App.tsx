@@ -29,13 +29,15 @@ export default function App() {
   const toast = useToast();
   
   const getUser = async () => {
-    const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-      withCredentials: true,
-    });
-    sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-    pongSocket.auth = { token: res.data.jwt };
-    userSocket.auth = { token: res.data.jwt };
-    chatSocket.auth = { token: res.data.jwt };
+	try {
+		const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
+		  withCredentials: true,
+		});
+		sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
+		pongSocket.auth = { token: res.data.jwt };
+		userSocket.auth = { token: res.data.jwt };
+		chatSocket.auth = { token: res.data.jwt };
+	} catch (error) {console.log(error)}
   };
 	useEffect(() => {
 		const handleError = (error: { message: string }) => {
