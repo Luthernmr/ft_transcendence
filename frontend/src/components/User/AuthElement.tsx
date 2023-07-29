@@ -78,7 +78,7 @@ export default function AuthElement() {
 					}
 				} catch (error) {
 					toast({
-						title: `Failde to connect with api`,
+						title: `Failed to connect with api`,
 						status: "error",
 						isClosable: true,
 						position: "top",

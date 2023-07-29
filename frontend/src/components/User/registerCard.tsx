@@ -12,9 +12,7 @@ import {
 	useColorModeValue,
 	useToast,
 } from "@chakra-ui/react";
-import { message } from "antd";
 import axios from "axios";
-import { each } from "chart.js/dist/helpers/helpers.core";
 import { useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 

@@ -13,7 +13,6 @@ import { AuthService } from 'src/auth/auth.service';
 import { BadRequestException, Logger } from '@nestjs/common';
 import { PongService } from 'src/pong/pong.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
-import { ChatService } from 'src/chat/chat.service';
 import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
@@ -238,7 +237,6 @@ async acceptFriendRequest(
 		const friendUser: User = await this.userService.getUserById(
 			request.senderId,
 		);
-		const otherId = friendUser.socketId;
 		const alreadyExist = await this.friendService.getRelation(
 			friendUser,
 			currentUser,
@@ -248,7 +246,8 @@ async acceptFriendRequest(
 			userA: currentUser,
 			userB: friendUser,
 		});
-		client.to(otherId).emit('reload');
+		client.to(friendUser.socketId).emit('reload');
+		client.emit('reload');
 		client.emit('requestAcccepted');
 		await this.userService.deletePendingRequestById(request);
 	} catch (error) {
@@ -297,6 +296,8 @@ async deleteFriend(client: Socket, data: { friendId: number }) {
 		);
 		await this.friendService.deleteFriend(currentUser, friendUser);
 		client.emit('reload');
+		client.to(friendUser.socketId).emit('reload');
+
 
 	} catch (error) {
 		client.emit('error', { message: error.message });
@@ -340,7 +341,6 @@ async blockUser(
 	userBlockedId: any;
 },
 ) {
-
 	try {
 		const userSender: User = await this.authService.getUserByToken(
 			client.handshake.auth.token,
