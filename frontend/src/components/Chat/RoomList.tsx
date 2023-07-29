@@ -171,6 +171,7 @@ const RoomList: React.FC<RoomListProps> = ({
                 }
               }}
               _hover={{
+				cursor : 'pointer',
                 bg:
                   room.bannedUsers &&
                   room.bannedUsers.find((user) => user.id === currentUser.id)

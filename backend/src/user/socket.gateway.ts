@@ -98,7 +98,6 @@ async pong(client: Socket){
 			this.gateway.userNamespace.emit('reloadLists');
 			this.logger.log('Disconnected');
 			client.emit('success', { message: "Disconnected" });
-
 		}
 	} catch (error) {
 		client.emit('error', { message: error.message });
@@ -175,7 +174,7 @@ async PongRequest(
 				userReceiv,
 			);
 		if (alreadyBlock)
-			throw new BadRequestException('Cannot play with blocked user');
+			throw new BadRequestException('This user blocked you');
 		await this.userService.createPendingRequest({
 			type: 'Pong',
 			senderId: userSender.id,

@@ -106,8 +106,7 @@ export default function Settings(props: any) {
 					});
 				}
 			}
-			else
-			{
+			else {
 				window.location.reload();
 			}
 		} catch (error) { }
@@ -128,15 +127,19 @@ export default function Settings(props: any) {
 			setPreview(res?.data?.user?.imgPdp);
 			sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
 		};
-		getUser();
 		if (profile.isTwoFA)
-			setIsChecked(true);
+		setIsChecked(true);
+		else
+		{
+			setIsChecked(false)
+		}
+		getUser();
 	}, [profile.isTwoFA, isChecked]);
 
 	async function handleCheck2FA() {
 		if (profile.isTwoFA) {
 			await axios.post(
-				import.meta.env.VITE_BACKEND + "/api/turn-off" + location.search,{}, { withCredentials: true }
+				import.meta.env.VITE_BACKEND + "/api/turn-off" + location.search, {}, { withCredentials: true }
 			);
 			setIsChecked(false);
 		} else {
@@ -297,6 +300,8 @@ export default function Settings(props: any) {
 							defaultChecked
 						/>
 					}
+					{isChecked && <Text>checked</Text>}
+					{!isChecked && <Text>not checked</Text>}
 				</HStack>
 				<Modal onClose={onClose} isOpen={isOpen} isCentered>
 					<ModalOverlay />

@@ -227,7 +227,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       bg={useColorModeValue("white", "gray.900")}
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue("gray.200", "gray.700")}
-      justifyContent={{ base: "space-between", md: "flex-end" }}
+      justifyContent={{ base: "space-between" , md : "flex-end"}}
       {...rest}
     >
       <IconButton
@@ -246,17 +246,10 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       >
         Pong
       </Text>
-
-      <HStack spacing={{ base: "0", md: "6" }}>
+      <HStack spacing={5}>
         <MediaQuery maxWidth={1224}>
           <Menu>
-            <MenuButton>
-              <IconButton
-                size={"lg"}
-                variant="ghost"
-                aria-label="open menu"
-                icon={<PiUsersThreeLight />}
-              />
+            <MenuButton as={IconButton}  variant="ghost"aria-label="open-friendlist" size={'lg'} icon={<PiUsersThreeLight size={'1.5em'}/>}>
             </MenuButton>
             <MenuList zIndex={"1"} p={3}>
               <FriendList />
@@ -281,7 +274,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm" fontWeight={"bold"}>
+                  <Text fontSize="sm" fontWeight={"light"}>
                     {user.nickname}
                   </Text>
                 </VStack>

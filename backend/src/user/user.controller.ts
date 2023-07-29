@@ -138,12 +138,9 @@ export class UserController {
 			storage: diskStorage({
 				destination: './uploadedFiles',
 				filename(req, file, callback) {
-					console.log(file)
 					const name = file.originalname.split('.')[0];
 					const fileExtension = file.originalname.split('.')[file.originalname.split.length];
-					const newFileName =
-						name.split(' ').join('_') + '_' + Date.now() + '.' + fileExtension;
-
+					const newFileName = name.substring(0,10).split(' ').join('_') + '_' + Date.now() + '.' + fileExtension;
 					callback(null, newFileName);
 				},
 			}),
@@ -169,10 +166,10 @@ export class UserController {
 				};
 				const user: any = request.user;
 				if (user.imgPdp) {
-					const oldFilePath = user.imgPdp;
-					let split = oldFilePath.split('/');
 					try {
+						const oldFilePath = user.imgPdp;
 						if (oldFilePath) {
+							let split = oldFilePath.split('/');
 							fs.unlinkSync(`./uploadedFiles/${split[5]}`);
 						}
 					} catch (error) {
