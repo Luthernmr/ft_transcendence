@@ -368,7 +368,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
               message.user?.id === currentUser.id ? "flex-end" : "flex-start"
             }
             borderRadius="lg"
-            maxWidth="80%"
+            maxWidth={["100%", "90%", "80%", "70%", "60%"]}
             mt={2}
             style={{
               filter: blockedUsers?.some((user) => user.id === message.user.id)
