@@ -4,11 +4,7 @@ import {
 	IsString,
 	Length,
 	Matches,
-	MaxLength,
-	Min,
-	MinLength,
-	IsAlpha,
-	IsNumberString
+	MaxLength, MinLength, IsNumberString
 } from 'class-validator';
 
 export class LoginDto {

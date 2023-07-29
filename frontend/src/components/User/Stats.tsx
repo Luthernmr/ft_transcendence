@@ -3,11 +3,9 @@ import { useState, useEffect } from "react";
 import {
 	Box,
 	CircularProgress,
-	CircularProgressLabel,
-	Flex,
-	Text,
+	CircularProgressLabel, Text,
 	VStack,
-	Wrap,
+	Wrap
 } from "@chakra-ui/react";
 import {
 	Chart as ChartJS,

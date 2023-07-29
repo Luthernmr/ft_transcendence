@@ -1,7 +1,6 @@
 import { Tabs, TabList, TabPanels, Tab, TabPanel, Flex } from "@chakra-ui/react";
 import AllUserItem, { User } from "./AllUserItem";
 import AllfriendItem from "./AllFriendsItem";
-import { MobileProps } from "../Dashboard/SidebarWithHeader";
 
 
 export default function FriendList() {

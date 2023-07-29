@@ -1,21 +1,20 @@
 import {
-  Card,
-  CardBody,
-  Heading,
-  Stack,
-  Text,
-  Avatar,
-  Flex,
-  HStack,
-  Center,
-  Spinner,
+	Card,
+	CardBody,
+	Heading,
+	Stack,
+	Text,
+	Avatar,
+	Flex,
+	HStack,
+	Center,
+	Spinner,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Link as RouteLink } from "react-router-dom";
 
 import { User } from "../Social/AllUserItem";
 import axios from "axios";
-import { ReactJSXElement } from "@emotion/react/types/jsx-namespace";
 
 export interface MatchHistory {
   id: number;

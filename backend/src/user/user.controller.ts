@@ -2,19 +2,13 @@ import { Request, Response } from 'express';
 import {
 	BadRequestException,
 	Body,
-	Controller,
-	FileTypeValidator,
-	Get,
-	MaxFileSizeValidator,
-	Param,
-	ParseFilePipe,
-	Post,
+	Controller, Get, Param, Post,
 	Req,
 	Res,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
-	ValidationError,
+	ValidationError
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import JwtTwoFactorGuard from 'src/auth/twofa.guard';
@@ -24,7 +18,7 @@ import { HistoryService } from 'src/pong/history.service';
 import * as fs from 'fs';
 import * as path from 'path';
 import { plainToClass } from 'class-transformer';
-import { NicknameDto, TwoFaCodeDto } from './user.dto';
+import { NicknameDto } from './user.dto';
 import { validateOrReject } from 'class-validator';
 
 
