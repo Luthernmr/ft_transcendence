@@ -51,7 +51,7 @@ const PendingRequest = () => {
 
     userSocket.on("duelRejected", () => {
       toast({
-        title: `Opponent disconnected`,
+        title: `Opponent unavailable`,
         status: "error",
         isClosable: true,
         position: "top",

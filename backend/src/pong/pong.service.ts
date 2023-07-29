@@ -464,7 +464,7 @@ export class PongService {
 		const user1Index = this.GetInfoIndexByUserID(user1ID); // this.userInfos.findIndex(infos => (infos.userId === user1ID));
 		const user2Index = this.GetInfoIndexByUserID(user2ID); // this.userInfos.findIndex(infos => (infos.userId === user2ID));
 
-		if (user1Index < 0 || user2Index < 0) {
+		if (user1Index < 0 || this.userInfos[user1Index].socket === null || user2Index < 0 || this.userInfos[user2Index].socket === null) {
 			//console.log("User of id " + user1Index < 0 ? user1ID : user2ID + " not registered to pong");
 			return false;
 		}
