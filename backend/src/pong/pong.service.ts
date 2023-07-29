@@ -419,7 +419,7 @@ export class PongService {
 		const queueInfos = this.UserInQueue(this.userInfos[currentPlayerInfoIndex].userId);
 		if (queueInfos.index >= 0) {
 			if (queueInfos.custom === custom) {
-				console.log("user already in queue");
+				//console.log("user already in queue");
 				return;
 			} else {
 				this.LeaveQueueByInfoIndex(currentPlayerInfoIndex);
@@ -466,7 +466,7 @@ export class PongService {
 
 		if (user1Index < 0 || user2Index < 0) {
 			//console.log("User of id " + user1Index < 0 ? user1ID : user2ID + " not registered to pong");
-			return;
+			return false;
 		}
 
 		if (this.UserLocked(user1Index) || this.UserLocked(user2Index))

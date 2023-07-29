@@ -36,8 +36,18 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     image: backend
+    environment:
+      AUTHORIZATION_URL: ${AUTHORIZATION_URL}
+      TOKEN_URL: ${TOKEN_URL}
+      CLIENT_ID: ${CLIENT_ID}
+      CLIENT_SECRET: ${CLIENT_SECRET}
+      CALLBACK_URL: ${CALLBACK_URL}
+      FRONTEND: ${FRONTEND}
+      BACKEND: ${BACKEND}
+      BACKEND_PORT: ${BACKEND_PORT}
+      SECRET: ${SECRET}
     ports:
-      - "${BACKEND_PORT}:${BACKEND_PORT}"
+      - "${BACKEND_PORT_INT}:${BACKEND_PORT_INT}"
     volumes:
       - backend-data:/app
     networks:
@@ -49,6 +59,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     image: frontend
+    environment:
+      VITE_BACKEND: ${BACKEND}
+      VITE_FRONTEND: ${FRONTEND}
+      VITE_42AUTH: ${VITE_42AUTH}
     ports:
       - "3000:3000"
     volumes:

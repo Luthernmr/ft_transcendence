@@ -208,7 +208,12 @@ async acceptPongRequest(
 		);
 		const request: PendingRequest =
 			await this.userService.getPendingRequestById(data.requestId);
-		this.pongService.AcceptInvitation(currentUser?.id, request?.senderId, request?.custom);
+		if (this.pongService.AcceptInvitation(currentUser?.id, request?.senderId, request?.custom) === false)
+		{
+			client.emit('duelRejected');
+			return;
+		}
+
 		const otherSocket = await this.authService.getUserSocket(
 			this.gateway.userNamespace,
 			request.senderId,

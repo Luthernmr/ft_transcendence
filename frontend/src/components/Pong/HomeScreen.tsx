@@ -46,7 +46,8 @@ function HomeScreen(props: HomeScreenProps) {
 					description: "There is no game currently running.",
 					status: "error",
 					duration: 3000,
-					isClosable: true
+					isClosable: true,
+					position: "top",
 				})
 			}
 		});

@@ -49,6 +49,14 @@ const PendingRequest = () => {
       userSocket.emit("getPendingRequest");
     });
 
+    userSocket.on("duelRejected", () => {
+      toast({
+        title: `Opponent disconnected`,
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
+    });
     userSocket.on("duelAcccepted", () => {
       userSocket.emit("getPendingRequest");
       navigate("/play");

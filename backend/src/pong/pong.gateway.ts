@@ -42,7 +42,7 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
 		if (user) {
       this.pongService.RegisterUserInfos(user.id, socket);
     } else {
-      console.log("User not found, token = " + token);
+      //console.log("User not found, token = " + token);
     }
   }
 
