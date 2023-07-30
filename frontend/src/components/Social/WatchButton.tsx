@@ -6,18 +6,18 @@ import { useNavigate } from "react-router-dom";
 export default function WatchGame(props: any) {
 	function sendPongRequest(e: any, id: number,) {
 		e.preventDefault();
-			userSocket.emit("watchGame", { userReceiveId: id});
+		userSocket.emit("watchGame", { userPlayingId: id });
 	}
 
 	const navigate = useNavigate()
-	function navigator(){
+	function navigator() {
 		navigate('/play')
 
 	}
-	useEffect(()=> {
-		userSocket.on('watching' ,navigator)
+	useEffect(() => {
+		userSocket.on('watching', navigator)
 
-		return () =>{
+		return () => {
 			userSocket.off("watching", navigator)
 		}
 
@@ -26,15 +26,12 @@ export default function WatchGame(props: any) {
 
 	return (
 		<>
-				
-						<Button
-							colorScheme="blue"
-							onClick={(e) => sendPongRequest(e, props?.user?.id)}
-						>
-							watch game
-						</Button>
-					
-						
+			<Button
+				colorScheme="blue"
+				onClick={(e) => sendPongRequest(e, props?.user?.id)}
+			>
+				watch game
+			</Button>
 		</>
 	)
 

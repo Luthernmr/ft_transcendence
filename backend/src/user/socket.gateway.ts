@@ -156,19 +156,20 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('watchGame')
-	async watxhGame(
+	async watchGame(
 		client: Socket,
 		data: {
-			userPlaying: number,
+			userPlayingId : number,
 		},
 	) {
 		try {
-			const userSender: User = await this.authService.getUserByToken(
+			const userWatcher: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
 			);
-			if (data.userPlaying == userSender.id)
+			if (data.userPlayingId == userWatcher.id)
 				throw new BadRequestException('Cannot play with yourself');
-			this.pongService.AddWatcherByUser(userSender.id, data.userPlaying)
+			console.log(userWatcher.id, data.userPlayingId)
+			this.pongService.AddWatcherByUser(userWatcher.id, data.userPlayingId)
 			client.emit('watching');
 		} catch (error) {
 			client.emit('error', { message: error.message });
