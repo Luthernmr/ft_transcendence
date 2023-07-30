@@ -21,15 +21,21 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
     pongService.RegisterGateway(this);
   }
 
-  handleConnection(@ConnectedSocket() socket: Socket) {
-    //console.log("New socket connected to pong backend: " + socket.id);
-    
-    if (socket.handshake.auth.token === null || socket.handshake.auth.token === undefined) {
-      return;
-    }
+  async handleConnection(client: Socket) {
+	try {
+		let user: User = await this.authService.getUserByToken(
+			client.handshake.auth.token,
+			);
+			if (user) {
+			client.emit('success', { message: "Connected" });
+			this.RegisterUserToPong(client, client.handshake.auth.token);
 
-    this.RegisterUserToPong(socket, socket.handshake.auth.token);
-  }
+		} else client.disconnect();
+
+	} catch(error) {
+		client.emit('error', { message: error.message });
+	}
+}
 
   @SubscribeMessage('register')
   handleRegistration(@ConnectedSocket() socket: Socket, @MessageBody() datas: { token: string }) {

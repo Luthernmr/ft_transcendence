@@ -23,12 +23,14 @@ import AddFriendButton from "./AddFriendButton";
 import PongInviteButton from "./PongInviteButton";
 import UserCard from "./UserCard";
 import DirectMessageButton from "./DirectMessageButton";
+import WatchGame from "./WatchButton";
 
 export interface User {
 	id: number;
 	nickname: string;
 	imgPdp: string;
 	isOnline: boolean;
+	isPlaying: boolean;
 	isTwoFa: boolean;
 	level: number;
 	experience: number;
@@ -94,7 +96,14 @@ export default function AllUserItem(props: any) {
 									<Flex justifyContent={"space-between"} zIndex={'99999999999'}>
 										<AddFriendButton user={user} />
 										<BlockUserButton user={user} />
-										<PongInviteButton user={user} />
+										{
+											user.isOnline &&  !user.isPlaying &&
+											<PongInviteButton user={user} />
+										}
+										{
+											user.isPlaying &&
+											<WatchGame user={user} />
+										}
 										<DirectMessageButton user={user} currentUser={currentUser} />
 									</Flex>
 								</PopoverBody>

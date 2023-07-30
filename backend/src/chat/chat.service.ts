@@ -35,19 +35,21 @@ export class ChatService {
   }
 
   async handleConnection(client: Socket) {
-    try {
-      this.logger.log('id: ' + client.id + ' connected');
-      let user: User = await this.authService.getUserByToken(
-        client.handshake.auth.token,
-      );
-      if (user) {
-        user = await this.userService.setSocket(user.id, client.id);
-        await this.userService.setOnline(user);
-      }
-    } catch (error) {
-      client.emit('error', { message: error.message });
-    }
-  }
+	try {
+		let user: User = await this.authService.getUserByToken(
+			client.handshake.auth.token,
+			);
+			if (user) {
+			this.logger.log(user.nickname + ' Connected');
+			this.gateway.userNamespace.emit('reloadLists');
+			client.emit('success', { message: "Connected" });
+
+		} else client.disconnect();
+
+	} catch(error) {
+		client.emit('error', { message: error.message });
+	}
+}
 
   @SubscribeMessage('createDirectMessageRoom')
   async handleCreateDirectMessageRoom(
