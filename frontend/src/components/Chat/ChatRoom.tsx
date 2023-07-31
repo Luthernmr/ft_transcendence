@@ -51,6 +51,7 @@ export interface Message {
   text: string;
   created_at: Date;
   user: User;
+  room: Room;
 }
 
 interface Props {
@@ -115,8 +116,11 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       isClosable: true,
       position: "top",
     });
-  const handleReceiveMessage = (receivedMessage: Message) =>
-    setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+  const handleReceiveMessage = (receivedMessage: Message) => {
+    if (selectedRoom.id === receivedMessage.room.id) {
+      setMessages((prevMessages) => [...prevMessages, receivedMessage]);
+    }
+  };
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -372,7 +376,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
             maxWidth={["100%", "90%", "80%", "70%", "60%"]}
             mt={2}
             style={{
-              wordBreak: 'break-word',
+              wordBreak: "break-word",
               filter: blockedUsers?.some((user) => user.id === message.user.id)
                 ? "blur(10px)"
                 : "none",
@@ -386,14 +390,19 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
             <Flex flexDirection="column">
               <Popover isLazy>
                 <PopoverTrigger>
-                  <Flex alignItems="center" _hover={{ cursor : 'pointer' }}>
+                  <Flex alignItems="center" _hover={{ cursor: "pointer" }}>
                     <Avatar
                       size="sm"
                       name={message.user.nickname}
                       src={message.user.imgPdp}
-                      _hover={{ boxShadow: "0 0 0 3px teal",  cursor : 'pointer' }}
+                      _hover={{
+                        boxShadow: "0 0 0 3px teal",
+                        cursor: "pointer",
+                      }}
                     />
-                    <Text _hover={{ cursor : 'pointer' }} ml={2}>{message.user?.nickname}</Text>
+                    <Text _hover={{ cursor: "pointer" }} ml={2}>
+                      {message.user?.nickname}
+                    </Text>
                   </Flex>
                 </PopoverTrigger>
                 <Portal>
@@ -418,7 +427,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                         as={RouteLink}
                         to={"/profile/" + message.user?.id}
                         alignItems={"center"}
-                        _hover={{ bg: "gray.200"}}
+                        _hover={{ bg: "gray.200" }}
                         p={2}
                         borderRadius={5}
                       >
