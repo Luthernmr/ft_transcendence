@@ -30,6 +30,8 @@ clean_folders:
 	rm -rf backend/dist backend/node_modules
 	@echo "Removing frontend/node_modules..."
 	rm -rf frontend/node_modules
+	@echo "Removing frontend/dist..."
+	rm -rf frontend/dist
 
 fclean: clean clean_folders
 

@@ -15,6 +15,9 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY . .
 
 EXPOSE 5000
+
 ENTRYPOINT ["/bcrypt.sh"]
+
+RUN npm run build
 
 CMD ["npm", "start"]
