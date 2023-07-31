@@ -109,7 +109,7 @@ export class AuthController {
 	}
 
 	@Get('logout')
-	@UseGuards(JwtTwoFactorGuard)
+	@UseGuards(LocalAuthGuard)
 	async logout(
 		@Res({ passthrough: true }) response: Response,
 		@Req() request: Request,

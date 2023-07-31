@@ -32,7 +32,7 @@ import { PiUsersThreeLight } from "react-icons/pi";
 import { BsJoystick } from "react-icons/bs";
 import { RiGamepadLine } from "react-icons/ri";
 import { IconType } from "react-icons";
-import { Link as RouteLink } from "react-router-dom";
+import { Link as RouteLink, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Notification from "../Social/Notification";
 import FriendList from "../Social/FriendList";
@@ -204,21 +204,20 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
     };
     getUser();
   }, []);
+  const navigate = useNavigate();
   const signOut = async () => {
+
     try {
       await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
         withCredentials: true,
       });
-      sessionStorage.removeItem("jwt");
-      sessionStorage.removeItem("currentUser");
+	  sessionStorage.clear()
+	  navigate('/');
       chatSocket.disconnect();
       userSocket.disconnect();
       pongSocket.disconnect();
     } catch (error) {console.log(error)}
   };
-  userSocket.on("disconnect", () => {
-    if (sessionStorage.getItem("currentUser")) signOut();
-  });
 
   return (
     <Flex

@@ -85,6 +85,7 @@ export default function UserStats(props: any) {
 				tension: 0.1,
 			},
 		],
+		
 	};
 
 	const options: Partial<ChartOptions<"line">> = {
@@ -108,12 +109,6 @@ export default function UserStats(props: any) {
 			<Box width={'95%'} m={3} >
 				<Wrap borderWidth="1px" borderRadius="lg" flexDirection={'column'} alignItems={'center'}>
 					<LineChart />
-					<VStack>
-						<Text>winrate</Text>
-						<CircularProgress value={40} color="purple.400">
-							<CircularProgressLabel>{stats.winrate} %</CircularProgressLabel>
-						</CircularProgress>
-					</VStack>
 				</Wrap>
 			</Box>
 		</VStack>

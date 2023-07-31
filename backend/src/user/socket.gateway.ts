@@ -43,7 +43,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					this.gateway.userNamespace.emit('reloadLists');
 				}
 			};
-		}, 20000);
+		}, 7000);
 	}
 
 	onModuleInit() {
