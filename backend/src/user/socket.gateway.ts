@@ -15,7 +15,7 @@ import { PongService } from 'src/pong/pong.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { GlobalGateway } from 'src/websockets/global.gateway';
 
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'user' })
+@WebSocketGateway({ cors: { origin: '*' }, namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	private logger: Logger;
 	constructor(

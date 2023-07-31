@@ -9,7 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { GlobalGateway } from 'src/websockets/global.gateway';
 
 @Injectable()
-@WebSocketGateway({ cors: { origin: process.env.FRONTEND }, namespace: 'pong' })
+@WebSocketGateway({ cors: { origin: "*" }, namespace: 'pong' })
 export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewayDisconnect {
   // @WebSocketServer()
   // gateway.pongNamespace: Server

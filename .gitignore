@@ -8,3 +8,4 @@ frontend/.env
 .env
 backend/src/auth/auth.controller.ts
 backend/uploadedFiles/avatars
+frontend/dist
