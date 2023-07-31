@@ -268,6 +268,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       padding={"15px"}
       height="100%"
       flex={"1"}
+      maxWidth={["100%", "90%", "80%", "70%", "60%"]}
       direction="column"
     >
       <Flex justifyContent={"space-between"} alignItems={"center"} mb={4}>
