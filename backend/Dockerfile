@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 5000
 ENTRYPOINT ["/bcrypt.sh"]
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "start"]
