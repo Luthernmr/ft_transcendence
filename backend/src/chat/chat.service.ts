@@ -99,6 +99,7 @@ export class ChatService {
 				data.isDm = true;
 				room = await this.roomService.createRoom(client, data);
 			} else {
+				data.isDm = false;
 				room = await this.roomService.createRoom(client, data);
 			}
 			data.users.forEach(async (element) => {

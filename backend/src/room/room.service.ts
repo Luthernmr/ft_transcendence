@@ -56,20 +56,10 @@ export class RoomService {
         name: dto.name,
         ownerId: user.id,
         isPrivate: dto.isPrivate,
-        isDm : false,
+        isDm : dto.isDm,
         password: hashedPassword,
         users: dto.users,
       };
-      if (dto.isDm) {
-         payload = {
-          name: dto.name,
-          ownerId: user.id,
-          isPrivate: dto.isPrivate,
-          isDm: true,
-          password: hashedPassword,
-          users: dto.users,
-        };
-      }
       const savedRoom = await this.roomRepo.save(payload);
       return savedRoom;
     } catch (error) {
