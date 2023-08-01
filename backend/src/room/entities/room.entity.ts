@@ -24,6 +24,9 @@ export class Room {
   @Column({ default: false })
   isPrivate: boolean;
 
+  @Column({ default: false })
+  isDm: boolean;
+
   @Column({ length: 80, nullable: true })
   password: string;
 

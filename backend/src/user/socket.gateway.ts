@@ -393,6 +393,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit('userHasBlocked');
 			this.deleteFriend(client, data.userBlockedId);
 			client.emit('success', { message: "User blocked and deleted" });
+			this.gateway.userNamespace.emit('userBlocked');
 		} catch (error) {
 			client.emit('error', { message: error.message });
 		}

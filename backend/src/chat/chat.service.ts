@@ -96,6 +96,7 @@ export class ChatService {
 
 				data.name = `💬 ${sortedIDs[0]}${sortedIDs[1]}`;
 				data.isPrivate = true;
+				data.isDm = true;
 				room = await this.roomService.createRoom(client, data);
 			} else {
 				room = await this.roomService.createRoom(client, data);
