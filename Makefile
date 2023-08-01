@@ -27,11 +27,9 @@ clean: stop
 
 clean_folders:
 	@echo "Removing backend/dist and backend/node_modules..."
-	rm -rf backend/dist backend/node_modules
+	rm -rf backend/dist backend/node_modules backend/package-lock.json
 	@echo "Removing frontend/node_modules..."
-	rm -rf frontend/node_modules
-	@echo "Removing frontend/dist..."
-	rm -rf frontend/dist
+	rm -rf frontend/dist frontend/node_modules frontend/package-lock.json
 
 fclean: clean clean_folders
 
