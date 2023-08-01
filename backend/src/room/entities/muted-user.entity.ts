@@ -10,7 +10,9 @@ export class Mute {
   @ManyToOne(() => User, (user) => user.mutes)
   user: User;
 
-  @ManyToOne(() => Room, (room) => room.mutes)
+  @ManyToOne(() => Room, (room) => room.mutes,{
+    cascade: true,
+  })
   room: Room;
 
   @Column('timestamp')
