@@ -14,6 +14,7 @@ import { BadRequestException, Logger } from '@nestjs/common';
 import { PongService } from 'src/pong/pong.service';
 import { PendingRequest } from 'src/social/pendingRequest.entity';
 import { GlobalGateway } from 'src/websockets/global.gateway';
+import { RoomService } from 'src/room/room.service';
 
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'user' })
 export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -21,6 +22,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
+		private readonly roomService: RoomService,
 		private readonly friendService: FriendService,
 		private readonly pongService: PongService,
 		private readonly gateway: GlobalGateway,
@@ -403,6 +405,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 			client.emit('userHasBlocked');
 			this.deleteFriend(client, data.userBlockedId);
+			const room = await this.roomService.getDirectRoom(userSender.id, userBlocked.id)
+			await this.roomService.deleteRoom(room.id);
 			client.emit('success', { message: "User blocked and deleted" });
 			this.gateway.userNamespace.emit('userBlocked');
 		} catch (error) {
