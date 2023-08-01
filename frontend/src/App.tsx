@@ -90,7 +90,9 @@ export default function App() {
 		userSocket.on("error", handleError);
 		userSocket.on("success", handleSuccess);
 
-		chatSocket.on("rllyconnected", () => {
+		chatSocket.on("connect", () => {
+			console.log('test')
+			if (sessionStorage.getItem('jwt'))
 				getUser();
 		});
 

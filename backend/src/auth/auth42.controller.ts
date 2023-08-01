@@ -18,9 +18,13 @@ export class Auth42Controller {
 		@Req() request: any,
 	) {
 		try {
-			if (request.cookies['jwt']) {
-				if (((await this.authService.getUserCookie(request.cookies['jwt'])).isOnline))
-					throw new BadRequestException('Already connected in other window');
+
+			if(!(await this.authService.getUserCookie(request)).isOnline)
+			{
+				await this.authService.logout(request, response);
+			}
+			else if (request.cookies['jwt']) {
+				throw new BadRequestException('Already connected in other window');
 			}
 			let token = await this.auth42Service.login(request.user);
 			const user = await this.authService.getUserByToken(token);

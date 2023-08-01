@@ -49,6 +49,9 @@ const LinkItems: Array<LinkItemProps> = [
   { name: "Chat", icon: FiMessageSquare, routeName: "/Chat" },
   { name: "Profile", icon: FiSettings, routeName: "/Profile" },
 ];
+const currentUser: User = JSON.parse(
+	sessionStorage.getItem("currentUser") || "{}"
+	);
 
 export default function SidebarWithHeader({
   children,
@@ -185,25 +188,20 @@ export interface User {
   isTwoFa: boolean;
 }
 
-const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-  const [user, setUser] = useState<User>({
-    nickname: "",
-    imgPdp: "",
-    isTwoFa: false,
-  });
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-          withCredentials: true,
-        });
-        setUser(res.data.user);
-        sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-      } catch (error) { console.log(error) }
-    };
-    getUser();
-  }, []);
+
+  
+
+const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+		const [user, setUser] = useState<User>(currentUser);
+	useEffect(() =>{
+		const currentUser: User = JSON.parse(
+			sessionStorage.getItem("currentUser") || "{}"
+			);
+		setUser(currentUser)
+	})
+
+  
   const navigate = useNavigate();
   const signOut = async () => {
 
