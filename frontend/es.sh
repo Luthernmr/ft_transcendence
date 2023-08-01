@@ -1,11 +1,9 @@
-#!/bin/sh
+# npm install vite
 
-npm install vite
-
-npm i express
+# npm i express
 
 npm rebuild esbuild
 
-#npm run build
+npm run build
 
 exec "$@"

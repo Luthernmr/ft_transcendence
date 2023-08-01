@@ -168,7 +168,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			);
 			if (data.userPlayingId == userWatcher.id)
 				throw new BadRequestException('Cannot play with yourself');
-			console.log(userWatcher.id, data.userPlayingId)
 			this.pongService.AddWatcherByUser(userWatcher.id, data.userPlayingId)
 			client.emit('watching');
 		} catch (error) {

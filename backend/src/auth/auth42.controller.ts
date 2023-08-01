@@ -31,7 +31,6 @@ export class Auth42Controller {
 			}
 			return;
 		} catch (error) {
-			console.log('hh', error)
 			return error
 		}
 	}
