@@ -8,6 +8,9 @@ export class CreateRoomDto {
   @IsBoolean()
   readonly isPrivate: boolean;
 
+  @IsBoolean()
+  readonly isDm: boolean;
+
   @IsOptional()
   @IsString()
   readonly password?: string;
