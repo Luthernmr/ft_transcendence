@@ -96,17 +96,21 @@ export class RoomService {
     return [...publicRooms, ...privateUserRooms];
   }
 
-  async getDirectRoom(userId1: number ,userId2: number): Promise<Room> {
-
-	const room = await this.roomRepo
-    .createQueryBuilder('room')
-    .where('room.isDm = :isDm', { isDm: true })
-    .innerJoin('room.users', 'user1', 'user1.id = :userId1', { userId1 })
-    .innerJoin('room.users', 'user2', 'user2.id = :userId2', { userId2 })
-    .getOne();
-
-  return room;
-  
+  async getDirectRoom(userId1: number, userId2: number): Promise<Room> | null {
+    const dmRooms = await this.roomRepo.find({
+      where: { isDm: true },
+      relations: ['users'],
+    });
+	console.log('dm', dmRooms)
+    for (let room of dmRooms) {
+      if (
+        room.users.some((user) => user.id === userId1) &&
+        room.users.some((user) => user.id === userId2)
+      ) {
+        return room;
+      }
+    }
+    return null;
   }
 
   async deleteRoom(roomId: number) {
