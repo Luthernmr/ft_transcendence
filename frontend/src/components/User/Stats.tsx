@@ -78,7 +78,7 @@ export default function UserStats(props: any) {
 				tension: 0.1,
 			},
 			{
-				label: "Oponent",
+				label: "Opponent",
 				data: stats.oponentTab.reverse(),
 				fill: false,
 				borderColor: "red",
