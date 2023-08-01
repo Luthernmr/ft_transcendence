@@ -1,6 +1,8 @@
-# npm install vite
+#!/bin/sh
 
-# npm i express
+npm install vite
+
+npm i express
 
 npm rebuild esbuild
 
