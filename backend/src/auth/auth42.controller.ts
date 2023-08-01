@@ -19,19 +19,20 @@ export class Auth42Controller {
 	) {
 		try {
 			if (request.cookies['jwt']) {
-				throw new BadRequestException('Already connected in other window');
+				if (((await this.authService.getUserCookie(request.cookies['jwt'])).isOnline))
+					throw new BadRequestException('Already connected in other window');
 			}
 			let token = await this.auth42Service.login(request.user);
 			const user = await this.authService.getUserByToken(token);
 			if (user) {
 				await this.authService.loginTwoFa(user, response, true);
-				response.cookie('jwt', token, { httpOnly: true });
+				
+				response.cookie('jwt', token, { httpOnly: true , sameSite: 'strict',});
 				if (!user.isTwoFA)
 					return { jwt: token};
 			}
 			return;
 		} catch (error) {
-			console.log('hh', error)
 			return error
 		}
 	}

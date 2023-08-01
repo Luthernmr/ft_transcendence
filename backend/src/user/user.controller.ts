@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import {
 	BadRequestException,
 	Body,
-	Controller, Get, Param, Post,
+	Controller, Get, Param, ParseFilePipeBuilder, Post,
 	Req,
 	Res,
 	UploadedFile,
@@ -134,7 +134,7 @@ export class UserController {
 				filename(req, file, callback) {
 					const name = file.originalname.split('.')[0];
 					const fileExtension = file.originalname.split('.')[file.originalname.split.length];
-					const newFileName = name.substring(0,10).split(' ').join('_') + '_' + Date.now() + '.' + fileExtension;
+					const newFileName = name.substring(0, 10).split(' ').join('_') + '_' + Date.now() + '.' + fileExtension;
 					callback(null, newFileName);
 				},
 			}),
@@ -149,7 +149,16 @@ export class UserController {
 	)
 	async addAvatar(
 		@Req() request: Request,
-		@UploadedFile() file: Express.Multer.File,
+		@UploadedFile( new ParseFilePipeBuilder()
+		.addFileTypeValidator({
+		  fileType: /(jpg|jpeg|png|gif)$/,
+		})
+		.addMaxSizeValidator({
+		  maxSize: 50000
+		})
+		.build({
+		}),
+		) file: Express.Multer.File,
 	) {
 		try {
 			if (!file) {
@@ -164,7 +173,7 @@ export class UserController {
 						const oldFilePath = user.imgPdp;
 						if (oldFilePath) {
 							let split = oldFilePath.split('/');
-							fs.unlinkSync(`./uploadedFiles/${split[5]}`);
+							fs.unlinkSync(`./uploadedFiles/${split.length}`);
 						}
 					} catch (error) {
 						console.error(

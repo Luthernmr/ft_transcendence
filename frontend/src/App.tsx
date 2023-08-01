@@ -73,13 +73,11 @@ export default function App() {
 		userSocket.on("success", handleSuccess);
 
 		chatSocket.on("connect", () => {
-			console.log(sessionStorage.getItem('currentUser'))
 			if (currentUser.isOnline)
 				getUser();
 		});
 
 		chatSocket.on("disconnect", () => {
-			console.log(sessionStorage.getItem('currentUser'))
 			if (sessionStorage.getItem('currentUser'))
 				sessionStorage.removeItem('currentUser')
 		});

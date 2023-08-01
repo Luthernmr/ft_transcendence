@@ -75,7 +75,14 @@ export default function Settings(props: any) {
 					withCredentials: true,
 				}
 			);
-		} catch (error) { }
+		} catch (error) {
+			toast({
+				title: "bad file",
+				status: "error",
+				isClosable: true,
+				position: "top",
+			});
+		}
 		try {
 			const response = await axios.post(
 				import.meta.env.VITE_BACKEND + "/user/settings",

@@ -22,7 +22,7 @@ export class AuthService {
 		  isTwoFa: user.isTwoFA,
 		};
 		const jwt = await this.jwtService.signAsync(payload);
-		response.cookie('jwt', jwt, { httpOnly: true });
+	  response.cookie('jwt', jwt, { httpOnly: true  , sameSite: 'strict', });
 		return { token: jwt };
 		
 	} catch (error) {
@@ -39,7 +39,7 @@ export class AuthService {
 		await this.userService.setOnline(user);
 		const payload = { id: user.id, isSecondFactorAuthenticated };
 		const twofaToken = await this.jwtService.signAsync(payload);
-		response.cookie('twofa', twofaToken, { httpOnly: true });
+		response.cookie('twofa', twofaToken, { httpOnly: true, sameSite: 'strict', });
 		
 	} catch (error) {
 		return error;
@@ -55,7 +55,7 @@ export class AuthService {
 		  isOnline: user.isOnline,
 		};
 		const jwt = await this.jwtService.signAsync(payload);
-		response.cookie('jwt', jwt, { httpOnly: true });
+		response.cookie('jwt', jwt, { httpOnly: true, sameSite: 'strict', });
 		
 	} catch (error) {
 		return error;

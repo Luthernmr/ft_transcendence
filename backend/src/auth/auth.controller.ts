@@ -70,7 +70,6 @@ export class AuthController {
 				await this.authService.logout(request, response);
 			}
 			else if (request.cookies['jwt']) {
-				console.log(request.cookies)
 				throw new BadRequestException('Already connected in other window');
 			}
 
