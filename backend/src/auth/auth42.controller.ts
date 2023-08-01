@@ -18,11 +18,7 @@ export class Auth42Controller {
 		@Req() request: any,
 	) {
 		try {
-			if(!(await this.authService.getUserCookie(request)).isOnline)
-			{
-				await this.authService.logout(request, response);
-			}
-			else if (request.cookies['jwt']) {
+			if (request.cookies['jwt']) {
 				throw new BadRequestException('Already connected in other window');
 			}
 			let token = await this.auth42Service.login(request.user);
@@ -31,10 +27,11 @@ export class Auth42Controller {
 				await this.authService.loginTwoFa(user, response, true);
 				response.cookie('jwt', token, { httpOnly: true });
 				if (!user.isTwoFA)
-					return { jwt: token };
+					return { jwt: token};
 			}
 			return;
 		} catch (error) {
+			console.log('hh', error)
 			return error
 		}
 	}

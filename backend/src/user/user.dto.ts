@@ -13,7 +13,7 @@ export class LoginDto {
 
 	@IsString()
 	@IsNotEmpty()
-	@Length(1, 20)
+	@Length(7, 50)
 	password: string;
 }
 
@@ -46,7 +46,7 @@ export class RegisterDto {
 
 	@IsString()
 	@IsNotEmpty()
-	@MinLength(2)
+	@MinLength(7)
 	@MaxLength(50)
 	@Matches(
 		/(?:(?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
