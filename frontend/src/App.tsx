@@ -58,7 +58,6 @@ export default function App() {
 		const signOut = async () => {
 		
 			try {
-			  console.log('test')
 			  sessionStorage.clear()
 			  navigate('/');
 			  chatSocket.disconnect();
