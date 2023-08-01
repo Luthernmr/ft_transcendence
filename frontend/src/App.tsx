@@ -21,6 +21,7 @@ import { User } from "./components/Social/AllUserItem"
 const currentUser: User = JSON.parse(
     sessionStorage.getItem("currentUser") || "{}"
   );
+
   
 function PrivateRoute({ children }: { children: ReactNode }) {
 	if (!sessionStorage.getItem("jwt")) {
@@ -50,9 +51,27 @@ const getUser = async () => {
 export default function App() {
 	const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
 	const toast = useToast();
-
-
+	
+	const navigate = useNavigate();
+	
 	useEffect(() => {
+		const signOut = async () => {
+		
+			try {
+			  console.log('test')
+			  sessionStorage.clear()
+			  navigate('/');
+			  chatSocket.disconnect();
+			  userSocket.disconnect();
+			  pongSocket.disconnect();
+			  toast({
+				title: 'Already connected in other window',
+				status: "error",
+				isClosable: true,
+				position: "top",
+			});
+			} catch (error) {console.log(error)}
+		  };
 		const handleError = (error: { message: string }) => {
 			toast({
 				title: error.message,
@@ -77,6 +96,8 @@ export default function App() {
 				getUser();
 		});
 
+		userSocket.on("logout", signOut);
+
 		chatSocket.on("disconnect", () => {
 			if (sessionStorage.getItem('currentUser'))
 				sessionStorage.removeItem('currentUser')
@@ -90,6 +111,7 @@ export default function App() {
 			userSocket.off("error", handleError)
 			userSocket.off("success", handleSuccess)
 			userSocket.off("connect", getUser)
+			userSocket.off("logout", signOut)
 		}
 
 	})

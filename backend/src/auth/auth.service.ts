@@ -105,6 +105,30 @@ export class AuthService {
 	}
   }
 
+  async AlreadyConnect(server: any, userId: number){
+	try {
+		let sockets = Array.from(await server.sockets);
+		let count = 0;
+		for (const socket of sockets) {
+		  let token = (socket as any)[1].handshake.auth.token;
+		  if (!token)
+			  return null;
+		  const user: User = await this.getUserByToken(token);
+		  if (userId == user.id)
+		  {
+			console.log('test')
+		  	count++
+		  }
+		}
+		if (count>1)
+			return true;
+		return false
+		
+	} catch (error) {
+		return error;
+	}
+  }
+
   async logout(request: Request, response: Response) {
 	  try {
 		const user = await this.getUserCookie(request);

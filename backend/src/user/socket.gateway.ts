@@ -52,10 +52,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 	async handleConnection(client: Socket) {
 		try {
+		
 			let user: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
 			);
 			if (user) {
+				const alreadyConnected : boolean= await this.authService.AlreadyConnect(
+					this.gateway.userNamespace,
+					user.id,
+				)
+				console.log('connected ?', alreadyConnected)
+				if (alreadyConnected)
+				{
+					client.emit('logout');
+					client.disconnect();
+					throw new BadRequestException('Already connected')
+				}
 				await this.userService.setOnline(user);
 				this.logger.log(user.nickname + ' Connected');
 				this.gateway.userNamespace.emit('reloadLists');
@@ -72,7 +84,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async pong(client: Socket) {
 
 		try {
-
 			let user: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
 			);
