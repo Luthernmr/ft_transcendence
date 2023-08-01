@@ -63,7 +63,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					this.gateway.userNamespace,
 					user.id,
 				)
-				console.log('connected ?', alreadyConnected)
 				if (alreadyConnected)
 				{
 					client.emit('logout');

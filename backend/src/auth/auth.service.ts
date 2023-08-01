@@ -116,7 +116,6 @@ export class AuthService {
 		  const user: User = await this.getUserByToken(token);
 		  if (userId == user.id)
 		  {
-			console.log('test')
 		  	count++
 		  }
 		}
