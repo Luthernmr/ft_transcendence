@@ -20,6 +20,8 @@ import * as path from 'path';
 import { plainToClass } from 'class-transformer';
 import { NicknameDto } from './user.dto';
 import { validateOrReject } from 'class-validator';
+import filetype from 'magic-bytes.js'
+
 
 
 @Controller('user')
@@ -133,59 +135,56 @@ export class UserController {
 				destination: './uploadedFiles',
 				filename(req, file, callback) {
 					const name = file.originalname.split('.')[0];
-					const fileExtension = file.originalname.split('.')[file.originalname.split.length];
-					const newFileName = name.substring(0, 10).split(' ').join('_') + '_' + Date.now() + '.' + fileExtension;
+					const newFileName = name.substring(0, 10).split(' ').join('_') + '_' + Date.now();
 					callback(null, newFileName);
 				},
 			}),
-			fileFilter(req, file, callback) {
-				const allowedExtensions = /\.(jpg|jpeg|png|gif)$/i;
-				if (!allowedExtensions.test(file.originalname)) {
-					return callback(new BadRequestException('Type de fichier non valide. Seules les images (jpg, jpeg, png, gif) sont autorisées.'), false);
-				}
-				callback(null, true);
-			},
 		}),
 	)
 	async addAvatar(
 		@Req() request: Request,
-		@UploadedFile( new ParseFilePipeBuilder()
-		.addFileTypeValidator({
-		  fileType: /(jpg|jpeg|png|gif)$/,
-		})
-		.addMaxSizeValidator({
-		  maxSize: 50000
-		})
-		.build({
-		}),
-		) file: Express.Multer.File,
+		@UploadedFile() file: Express.Multer.File,
 	) {
 		try {
-			if (!file) {
-				throw new BadRequestException('File is not an image');
-			} else {
-				const response = {
-					filePath: `${process.env.BACKEND}/user/avatars/${file.filename}`,
-				};
-				const user: any = request.user;
-				if (user.imgPdp) {
-					try {
-						const oldFilePath = user.imgPdp;
-						if (oldFilePath) {
-							let split = oldFilePath.split('/');
-							fs.unlinkSync(`./uploadedFiles/${split.length}`);
-						}
-					} catch (error) {
-						console.error(
-							"Erreur lors de la suppression de l'ancienne image :",
-							error,
-						);
-					}
+			const test = filetype(fs.readFileSync(file.path))
+			console.log('file', file, test)
+			if (test.length) {
+				if (!((test[0].mime == 'image/png' || test[0].mime == 'image/jpeg' ||
+					test[0].mime == 'image/jpg' || test[0].mime == 'image/gif') && file.size < 50000)) {
+					console.log(file.path)
+					fs.unlinkSync(file.path);
+					throw new BadRequestException('Invalid Format');
 				}
-				await this.userService.changeImg(user, response.filePath);
-				return response;
 			}
+			else if (!test.length) {
+				fs.unlinkSync(file.path);
+				throw new BadRequestException('Invalid Format');
+			}
+
+			const response = {
+				filePath: `${process.env.BACKEND}/user/avatars/${file.filename}`,
+			};
+			console.log('response', response.filePath)
+			const user: any = request.user;
+			if (user.imgPdp) {
+				try {
+					const oldFilePath = user.imgPdp;
+					if (oldFilePath) {
+						let split = oldFilePath.split('/');
+						fs.unlinkSync(`./uploadedFiles/${split[5]}`);
+					}
+				} catch (error) {
+					console.error(
+						"Erreur lors de la suppression de l'ancienne image :",
+						error,
+					);
+				}
+			}
+			console.log('response', response.filePath)
+			await this.userService.changeImg(user, response.filePath);
+			return response;
 		} catch (error) {
+			console.log(error)
 			return error
 		}
 	}
