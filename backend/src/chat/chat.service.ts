@@ -59,7 +59,13 @@ export class ChatService {
 		data: { targetUser: User; user: User },
 	) {
 		try {
-			const block = await this.friendService.getBlockedRelation(data.user, data.targetUser);
+			const userSender: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			const userReceiv: User = await this.userService.getUserById(
+				data.targetUser.id,
+			);
+			const block = await this.friendService.getBlockedRelation(userSender, userReceiv);
 			if (block) {
 				throw new BadRequestException("Relation blocked.");
 			}
