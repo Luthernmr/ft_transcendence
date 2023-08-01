@@ -406,6 +406,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.deleteFriend(client, data.userBlockedId);
 			const room = await this.roomService.getDirectRoom(userSender.id, userBlocked.id)
 			await this.roomService.deleteRoom(room.id);
+			await this.gateway.chatNamespace.emit('roomDeleted', room.name);
 			client.emit('success', { message: "User blocked and deleted" });
 			this.gateway.userNamespace.emit('userBlocked');
 		} catch (error) {

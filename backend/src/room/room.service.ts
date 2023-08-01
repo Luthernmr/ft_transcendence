@@ -95,6 +95,7 @@ export class RoomService {
     .getOne();
 
   return room;
+  
   }
 
   async deleteRoom(roomId: number) {
