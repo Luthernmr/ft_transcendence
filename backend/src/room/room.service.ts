@@ -85,6 +85,22 @@ export class RoomService {
     return [...publicRooms, ...privateUserRooms];
   }
 
+  async getDmRoom(userId1: number, userId2: number): Promise<Room> | null {
+    const dmRooms = await this.roomRepo.find({
+      where: { isDm: true },
+      relations: ['users'],
+    });
+    for (let room of dmRooms) {
+      if (
+        room.users.some((user) => user.id === userId1) &&
+        room.users.some((user) => user.id === userId2)
+      ) {
+        return room;
+      }
+    }
+    return null;
+  }
+
   async deleteRoom(roomId: number) {
     await this.roomRepo.delete({ id: roomId });
   }
