@@ -46,6 +46,7 @@ export class ChatService {
 				this.logger.log(user.nickname + ' Connected');
 				this.gateway.userNamespace.emit('reloadLists');
 				client.emit('success', { message: "Connected" });
+				client.emit('rllyconnected');
 			} else client.disconnect();
 
 		} catch (error) {
