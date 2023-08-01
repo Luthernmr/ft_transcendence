@@ -30,7 +30,7 @@ export default function Home() {
                 zIndex: -1,
               }}
             >
-              Welcome
+              Welcome 
             </Text>
             <Text color={"blue.400"} as={"span"}>
               On our ft_transcendence

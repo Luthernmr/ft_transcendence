@@ -40,6 +40,7 @@ export interface Room {
   name: string;
   password: string;
   isPrivate: boolean;
+  isDm: boolean;
   users: User[];
   admins: User[];
   bannedUsers: User[];
@@ -249,6 +250,12 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
         setSelectedRoom(null);
       }
     });
+    userSocket.on('userBlocked', () => {
+      userSocket.emit("getBlockedList");
+      if (selectedRoom.isDm) {
+        setSelectedRoom(null);
+      }
+    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
       chatSocket.off("blockedList", handleRoomMessages);
@@ -262,6 +269,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("muteStatus");
       chatSocket.off("joinedRoom");
       chatSocket.off("roomDeleted");
+      chatSocket.off("userBlocked");
     };
   }, []);
 

@@ -59,8 +59,13 @@ export class ChatService {
 		data: { targetUser: User; user: User },
 	) {
 		try {
-			const block = await this.friendService.getBlockedRelation(data.user, data.targetUser);
-			console.log('block boule',block)
+			const userSender: User = await this.authService.getUserByToken(
+				client.handshake.auth.token,
+			);
+			const userReceiv: User = await this.userService.getUserById(
+				data.targetUser.id,
+			);
+			const block = await this.friendService.getBlockedRelation(userSender, userReceiv);
 			if (block) {
 				throw new BadRequestException("Relation blocked.");
 			}
@@ -91,6 +96,7 @@ export class ChatService {
 
 				data.name = `💬 ${sortedIDs[0]}${sortedIDs[1]}`;
 				data.isPrivate = true;
+				data.isDm = true;
 				room = await this.roomService.createRoom(client, data);
 			} else {
 				room = await this.roomService.createRoom(client, data);
