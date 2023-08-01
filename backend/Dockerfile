@@ -18,6 +18,5 @@ EXPOSE 5001
 
 ENTRYPOINT ["/bcrypt.sh"]
 
-RUN npm run build
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:dev"]
