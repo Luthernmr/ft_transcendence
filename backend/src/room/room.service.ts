@@ -100,7 +100,7 @@ export class RoomService {
 
 	const room = await this.roomRepo
     .createQueryBuilder('room')
-    .where('room.isDm = :isDm', { isDm: true }) // Vérifie que la salle est un DM
+    .where('room.isDm = :isDm', { isDm: true })
     .innerJoin('room.users', 'user1', 'user1.id = :userId1', { userId1 })
     .innerJoin('room.users', 'user2', 'user2.id = :userId2', { userId2 })
     .getOne();
