@@ -252,9 +252,6 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
     });
     userSocket.on('userBlocked', () => {
       userSocket.emit("getBlockedList");
-      if (selectedRoom.isDm) {
-        console.log('romm is DM');
-      }
     });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);

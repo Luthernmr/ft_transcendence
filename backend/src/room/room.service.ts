@@ -101,7 +101,6 @@ export class RoomService {
       where: { isDm: true },
       relations: ['users'],
     });
-	console.log('dm', dmRooms)
     for (let room of dmRooms) {
       if (
         room.users.some((user) => user.id === userId1) &&
