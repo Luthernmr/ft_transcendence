@@ -52,13 +52,24 @@ export class RoomService {
         const salt = await bcrypt.genSalt();
         hashedPassword = await bcrypt.hash(dto.password, salt);
       }
-      const payload = {
+      let payload = {
         name: dto.name,
         ownerId: user.id,
         isPrivate: dto.isPrivate,
+        isDm : false,
         password: hashedPassword,
         users: dto.users,
       };
+      if (dto.isDm) {
+         payload = {
+          name: dto.name,
+          ownerId: user.id,
+          isPrivate: dto.isPrivate,
+          isDm: true,
+          password: hashedPassword,
+          users: dto.users,
+        };
+      }
       const savedRoom = await this.roomRepo.save(payload);
       return savedRoom;
     } catch (error) {
