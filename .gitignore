@@ -9,3 +9,9 @@ frontend/.env
 backend/src/auth/auth.controller.ts
 backend/uploadedFiles/avatars
 frontend/dist
+.DS_Store
+frontend/.DS_Store
+frontend/src/.DS_Store
+frontend/src/assets/.DS_Store
+.DS_Store
+frontend/src/.DS_Store
