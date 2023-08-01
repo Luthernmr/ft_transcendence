@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { SubscribeMessage, WebSocketGateway } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { RoomService } from 'src/room/room.service';
@@ -10,6 +10,7 @@ import { AuthService } from 'src/auth/auth.service';
 import * as bcrypt from 'bcrypt';
 import { Message } from 'src/message/entities/message.entity';
 import { GlobalGateway } from 'src/websockets/global.gateway';
+import { FriendService } from 'src/social/friend.service';
 
 @Injectable()
 @WebSocketGateway({ cors: { origin: '*' }, namespace: 'chat' })
@@ -17,6 +18,7 @@ export class ChatService {
 	private logger: Logger;
 
 	constructor(
+		private readonly friendService: FriendService,
 		private readonly roomService: RoomService,
 		private readonly userService: UserService,
 		private readonly authService: AuthService,
@@ -57,6 +59,10 @@ export class ChatService {
 		data: { targetUser: User; user: User },
 	) {
 		try {
+			const block = await this.friendService.getBlockedRelation(data.user, data.targetUser);
+			if (block) {
+				throw new BadRequestException("Relation blocked.");
+			}
 			const { targetUser, user } = data;
 			const room = await this.createRoom(
 				client,

@@ -10,6 +10,7 @@ import { RoomService } from 'src/room/room.service';
 import { MessageService } from 'src/message/message.service';
 import { GlobalGateway } from 'src/websockets/global.gateway';
 import { Mute } from 'src/room/entities/muted-user.entity';
+import { FriendService } from 'src/social/friend.service';
 
 @Module({
   imports: [
@@ -18,6 +19,6 @@ import { Mute } from 'src/room/entities/muted-user.entity';
     AuthModule,
     FriendModule,
   ],
-  providers: [ChatService, RoomService, MessageService, GlobalGateway],
+  providers: [FriendService, ChatService, RoomService, MessageService, GlobalGateway],
 })
 export class ChatModule {}
