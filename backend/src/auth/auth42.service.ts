@@ -15,7 +15,8 @@ export class Auth42Service {
 			var user: User = await this.userService.getUser(request.user._json.email);
 			
 			if (!user) {
-				var userN: User = await this.userService.getUser(user.nickname);
+				var userN: User = await this.userService.getUserByNickname(request.user._json.login);
+				console.log(userN)
 				if (userN) {
 					user = await this.userService.create({
 						nickname: userN.nickname + '1',
