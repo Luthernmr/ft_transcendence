@@ -71,14 +71,28 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   const [isMuted, setIsMuted] = useState(false);
   const toast = useToast();
 
-  const handleLeaveRoom = () => {
+  function handleLeaveRoom(){
     chatSocket.emit("leaveRoom", {
       roomId: selectedRoom.id,
     });
     setSelectedRoom(null);
   };
 
-  const handleSendMessage = (e: FormEvent) => {
+  function handleLeftRoom(userName: string, updatedRoom: Room){
+    if (selectedRoom.id === updatedRoom.id) {
+      toast({
+        title: userName + " just left the room.",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+      if (userName != currentUser.nickname) {
+        setSelectedRoom(updatedRoom);
+      }
+    }
+  }
+
+  function handleSendMessage(e: FormEvent){
     e.preventDefault();
     if (isMuted) {
       toast({
@@ -106,22 +120,140 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
     setMessageContent("");
   };
 
-  const handleRoomMessages = (roomMessages: Message[]) =>
+  function handleRoomMessages(roomMessages: Message[]) {
     setMessages(roomMessages);
-  const handleBlockedUsers = (blockedUsers: User[]) =>
+  }
+
+  function handleBlockedUsers(blockedUsers: User[]) {
     setBlockedUsers(blockedUsers);
-  const handleError = (error: { message: string }) =>
+  }
+    
+  function handleError(error: { message: string }) {
     toast({
       title: error.message,
       status: "error",
       isClosable: true,
       position: "top",
     });
-  const handleReceiveMessage = (receivedMessage: Message) => {
+  }
+
+  function handleReceiveMessage(receivedMessage: Message) {
     if (selectedRoom.id === receivedMessage.room.id) {
       setMessages((prevMessages) => [...prevMessages, receivedMessage]);
     }
   };
+
+  function handleRoomDeleted(deletedRoomName: string) {
+    if (selectedRoom.name === deletedRoomName) {
+      toast({
+        title: deletedRoomName + " has been deleted.",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+      setSelectedRoom(null);
+    }
+  }
+
+  function handlePasswordChanged(updatedRoom: Room) {
+    if (selectedRoom.id === updatedRoom.id) {
+      toast({
+        title: "Room password has been changed.",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+      setSelectedRoom(updatedRoom);
+    }
+  }
+
+  function handleUserBlocked() {
+    userSocket.emit("getBlockedList");
+  }
+
+  function handleJoinedRoom(updatedRoom: Room) {
+    if (selectedRoom.id === updatedRoom.id) {
+      setSelectedRoom(updatedRoom);
+    }
+  }
+
+  function handleUserMuted(nickname: string) {
+    if (nickname === currentUser.nickname) {
+      toast({
+        title: "You've been muted.",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+    } else {
+      toast({
+        title: nickname + " has been muted.",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+    }
+  }
+
+  function handleMuteStatus(muted: boolean) {
+    setIsMuted(muted);
+  }
+
+  function handleUserBanned(bannedNickname: string, updatedRoom: Room) {
+    if (selectedRoom.id === updatedRoom.id) {
+      if (bannedNickname === currentUser.nickname) {
+        toast({
+          title: "You were banned from the room.",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(null);
+      } else {
+        toast({
+          title: bannedNickname + " was banned from the room.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(updatedRoom);
+      }
+    }
+  }
+
+  function handleUserKicked(kickedNickname: string, updatedRoom: Room) {
+    if (selectedRoom.id === updatedRoom.id) {
+      if (kickedNickname === currentUser.nickname) {
+        toast({
+          title: "You were kicked from the room.",
+          status: "error",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(null);
+      } else {
+        toast({
+          title: kickedNickname + " was kicked from the room.",
+          status: "info",
+          isClosable: true,
+          position: "top",
+        });
+        setSelectedRoom(updatedRoom);
+      }
+    }
+  }
+
+  function handleAdminsUpdated(updatedRoom: Room) {
+    if (selectedRoom.id === updatedRoom.id) {
+      toast({
+        title: "Room admins have been updated.",
+        status: "info",
+        isClosable: true,
+        position: "top",
+      });
+      setSelectedRoom(updatedRoom);
+    }
+  }
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -136,137 +268,32 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
     userSocket.on("blockedList", handleBlockedUsers);
     chatSocket.on("error", handleError);
     chatSocket.on("receiveMessage", handleReceiveMessage);
-    chatSocket.on("leftRoom", (userName: string, updatedRoom: Room) => {
-      if (selectedRoom.id === updatedRoom.id) {
-        toast({
-          title: userName + " just left the room.",
-          status: "info",
-          isClosable: true,
-          position: "top",
-        });
-        if (userName != currentUser.nickname) {
-          setSelectedRoom(updatedRoom);
-        }
-      }
-    });
-    chatSocket.on("roomPasswordChanged", (updatedRoom: Room) => {
-      if (selectedRoom.id === updatedRoom.id) {
-        toast({
-          title: "Room password has been changed.",
-          status: "info",
-          isClosable: true,
-          position: "top",
-        });
-        setSelectedRoom(updatedRoom);
-      }
-    });
-    chatSocket.on("adminsUpdated", (updatedRoom: Room) => {
-      if (selectedRoom.id === updatedRoom.id) {
-        toast({
-          title: "Room admins have been updated.",
-          status: "info",
-          isClosable: true,
-          position: "top",
-        });
-        setSelectedRoom(updatedRoom);
-      }
-    });
-    chatSocket.on("userKicked", (kickedNickname: string, updatedRoom: Room) => {
-      if (selectedRoom.id === updatedRoom.id) {
-        if (kickedNickname === currentUser.nickname) {
-          toast({
-            title: "You were kicked from the room.",
-            status: "error",
-            isClosable: true,
-            position: "top",
-          });
-          setSelectedRoom(null);
-        } else {
-          toast({
-            title: kickedNickname + " was kicked from the room.",
-            status: "info",
-            isClosable: true,
-            position: "top",
-          });
-          setSelectedRoom(updatedRoom);
-        }
-      }
-    });
+    chatSocket.on("leftRoom", handleLeftRoom);
+    chatSocket.on("roomPasswordChanged", handlePasswordChanged);
+    chatSocket.on("adminsUpdated", handleAdminsUpdated);
+    chatSocket.on("userKicked", handleUserKicked);
+    chatSocket.on("userBanned", handleUserBanned);
+    chatSocket.on("muteStatus", handleMuteStatus);
+    chatSocket.on("userMuted", handleUserMuted);
+    chatSocket.on("joinedRoom", handleJoinedRoom);
+    chatSocket.on("roomDeleted", handleRoomDeleted);
+    userSocket.on('userBlocked', handleUserBlocked);
 
-    chatSocket.on("userBanned", (bannedNickname: string, updatedRoom: Room) => {
-      if (selectedRoom.id === updatedRoom.id) {
-        if (bannedNickname === currentUser.nickname) {
-          toast({
-            title: "You were banned from the room.",
-            status: "error",
-            isClosable: true,
-            position: "top",
-          });
-          setSelectedRoom(null);
-        } else {
-          toast({
-            title: bannedNickname + " was banned from the room.",
-            status: "info",
-            isClosable: true,
-            position: "top",
-          });
-          setSelectedRoom(updatedRoom);
-        }
-      }
-    });
-    chatSocket.on("muteStatus", (muted) => {
-      setIsMuted(muted);
-    });
-    chatSocket.on("userMuted", (nickname: string) => {
-      if (nickname === currentUser.nickname) {
-        toast({
-          title: "You've been muted.",
-          status: "info",
-          isClosable: true,
-          position: "top",
-        });
-      } else {
-        toast({
-          title: nickname + " has been muted.",
-          status: "info",
-          isClosable: true,
-          position: "top",
-        });
-      }
-    });
-    chatSocket.on("joinedRoom", (updatedRoom: Room) => {
-      if (selectedRoom.id === updatedRoom.id) {
-        setSelectedRoom(updatedRoom);
-      }
-    });
-    chatSocket.on("roomDeleted", (deletedRoomName) => {
-      if (selectedRoom.name === deletedRoomName) {
-        toast({
-          title: deletedRoomName + " has been deleted.",
-          status: "info",
-          isClosable: true,
-          position: "top",
-        });
-        setSelectedRoom(null);
-      }
-    });
-    userSocket.on('userBlocked', () => {
-      userSocket.emit("getBlockedList");
-    });
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
-      chatSocket.off("blockedList", handleRoomMessages);
+      chatSocket.off("blockedList", handleBlockedUsers);
       chatSocket.off("error", handleError);
       chatSocket.off("receiveMessage", handleReceiveMessage);
-      chatSocket.off("leftRoom", handleReceiveMessage);
-      chatSocket.off("roomPasswordChanged");
-      chatSocket.off("adminsUpdated");
-      chatSocket.off("userKicked");
-      chatSocket.off("userBanned");
-      chatSocket.off("muteStatus");
-      chatSocket.off("joinedRoom");
-      chatSocket.off("roomDeleted");
-      chatSocket.off("userBlocked");
+      chatSocket.off("leftRoom", handleLeftRoom);
+      chatSocket.off("roomPasswordChanged",handlePasswordChanged);
+      chatSocket.off("adminsUpdated", handleAdminsUpdated);
+      chatSocket.off("userKicked", handleUserKicked);
+      chatSocket.off("userBanned", handleUserBanned);
+      chatSocket.off("muteStatus", handleMuteStatus);
+      chatSocket.off("userMuted", handleUserMuted);
+      chatSocket.off("joinedRoom", handleJoinedRoom);
+      chatSocket.off("roomDeleted", handleRoomDeleted);
+      chatSocket.off("userBlocked", handleUserBlocked);
     };
   }, []);
 
