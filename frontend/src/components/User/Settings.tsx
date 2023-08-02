@@ -311,8 +311,6 @@ export default function Settings(props: any) {
 							defaultChecked
 						/>
 					}
-					{isChecked && <Text>checked</Text>}
-					{!isChecked && <Text>not checked</Text>}
 				</HStack>
 				<Modal onClose={onClose} isOpen={isOpen} isCentered>
 					<ModalOverlay />

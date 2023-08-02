@@ -147,11 +147,9 @@ export class UserController {
 	) {
 		try {
 			const test = filetype(fs.readFileSync(file.path))
-			console.log('file', file, test)
 			if (test.length) {
 				if (!((test[0].mime == 'image/png' || test[0].mime == 'image/jpeg' ||
 					test[0].mime == 'image/jpg' || test[0].mime == 'image/gif') && file.size < 50000)) {
-					console.log(file.path)
 					fs.unlinkSync(file.path);
 					throw new BadRequestException('Invalid Format');
 				}
@@ -164,7 +162,6 @@ export class UserController {
 			const response = {
 				filePath: `${process.env.BACKEND}/user/avatars/${file.filename}`,
 			};
-			console.log('response', response.filePath)
 			const user: any = request.user;
 			if (user.imgPdp) {
 				try {
@@ -180,11 +177,9 @@ export class UserController {
 					);
 				}
 			}
-			console.log('response', response.filePath)
 			await this.userService.changeImg(user, response.filePath);
 			return response;
 		} catch (error) {
-			console.log(error)
 			return error
 		}
 	}

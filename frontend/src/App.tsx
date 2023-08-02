@@ -91,7 +91,6 @@ export default function App() {
 		userSocket.on("success", handleSuccess);
 
 		chatSocket.on("connect", () => {
-			console.log('test')
 			if (sessionStorage.getItem('jwt'))
 				getUser();
 		});
