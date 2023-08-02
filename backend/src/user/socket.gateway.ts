@@ -52,6 +52,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.logger.log('Gateway initialized');
 		this.ping()
 	}
+
 	async handleConnection(client: Socket) {
 		try {
 
@@ -65,7 +66,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				)
 				if (alreadyConnected) {
 					client.emit('logout');
-					client.disconnect();
+					client.handshake.auth.token = "";
 					throw new BadRequestException('Already connected')
 				}
 				await this.userService.setOnline(user);
@@ -102,6 +103,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
 			);
+			
 			if (user) {
 				await this.userService.setOffline(user);
 				this.gateway.userNamespace.emit('reloadLists');
