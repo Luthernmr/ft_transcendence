@@ -59,7 +59,6 @@ function StringMaxLength(s: string, n: number) : string {
 		return s;
 	
 	const stringCut=s.slice(0, n - 2) + ".";
-	console.log("cut " + s + " to " + stringCut);
 	return stringCut;
 }
 
