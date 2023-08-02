@@ -54,10 +54,10 @@ export class MessageService {
     }
   }
 
-  async getMessagesByRoom(roomName: string): Promise<Message[]> {
+  async getMessagesByRoom(roomId: number): Promise<Message[]> {
     try {
       const room = await this.roomRepo.findOne({
-        where: { name: roomName },
+        where: { id: roomId },
         relations: ['messages', 'messages.user'],
       });
       if (!room) {

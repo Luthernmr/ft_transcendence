@@ -47,7 +47,7 @@ const RoomList: React.FC<RoomListProps> = ({
   const [rooms, setRooms] = useState<Room[]>([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [roomPassword, setRoomPassword] = useState("");
-  const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);
+  const [selectedRoomLocal, setSelectedRoomLocal] = useState<Room | null>(null);
   const toast = useToast();
 
   const handleRoomClick = (room: Room) => {
@@ -70,14 +70,18 @@ const RoomList: React.FC<RoomListProps> = ({
 
   const handlePasswordSubmit = (e: FormEvent) => {
     e.preventDefault();
+    chatSocket.emit("checkRoomPassword", {
+      room: selectedRoomLocal,
+      password: roomPassword,
+    });
     chatSocket.on("passCheck", (check: boolean) => {
-      if (check && selectedRoom) {
+      if (check && selectedRoomLocal) {
         chatSocket.emit("joinRoom", {
           userId: currentUser.id,
-          room: selectedRoom,
+          room: selectedRoomLocal,
         });
-        chatSocket.on("joinedRoom", (selectedRoom: Room) => {
-          setSelectedRoom(selectedRoom);
+        chatSocket.on("joinedRoom", (joinedRoom: Room) => {
+          setSelectedRoom(joinedRoom);
         });
       } else {
         setRoomPassword("");
@@ -87,12 +91,9 @@ const RoomList: React.FC<RoomListProps> = ({
           isClosable: true,
           position: "top",
         });
+        setSelectedRoomLocal(null);
         return;
       }
-    });
-    chatSocket.emit("checkRoomPassword", {
-      room: selectedRoom,
-      password: roomPassword,
     });
     onClose();
   };

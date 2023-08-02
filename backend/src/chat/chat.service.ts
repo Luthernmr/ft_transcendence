@@ -155,7 +155,7 @@ export class ChatService {
 	@SubscribeMessage('sendMessage')
 	async sendMessage(client: Socket, data: Message) {
 		try {
-			const { text, room, user } = data;
+			const { room, user } = data;
 			const isMuted = await this.roomService.isMuted(user.id, room.id);
 			if (isMuted) {
 				client.emit('error', { message: 'You are currently muted' });
@@ -175,7 +175,7 @@ export class ChatService {
 	@SubscribeMessage('getRoomMessages')
 	async getRoomMessages(client: Socket, room: Room) {
 		try {
-			const messages = await this.messageService.getMessagesByRoom(room.name);
+			const messages = await this.messageService.getMessagesByRoom(room.id);
 			client.emit('roomMessages', messages);
 		} catch (error) {
 			client.emit('error', { message: error.message });
