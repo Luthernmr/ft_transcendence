@@ -71,14 +71,14 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   const [isMuted, setIsMuted] = useState(false);
   const toast = useToast();
 
-  function handleLeaveRoom(){
+  function handleLeaveRoom() {
     chatSocket.emit("leaveRoom", {
       roomId: selectedRoom.id,
     });
     setSelectedRoom(null);
-  };
+  }
 
-  function handleLeftRoom(userName: string, updatedRoom: Room){
+  function handleLeftRoom(userName: string, updatedRoom: Room) {
     if (selectedRoom.id === updatedRoom.id) {
       toast({
         title: userName + " just left the room.",
@@ -92,7 +92,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
     }
   }
 
-  function handleSendMessage(e: FormEvent){
+  function handleSendMessage(e: FormEvent) {
     e.preventDefault();
     if (isMuted) {
       toast({
@@ -118,7 +118,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       user: currentUser,
     });
     setMessageContent("");
-  };
+  }
 
   function handleRoomMessages(roomMessages: Message[]) {
     setMessages(roomMessages);
@@ -127,22 +127,22 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   function handleBlockedUsers(blockedUsers: User[]) {
     setBlockedUsers(blockedUsers);
   }
-    
+
   function handleError(error: { message: string }) {
     if (error.message !== "Room already exists")
-    toast({
-      title: error.message,
-      status: "error",
-      isClosable: true,
-      position: "top",
-    });
+      toast({
+        title: error.message,
+        status: "error",
+        isClosable: true,
+        position: "top",
+      });
   }
 
   function handleReceiveMessage(receivedMessage: Message) {
     if (selectedRoom.id === receivedMessage.room.id) {
       setMessages((prevMessages) => [...prevMessages, receivedMessage]);
     }
-  };
+  }
 
   function handleRoomDeleted(deletedRoomName: string) {
     if (selectedRoom.name === deletedRoomName) {
@@ -278,7 +278,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
     chatSocket.on("userMuted", handleUserMuted);
     chatSocket.on("joinedRoom", handleJoinedRoom);
     chatSocket.on("roomDeleted", handleRoomDeleted);
-    userSocket.on('userBlocked', handleUserBlocked);
+    userSocket.on("userBlocked", handleUserBlocked);
 
     return () => {
       chatSocket.off("roomMessages", handleRoomMessages);
@@ -286,7 +286,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
       chatSocket.off("error", handleError);
       chatSocket.off("receiveMessage", handleReceiveMessage);
       chatSocket.off("leftRoom", handleLeftRoom);
-      chatSocket.off("roomPasswordChanged",handlePasswordChanged);
+      chatSocket.off("roomPasswordChanged", handlePasswordChanged);
       chatSocket.off("adminsUpdated", handleAdminsUpdated);
       chatSocket.off("userKicked", handleUserKicked);
       chatSocket.off("userBanned", handleUserBanned);
@@ -433,7 +433,17 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                         cursor: "pointer",
                       }}
                     />
-                    <Text _hover={{ cursor: "pointer" }} ml={2}>
+                    <Text
+                      _hover={{ cursor: "pointer" }}
+                      ml={2}
+                      style={{
+                        userSelect: blockedUsers?.some(
+                          (user) => user.id === message.user.id
+                        )
+                          ? "none"
+                          : "auto",
+                      }}
+                    >
                       {message.user?.nickname}
                     </Text>
                   </Flex>
@@ -490,7 +500,18 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
                   </PopoverContent>
                 </Portal>
               </Popover>
-              <Text mt={1}>{message.text}</Text>
+              <Text
+                mt={1}
+                style={{
+                  userSelect: blockedUsers?.some(
+                    (user) => user.id === message.user.id
+                  )
+                    ? "none"
+                    : "auto",
+                }}
+              >
+                {message.text}
+              </Text>
             </Flex>
           </Box>
         ))}
