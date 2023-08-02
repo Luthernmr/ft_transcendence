@@ -16,4 +16,4 @@ RUN chmod +x /es.sh
 
 ENTRYPOINT ["/es.sh"]
 
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.cjs"]

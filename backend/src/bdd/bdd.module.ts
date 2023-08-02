@@ -7,7 +7,7 @@ import { BlockedUser } from 'src/social/blockedUser.entity';
 import { Room } from 'src/room/entities/room.entity';
 import { Message } from 'src/message/entities/message.entity';
 import { PongHistory } from 'src/pong/pongHistory.entity';
-import { Mute } from 'src/room/entities/muted-user.entity';
+import { MutedUser } from 'src/room/entities/muted-user.entity';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { Mute } from 'src/room/entities/muted-user.entity';
       database: 'ft_db',
       entities: [
         User,
-        Mute,
+        MutedUser,
         Friend,
         PendingRequest,
         BlockedUser,

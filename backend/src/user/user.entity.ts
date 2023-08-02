@@ -1,5 +1,5 @@
 import { Message } from 'src/message/entities/message.entity';
-import { Mute } from './../room/entities/muted-user.entity';
+import { MutedUser } from '../room/entities/muted-user.entity';
 import { Room } from 'src/room/entities/room.entity';
 import { BlockedUser } from 'src/social/blockedUser.entity';
 import { Friend } from 'src/social/friend.entity';
@@ -66,8 +66,8 @@ export class User {
   @ManyToMany(() => Room, (room: Room) => room.admins)
   adminRooms: Room[];
 
-  @OneToMany(() => Mute, (mute) => mute.user)
-  mutes: Mute[];
+  @OneToMany(() => MutedUser, (mutedUser) => mutedUser.user)
+  mutedUsers: MutedUser[];
 
   @OneToMany(() => Message, (message: Message) => message.user)
   messages: Array<Message>;

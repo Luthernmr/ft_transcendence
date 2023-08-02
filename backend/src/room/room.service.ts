@@ -18,7 +18,7 @@ import { validateOrReject } from 'class-validator';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Mute } from './entities/muted-user.entity';
+import { MutedUser } from './entities/muted-user.entity';
 
 @Injectable()
 export class RoomService {
@@ -26,7 +26,7 @@ export class RoomService {
 
   constructor(
     @InjectRepository(Room) private roomRepo: Repository<Room>,
-    @InjectRepository(Mute) private muteRepo: Repository<Mute>,
+    @InjectRepository(MutedUser) private muteRepo: Repository<MutedUser>,
     private readonly authService: AuthService,
     private readonly userService: UserService,
   ) {
@@ -332,7 +332,7 @@ export class RoomService {
       throw new ConflictException('User is already muted');
     }
 
-    const mute = new Mute();
+    const mute = new MutedUser();
     mute.user = targetUser;
     mute.room = room;
     mute.muteEnd = new Date(Date.now() + 60 * 1000);
