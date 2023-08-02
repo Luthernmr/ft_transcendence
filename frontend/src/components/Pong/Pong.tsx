@@ -47,7 +47,6 @@ function Pong() {
   
   useEffect(() => {
     updateDimensions();
-    //console.log("requestGameState");
     pongSocket.emit('requestGameState');
   }, [])
 
@@ -116,8 +115,6 @@ function Pong() {
         window.innerHeight / MAX_WIN_HEIGHT
       );
     }
-
-    //console.log(rate);
     setSize(rate);
   }
 

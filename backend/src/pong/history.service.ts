@@ -46,7 +46,6 @@ export class HistoryService {
 			await this.addXP(winnerUser, xpGained);
 			await this.addXP(loserUser, XP_GAIN_LOSS);
 		} catch (error) {
-			console.log(error)
 		}
 
 		const history = {
@@ -61,7 +60,6 @@ export class HistoryService {
 		try {
 			await this.pongHistory.save(history);
 		} catch (error) {
-			console.log(error);
 		}
   }
 
@@ -88,7 +86,6 @@ export class HistoryService {
 		ratioToNextLevel: ratioToNextLevel,
 		});
 	} catch (error) {
-		console.log(error);
 	}
   }
 

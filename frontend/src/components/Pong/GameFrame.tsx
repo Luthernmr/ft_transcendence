@@ -15,7 +15,6 @@ function GameFrame({ width, height } : GameFrameProps) {
 	const walls = useRef<Obstacle[]>([WALL_PLACEHOLDER, WALL_PLACEHOLDER, WALL_PLACEHOLDER, WALL_PLACEHOLDER]);
 	
 	useEffect(() => {
-    //console.log("Updating walls");
     walls.current = [
       {
         // UP

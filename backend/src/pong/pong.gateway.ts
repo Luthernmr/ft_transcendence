@@ -53,12 +53,10 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   handleDisconnect(socket: Socket) {
-    //console.log("Socket disconnected from pong :" + socket.id);
     this.pongService.UnregisterUserInfos(socket);
   }
 
   afterInit(socket: Socket) {
-    //console.log('Pong Gateway successfully init');
     this.pongService.LaunchUpdates();
   }
 
@@ -120,7 +118,6 @@ export class PongGateway implements OnGatewayConnection, OnGatewayInit, OnGatewa
   }
 
   EmitGameState(socket: Socket, gameState: GameDatas) {
-    //console.log("Emitting gamestate " + gameState.pongState);
     socket.emit('gamestate', gameState);
   }
 

@@ -310,8 +310,6 @@ export class PongService {
 			this.watchers.push(-1);
 		}
 
-		//console.log("Added new user to pong userInfos (id: " + userID + ")");
-
 		const awaitGameStateIndex = this.awaitGameState.findIndex(s => s === socket);
 		if (awaitGameStateIndex >= 0) {
 			this.awaitGameState.splice(awaitGameStateIndex, 1);
@@ -325,7 +323,6 @@ export class PongService {
 		const userInfoIndex = this.GetInfoIndexBySocketID(socket.id);
 
 		if (userInfoIndex < 0) {
-			//console.log("Cannot find index for socket", socket.id);
 			return;
 		}
 
@@ -353,8 +350,6 @@ export class PongService {
 
 		// Socket
 		this.userInfos[userInfoIndex].socket = null;
-
-		//console.log('User unregistered from pong');
 	}
 
 	LaunchUpdates() {
@@ -402,24 +397,20 @@ export class PongService {
 		const currentPlayerInfoIndex = this.GetInfoIndexBySocketID(socket.id); //this.userInfos.findIndex(infos => (infos.socket === socket));
 
 		if (currentPlayerInfoIndex < 0) {
-      		//console.log("User not registered to pong");
       		return;
     	}
 
 		if (this.UserLocked(currentPlayerInfoIndex)) {
-			//console.log("user currently in game");
 			return;
 		}
 
 		if (this.watchers[currentPlayerInfoIndex] >= 0) {
-			// console.log("user ", this.userInfos[currentPlayerInfoIndex].userId, ": cannot join queue when you're watching a game !");
 			return;
 		}
 
 		const queueInfos = this.UserInQueue(this.userInfos[currentPlayerInfoIndex].userId);
 		if (queueInfos.index >= 0) {
 			if (queueInfos.custom === custom) {
-				//console.log("user already in queue");
 				return;
 			} else {
 				this.LeaveQueueByInfoIndex(currentPlayerInfoIndex);
@@ -428,8 +419,6 @@ export class PongService {
 
 		const queueArray = custom ? this.queueCustom : this.queueClassic;
 
-		//console.log("Joined queue, userID: " + this.userInfos[currentPlayerInfoIndex].userId);
-
 		if (queueArray.length >= 1) {
 			const opponentInfoIndex = queueArray[0];
 			this.lockedUsers.push(currentPlayerInfoIndex);
@@ -437,7 +426,6 @@ export class PongService {
 			queueArray.splice(0, 1);
 			this.CreateRoom(currentPlayerInfoIndex, opponentInfoIndex, custom).catch((e) => console.log("JoinQueue error: " + e));
 		} else {
-			//console.log("Not enough players in queue");
 			queueArray.push(currentPlayerInfoIndex);
 		}
 	}
@@ -465,7 +453,6 @@ export class PongService {
 		const user2Index = this.GetInfoIndexByUserID(user2ID); // this.userInfos.findIndex(infos => (infos.userId === user2ID));
 
 		if (user1Index < 0 || this.userInfos[user1Index].socket === null || user2Index < 0 || this.userInfos[user2Index].socket === null) {
-			//console.log("User of id " + user1Index < 0 ? user1ID : user2ID + " not registered to pong");
 			return false;
 		}
 
@@ -489,7 +476,6 @@ export class PongService {
 		if (userIndex < 0) {
 			this.awaitGameState.push(socket);
 		} else {
-			//console.log("Found user", this.userInfos[userIndex].userId, ", sending it to socket", socket.id);
 			this.SendGameState(socket).catch((e) => console.log("RequestGameState error: " + e));
 		}
 	}
@@ -509,7 +495,6 @@ export class PongService {
 				return { 	pongState: PongState.Play,
 							payload: payload };
 			} catch (error) {
-				console.log("GetGameState error: " + error);
 				return {
 					pongState: PongState.Error,
 					payload: null
@@ -524,7 +509,6 @@ export class PongService {
 				return { 	pongState: PongState.Watch,
 							payload: payload };
 			} catch (error) {
-				console.log("GetGameState error: " + error);
 				return {
 					pongState: PongState.Error,
 					payload: null
@@ -577,7 +561,6 @@ export class PongService {
 			if (this.watchers[i] === roomID) {
 				const user = await this.userService.getUserById(this.userInfos[i].userId);
 				if (user === null) {
-					console.log("GetWatchersDatas: user of id ", this.userInfos[i].userId, " not found!");
 					return;
 				}
 				watchersList.push(user);
@@ -592,7 +575,6 @@ export class PongService {
 		const user2 = await this.userService.getUserById(this.userInfos[player2].userId);
 
 		if (user1 === null || user2 === null) {
-			console.log("SetPlayingState: one of id ", (user1 === null ? this.userInfos[player1].userId : this.userInfos[player2].userId), " not found!");
 			return;
 		}
 
@@ -685,11 +667,7 @@ export class PongService {
 
 		this.scoreData.push(score);
 		this.gameState.push(GameState.Connecting);
-
 		this.countdown.push(0);
-
-		//console.log("room created");
-
 		this.pongGateway.EmitInit(playerInfo1.socket, { ...initDatas, playerNumber: 2, custom: custom });
 		this.pongGateway.EmitInit(playerInfo2.socket, { ...initDatas, playerNumber: 1, custom: custom });
   	}
@@ -698,7 +676,6 @@ export class PongService {
 		const roomID = this.GetRoomIDBySocketID(socket.id);
 
 		if (roomID < 0) {
-      		//console.log("ClientIsReady: client not found");
       		return;
    		}
 
@@ -738,7 +715,6 @@ export class PongService {
 		const roomID = this.GetRoomIDBySocketID(socket.id);
 
 		if (roomID < 0) {
-      		//console.log("ClientIsReady: client not found");
       		return;
     	}
 
@@ -769,7 +745,6 @@ export class PongService {
 		const watcherInfoIndex = this.GetInfoIndexBySocketID(socket.id);
 
 		if (watcherInfoIndex < 0) {
-			console.log("Watcher not registered to pong");
 			return;
 		}
 
@@ -785,7 +760,6 @@ export class PongService {
 		const watcherUserInfosIndex = this.GetInfoIndexByUserID(userWatcherID); //this.userInfos.findIndex(info => info.userId === userWatcherID);
 
 		if (this.watchers[watcherUserInfosIndex] >= 0) {
-			console.log("AddWatcher: cannot watch game when already watching one !");
 			return;
 		}
 
@@ -793,7 +767,6 @@ export class PongService {
 																|| pair.indexUser2 === watcherUserInfosIndex);
 
 		if (watcherRuntimeIndex >= 0) {
-			console.log("AddWatcher: cannot watch a game when playing one !");
 			return;
 		}
 
@@ -803,7 +776,6 @@ export class PongService {
 																|| pair.indexUser2 === playerUserInfosIndex)
 
 		if (playerRuntimeIndex < 0) {
-			console.log("AddWatcher: requested to user of id " + userPlayerID + " but target user is not playing");
 			return;
 		}
 
@@ -821,7 +793,6 @@ export class PongService {
 		const user = await this.userService.getUserById(this.userInfos[watcherInfoIndex].userId);
 
 		if (user === null) {
-			console.log("AddWatcher: user of id ", this.userInfos[watcherInfoIndex], " not found!");
 			return;
 		}
 
@@ -897,7 +868,6 @@ export class PongService {
 	private StartGame(roomID: number, firstPlayer: number) {
 		let runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
 		if (runtimeIndex < 0) {
-			console.log("StartGameAtCountdown: runtimeIndex not found " + runtimeIndex);
 			return;
 		}
 
@@ -939,12 +909,8 @@ export class PongService {
  	}
 
 	private CloseRoom(socketID: string) {
-    //console.log('Closing pong room');
-
 		const roomID = this.GetRoomIDBySocketID(socketID);
 		const runtimeIndex = this.GetRuntimeIndexByRoomID(roomID);
-		//console.log('Found index: ' + index);
-
 		const player1Index = this.usersRuntime[runtimeIndex].indexUser1;
 		const player2Index = this.usersRuntime[runtimeIndex].indexUser2;
 
