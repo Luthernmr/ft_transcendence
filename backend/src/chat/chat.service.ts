@@ -48,7 +48,6 @@ export class ChatService {
 				)
 				if (alreadyConnected) {
 					client.emit('logout');
-					client.disconnect();
 					throw new BadRequestException('Already connected')
 				}
 				user = await this.userService.setSocket(user.id, client.id);
