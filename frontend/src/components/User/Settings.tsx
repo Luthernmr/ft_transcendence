@@ -59,31 +59,54 @@ export default function Settings(props: any) {
 
 	useEffect(() => {
 		if (profilePreview) {
-			if (selectedFile) formData.append("file", selectedFile);
+			if (selectedFile)
+				formData.append("file", selectedFile);
+			const fetchData = async () => {
+				try {
+					const response = await axios.post(
+						import.meta.env.VITE_BACKEND + "/user/avatar",
+						formData,
+						{
+							headers: {
+								"Content-Type": "multipart/form-data",
+							},
+							withCredentials: true,
+						}
+					);
+					if (response.data.message) {
+						toast({
+							title: response.data.message,
+							status: "error",
+							isClosable: true,
+							position: "top",
+						});
+					}
+					else {
+						toast({
+							title: 'File changed',
+							status: "success",
+							isClosable: true,
+							position: "top",
+						});
+						window.location.reload()
+					}
+				} catch (error) {
+					toast({
+						title: "bad file",
+						status: "error",
+						isClosable: true,
+						position: "top",
+					});
+				}
+			}
+			if (profilePreview != profile.imgPdp)
+				fetchData();
 		}
 	}, [profilePreview]);
 
 	const SendModif = async (event: any) => {
 		event.preventDefault();
-		try {
-			await axios.post(
-				import.meta.env.VITE_BACKEND + "/user/avatar",
-				formData,
-				{
-					headers: {
-						"Content-Type": "multipart/form-data",
-					},
-					withCredentials: true,
-				}
-			);
-		} catch (error) {
-			toast({
-				title: "bad file",
-				status: "error",
-				isClosable: true,
-				position: "top",
-			});
-		}
+
 		try {
 			const response = await axios.post(
 				import.meta.env.VITE_BACKEND + "/user/settings",
@@ -135,12 +158,11 @@ export default function Settings(props: any) {
 				setProfile(res.data.user);
 				setPreview(res?.data?.user?.imgPdp);
 				sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
-			} catch (error) {console.log(error)}
+			} catch (error) { console.log(error) }
 		};
 		if (profile.isTwoFA)
-		setIsChecked(true);
-		else
-		{
+			setIsChecked(true);
+		else {
 			setIsChecked(false)
 		}
 		getUser();
@@ -161,22 +183,22 @@ export default function Settings(props: any) {
 				const qrUrl = URL.createObjectURL(resp.data);
 				setQrcode(qrUrl);
 				onOpen();
-			} catch (error) {console.log(error)}
+			} catch (error) { console.log(error) }
 		}
 	}
 	const signOut = async () => {
 
 		try {
-		  await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
-			withCredentials: true,
-		  });
-		  sessionStorage.clear()
-		  navigate('/');
-		  chatSocket.disconnect();
-		  userSocket.disconnect();
-		  pongSocket.disconnect();
-		} catch (error) {console.log(error)}
-	  };
+			await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+				withCredentials: true,
+			});
+			sessionStorage.clear()
+			navigate('/');
+			chatSocket.disconnect();
+			userSocket.disconnect();
+			pongSocket.disconnect();
+		} catch (error) { console.log(error) }
+	};
 
 	const toast = useToast();
 	async function sendCode() {

@@ -17,6 +17,7 @@ import { useToast } from "@chakra-ui/react";
 import SelectedRoomContext from "./components/Chat/SelectedRoomContext";
 import { Room } from "./components/Chat/ChatRoom";
 import { User } from "./components/Social/AllUserItem"
+import Settings from "./components/User/Settings";
 
 const currentUser: User = JSON.parse(
     sessionStorage.getItem("currentUser") || "{}"
@@ -149,7 +150,7 @@ export default function App() {
 					path="/Home"
 					element={
 						<PrivateRoute>
-							<SidebarWithHeader children={<Chat />} />
+							<SidebarWithHeader children={<UserProfile />} />
 						</PrivateRoute>
 					}
 				/>

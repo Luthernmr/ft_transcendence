@@ -120,6 +120,8 @@ export class UserController {
 			const user: any = request.user;
 			if (!user)
 				return 'no user';
+			if (user.nickname == dto.nickname)
+				throw new BadRequestException('Its the same nickname')
 			await this.userService.changeNickname(user, dto.nickname);
 			response.send({ user });
 		} catch (error) {
@@ -146,6 +148,8 @@ export class UserController {
 		@UploadedFile() file: Express.Multer.File,
 	) {
 		try {
+			if (!file)
+				throw new BadRequestException('Please enter valid file');
 			const test = filetype(fs.readFileSync(file.path))
 			if (test.length) {
 				if (!((test[0].mime == 'image/png' || test[0].mime == 'image/jpeg' ||
