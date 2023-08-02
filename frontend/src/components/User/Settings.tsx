@@ -30,6 +30,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserStats from "./Stats";
+import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
 export interface Profile {
 	imgPdp: string;
 	nickname: string;
@@ -163,6 +164,19 @@ export default function Settings(props: any) {
 			} catch (error) {console.log(error)}
 		}
 	}
+	const signOut = async () => {
+
+		try {
+		  await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
+			withCredentials: true,
+		  });
+		  sessionStorage.clear()
+		  navigate('/');
+		  chatSocket.disconnect();
+		  userSocket.disconnect();
+		  pongSocket.disconnect();
+		} catch (error) {console.log(error)}
+	  };
 
 	const toast = useToast();
 	async function sendCode() {
@@ -197,14 +211,14 @@ export default function Settings(props: any) {
 				}
 			}
 			else {
-				setIsChecked(true);
 				toast({
 					title: `2FA is now activate please log in again`,
 					status: "success",
 					isClosable: true,
 					position: "top",
 				});
-					onClose()
+				onClose()
+				signOut()
 			}
 		} catch (error) {
 			toast({

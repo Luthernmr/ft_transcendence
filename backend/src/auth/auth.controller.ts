@@ -225,7 +225,6 @@ export class AuthController {
 			}
 			const jwtToken = request.cookies['jwt'];
 			await this.authService.loginTwoFa(user, response, true);
-			response.send({ jwt: jwtToken });
 			return { jwt: jwtToken };
 		} catch (error) {
 			return error;

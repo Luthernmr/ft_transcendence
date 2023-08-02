@@ -16,7 +16,7 @@ import {
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { pongSocket } from "../../sockets/sockets";
+import { chatSocket, pongSocket, userSocket } from "../../sockets/sockets";
 
 export default function TwoFA() {
 	const [pinCode, setPinCode] = useState("");
@@ -49,7 +49,6 @@ export default function TwoFA() {
 					})
 				}
 				else if (messages) {
-
 					toast({
 						title: response.data.response.message,
 						status: "error",
@@ -59,7 +58,6 @@ export default function TwoFA() {
 				}
 			}
 			else {
-				navigate("/Home");
 				sessionStorage.setItem("jwt", response.data.jwt);
 				pongSocket.emit("register", { token: response.data.jwt });
 				toast({
@@ -68,6 +66,19 @@ export default function TwoFA() {
 					isClosable: true,
 					position: "top",
 				});
+				if (sessionStorage.getItem("jwt"))
+				{
+					chatSocket.disconnect();
+					userSocket.disconnect();
+					pongSocket.disconnect();
+					userSocket.auth = { token: response.data.jwt };
+					chatSocket.auth = { token: response.data.jwt };
+					pongSocket.auth = { token: response.data.jwt };
+					chatSocket.connect();
+					pongSocket.connect();
+					userSocket.connect();
+					navigate("/Home");
+				}
 			}
 			onClose();
 		} catch (error) {
