@@ -13,14 +13,27 @@ export class Auth42Service {
 	async login(request: any): Promise<any> {
 		try {
 			var user: User = await this.userService.getUser(request.user._json.email);
+			
 			if (!user) {
-				user = await this.userService.create({
-					nickname: request.user._json.login,
-					email: request.user._json.email,
-					imgPdp: request.user._json.image.link,
-					isOnline: false,
-					pendingRequests: [],
-				});
+				var userN: User = await this.userService.getUser(user.nickname);
+				if (userN) {
+					user = await this.userService.create({
+						nickname: userN.nickname + '1',
+						email: request.user._json.email,
+						imgPdp: request.user._json.image.link,
+						isOnline: false,
+						pendingRequests: [],
+					});
+				}
+				else{
+					user = await this.userService.create({
+						nickname: request.user._json.login,
+						email: request.user._json.email,
+						imgPdp: request.user._json.image.link,
+						isOnline: false,
+						pendingRequests: [],
+					});
+				}
 			}
 			if (user.isOnline)
 				throw new BadRequestException('Already Online')

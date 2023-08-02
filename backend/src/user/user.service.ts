@@ -30,6 +30,15 @@ export class UserService {
 	}
   }
 
+  async getUserByNickname(nickname: any): Promise<User> {
+	try {
+		return await this.userRepository.findOne({ where: { nickname: nickname } });
+		
+	} catch (error) {
+		return error
+	}
+  }
+
   async getAllUser(): Promise<User[]> {
 	try {
 		const users = await this.userRepository.find();
