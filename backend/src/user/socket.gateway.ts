@@ -54,17 +54,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 	async handleConnection(client: Socket) {
 		try {
-		
+
 			let user: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
 			);
 			if (user) {
-				const alreadyConnected : boolean= await this.authService.AlreadyConnect(
+				const alreadyConnected: boolean = await this.authService.AlreadyConnect(
 					this.gateway.userNamespace,
 					user.id,
 				)
-				if (alreadyConnected)
-				{
+				if (alreadyConnected) {
 					client.emit('logout');
 					client.disconnect();
 					throw new BadRequestException('Already connected')
@@ -137,6 +136,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userSender,
 				userReceiv,
 			);
+
 			if (alreadyBlock)
 				throw new BadRequestException('User is blocked');
 			if (alreadyExist != null) {
@@ -171,7 +171,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async watchGame(
 		client: Socket,
 		data: {
-			userPlayingId : number,
+			userPlayingId: number,
 		},
 	) {
 		try {
@@ -390,11 +390,18 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const userBlocked: any = await this.userService.getUserById(
 				data.userBlockedId,
 			);
-			const alreadyBlock: any = await this.friendService.getBlockedRelation(
+
+			const alreadyBlock1: any = await this.friendService.getBlockedRelation1(
 				userSender,
 				userBlocked,
 			);
-			if (alreadyBlock)
+			if (alreadyBlock1)
+				throw new BadRequestException('User already blocked');
+			const alreadyBlock2: any = await this.friendService.getBlockedRelation1(
+				userSender,
+				userBlocked,
+			);
+			if (alreadyBlock2)
 				throw new BadRequestException('User already blocked');
 			else if (userSender.id == userBlocked.id)
 				throw new BadRequestException('Cannot block yourself');
@@ -405,8 +412,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit('userHasBlocked');
 			this.deleteFriend(client, data.userBlockedId);
 			const room = await this.roomService.getDirectRoom(userSender.id, userBlocked.id)
-			if (room)
-			{
+			if (room) {
 				await this.roomService.deleteRoom(room.id);
 				await this.gateway.chatNamespace.emit('roomDeleted', room.name);
 			}

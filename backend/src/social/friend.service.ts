@@ -127,6 +127,37 @@ export class FriendService {
   /*                              Blocked Features                              */
   /* -------------------------------------------------------------------------- */
 
+  async getBlockedRelation1(currentUser: User, otherUser: User) {
+    try {
+		const relation1 = await this.blockedUserRepository.find({
+		  where: {
+			currentUser: currentUser,
+			otherUser: otherUser,
+		  },
+		});
+		  if (relation1.length) {
+			return relation1;
+		  } else return null;
+	} catch (error) {
+		return error
+	}
+  }
+  async getBlockedRelation2(currentUser: User, otherUser: User) {
+    try {
+		const relation2 = await this.blockedUserRepository.find({
+			where: {
+				currentUser: otherUser,
+				otherUser: currentUser,
+			},
+		  });
+		if (relation2.length) {
+			return relation2;
+		  } else return null;
+	} catch (error) {
+		return error
+	}
+  }
+  
   async getBlockedRelation(currentUser: User, otherUser: User) {
     try {
 		const relation1 = await this.blockedUserRepository.find({
