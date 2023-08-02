@@ -101,14 +101,14 @@ const RoomList: React.FC<RoomListProps> = ({
     setRooms(rooms);
   }
 
-  function handleRoomDeleted(roomName: string) {
+  async function handleRoomDeleted(roomName: string) {
     toast({
       title: roomName + " room deleted",
       status: "info",
       isClosable: true,
       position: "top",
     });
-    chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    await chatSocket.emit("getUserRooms", { userId: currentUser.id });
   }
 
   function handleRoomCreated() {
