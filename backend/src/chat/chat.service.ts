@@ -42,6 +42,15 @@ export class ChatService {
 				client.handshake.auth.token,
 			);
 			if (user) {
+				const alreadyConnected: boolean = await this.authService.AlreadyConnect(
+					this.gateway.chatNamespace,
+					user.id,
+				)
+				if (alreadyConnected) {
+					client.emit('logout');
+					client.disconnect();
+					throw new BadRequestException('Already connected')
+				}
 				user = await this.userService.setSocket(user.id, client.id);
 				this.logger.log(user.nickname + ' Connected');
 				this.gateway.userNamespace.emit('reloadLists');
