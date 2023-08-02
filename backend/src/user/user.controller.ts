@@ -149,7 +149,7 @@ export class UserController {
 			const test = filetype(fs.readFileSync(file.path))
 			if (test.length) {
 				if (!((test[0].mime == 'image/png' || test[0].mime == 'image/jpeg' ||
-					test[0].mime == 'image/jpg' || test[0].mime == 'image/gif') && file.size < 50000)) {
+					test[0].mime == 'image/jpg' || test[0].mime == 'image/gif') && file.size < 5000000)) {
 					fs.unlinkSync(file.path);
 					throw new BadRequestException('Invalid Format');
 				}
