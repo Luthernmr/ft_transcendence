@@ -204,14 +204,7 @@ export default function Settings(props: any) {
 					isClosable: true,
 					position: "top",
 				});
-
-				await axios.get(import.meta.env.VITE_BACKEND + "/api/logout", {
-					withCredentials: true,
-				});
-				sessionStorage.removeItem("jwt");
-				sessionStorage.removeItem("currentUser");
-				onClose();
-				navigate("/login");
+					onClose()
 			}
 		} catch (error) {
 			toast({
