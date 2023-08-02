@@ -3,16 +3,14 @@ import { User } from '../../user/user.entity';
 import { Room } from './room.entity';
 
 @Entity()
-export class Mute {
+export class MutedUser {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.mutes)
+  @ManyToOne(() => User, (user) => user.mutedUsers, { onDelete: 'CASCADE' })
   user: User;
 
-  @ManyToOne(() => Room, (room) => room.mutes,{
-    cascade: true,
-  })
+  @ManyToOne(() => Room, (room) => room.mutedUsers, { onDelete: 'CASCADE' })
   room: Room;
 
   @Column('timestamp')
