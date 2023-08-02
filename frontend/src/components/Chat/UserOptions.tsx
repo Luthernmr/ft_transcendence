@@ -37,11 +37,15 @@ const UserOptions: React.FC<UserOptionsProps> = ({
   };
 
   const handleBan = (user: User, selectedRoom: Room, currentUser: User) => {
-    chatSocket.emit("banUser", {
-      targetUser: user,
-      room: selectedRoom,
-      user: currentUser,
-    });
+    if (selectedRoom.isDm) {
+      chatSocket.emit("deleteRoom", selectedRoom);
+    } else {
+      chatSocket.emit("banUser", {
+        targetUser: user,
+        room: selectedRoom,
+        user: currentUser,
+      });
+    }
   };
 
   const handleMute = (user: User, selectedRoom: Room, currentUser: User) => {

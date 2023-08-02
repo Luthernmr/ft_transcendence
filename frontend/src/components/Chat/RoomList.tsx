@@ -50,37 +50,6 @@ const RoomList: React.FC<RoomListProps> = ({
   const [selectedRoom, setSelectedRoomLocal] = useState<Room | null>(null);
   const toast = useToast();
 
-  useEffect(() => {
-    chatSocket.emit("getUserRooms", { userId: currentUser.id });
-    chatSocket.on("roomList", (rooms: Room[]) => {
-      setRooms(rooms);
-    });
-    chatSocket.on("roomDeleted", (roomName: string) => {
-      toast({
-        title: roomName + " room deleted",
-        status: "info",
-        isClosable: true,
-        position: "top",
-      });
-      chatSocket.emit("getUserRooms", { userId: currentUser.id });
-    });
-
-    chatSocket.on("roomCreated", () => {
-      chatSocket.emit("getUserRooms", { userId: currentUser.id });
-    });
-
-    chatSocket.on("updatedRoom", () => {
-      chatSocket.emit("getUserRooms", { userId: currentUser.id });
-    });
-
-    return () => {
-      chatSocket.off("roomList");
-      chatSocket.off("roomCreated");
-      chatSocket.off("roomDeleted");
-      chatSocket.off("updatedRoom");
-    };
-  }, [currentUser.id]);
-
   const handleRoomClick = (room: Room) => {
     if (room.password) {
       setSelectedRoomLocal(room);
@@ -127,6 +96,43 @@ const RoomList: React.FC<RoomListProps> = ({
     });
     onClose();
   };
+
+  function handleRoomList(rooms: Room[]) {
+    setRooms(rooms);
+  }
+
+  async function handleRoomDeleted(roomName: string) {
+    toast({
+      title: roomName + " room deleted",
+      status: "info",
+      isClosable: true,
+      position: "top",
+    });
+    await chatSocket.emit("getUserRooms", { userId: currentUser.id });
+  }
+
+  function handleRoomCreated() {
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
+  }
+
+  function handleUpdatedRoom() {
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
+  }
+
+  useEffect(() => {
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    chatSocket.on("roomList", handleRoomList);
+    chatSocket.on("roomDeleted", handleRoomDeleted);
+    chatSocket.on("roomCreated", handleRoomCreated);
+    chatSocket.on("updatedRoom", handleUpdatedRoom);
+
+    return () => {
+      chatSocket.off("roomList", handleRoomList);
+      chatSocket.off("roomDeleted", handleRoomDeleted);
+      chatSocket.off("roomCreated", handleRoomCreated);
+      chatSocket.off("updatedRoom", handleUpdatedRoom);
+    };
+  }, [currentUser.id]);
 
   return (
     <Flex
