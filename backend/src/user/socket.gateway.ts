@@ -134,13 +134,18 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userSender,
 				userReceiv,
 			);
-			const alreadyBlock: any = await this.friendService.getBlockedRelation(
+			const alreadyBlock1: any = await this.friendService.getBlockedRelation1(
 				userSender,
 				userReceiv,
 			);
-
-			if (alreadyBlock)
+			if (alreadyBlock1)
 				throw new BadRequestException('User is blocked');
+				const alreadyBlock2: any = await this.friendService.getBlockedRelation1(
+					userSender,
+					userReceiv,
+				);
+			if (alreadyBlock2)
+					throw new BadRequestException('User blocked you');
 			if (alreadyExist != null) {
 				throw new BadRequestException('Already friend.');
 			}
@@ -159,9 +164,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userReceiv.id,
 			);
 			if (otherSocket)
+			{
 				otherSocket.emit('notifyRequest');
-			else
 				otherSocket.emit('reload');
+			}
 			client.emit('success', { message: "Friend request sent" });
 
 		} catch (error) {
@@ -294,7 +300,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				friendUser.id,
 			);
-			otherSocket.emit('reload');
+			if(otherSocket)
+				otherSocket.emit('reload');
 			client.emit('reload');
 			client.emit('requestAcccepted');
 			await this.userService.deletePendingRequestById(request);
@@ -347,7 +354,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				friendUser.id,
 			);
-			otherSocket.emit('reload');
+			if(otherSocket)
+				otherSocket.emit('reload');
 			client.emit('reload');
 			client.to(friendUser.socketId).emit('reload');
 
@@ -431,7 +439,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				userBlocked.id,
 			);
-			otherSocket.emit('reload');
+			if(otherSocket)
+				otherSocket.emit('reloadList');
 			client.emit('reload');
 			client.emit('success', { message: "User blocked and deleted" });
 			this.gateway.userNamespace.emit('userBlocked');
