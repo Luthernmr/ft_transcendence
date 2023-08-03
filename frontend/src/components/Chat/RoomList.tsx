@@ -51,6 +51,7 @@ const RoomList: React.FC<RoomListProps> = ({
   const toast = useToast();
 
   const handleRoomClick = (room: Room) => {
+    setSelectedRoomLocal(null);
     if (room.password) {
       setSelectedRoomLocal(room);
       onOpen();
@@ -104,7 +105,7 @@ const RoomList: React.FC<RoomListProps> = ({
       isClosable: true,
       position: "top",
     });
-    await chatSocket.emit("getUserRooms", { userId: currentUser.id });
+    chatSocket.emit("getUserRooms", { userId: currentUser.id });
   }
 
   function handleRoomCreated() {
