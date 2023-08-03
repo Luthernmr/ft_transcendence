@@ -103,7 +103,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
 			);
-			
+
 			if (user) {
 				await this.userService.setOffline(user);
 				this.gateway.userNamespace.emit('reloadLists');
@@ -140,12 +140,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			);
 			if (alreadyBlock1)
 				throw new BadRequestException('User is blocked');
-				const alreadyBlock2: any = await this.friendService.getBlockedRelation1(
-					userSender,
-					userReceiv,
-				);
+
+			const alreadyBlock2: any = await this.friendService.getBlockedRelation1(
+				userReceiv,
+				userSender,
+			);
 			if (alreadyBlock2)
-					throw new BadRequestException('User blocked you');
+				throw new BadRequestException('User blocked you');
 			if (alreadyExist != null) {
 				throw new BadRequestException('Already friend.');
 			}
@@ -163,8 +164,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				userReceiv.id,
 			);
-			if (otherSocket)
-			{
+			if (otherSocket) {
 				otherSocket.emit('notifyRequest');
 				otherSocket.emit('reload');
 			}
@@ -300,7 +300,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				friendUser.id,
 			);
-			if(otherSocket)
+			if (otherSocket)
 				otherSocket.emit('reload');
 			client.emit('reload');
 			client.emit('requestAcccepted');
@@ -354,7 +354,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				friendUser.id,
 			);
-			if(otherSocket)
+			if (otherSocket)
 				otherSocket.emit('reload');
 			client.emit('reload');
 			client.to(friendUser.socketId).emit('reload');
@@ -439,7 +439,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				userBlocked.id,
 			);
-			if(otherSocket)
+			if (otherSocket)
 				otherSocket.emit('reloadList');
 			client.emit('reload');
 			client.emit('success', { message: "User blocked and deleted" });
