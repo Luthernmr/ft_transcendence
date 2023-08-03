@@ -46,6 +46,7 @@ const getUser = async () => {
 		pongSocket.auth = { token: res.data.jwt };
 		userSocket.auth = { token: res.data.jwt };
 		chatSocket.auth = { token: res.data.jwt };
+		window.location.reload
 	} catch (error) { console.log(error) }
 };
 
@@ -112,7 +113,7 @@ export default function App() {
 			userSocket.off("success", handleSuccess)
 			userSocket.off("connect", getUser)
 			userSocket.off("logout", signOut)
-		}
+		}	
 
 	})
 
