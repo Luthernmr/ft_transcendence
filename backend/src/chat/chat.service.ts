@@ -146,6 +146,9 @@ export class ChatService {
 				payload.password,
 				payload.room.password,
 			);
+			if (!answer) {
+				client.emit('error', {message: "Wrong password"})
+			}
 			client.emit('passCheck', answer);
 		} catch (error) {
 			client.emit('error', { message: error.message });

@@ -86,12 +86,6 @@ const RoomList: React.FC<RoomListProps> = ({
         });
       } else {
         setRoomPassword("");
-        toast({
-          title: "Wrong password",
-          status: "error",
-          isClosable: true,
-          position: "top",
-        });
         setSelectedRoomLocal(null);
         return;
       }

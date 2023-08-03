@@ -56,7 +56,7 @@ export class RoomService {
         name: dto.name,
         ownerId: user.id,
         isPrivate: dto.isPrivate,
-        isDm : dto.isDm,
+        isDm: dto.isDm,
         password: hashedPassword,
         users: dto.users,
       };
