@@ -18,7 +18,6 @@ export class Auth42Controller {
 		@Req() request: any,
 	) {
 		try {
-
 			if(!(await this.authService.getUserCookie(request)).isOnline)
 			{
 				await this.authService.logout(request, response);

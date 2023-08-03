@@ -1,6 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
+import { ReturnDocument } from 'typeorm';
 
 @Injectable()
 export class LocalAuthGuard implements CanActivate {
@@ -11,8 +12,11 @@ export class LocalAuthGuard implements CanActivate {
     try {
       const request = context.switchToHttp().getRequest();
       const cookie = request.cookies['jwt'];
+		if (!cookie)
+			return false 
       const data = this.jwtService.verifyAsync(cookie);
-      if (!data) return false;
+      if (!data)
+	  	return false;
     } catch (error) {
       return false;
     }

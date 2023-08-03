@@ -161,7 +161,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (otherSocket)
 				otherSocket.emit('notifyRequest');
 			else
-				client.to(userReceiv.socketId).emit('reload');
+				otherSocket.emit('reload');
 			client.emit('success', { message: "Friend request sent" });
 
 		} catch (error) {
@@ -290,7 +290,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				userA: currentUser,
 				userB: friendUser,
 			});
-			client.to(friendUser.socketId).emit('reload');
+			const otherSocket = await this.authService.getUserSocket(
+				this.gateway.userNamespace,
+				friendUser.id,
+			);
+			otherSocket.emit('reload');
 			client.emit('reload');
 			client.emit('requestAcccepted');
 			await this.userService.deletePendingRequestById(request);
@@ -339,6 +343,11 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				data.friendId,
 			);
 			await this.friendService.deleteFriend(currentUser, friendUser);
+			const otherSocket = await this.authService.getUserSocket(
+				this.gateway.userNamespace,
+				friendUser.id,
+			);
+			otherSocket.emit('reload');
 			client.emit('reload');
 			client.to(friendUser.socketId).emit('reload');
 
@@ -412,12 +421,18 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				otherUser: userBlocked,
 			});
 			client.emit('userHasBlocked');
-			this.deleteFriend(client, data.userBlockedId);
+			await this.deleteFriend(client, data.userBlockedId);
 			const room = await this.roomService.getDirectRoom(userSender.id, userBlocked.id)
 			if (room) {
 				await this.roomService.deleteRoom(room.id);
 				await this.gateway.chatNamespace.emit('roomDeleted', room.name);
 			}
+			const otherSocket = await this.authService.getUserSocket(
+				this.gateway.userNamespace,
+				userBlocked.id,
+			);
+			otherSocket.emit('reload');
+			client.emit('reload');
 			client.emit('success', { message: "User blocked and deleted" });
 			this.gateway.userNamespace.emit('userBlocked');
 		} catch (error) {
