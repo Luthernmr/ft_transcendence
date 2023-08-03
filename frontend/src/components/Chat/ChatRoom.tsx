@@ -129,7 +129,7 @@ const ChatRoom: React.FC<Props> = ({ setSelectedRoom, selectedRoom }) => {
   }
 
   function handleError(error: { message: string }) {
-    if (error.message !== "Room already exists")
+    if (error.message !== "Room already exists" && error.message !== "Room does not exist")
       toast({
         title: error.message,
         status: "error",
