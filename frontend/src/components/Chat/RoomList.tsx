@@ -53,8 +53,6 @@ const RoomList: React.FC<RoomListProps> = ({
 	const handleRoomClick = (room: Room) => {
 		setSelectedRoomLocal(null);
 		if (room.password) {
-
-			console.log('setSelectedroom local  name', room.name )
 			setSelectedRoomLocal(room);
 			onOpen();
 		} else {
@@ -75,8 +73,6 @@ const RoomList: React.FC<RoomListProps> = ({
 		chatSocket.on("passCheck", (check: boolean) => {
 			
 			if (check && selectedRoomLocal) {
-			console.log('setSelectedroom local  pass Check name', selectedRoomLocal.name )
-
 				chatSocket.emit("joinRoom", {
 					userId: currentUser.id,
 					room: selectedRoomLocal,
