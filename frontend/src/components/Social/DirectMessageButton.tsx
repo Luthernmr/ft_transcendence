@@ -36,8 +36,8 @@ export default function DirectMessageButton(props: any) {
     });
     
     chatSocket.on('roomAlreadyExists', (newRoom: Room) => {
-      chatSocket.emit("joinRoom", { userId: currentUser.id, room: newRoom });
       navigate('/Chat');
+      chatSocket.emit("joinRoom", { userId: currentUser.id, room: newRoom });
       setSelectedRoom(newRoom);
     });
   };
