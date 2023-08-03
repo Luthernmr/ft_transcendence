@@ -78,6 +78,7 @@ export default function TwoFA() {
 					pongSocket.connect();
 					userSocket.connect();
 					navigate("/Home");
+					window.location.reload
 				}
 			}
 			onClose();

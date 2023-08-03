@@ -151,7 +151,7 @@ export default function App() {
 					path="/Home"
 					element={
 						<PrivateRoute>
-							<SidebarWithHeader children={<UserProfile />} />
+							<SidebarWithHeader children={<Chat/>} />
 						</PrivateRoute>
 					}
 				/>

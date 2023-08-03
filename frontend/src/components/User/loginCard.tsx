@@ -64,6 +64,7 @@ export default function loginCard() {
           userSocket.connect();
           pongSocket.connect();
           navigate("/home");
+          window.location.reload
         }
       }
       if (!response.data) {

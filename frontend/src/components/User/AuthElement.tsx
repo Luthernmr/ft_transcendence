@@ -47,6 +47,7 @@ export default function AuthElement() {
 							userSocket.connect();
 							pongSocket.connect();
 							navigate("/home");
+							window.location.reload
 						}
 					} 
 					else if (res.data.status == 401 || res.data.status == 400) {
