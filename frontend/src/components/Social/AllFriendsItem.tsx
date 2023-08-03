@@ -24,6 +24,8 @@ import UserCard from "./UserCard";
 import PongInviteButton from "./PongInviteButton";
 import DirectMessageButton from "./DirectMessageButton";
 import { User } from "./AllUserItem";
+import BlockUserButton from "./BlockUserButton";
+import WatchGame from "./WatchButton";
 
 export interface Friend {
   id: number;
@@ -95,7 +97,15 @@ export default function AllfriendItem() {
                 <PopoverBody>
                   <Flex justifyContent={"space-between"}>
                     <DeleteFriendButton user={friend} />
-                    <PongInviteButton user={friend} />
+                    {
+											friend.isOnline &&  !friend.isPlaying &&
+											<PongInviteButton user={friend} />
+										}
+										{
+										friend.isPlaying &&
+											<WatchGame user={friend} />
+										}
+										<BlockUserButton user={friend} />
                     <DirectMessageButton
                       user={friend}
                       currentUser={currentUser}
