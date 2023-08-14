@@ -22,12 +22,12 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	if (props.joined === false) {
 		return (
 			<>
-				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
-					<Box as='button' bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25'
+				<Box bg='teal.500' color='white' w='70%' h='80%' borderRadius='10'>
+					<Box as='button' color='white'  bg="teal.500" w='100%' h='100%' borderRadius='10'
 						_hover={{
 						bg: "rgba(255, 255, 255, 0.3)"
 						}} onClick={JoinQueue}>
-						<Text as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
+						<Text color='white' as='b' fontSize={["md", "lg", "xl", "2xl"]} align='center'>{props.name}</Text>
 						<Text fontSize={["xs", "sm", "md", "lg"]}>Join Queue</Text>
 					</Box>
 				</Box>
@@ -36,7 +36,7 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	} else {
 		return (
 			<>
-				<Box bg='teal.300' w='70%' h='80%' borderRadius='25'>
+				<Box bg='teal.500' w='70%' h='80%' borderRadius='10'>
 					<Flex direction='column' w='100%' h='100%'>
 						<Box h='33%'>
 							<Center h='100%'>
@@ -50,7 +50,7 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 						</Box>
 						<Box h='33%' w='100%'>
 							<Center h='100%'>
-								<Button bg='teal.300' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}
+								<Button bg='teal.500' color='white' size={['xm', 'xm', 'md', 'md']} minWidth={50} fontSize={["xs", "sm", "md", "lg"]} onClick={LeaveQueue}
 										_hover={{
 										bg: "rgba(255, 255, 255, 0.3)"
 										}}>Leave</Button>

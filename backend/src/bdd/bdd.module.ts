@@ -15,9 +15,9 @@ import { MutedUser } from 'src/room/entities/muted-user.entity';
       type: 'postgres',
       host: 'postgres',
       port: 5432,
-      username: 'root',
-      password: 'root',
-      database: 'ft_db',
+      username: process.env.POSTGRES_USER,
+      password:process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_DB,
       entities: [
         User,
         MutedUser,
