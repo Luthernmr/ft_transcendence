@@ -63,7 +63,7 @@ function HomeScreen(props: HomeScreenProps) {
 					</Center>
 				</Box>
 				<Flex direction='row' w='100%' h={['10%', '30%', '80%', '100%']} minHeight={100} maxHeight={200}>
-					<Box w='100%' minWidth={50} color='white' >
+					<Box w='100%' minWidth={50} color='white'>
 						<Center w='100%' h='100%'>
 							<QueueWidget name='PONG' joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
 						</Center>
@@ -79,7 +79,7 @@ function HomeScreen(props: HomeScreenProps) {
 					<Center w='100%' h='100%'>
 						<Box w='85%' h='100%' bg='teal.500' color='white' borderRadius='10'>
 							<Box as='button'
-							bg="blue.300" w='100%' h='100%' borderRadius='10'
+							bg="blue.300" w='100%' h='100%' borderRadius='25'
 							_hover={{
 							bg: "blue.200"
 							}} fontSize={'xl'} onClick={WatchGame}>
@@ -89,7 +89,6 @@ function HomeScreen(props: HomeScreenProps) {
 					</Center>
 				</Box>
 				<Box w='100%' h='100%' minHeight={5} maxHeight={50} />
-				
 			</Flex>
 		</>
 	)
