@@ -22,8 +22,8 @@ function QueueWidget(props: QueueQueueWidgetProps) {
 	if (props.joined === false) {
 		return (
 			<>
-				<Box bg='teal.500' color='white' w='70%' h='80%' borderRadius='25'>
-					<Box as='button' color='white' bg="teal.500" w='100%' h='100%' borderRadius='10'
+				<Box bg='teal.500' color='white' w='70%' h='80%' borderRadius='10'>
+					<Box as='button' color='white'  bg="teal.500" w='100%' h='100%' borderRadius='10'
 						_hover={{
 						bg: "rgba(255, 255, 255, 0.3)"
 						}} onClick={JoinQueue}>
