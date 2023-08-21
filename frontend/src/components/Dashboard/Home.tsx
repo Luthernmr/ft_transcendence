@@ -36,8 +36,8 @@ export default function Home() {
              {" On our ft_transcendence"}
             </Text>{" "}
           </Heading>
-          <Text fontSize={{ base: "md", lg: "lg" }} color={"gray.500"}>
-            Student project
+          <Text fontSize={{ base: "md", lg: "lg" }} color={"red.500"}>
+		  This is a student project, please do not enter any sensitive data.
           </Text>
           <Stack direction={{ base: "column", md: "row" }} spacing={4}>
             <Button
