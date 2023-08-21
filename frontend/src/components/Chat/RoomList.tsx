@@ -81,7 +81,7 @@ const RoomList: React.FC<RoomListProps> = ({
 			} else {
 				setRoomPassword("");
 				setSelectedRoomLocal(null);
-				onClose();
+				//onClose();
 				return;
 			}
 

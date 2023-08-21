@@ -14,10 +14,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY . .
 
-EXPOSE 5001
+EXPOSE 5000
 
 ENTRYPOINT ["/bcrypt.sh"]
 
-RUN npm run build
+#RUN npm run build
 
-CMD ["npm", "start"]
+CMD ["npm", "run", "start:dev"]
