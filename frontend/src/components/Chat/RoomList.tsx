@@ -102,8 +102,7 @@ const RoomList: React.FC<RoomListProps> = ({
 			room: selectedRoomLocal,
 			password: roomPassword,
 		});
-
-
+		onClose();
 	};
 
 	function handleRoomList(rooms: Room[]) {
