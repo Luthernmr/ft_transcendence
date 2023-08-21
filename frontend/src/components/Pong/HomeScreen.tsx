@@ -62,14 +62,14 @@ function HomeScreen(props: HomeScreenProps) {
 						<Text as='b' fontSize='2xl'>Play</Text>
 					</Center>
 				</Box>
-				<Flex direction='row' w='100%' h={['10%', '30%', '80%', '100%']} minHeight={100} maxHeight={400}>
-					<Box w='100%' minWidth={50}>
+				<Flex direction='row' w='100%' h={['10%', '30%', '80%', '100%']} minHeight={100} maxHeight={200}>
+					<Box w='100%' minWidth={50} color='white' >
 						<Center w='100%' h='100%'>
 							<QueueWidget name='PONG' joined={joinedClassic} joinQueue={() => JoinQueue(false)} leaveQueue={() => LeaveQueue(false)} />
 						</Center>
 					</Box>
 					<Divider orientation='vertical' />
-					<Box w='100%' minWidth={50}>
+					<Box w='100%' minWidth={50} color='white'>
 						<Center w='100%' h='100%'>
 							<QueueWidget name='GNOP' joined={joinedCustom} joinQueue={() => JoinQueue(true)} leaveQueue={() => LeaveQueue(true)} />
 						</Center>
@@ -77,11 +77,11 @@ function HomeScreen(props: HomeScreenProps) {
 				</Flex>
 				<Box w='100%' h='100%' minHeight={7} maxHeight={100}>
 					<Center w='100%' h='100%'>
-						<Box w='85%' h='100%' bg='teal.300' borderRadius='25'>
+						<Box w='85%' h='100%' bg='teal.500' color='white' borderRadius='10'>
 							<Box as='button'
-							bg="rgba(76, 175, 80, 0.1)" w='100%' h='100%' borderRadius='25'
+							bg="blue.300" w='100%' h='100%' borderRadius='10'
 							_hover={{
-							bg: "rgba(255, 255, 255, 0.3)"
+							bg: "blue.200"
 							}} fontSize={'xl'} onClick={WatchGame}>
 								<Text fontSize={["md", "lg", "xl", "2xl"]} align='center'>Watch a game</Text>
 							</Box>
@@ -89,16 +89,7 @@ function HomeScreen(props: HomeScreenProps) {
 					</Center>
 				</Box>
 				<Box w='100%' h='100%' minHeight={5} maxHeight={50} />
-				<Box w='100%' h='100%' maxHeight={300}>
-						<Box w='100%' h='20%' borderRadius={10} bg='gray.100' >
-							<Center w='100%' h='100%'>
-								<Text as='b' fontSize='2xl'>Recent Matches</Text>
-							</Center>
-						</Box>
-						<Box w='100%' h='80%'>
-							<MatchHistory user={currentUser} />
-						</Box>
-				</Box>
+				
 			</Flex>
 		</>
 	)
