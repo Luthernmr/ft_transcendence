@@ -15,21 +15,23 @@ export class Auth42Service {
 			var user: User = await this.userService.getUser(request.user._json.email);
 			
 			if (!user) {
+				const imgPdp = request.user._json.image && request.user.__json.image.link ? request.user._json.image.link : null;
+
 				var userN: User = await this.userService.getUserByNickname(request.user._json.login);
 				if (userN) {
 					user = await this.userService.create({
 						nickname: userN.nickname + '1',
 						email: request.user._json.email,
-						imgPdp: request.user._json.image.link,
+						imgPdp: imgPdp,
 						isOnline: false,
 						pendingRequests: [],
 					});
 				}
-				else{
+				else {
 					user = await this.userService.create({
 						nickname: request.user._json.login,
 						email: request.user._json.email,
-						imgPdp: request.user._json.image.link,
+						imgPdp: imgPdp,
 						isOnline: false,
 						pendingRequests: [],
 					});

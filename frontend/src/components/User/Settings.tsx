@@ -169,22 +169,23 @@ export default function Settings(props: any) {
 	}, [profile.isTwoFA, isChecked]);
 
 	async function handleCheck2FA() {
-		if (profile.isTwoFA) {
-			await axios.post(
-				import.meta.env.VITE_BACKEND + "/api/turn-off" + location.search, {}, { withCredentials: true }
-			);
-			setIsChecked(false);
-		} else {
-			try {
-				const resp: any = await axios.get(
-					import.meta.env.VITE_BACKEND + "/api/generate" + location.search,
-					{ withCredentials: true, responseType: "blob" }
+		
+		try {
+			if (profile.isTwoFA) {
+				await axios.post(
+					import.meta.env.VITE_BACKEND + "/api/turn-off" + location.search, {}, { withCredentials: true }
 				);
-				const qrUrl = URL.createObjectURL(resp.data);
-				setQrcode(qrUrl);
-				onOpen();
-			} catch (error) { console.log(error) }
-		}
+				setIsChecked(false);
+			} else {
+					const resp: any = await axios.get(
+						import.meta.env.VITE_BACKEND + "/api/generate" + location.search,
+						{ withCredentials: true, responseType: "blob" }
+					);
+					const qrUrl = URL.createObjectURL(resp.data);
+					setQrcode(qrUrl);
+					onOpen();
+				}
+		} catch (error) { console.log(error) }
 	}
 	const signOut = async () => {
 
