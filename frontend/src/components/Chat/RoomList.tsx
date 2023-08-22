@@ -103,6 +103,9 @@ const RoomList: React.FC<RoomListProps> = ({
 			password: roomPassword,
 		});
 		onClose();
+		return () => {
+			chatSocket.off('error');
+		}
 	};
 
 	function handleRoomList(rooms: Room[]) {
