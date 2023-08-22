@@ -20,6 +20,7 @@ function Chat() {
     });
 
   useEffect(() => {
+    setSelectedRoom(null);
     chatSocket.on("error", handleError);
     return () => {
       chatSocket.off("error", handleError);

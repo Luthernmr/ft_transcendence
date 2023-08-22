@@ -36,14 +36,16 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			let users = (await this.userService.getAllUserOnline());
 			this.logger.log('Ping');
 			for (let user of users) {
-				const otherSocket = await this.authService.getUserSocket(
-					this.gateway.userNamespace,
-					user.id,
-				);
-				if (!otherSocket) {
-					this.userService.setOffline(user);
-					this.gateway.userNamespace.emit('reloadLists');
-				}
+				try {
+					const otherSocket = await this.authService.getUserSocket(
+						this.gateway.userNamespace,
+						user.id,
+					);
+					if (!otherSocket) {
+						this.userService.setOffline(user);
+						this.gateway.userNamespace.emit('reloadLists');
+					}
+				} catch (error) { console.log(error); }
 			};
 		}, 7000);
 	}
