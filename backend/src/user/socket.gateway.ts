@@ -60,7 +60,8 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			let user: User = await this.authService.getUserByToken(
 				client.handshake.auth.token,
-			);
+				);
+			
 			if (user) {
 				const alreadyConnected: boolean = await this.authService.AlreadyConnect(
 					this.gateway.userNamespace,

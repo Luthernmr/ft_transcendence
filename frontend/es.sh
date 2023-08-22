@@ -6,6 +6,6 @@ npm i express
 
 npm rebuild esbuild
 
-#npm run build
+# npm run build
 
 exec "$@"

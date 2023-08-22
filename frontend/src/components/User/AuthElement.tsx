@@ -36,6 +36,7 @@ export default function AuthElement() {
 					);
 					if (res.data.jwt) {
 						sessionStorage.setItem("jwt", res.data.jwt);
+						console.log('res jwt', res.data.jwt)
 						if (sessionStorage.getItem("jwt")) {
 							chatSocket.disconnect();
 							userSocket.disconnect();
@@ -47,7 +48,6 @@ export default function AuthElement() {
 							userSocket.connect();
 							pongSocket.connect();
 							navigate("/home");
-							window.location.reload
 						}
 					} 
 					else if (res.data.status == 401 || res.data.status == 400) {

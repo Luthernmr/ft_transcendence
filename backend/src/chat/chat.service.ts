@@ -144,7 +144,7 @@ export class ChatService {
 		try {
 			const answer = await bcrypt.compare(
 				payload.password,
-				payload.room.password,
+				payload?.room?.password,
 			);
 			if (!answer) {
 				client.emit('error', {message: "Wrong password"})

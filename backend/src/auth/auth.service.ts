@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Response, Request } from 'express';
 import { User } from 'src/user/user.entity';
@@ -65,10 +65,13 @@ export class AuthService {
   async getUserCookie(request: Request): Promise<User> {
 	try {
 		const cookie = await request.cookies['jwt'];
-		const data = await this.jwtService.verifyAsync(cookie);
-		return await this.userService.getUser(data.email);
+		const data = await this.jwtService.verify(cookie);
+		console.log(data)
+		if (data)
+			return await this.userService.getUser(data.email);
 		
 	} catch (error) {
+		console.log('error1==================', error)
 		return error;
 	}
   }
@@ -76,13 +79,29 @@ export class AuthService {
   async getUserByToken(token: string): Promise<User> {
 	try {
 		if (token) {
-		  const data = await this.jwtService.verifyAsync(token);
+		  const data = await this.jwtService.verify(token);
 		  const user: User = await this.userService.getUser(data.email);
 		  delete user?.password;
 		  return user;
 		}
 	} catch (error) {
+		console.log('error2===============', error)
+
 		return error;
+	}
+}
+async verifyJWT(token: string) {
+	try {
+		if (token) {
+		  const data = await this.jwtService.verify(token);
+		  if (!data)
+			throw new UnauthorizedException('bad token')
+		return(true)
+		}
+	} catch (error) {
+		console.log('error verify',  error)
+
+		return(false)
 	}
 }
 
@@ -131,11 +150,11 @@ export class AuthService {
   async logout(request: Request, response: Response) {
 	  try {
 		const user = await this.getUserCookie(request);
+		if(!user.id)
+			throw new UnauthorizedException('failed to load user')
 		await this.userService.setOffline(user);
 		response.clearCookie('jwt');
-		response.clearCookie('twofa');
 	} catch (error) {
-		return error;
 		
 	}
   }

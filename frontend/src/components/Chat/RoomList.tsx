@@ -81,10 +81,8 @@ const RoomList: React.FC<RoomListProps> = ({
 			} else {
 				setRoomPassword("");
 				setSelectedRoomLocal(null);
-				//onClose();
 				return;
 			}
-
 		});
 
 		chatSocket.on("joinedRoom", (joinedRoom: Room) => {
