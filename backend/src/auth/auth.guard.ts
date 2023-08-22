@@ -14,7 +14,7 @@ export class LocalAuthGuard implements CanActivate {
       const cookie = request?.cookies['jwt'];
       if (!cookie)
         return false
-      const data = this.jwtService.verifyAsync(cookie);
+      const data = this.jwtService.verify(cookie);
       if (!data)
 	  	return false;
     } catch (error) {
