@@ -431,7 +431,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				otherUser: userBlocked,
 			});
 			client.emit('userHasBlocked');
-			await this.deleteFriend(client, data.userBlockedId);
+			await this.friendService.deleteFriend(userSender, data.userBlockedId);
 			const room = await this.roomService.getDirectRoom(userSender.id, userBlocked.id)
 			if (room) {
 				await this.roomService.deleteRoom(room.id);
@@ -441,8 +441,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.gateway.userNamespace,
 				userBlocked.id,
 			);
-			if (otherSocket)
+			if (otherSocket){
 				otherSocket.emit('reloadList');
+				otherSocket.emit('reload')
+			}
 			client.emit('reload');
 			client.emit('success', { message: "User blocked and deleted" });
 			this.gateway.userNamespace.emit('userBlocked');
