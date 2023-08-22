@@ -54,8 +54,9 @@ function PrivateRoute({ children }: { children: ReactNode }) {
   const jwtSession = sessionStorage.getItem("jwt");
   useEffect(() => {
     const check_jwt = async () => {
-      console.log(jwtSession);
+      console.log('here', jwtSession);
       try {
+
         const res = await axios.post(
           import.meta.env.VITE_BACKEND + "/api/verify",
           { jwt: jwtSession },

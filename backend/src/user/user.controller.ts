@@ -54,6 +54,7 @@ export class UserController {
       const user = await this.userService.getUserById(id);
       if (!user) return response.sendStatus(404);
       delete user.password;
+      delete user.twoFASecret;
       response.send({ user: user });
     } catch (error) {
       response.sendStatus(404);
@@ -67,6 +68,8 @@ export class UserController {
       const user: any = await this.userService.getUserById(id);
       if (!user) return response.sendStatus(404);
       delete user.password;
+      delete user.twoFASecret;
+
       const history: any = await this.historyService.getUserHistory(user);
 
       response.send({ history: history });
@@ -82,6 +85,8 @@ export class UserController {
       const user: any = await this.userService.getUserById(id);
       if (!user) throw Error;
       delete user.password;
+      delete user.twoFASecret;
+
       const historys = await this.historyService.getUserHistory(user);
       let nbOfGame = historys.length;
       let nbOfWin = 0;

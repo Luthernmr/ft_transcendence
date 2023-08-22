@@ -55,7 +55,7 @@ export default function AllfriendItem() {
     });
   }, []);
 
-  if (friends)
+  if (friends.length)
     return (
       <List>
         {friends.map((friend) => (
