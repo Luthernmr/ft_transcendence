@@ -51,21 +51,24 @@ export default function UserStats(props: any) {
 	useEffect(() => {
 		try {
 			const getHistory = async () => {
-				try {
-					const resp = await axios.get(
-						import.meta.env.VITE_BACKEND + "/user/stats/" + props?.user?.id,
-						{
-							withCredentials: true,
+				if (props?.user?.id)
+					{
+						try {
+							const resp = await axios.get(
+								import.meta.env.VITE_BACKEND + "/user/stats/" + props?.user?.id,
+								{
+									withCredentials: true,
+								}
+							);
+							setStats(resp.data.stats);
+						} catch (error) {
 						}
-					);
-					setStats(resp.data.stats);
-				} catch (error) {
+					};
 				}
-			};
-			getHistory();
-		} catch (error) {
-		}
-	}, [props?.user?.id]);
+				getHistory();
+			} catch (error) {
+			}
+		}, [props?.user?.id]);
 
 	const data = {
 		labels: stats.matchList,
@@ -85,7 +88,7 @@ export default function UserStats(props: any) {
 				tension: 0.1,
 			},
 		],
-		
+
 	};
 
 	const options: Partial<ChartOptions<"line">> = {

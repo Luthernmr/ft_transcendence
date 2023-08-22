@@ -61,7 +61,7 @@ export class UserService {
 	try {
 		return await this.userRepository.findOne({ where: { id: id } });
 	} catch (error) {
-		return error
+		throw error
 	}
   }
 

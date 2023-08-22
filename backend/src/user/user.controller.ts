@@ -66,7 +66,8 @@ export class UserController {
   async history(@Res() response: Response, @Param('id') id: number) {
     try {
       const user: any = await this.userService.getUserById(id);
-      if (!user) return response.sendStatus(404);
+	  console.log(user)
+      if (!user) return;
       delete user.password;
       delete user.twoFASecret;
 
@@ -74,6 +75,7 @@ export class UserController {
 
       response.send({ history: history });
     } catch (error) {
+		console.log(error)
       response.sendStatus(404);
     }
   }
@@ -83,7 +85,8 @@ export class UserController {
   async stats(@Res() response: Response, @Param('id') id: number) {
     try {
       const user: any = await this.userService.getUserById(id);
-      if (!user) throw Error;
+      if (!user) 
+		return
       delete user.password;
       delete user.twoFASecret;
 

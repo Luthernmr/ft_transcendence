@@ -32,6 +32,7 @@ export default function OtherProfilPage() {
     } catch (error) {}
   }, [id]);
 
+  console.log('ueserg', user)
   return (
     <>
       <Flex
