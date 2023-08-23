@@ -72,8 +72,9 @@ services:
       VITE_BACKEND: ${BACKEND}
       VITE_FRONTEND: ${FRONTEND}
       VITE_42AUTH: ${VITE_42AUTH}
+      VITE_FRONTEND_PORT: ${FRONTEND_PORT_INT}
     ports:
-      - "3000:3000"
+      - "${FRONTEND_PORT_INT}:${FRONTEND_PORT_INT}"
     volumes:
       - frontend-data:/app
     networks:
