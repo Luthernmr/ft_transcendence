@@ -89,7 +89,16 @@ function HomeScreen(props: HomeScreenProps) {
 					</Center>
 				</Box>
 				<Box w='100%' h='100%' minHeight={5} maxHeight={50} />
-				
+				<Box w='100%' h='100%' maxHeight={300}>
+						<Box w='100%' h='20%' borderRadius={10} bg='gray.100' >
+							<Center w='100%' h='100%'>
+								<Text as='b' fontSize='2xl'>Recent Matches</Text>
+							</Center>
+						</Box>
+						<Box w='100%' h='80%'>
+							<MatchHistory user={currentUser} />
+						</Box>
+				</Box>
 			</Flex>
 		</>
 	)
