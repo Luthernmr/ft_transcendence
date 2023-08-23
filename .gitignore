@@ -6,7 +6,6 @@ frontend/node_modules
 frontend/.env
 .vscode
 .env
-backend/src/auth/auth.controller.ts
 backend/uploadedFiles/avatars
 frontend/dist
 .DS_Store
