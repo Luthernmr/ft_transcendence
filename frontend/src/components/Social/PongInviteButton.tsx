@@ -24,7 +24,7 @@ export default function PongInviteButton(props: any) {
 							colorScheme="blue"
 							onClick={(e) => sendPongRequest(e, props?.user?.id, false)}
 						>
-							normal
+							Normal
 						</Button>
 						<Button
 							colorScheme="green"
