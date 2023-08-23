@@ -14,25 +14,22 @@ export default function OtherProfilPage() {
   useEffect(() => {
     try {
       const getUser = async () => {
-		try {
-        const resp: any = await axios.get(
-          import.meta.env.VITE_BACKEND + "/user/" + id,
-          {
-            withCredentials: true,
+        try {
+          const resp: any = await axios.get(
+            import.meta.env.VITE_BACKEND + "/user/" + id,
+            {
+              withCredentials: true,
+            }
+          );
+          if (resp.status != 404) {
+            setUser(resp?.data?.user);
           }
-        );
-        if (resp.status != 404) {
-			setUser(resp?.data?.user);
-		}
-		} catch (error)
-		{}
+        } catch (error) {}
         // throw Error
       };
       getUser();
     } catch (error) {}
   }, [id]);
-
-  console.log('ueserg', user)
   return (
     <>
       <Flex

@@ -22,7 +22,6 @@ const UserProfile: React.FC = () => {
 	const currentUser: User = JSON.parse(
 	  sessionStorage.getItem("currentUser") || "{}"
 	);
-  console.log(currentUser.nickname);
   return (
     <Flex
       borderRadius={"md"}

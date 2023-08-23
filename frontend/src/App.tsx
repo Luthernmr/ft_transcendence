@@ -30,7 +30,6 @@ const getUser = async () => {
     });
     sessionStorage.setItem("currentUser", JSON.stringify(res.data.user));
   } catch (error) {
-    console.log(error);
     sessionStorage.clear();
     sessionStorage.removeItem("currentUser");
     return <Navigate to="/login" />;
@@ -39,69 +38,67 @@ const getUser = async () => {
 
 const getUserData = async () => {
   try {
-	const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
-	  withCredentials: true,
-	});
-	console.log('ress',res)
+    const res = await axios.get(import.meta.env.VITE_BACKEND + "/api/user", {
+      withCredentials: true,
+    });
 
-	return JSON.stringify(res.data.user);
+    return JSON.stringify(res.data.user);
   } catch (error) {
-	return "";
+    return "";
   }
 };
 function PrivateRoute({ children }: { children: ReactNode }) {
-	const [hasPermission, setHasPermission] = useState(true);
-	const [currentUser, setCurrentUser] = useState("");
-	const jwtSession = sessionStorage.getItem("jwt");
-  
-	useEffect(() => {
-	  const checkJwt = async () => {
-		try {
-		  const res = await axios.post(
-			import.meta.env.VITE_BACKEND + "/api/verify",
-			{ jwt: jwtSession },
-			{
-			  withCredentials: true,
-			}
-		  );
-		  if (res.status === 200) {
-			setHasPermission(true);
-			const userData = await getUserData();
-			setCurrentUser(userData);
-		  }
-		} catch {
-		  setHasPermission(false);
-		}
-	  };
-	  checkJwt();
-	}, []);
-  
-	useEffect(() => {
-	  if (!hasPermission) {
-		sessionStorage.clear();
-		// Utilisation d'un return pour arrêter ici le rendu
-		return;
-	  }
-  
-	  // Mettre à jour le "currentUser" dans le sessionStorage
-	  sessionStorage.setItem("currentUser", currentUser);
-	}, [hasPermission, currentUser]);
-  
-	// Si l'utilisateur n'a pas la permission, rediriger vers la page de connexion
-	if (!hasPermission) {
-	  return <Navigate to="/login" />;
-	}
-  
-	// Sinon, rendre les enfants
-	return <>{children}</>;
+  const [hasPermission, setHasPermission] = useState(true);
+  const [currentUser, setCurrentUser] = useState("");
+  const jwtSession = sessionStorage.getItem("jwt");
+
+  useEffect(() => {
+    const checkJwt = async () => {
+      try {
+        const res = await axios.post(
+          import.meta.env.VITE_BACKEND + "/api/verify",
+          { jwt: jwtSession },
+          {
+            withCredentials: true,
+          }
+        );
+        if (res.status === 200) {
+          setHasPermission(true);
+          const userData = await getUserData();
+          setCurrentUser(userData);
+        }
+      } catch {
+        setHasPermission(false);
+      }
+    };
+    checkJwt();
+  }, []);
+
+  useEffect(() => {
+    if (!hasPermission) {
+      sessionStorage.clear();
+      // Utilisation d'un return pour arrêter ici le rendu
+      return;
+    }
+
+    // Mettre à jour le "currentUser" dans le sessionStorage
+    sessionStorage.setItem("currentUser", currentUser);
+  }, [hasPermission, currentUser]);
+
+  // Si l'utilisateur n'a pas la permission, rediriger vers la page de connexion
+  if (!hasPermission) {
+    return <Navigate to="/login" />;
   }
+
+  // Sinon, rendre les enfants
+  return <>{children}</>;
+}
 const PublicRoute = ({ children }: { children: ReactNode }) => {
   if (sessionStorage.getItem("jwt")) {
     return <Navigate to="/Home" />;
   }
   return <>{children}</>;
 };
-
 
 export default function App() {
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
