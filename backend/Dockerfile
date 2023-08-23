@@ -1,5 +1,7 @@
 FROM node:lts
 
+ARG BACKEND_PORT_INT
+
 WORKDIR /app
 
 COPY package.json ./
@@ -14,10 +16,10 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY . .
 
-EXPOSE 5000
+EXPOSE ${BACKEND_PORT_INT}
 
 ENTRYPOINT ["/bcrypt.sh"]
 
-# RUN npm run build
+RUN npm run build
 
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "start"]

@@ -35,6 +35,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        BACKEND_PORT_INT: ${BACKEND_PORT_INT}
     image: backend
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -63,6 +65,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        FRONTEND_PORT_INT: ${FRONTEND_PORT_INT}
     image: frontend
     environment:
       VITE_BACKEND: ${BACKEND}
