@@ -33,7 +33,7 @@ export default function Home() {
               Welcome 
             </Text>
             <Text color={"blue.400"} as={"span"}>
-             {" On our ft_transcendence"}
+             {" To our ft_transcendence"}
             </Text>{" "}
           </Heading>
           <Text fontSize={{ base: "md", lg: "lg" }} color={"red.500"}>

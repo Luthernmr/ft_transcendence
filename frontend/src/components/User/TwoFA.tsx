@@ -61,7 +61,7 @@ export default function TwoFA() {
 				sessionStorage.setItem("jwt", response.data.jwt);
 				pongSocket.emit("register", { token: response.data.jwt });
 				toast({
-					title: `2fa Validate`,
+					title: `2fa Validated`,
 					status: "success",
 					isClosable: true,
 					position: "top",
